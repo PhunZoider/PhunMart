@@ -1,0 +1,53 @@
+VERSION = 1,
+
+option PhunMart.PoweredMachinesEnabled
+{ 
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMartPoweredMachinesEnabled 
+}
+
+option PhunMart.PoweredMachinesEnableTabs
+{ 
+    type = boolean, 
+    default = true, 
+    page = PhunMart, 
+    translation = PhunMartPoweredMachinesEnableTabs 
+}
+
+option PhunMart.PoweredMachinesAlpha
+{ 
+    type = integer, 
+    default = 80, 
+    min = 0,
+    max = 100,
+    page = PhunMart, 
+    translation = PhunMartPoweredMachinesAlpha
+}
+
+option PhunMart.DefaultItemProbability
+{ 
+    type = integer, 
+    default = 10, 
+    min = 1,
+    max = 100,
+    page = PhunMart, 
+    translation = PhunMartDefaultItemProbability
+}
+
+option PhunMart.CumulativeItemGeneration
+{ 
+    type = boolean, 
+    default = false,
+    page = PhunMart, 
+    translation = PhunMartCumulativeItemGeneration
+}
+
+option PhunMart.ValidateDefsOnStartup
+{ 
+    type = boolean, 
+    default = true, 
+    page = PhunMart, 
+    translation = PhunMartValidateDefsOnStartup
+}

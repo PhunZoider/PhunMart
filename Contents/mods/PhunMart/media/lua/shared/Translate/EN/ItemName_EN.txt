@@ -1,0 +1,5 @@
+ItemName_EN = {
+    ItemName_PhunMart.SilverDollar = "Silver Dollar",
+    ItemName_PhunMart.CheeseToken = "Charles D. Cheese Token",
+    ItemName_PhunMart.TraiterToken = "Traiter Joes Token"
+}

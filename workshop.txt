@@ -1,0 +1,4 @@
+version=1
+title=PhunMart
+description=Shop Smart. Shop PhunMart. Your total vending solution.
+tags=Build 41
