@@ -48,13 +48,11 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
             print("Adding " .. v .. " to lookup (" .. (self.defs.items[v].probability or defaultProbaility or 1) .. ")")
             totalProbability = totalProbability + (self.defs.items[v].probability or defaultProbaility or 1)
             haslookup[v] = self.defs.items[v].probability or defaultProbaility or 1
-
         end
     end
 
-    local fill = pool.fill or shop.pools.fill or shop.fill
+    local fill = pool.fills or shop.pools.fills or shop.fills
     local rolls = #itemsKeys
-
     if type(fill) == "table" then
         rolls = ZombRand(fill.min or 1, fill.max or #itemsKeys) + 1
     elseif fill == nil then
@@ -66,17 +64,21 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
     end
     print("Rolling " .. rolls .. " with total probability of " .. totalProbability)
 
-    for k, v in pairs(haslookup) do
-        local rand = ZombRand(1, totalProbability or 100)
-        if not hash[k] and rand <= v then
-            hash[k] = true
-            table.insert(results, k)
-            if #results >= rolls then
-                break
+    for sanity = 1, 10 do
+        for k, v in pairs(haslookup) do
+            local rand = ZombRand(1, totalProbability or 100)
+            if not hash[k] and rand <= v then
+                hash[k] = true
+                table.insert(results, k)
+                if #results >= rolls then
+                    break
+                end
             end
         end
+        if #results >= rolls then
+            break
+        end
     end
-
     return results
 end
 
@@ -120,9 +122,8 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         end
     end
 
-    local fill = pool.fill or shop.pools.fill or shop.fill
+    local fill = pool.fills or shop.pools.fills or shop.fills
     local rolls = #itemsKeys
-
     if type(fill) == "table" then
         rolls = ZombRand(fill.min or 1, fill.max or #itemsKeys) + 1
     elseif fill == nil then
@@ -142,11 +143,14 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         for _, v in ipairs(itemsKeys) do
             if ZombRand(100) <= (self.defs.items[v].probability or defaultProbaility) then
                 table.insert(results, v)
+                print("Result count = " .. #results .. ", rolls=" .. rolls .. ", using probabiltiy " ..
+                          (self.defs.items[v].probability or defaultProbaility))
                 if #results >= rolls then
                     break
                 end
             end
         end
+        print("2. Result count = " .. #results .. ", rolls=" .. rolls)
         if #results >= rolls then
             break
         end
