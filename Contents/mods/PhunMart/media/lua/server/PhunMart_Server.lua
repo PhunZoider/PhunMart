@@ -602,7 +602,7 @@ function PhunMart:loadAllShops()
     print("Added " .. results.all.success .. " shops from:")
 
     for k, v in pairs(results.files) do
-        print(" - Lua/" .. k .. " loaded " .. v.success .. " items")
+        print(" - Lua/" .. k .. " loaded " .. (v and v.success or 0) .. " items")
     end
 
     results = self:validateShops()

@@ -92,7 +92,6 @@ IGUI_EN = {
     IGUI_PhunMart.Receives.traitRemoved = "removal of %1 trait"
     IGUI_PhunMart.Receives.traitAdded = "%1 trait"
 
-    IGUI_PhunMart.PortToX = "Travel to %1"
     IGUI_PhunMart.Error.OOS = "Insufficient Inventory"
 
 }

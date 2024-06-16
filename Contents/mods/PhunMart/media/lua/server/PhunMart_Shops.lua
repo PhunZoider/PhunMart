@@ -246,7 +246,7 @@ function PhunMart:formatShop(data)
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false
     }
-
+    self:debug(formatted)
     return formatted
 end
 
@@ -305,7 +305,7 @@ function PhunMart:processShopTransformQueue()
     }
     for _, v in ipairs(self.loaders.shops or {}) do
         if v.status == "pending" then
-            local f = v.data.file or "unknown"
+            local f = v.data.file or "none"
             local r = self:transformToShopDef(v.data)
 
             if not results.all[r.status] then

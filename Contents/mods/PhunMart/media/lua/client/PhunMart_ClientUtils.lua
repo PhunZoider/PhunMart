@@ -31,8 +31,6 @@ function PhunMart:getTextureFromItem(item)
             else
                 textureCache[typeName][textureName] = false
             end
-        elseif typeName == "PORT" then
-            textureCache[typeName][textureName] = getTexture("media/textures/perk-Aiming.png")
         elseif typeName == "VEHICLE" then
             -- always display a key for vehicles
             textureCache[typeName][textureName] = carKeyTexture
@@ -55,7 +53,17 @@ function PhunMart:getTextureFromItem(item)
                 textureCache[typeName][textureName] = trait:getTexture()
             end
         else
-            textureCache[typeName][textureName] = false
+            local res = false
+            local hooks = self.hooks.getTexture
+            if hooks and #hooks > 0 then
+                for i = 1, #hooks do
+                    res = hooks[i](typeName, textureName)
+                    if res then
+                        break
+                    end
+                end
+            end
+            textureCache[typeName][textureName] = res
         end
     end
     if textureCache[typeName][textureName] == false then
@@ -85,8 +93,6 @@ function PhunMart:getLabelFromItem(item)
             else
                 labelCache[typeName][labelName] = false
             end
-        elseif typeName == "PORT" then
-            labelCache[typeName][labelName] = getText("IGUI_PhunMart.PortToX", labelName)
         elseif typeName == "VEHICLE" then
             local vehicle = getScriptManager():getVehicle(labelName)
             if vehicle and vehicle.getName then
@@ -110,7 +116,17 @@ function PhunMart:getLabelFromItem(item)
                 labelCache[typeName][labelName] = trait:getLabel()
             end
         else
-            labelCache[typeName][labelName] = false
+            local res = false
+            local hooks = self.hooks.getLabel
+            if hooks and #hooks > 0 then
+                for i = 1, #hooks do
+                    res = hooks[i](typeName, labelName)
+                    if res then
+                        break
+                    end
+                end
+            end
+            labelCache[typeName][labelName] = res
         end
 
     end

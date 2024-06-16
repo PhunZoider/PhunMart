@@ -96,8 +96,6 @@ function PhunMart:validateItemDef(item)
                 if not instance then
                     table.insert(issues, "Invalid TRAIT display.label: " .. item.display.label)
                 end
-            elseif item.display.type == "PORT" then
-
             end
         end
     end
@@ -340,7 +338,8 @@ end
 function PhunMart:processFilesToItemQueue()
     for _, v in ipairs(self.loaders.itemFiles) do
         v.status = "processing"
-        -- load the contents of the file into queu
+        -- load the contents of the file into queue
+        print(v.file .. ".lua")
         self:loadFileContentsToItemQueue(v.file .. ".lua")
         v.status = "processed"
     end

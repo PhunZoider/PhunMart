@@ -40,7 +40,11 @@ PhunMart = {
         currencyLabel = {},
         preSatisfyPrice = {},
         postSatisfyPrice = {},
-        purchase = {}
+        prePurchase = {},
+        purchase = {},
+        receiveItem = {},
+        getLabel = {},
+        getTexture = {}
     },
     settings = {
         debug = true

@@ -53,14 +53,26 @@ function PhunMart:completeTransaction(args)
 
     if args.success == true then
         local playerObj = getSpecificPlayer(args.playerIndex)
+
+        local hooks = self.hooks.purchase
+        if hooks and #hooks > 0 then
+            for _, v in ipairs(args.item.conditions[1]) do
+                if v.type == "price" then
+                    local key = v.key
+                    local val = tonumber(v.value)
+                    for _, v in ipairs(hooks) do
+                        if v then
+                            -- should mutate val if handled in hook
+                            v(playerObj, key, val)
+                        end
+                    end
+                end
+            end
+        end
+
         for _, v in ipairs(args.item.receive) do
             if v.type == "ITEM" then
-                -- is item a currency?
-                -- if PhunWallet and PhunWallet.currencies and PhunWallet.currencies[v.name] then
-                --     PhunWallet.queue:add(playerObj, v.name, v.quantity)
-                -- else
                 playerObj:getInventory():AddItem(v.name, v.quantity)
-                -- end
             elseif v.type == "PERK" then
                 local perk = PerkFactory.getPerkFromName(v.name or v.label)
                 local qty = v.quantity or 1
@@ -86,24 +98,14 @@ function PhunMart:completeTransaction(args)
                     name = v.name or v.label
                 }
                 playerObj:getInventory():AddItem(item)
-            elseif v.type == "PORT" then
-                local dest = nil
-                if type(v.value) == "table" then
 
-                    if #v.value > 1 then
-                        local i = ZombRand(#v.value) + 1
-                        dest = v.value[i]
-                    elseif #v.value == 1 then
-                        dest = v.value[1]
+            else
+
+                local hooks = self.hooks.receiveItem
+                for _, hook in ipairs(hooks) do
+                    if hook then
+                        hook(playerObj, v)
                     end
-                end
-                if dest then
-                    playerObj:setX(dest.x + 0.5)
-                    playerObj:setY(dest.y + 0.5)
-                    playerObj:setZ(dest.z + 0.5)
-                    playerObj:setLx(dest.x + 0.5);
-                    playerObj:setLy(dest.y + 0.5);
-                    playerObj:setLz(dest.z + 0.5);
                 end
             end
         end
@@ -197,7 +199,7 @@ function PhunMart:purchase(playerObj, shopKey, item)
                 local key = v.key
                 local val = tonumber(v.value)
 
-                local hooks = self.hooks.purchase
+                local hooks = self.hooks.prePurchase
                 for _, v in ipairs(hooks) do
                     if v then
                         -- should mutate val if handled in hook

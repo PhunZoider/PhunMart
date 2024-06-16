@@ -107,14 +107,6 @@ return { --[[
         tags = "ammo,pistol,melee,wear",
         files = "PhunMart_WeaponItems.lua"
     }
-}, {
-    abstract = true,
-    key = "base:travel",
-    inherits = "base:shop",
-    backgroundImage = "machine-budget-travel",
-    filters = {
-        files = "PhunMart_PortItems.lua"
-    }
 }, --[[
 
     Actual shops
@@ -151,7 +143,4 @@ return { --[[
     key = "SHOP:WEAPONS:final_ammendment",
     inherits = "base:guns",
     requiresPower = true
-}, {
-    key = "SHOP:TRVEL:budget_travel",
-    inherits = "base:travel"
 }}
