@@ -50,7 +50,6 @@ local PhunTools = PhunTools
 
 function PhunMart:validateItemDef(item)
 
-    -- self:debug(item)
     local issues = {}
     if item.abstract or not item.enabled then
         -- do not validate abstract or disabled items
@@ -189,11 +188,6 @@ function PhunMart:formatItem(data)
 
     local doDebug = (data.display and data.display.type == "PERK") or (base.display and base.display.type == "PERK")
 
-    if doDebug then
-        print("-- PRE Formatted --")
-        PhunTools:printTable(data)
-    end
-
     local type = data.display.type or base.display.type or data.type or base.type or "ITEM"
     local name = data.name or base.name or data.display.label or base.display.label or nil
     local key = data.key or (type .. ":" .. name)
@@ -305,11 +299,6 @@ function PhunMart:formatItem(data)
         end
     end
 
-    if doDebug then
-        print("Formatted")
-        PhunTools:printTable(formatted)
-    end
-
     return formatted
 end
 
@@ -350,7 +339,6 @@ end
 function PhunMart:loadFileContentsToItemQueue(file)
     local data = PhunTools:loadTable(file)
     for _, v in ipairs(data) do
-        -- self:debug("PhunMart:loadFileContentsToItemQueue()", v)
         v.file = file
         self:queueRawItemToProcess(v, file)
     end

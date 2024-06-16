@@ -181,8 +181,6 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
         return
     end
 
-    -- self:debug(shop.key, shop.items)
-
     -- different models for generating items
     local itemKeys = nil
     if cumulativeModel then
@@ -194,7 +192,6 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
     end
 
     local items = {}
-    -- self:debug("keys", itemKeys)
     for _, v in ipairs(itemKeys) do
 
         local item = self.defs.items[v]
@@ -250,8 +247,6 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
                     instance.conditions[i].price = p
                 end
             end
-
-            -- self:debug("Instance", instance)
             items[item.key] = instance
         end
     end
@@ -265,11 +260,30 @@ function PhunMart:getShopListFromKey(key)
     local totalProbability = 0
 
     for k, v in pairs(self.defs.shops) do
-        if v.enabled then
-            if v.zones then
+        if v.enabled and v.reservations == nil or v.reservations == false and not v.abstract then
+            if v.zones and type(v.zones) == "table" then
+
+                local difficultyMin = 0
+                local difficultyMax = 100
+                if v.zones.difficulty then
+                    if type(v.zones.difficulty) == "table" then
+                        difficultyMin = v.zones.difficulty.min or 0
+                        difficultyMax = v.zones.difficulty.max or 100
+                    else
+                        difficultyMin = v.zones.difficulty
+                    end
+                end
+
+                local names = v.zones.names or {}
+
                 if zoneInfo ~= nil then
-                    if (v.difficulty and v.difficulty == zoneInfo.difficulty) or
-                        (PhunTools:inArray(zoneInfo.name, v.zones)) then
+                    -- print("Zone check " .. tostring(difficultyMin) .. "/" .. tostring(difficultyMax) .. " == " ..
+                    --           tostring(zoneInfo.difficulty))
+                    PhunTools:printTable(zoneInfo)
+                    if (zoneInfo.difficulty and
+                        (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <= difficultyMax)) or
+                        (#names > 0 and PhunTools:inArray(zoneInfo.name, names)) then
+
                         table.insert(shops, {
                             key = k,
                             probability = v.probability or sandbox.DefaultItemProbability or 1
@@ -302,23 +316,32 @@ function PhunMart:generateShop(vendingMachineOrKey)
 
     local key = self:getKey(vendingMachineOrKey)
     print("Generating shop for " .. key)
-    local shopCandidates = self:getShopListFromKey(key)
-    -- self:debug("Shop candidates", shopCandidates)
     local chosenShopDef = nil
-    local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
-    local cumulative = 0
+    local resKey = nil
+    if self.reservations[key] then
+        resKey = self.reservations[key]
+        print("Reservations found for " .. key .. " ( " .. resKey .. ")")
+    end
+    if resKey and self.defs.shops[resKey] and self.defs.shops[resKey].enabled then
+        chosenShopDef = self.defs.shops[resKey]
+    else
+        local shopCandidates = self:getShopListFromKey(key)
+        local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
+        local cumulative = 0
 
-    for _, entry in ipairs(shopCandidates.list) do
-        cumulative = cumulative + entry.probability
-        if rand <= cumulative then
-            chosenShopDef = self.defs.shops[entry.key]
-            break
+        for _, entry in ipairs(shopCandidates.list) do
+            cumulative = cumulative + entry.probability
+            if rand <= cumulative then
+                chosenShopDef = self.defs.shops[entry.key]
+                break
+            end
         end
     end
 
     local shopInstance = {
         key = chosenShopDef.key or chosenShopDef.name,
         name = chosenShopDef.name,
+        label = chosenShopDef.label or "Vending Machine",
         vendor = chosenShopDef.name, -- deprecated
         nextRestock = GameTime:getInstance():getWorldAgeHours() + (chosenShopDef.restock or 24),
         backgroundImage = chosenShopDef.backgroundImage or nil,
@@ -329,12 +352,10 @@ function PhunMart:generateShop(vendingMachineOrKey)
 
     self.shops[key] = shopInstance
     if not self.shoplist[key] or self.shoplist[key].key ~= shopInstance.key then
-        self.shoplist[key] = shopInstance.name
+        self.shoplist[key] = shopInstance.label
         ModData.transmit(self.consts.shoplist)
     end
     shopInstance.items = self:generateShopItems(key, sandbox.CumulativeItemGeneration == true)
-
-    self:debug("Generated shop for " .. key, shopInstance)
 
     return shopInstance
 end
@@ -342,7 +363,6 @@ end
 function PhunMart:purchase(playerObj, shopKey, item)
     local shop = PhunMart:getShop(shopKey)
     print("Purchasing " .. item.key .. " from " .. shopKey)
-    self:debug(shop.items[item.key])
     if shop.items[item.key].inventory ~= false then
         if shop.items[item.key].inventory < 1 then
             sendServerCommand(playerObj, self.name, self.commands.serverPurchaseFailed, {
@@ -389,7 +409,6 @@ local Commands = {}
 
 Commands[PhunMart.commands.rebuildExportItems] = function(playerObj, args)
     local results = PhunMart:exportItems()
-    PhunMart:debug("Rebuilding results", args)
     sendServerCommand(playerObj, PhunMart.name, "rebuildExportItems", {
         type = "ITEMS",
         value = args
@@ -398,7 +417,6 @@ end
 
 Commands[PhunMart.commands.rebuildPerks] = function(playerObj, args)
     local results = PhunMart:exportPerksBuild()
-    PhunMart:debug("Rebuilding perks", arguments)
     sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
         type = "PERKS",
         value = args
@@ -407,7 +425,6 @@ end
 
 Commands[PhunMart.commands.rebuildVehicles] = function(playerObj, args)
     local results = PhunMart:exportVehicleBuild()
-    PhunMart:debug("Rebuilding results", arguments)
     sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
         type = "VEHICLES",
         value = args

@@ -28,10 +28,7 @@ local vendingContextMenu = function(playerObj, context, worldobjects)
     end
     local pv = PhunMart
     local key = pv:getKey(machine)
-    local shop = pv.shoplist[key]
-    if not shop then
-        shop = "View vending machine"
-    end
+    local shop = pv.shoplist[key] or "View vending machine"
 
     context:addOption(shop, player, function()
         PhunMartShowUI(player, machine)

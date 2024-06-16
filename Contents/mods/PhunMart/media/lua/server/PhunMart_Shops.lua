@@ -219,8 +219,7 @@ function PhunMart:formatShop(data)
     end
 
     data.pool = buildPool(data)
-
-    if not data.isTemplate then
+    if not data.abstract then
 
         populatePoolItems(data.pool)
 
@@ -228,6 +227,7 @@ function PhunMart:formatShop(data)
 
     local formatted = {
         key = data.key,
+        label = data.label or base.label or "Vending Machine",
         fills = data.fills or base.fills or nil,
         probability = data.probability or base.probability or nil,
         restock = data.restock or base.restock or nil,
@@ -241,12 +241,25 @@ function PhunMart:formatShop(data)
         mod = data.mod or base.mod or nil,
         abstract = data.abstract,
         sprites = data.sprites or base.sprites or {},
+        reservations = data.reservations or base.reservations or {},
         currency = data.currency or base.currency or "Base.Money",
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false
     }
-    self:debug(formatted)
+
+    if formatted.reservations and #formatted.reservations > 0 then
+        for _, v in ipairs(formatted.reservations) do
+            if formatted.enabled then
+                self.reservations[v] = formatted.key
+            else
+                print("PhunMart: Skipping reservation " .. v .. " for " .. formatted.key .. " as it is not enabled")
+            end
+        end
+    else
+        formatted.reservations = false
+    end
+
     return formatted
 end
 

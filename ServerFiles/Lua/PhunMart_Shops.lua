@@ -6,6 +6,7 @@ return { --[[
 --]] {
     abstract = true,
     key = "base:shop",
+    label = "Vending Machine",
     fills = {
         min = 2,
         max = 5
@@ -18,6 +19,7 @@ return { --[[
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18"}
 }, {
     abstract = true,
+    label = "Good Phoods",
     key = "base:food",
     inherits = "base:shop",
     pools = {
@@ -40,6 +42,7 @@ return { --[[
     abstract = true,
     key = "base:junk_food",
     inherits = "base:food",
+    label = "Phat Phoods",
     filters = {
         tags = "junk,breads,readytoeat,condiments,pie"
     },
@@ -56,6 +59,7 @@ return { --[[
 }, {
     abstract = true,
     key = "base:xp",
+    label = "Budget Xperiences",
     inherits = "base:shop",
     backgroundImage = "machine-budget-xp",
     currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
@@ -67,7 +71,11 @@ return { --[[
     abstract = true,
     key = "base:xp2",
     inherits = "base:xp",
+    label = "Gifted Xperiences",
     backgroundImage = "machine-gifted-xp",
+    zones = {
+        difficulty = 2
+    },
     filters = {
         tags = "perks2,perks3,boosts1,boosts2"
     }
@@ -75,7 +83,11 @@ return { --[[
     abstract = true,
     key = "base:xp3",
     inherits = "base:xp",
+    label = "Luxury Xperiences",
     backgroundImage = "machine-luxury-xp",
+    zones = {
+        difficulty = 3
+    },
     filters = {
         tags = "perks3,perks4,boosts3,boosts4"
     }
@@ -83,6 +95,7 @@ return { --[[
     abstract = true,
     key = "base:traits",
     inherits = "base:shop",
+    label = "NewU",
     requiresPower = true,
     backgroundImage = "machine-new-u",
     filters = {
@@ -93,6 +106,7 @@ return { --[[
     abstract = true,
     key = "base:vehicles",
     inherits = "base:shop",
+    label = "Wrent a Wreck",
     requiresPower = true,
     backgroundImage = "machine-wrent-a-wreck",
     filters = {
@@ -102,6 +116,7 @@ return { --[[
     abstract = true,
     key = "base:guns",
     inherits = "base:shop",
+    label = "Final Ammendment",
     backgroundImage = "machine-final-ammendment",
     filters = {
         tags = "ammo,pistol,melee,wear",
@@ -121,6 +136,7 @@ return { --[[
 }, {
     key = "SHOP:FOOD:phat_foods_alcohol",
     inherits = "base:junk_food",
+    reservations = {"10608_10336_0"},
     filters = {
         tags = "alcohol"
     }

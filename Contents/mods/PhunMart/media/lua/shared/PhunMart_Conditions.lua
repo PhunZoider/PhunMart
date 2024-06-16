@@ -39,7 +39,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
 
         if type(v) == "number" then
             -- value is min and expressed as "Strength": 5
-            if v >= skills[k] then
+            if skills[k] >= v then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredDesc", k, v)
             else
@@ -49,7 +49,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
             end
 
         elseif v.min and v.max then
-            if v.min >= skills[k] and skills[k] <= v.max then
+            if skills[k] >= v.min and skills[k] <= v.max then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredBetweenDesc", k, v.min, v.max)
             else
@@ -58,7 +58,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
                 tooltip = getText("IGUI_PhunMart.SkillRequiredBetweenDesc", k, v.min, v.max)
             end
         elseif v.min then
-            if v.min >= skills[k] then
+            if skills[k] >= v.min then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredDesc", k, v.min)
             else
@@ -106,7 +106,7 @@ Conditions.boosts = function(self, playerObj, item, condition, results)
         local perk = PerkFactory.getPerkFromName(k)
         local level = playerObj:getXp():getPerkBoost(perk);
         if level == 3 then
-            -- player can't go higher without resetting boost so auto-fail?
+            -- player can't go higher without resetting boost so auto-fail
             table.insert(results, {
                 passed = false,
                 type = "boosts",
@@ -628,15 +628,6 @@ Conditions.price = function(self, playerObj, item, price, results)
             -- player is "paying" with a trait
             if playerObj:HasTrait(k) then
                 v.value = v.value - 1
-            end
-        end
-    end
-
-    hooks = self.hooks.preSatisfyPrice or {}
-    if #hooks then
-        for _, v in ipairs(hooks) do
-            if v then
-                v(playerObj, item, satisfied)
             end
         end
     end

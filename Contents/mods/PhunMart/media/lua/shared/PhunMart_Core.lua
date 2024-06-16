@@ -53,6 +53,7 @@ PhunMart = {
     players = {},
     history = {},
     defs = {},
+    reservations = {},
     currencies = {}, -- a cache for different types of currencies and their types
     cache = {
         labels = {

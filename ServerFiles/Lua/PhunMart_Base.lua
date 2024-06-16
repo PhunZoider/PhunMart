@@ -1,5 +1,5 @@
 return {{
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:food",
     inventory = {
         min = 2,
@@ -14,14 +14,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:fruit",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Fruits",
-	tags = "fruits,healthy",
+    tags = "fruits,healthy",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -29,14 +29,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:junkfood",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Food",
-	tags = "meats,junk",
+    tags = "meats,junk",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -44,14 +44,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:fish",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Fish",
-	tags = "fish",
+    tags = "fish",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -59,7 +59,7 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:breads",
     inventory = {
         min = 2,
@@ -73,14 +73,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:raw-meat",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Meat",
-	tags = "meat,cooking",
+    tags = "meat,cooking",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -88,14 +88,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:foodingredients",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Ingredients",
-	tags = "healthy,cooking",
+    tags = "healthy,cooking",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -103,14 +103,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:cannedfood",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Canned",
-	tags = "food",
+    tags = "food",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -118,14 +118,14 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:drink",
     inventory = {
         min = 2,
         max = 5
     },
     tab = "Drink",
-	tag = "drinks",
+    tag = "drinks",
     price = {
         ["Base.Money"] = {
             min = 1,
@@ -133,13 +133,13 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:alcohol",
     inventory = {
         min = 2,
         max = 5
     },
-	tags = "alcohol",
+    tags = "alcohol",
     tab = "Alcohol",
     price = {
         ["Base.Money"] = {
@@ -148,7 +148,7 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:pistols",
     inventory = {
         min = 2,
@@ -162,7 +162,7 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:rifles",
     inventory = {
         min = 2,
@@ -176,7 +176,7 @@ return {{
         }
     }
 }, {
-    isTemplate = true, -- don't validate this item or use it for anything other than inheriting from
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
     key = "base:tools",
     inventory = {
         min = 2,
