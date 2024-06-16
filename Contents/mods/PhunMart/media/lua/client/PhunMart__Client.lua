@@ -56,20 +56,21 @@ function PhunMart:completeTransaction(args)
         for _, v in ipairs(args.item.receive) do
             if v.type == "ITEM" then
                 -- is item a currency?
-                if PhunWallet and PhunWallet.currencies and PhunWallet.currencies[v.name] then
-                    PhunWallet.queue:add(playerObj, v.name, v.quantity)
-                else
-                    playerObj:getInventory():AddItem(v.name, v.quantity)
-                end
-            elseif args.item.type == "PERK" then
-                local perk = PerkFactory.getPerkFromName(v.name)
+                -- if PhunWallet and PhunWallet.currencies and PhunWallet.currencies[v.name] then
+                --     PhunWallet.queue:add(playerObj, v.name, v.quantity)
+                -- else
+                playerObj:getInventory():AddItem(v.name, v.quantity)
+                -- end
+            elseif v.type == "PERK" then
+                local perk = PerkFactory.getPerkFromName(v.name or v.label)
                 local qty = v.quantity or 1
                 playerObj:getXp():AddXP(perk, qty, true, false, false)
-            elseif args.item.type == "BOOST" then
-                local perk = PerkFactory.getPerkFromName(v.name)
-                playerObj:getXp():setPerkBoost(perk, v.quantity);
-            elseif args.item.type == "TRAIT" then
-                local trait = TraitFactory.getTrait(v.name)
+            elseif v.type == "BOOST" then
+                local perk = PerkFactory.getPerkFromName(v.name or v.label)
+                local existing = playerObj:getXp():getPerkBoost(perk) or 0
+                playerObj:getXp():setPerkBoost(perk, v.quantity + existing);
+            elseif v.type == "TRAIT" then
+                local trait = TraitFactory.getTrait(v.name or v.label)
                 if v.tag == "REMOVE" then
                     playerObj:getTraits():remove(trait:getType())
                 else
@@ -77,12 +78,12 @@ function PhunMart:completeTransaction(args)
                 end
             elseif v.type == "VEHICLE" then
                 local item = InventoryItemFactory.CreateItem("PhunMart.VehicleKeySpawner")
-                local VehicleScript = getScriptManager():getVehicle(args.item.name)
+                local VehicleScript = getScriptManager():getVehicle(v.name or v.label)
                 local named = getText("IGUI_VehicleName" .. VehicleScript:getName())
                 item:setName(getText("IGUI_PhunMart.CallForX", named))
                 item:getModData().PhunMart = {
                     text = named,
-                    name = v.name
+                    name = v.name or v.label
                 }
                 playerObj:getInventory():AddItem(item)
             elseif v.type == "PORT" then
@@ -168,6 +169,18 @@ function PhunMart:canBuy(playerObj, item)
             return summary
         end
     end
+
+    if item.inventory ~= false and item.inventory < 1 then
+        summary.passed = false
+        table.insert(summary.conditions, {
+            type = "inventory",
+            passed = false,
+            key = "inventory",
+            value = item.inventory,
+            message = "IGUI_PhunMart.Error.OOS"
+        })
+    end
+
     return summary
 end
 
@@ -184,25 +197,39 @@ function PhunMart:purchase(playerObj, shopKey, item)
                 local key = v.key
                 local val = tonumber(v.value)
 
+                local hooks = self.hooks.purchase
+                for _, v in ipairs(hooks) do
+                    if v then
+                        -- should mutate val if handled in hook
+                        v(playerObj, key, val)
+                    end
+                end
+
                 if self.currencies[key] then
                     if self.currencies[key].type == "trait" then
                         -- spending a trait
                         playerObj:getTraits():remove(key)
-                    elseif self.currencies[key].type == "PhunWallet" then
-                        PhunWallet.queue:add(playerObj, key, (tonumber(val) * -1))
-                    elseif self.currencies[key].type == "item" then
+                    elseif self.currencies[key].type == "item" and val > 0 then
                         -- spending an item
                         local item = getScriptManager():getItem(key)
                         if item then
                             local remaining = val
                             -- asserting we have enough to consume or canBuy wouldn't have passed?
-                            for i = 1, val do
+                            for i = 1, remaining do
                                 local invItem = playerObj:getInventory():getItemFromTypeRecurse(key)
-                                invItem:getContainer():DoRemoveItem(invItem)
+                                if invItem then
+                                    invItem:getContainer():DoRemoveItem(invItem)
+                                    val = val - 1
+                                end
                             end
 
                         end
                     end
+                end
+
+                if val > 0 then
+                    print("PhunMart: Player " .. playerObj:getUsername() .. " has outstanding " .. val .. " " .. key ..
+                              " to pay")
                 end
             end
         end

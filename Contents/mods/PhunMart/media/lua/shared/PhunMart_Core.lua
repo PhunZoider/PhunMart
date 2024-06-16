@@ -28,6 +28,7 @@ PhunMart = {
     events = {
         OnWindowOpened = "OnPhunMartWindowOpened",
         OnWindowClosed = "OnPhunMartWindowClosed",
+        onInitialized = "OnPhunMartInitialized",
         OnItemQueueReadyToProcess = "OnPhunMartItemQueueReadyToProcess",
         OnItemQueueFilesReadyToProcess = "OnPhunMartItemQueueFilesReadyToProcess",
         OnItemQueueProcessed = "OnPhunMartItemQueueProcessed",
@@ -38,7 +39,8 @@ PhunMart = {
     hooks = {
         currencyLabel = {},
         preSatisfyPrice = {},
-        postSatisfyPrice = {}
+        postSatisfyPrice = {},
+        purchase = {}
     },
     settings = {
         debug = true
@@ -95,7 +97,7 @@ function PhunMart:ini()
     self.settings.debug = self.settings.debug or true
     self.inied = true
     self.inied_time = getTimestamp()
-
+    triggerEvent(self.events.onInitialized, self)
 end
 
 function PhunMart:debug(...)
@@ -178,10 +180,13 @@ function PhunMart:queueRawShopToProcess(data)
 end
 
 --- Adds a hook into the system
---- @param hook currencyLabel|preSatisfyPrice|postSatisfyPrice The name of the hook
+--- @param hook currencyLabel|preSatisfyPrice|postSatisfyPrice|purchase The name of the hook
 function PhunMart:addHook(hook, func)
+    print("PhunMart: Adding hook " .. hook)
     if self.hooks[hook] then
         table.insert(self.hooks[hook], func)
+    else
+        self:debug(" Warning: Hook " .. hook .. " does not exist")
     end
 end
 

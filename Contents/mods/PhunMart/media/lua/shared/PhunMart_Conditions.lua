@@ -105,7 +105,18 @@ Conditions.boosts = function(self, playerObj, item, condition, results)
 
         local perk = PerkFactory.getPerkFromName(k)
         local level = playerObj:getXp():getPerkBoost(perk);
-        if v == true then
+        if level == 3 then
+            -- player can't go higher without resetting boost so auto-fail?
+            table.insert(results, {
+                passed = false,
+                type = "boosts",
+                key = k,
+                value = true,
+                text = k,
+                richText = RICH_PREFIX_RED .. k,
+                tooltipText = getText("IGUI_PhunMart.ConditionCategory.boostsMaxed", k)
+            })
+        elseif v == true then
             -- we are requiring an existing boost for some reason
             if level == 0 then
                 -- failed
@@ -642,7 +653,7 @@ Conditions.price = function(self, playerObj, item, price, results)
                 gap = v.value,
                 text = v.text,
                 richText = RICH_PREFIX_RED .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, v.label),
-                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), v.text)
+                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), v.label)
             })
             hasPassed = false
         else

@@ -70,6 +70,7 @@ IGUI_EN = {
 
     IGUI_PhunMart.ConditionCategory.boostsRequired = "Boosts Required"
     IGUI_PhunMart.ConditionCategory.boostsForbidden = "Boosts Forbidden"
+    IGUI_PhunMart.ConditionCategory.boostsMaxed = "You are already at max boost for %1"
 
     IGUI_PhunMart.ConditionCategory.traitsRequired = "Traits Required"
     IGUI_PhunMart.ConditionCategory.traitsForbidden = "Traits Forbidden"

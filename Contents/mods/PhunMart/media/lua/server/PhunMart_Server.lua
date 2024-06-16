@@ -341,6 +341,8 @@ end
 
 function PhunMart:purchase(playerObj, shopKey, item)
     local shop = PhunMart:getShop(shopKey)
+    print("Purchasing " .. item.key .. " from " .. shopKey)
+    self:debug(shop.items[item.key])
     if shop.items[item.key].inventory ~= false then
         if shop.items[item.key].inventory < 1 then
             sendServerCommand(playerObj, self.name, self.commands.serverPurchaseFailed, {

@@ -185,11 +185,16 @@ function PhunMart:formatItem(data)
     if data.inherits then
         local b = self.defs.items[data.inherits]
         if b then
-            base = b
+            base = PhunTools:deepCopyTable(b)
         end
     end
 
     local doDebug = (data.display and data.display.type == "PERK") or (base.display and base.display.type == "PERK")
+
+    if doDebug then
+        print("-- PRE Formatted --")
+        PhunTools:printTable(data)
+    end
 
     local type = data.display.type or base.display.type or data.type or base.type or "ITEM"
     local name = data.name or base.name or data.display.label or base.display.label or nil
@@ -211,8 +216,11 @@ function PhunMart:formatItem(data)
     }
 
     local receives = {}
-    local receive = data.receive or base.receive or nil
-    if receive then
+
+    -- do not inherit the base receive values
+    local receive = data.receive or nil
+
+    if receive and #receive > 0 then
         -- provided own receive values
         for _, v in ipairs(receive) do
             table.insert(receives, {
@@ -220,6 +228,7 @@ function PhunMart:formatItem(data)
                 label = v.label or v.name or name,
                 quantity = v.quantity or 1,
                 tag = v.tag or nil,
+                name = v.name or name,
                 value = v.value or nil
             })
         end
@@ -228,6 +237,7 @@ function PhunMart:formatItem(data)
         table.insert(receives, {
             type = type,
             label = name or display.label,
+            name = name or display.label,
             quantity = data.quantity or base.quantity or 1
         })
     end
@@ -295,6 +305,11 @@ function PhunMart:formatItem(data)
         if not PhunTools:endsWith(formatted.tags, ",") then
             formatted.tags = formatted.tags .. ","
         end
+    end
+
+    if doDebug then
+        print("Formatted")
+        PhunTools:printTable(formatted)
     end
 
     return formatted
