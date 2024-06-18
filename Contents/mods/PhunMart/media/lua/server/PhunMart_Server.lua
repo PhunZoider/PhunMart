@@ -25,7 +25,6 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
-        self:debug(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -91,7 +90,6 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
-        self:debug(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -277,9 +275,6 @@ function PhunMart:getShopListFromKey(key)
                 local names = v.zones.names or {}
 
                 if zoneInfo ~= nil then
-                    -- print("Zone check " .. tostring(difficultyMin) .. "/" .. tostring(difficultyMax) .. " == " ..
-                    --           tostring(zoneInfo.difficulty))
-                    PhunTools:printTable(zoneInfo)
                     if (zoneInfo.difficulty and
                         (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <= difficultyMax)) or
                         (#names > 0 and PhunTools:inArray(zoneInfo.name, names)) then

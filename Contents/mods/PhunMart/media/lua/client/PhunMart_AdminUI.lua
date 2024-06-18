@@ -67,24 +67,6 @@ function PhunMartAdminUI:createChildren()
 
     y = y + h + x
 
-    -- self.exportFoodsButton = ISButton:new(x, y, w, h, "Rebuild Foods Export", self, function()
-
-    --     local items = getScriptManager():getItems()
-    --     local foods = {}
-    --     for i = 0, items:size() - 1 do
-    --         local item = items:get(i)
-    --         if item:getType() == "Food" then
-    --             table.insert(foods, item:getName())
-    --         end
-    --     end
-    --     PhunMart:debug("Foods", foods)
-
-    -- end);
-    -- self.exportPerksButton:initialise();
-    -- self:addChild(self.exportPerksButton);
-
-    -- y = y + h + x
-
     self.closeButton = ISButton:new(x, y, w, h, "Close", self, function()
         PhunMartAdminUI.instance:close()
     end);

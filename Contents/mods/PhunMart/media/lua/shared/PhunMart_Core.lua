@@ -187,7 +187,6 @@ end
 --- Adds a hook into the system
 --- @param hook currencyLabel|preSatisfyPrice|postSatisfyPrice|purchase The name of the hook
 function PhunMart:addHook(hook, func)
-    print("PhunMart: Adding hook " .. hook)
     if self.hooks[hook] then
         table.insert(self.hooks[hook], func)
     else
@@ -295,7 +294,6 @@ function PhunMart:getData(vendingMachine)
             })
             return nil
         else
-            print("Generating shop for " .. key .. " from getData()???")
             self:generateShop(key)
         end
     end
