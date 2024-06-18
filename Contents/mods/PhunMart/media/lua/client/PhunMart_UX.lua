@@ -3,7 +3,7 @@ local PhunMart = PhunMart
 
 local teathers = {}
 
-local function closeOnWanderAway(playerObj)
+function PhunMartCloseOnWanderAway(playerObj)
     for _, v in pairs(PhunMartShopWindow.instances) do
         if v.pIndex == playerObj:getPlayerNum() then
             local location = PhunMart:xyzFromKey(v.data.key)
@@ -27,7 +27,7 @@ function PhunMartShowUI(playerObj, machine)
         instance:close()
     end
     PhunMartShopWindow.OnOpenPanel(playerObj, key)
-    local open = ISPhunMartOpenShop:new(playerObj, machine, 55)
+    local open = ISPhunMartOpenShop:new(playerObj, machine, 75)
     ISTimedActionQueue.add(open)
 end
 
@@ -52,7 +52,7 @@ end
 Events[PhunMart.events.OnWindowClosed].Add(function(playerObj)
     local pIndex = playerObj:getPlayerNum()
     if teathers[pIndex] then
-        Events.OnPlayerMove.Remove(closeOnWanderAway)
+        Events.OnPlayerMove.Remove(PhunMartCloseOnWanderAway)
         teathers[pIndex] = nil
     end
 end)
@@ -60,7 +60,7 @@ end)
 Events[PhunMart.events.OnWindowOpened].Add(function(playerObj)
     local pIndex = playerObj:getPlayerNum()
     if not teathers[pIndex] then
-        Events.OnPlayerMove.Add(closeOnWanderAway)
+        Events.OnPlayerMove.Add(PhunMartCloseOnWanderAway)
         teathers[pIndex] = true
     end
 end)

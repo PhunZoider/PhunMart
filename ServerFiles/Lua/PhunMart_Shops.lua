@@ -12,7 +12,7 @@ return { --[[
         max = 5
     },
     probability = 15,
-    restock = 120,
+    restock = 24,
     currency = "Base.Money", -- the default currency for shops
     backgroundImage = "machine-none",
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
