@@ -93,5 +93,9 @@ IGUI_EN = {
     IGUI_PhunMart.Receives.traitAdded = "%1 trait"
 
     IGUI_PhunMart.Error.OOS = "Insufficient Inventory"
+    IGUI_PhunMart.HoursTillRestock.Days = "%1 days until next restock"
+    IGUI_PhunMart.HoursTillRestock.Day = "Restocks tomorrow"
+    IGUI_PhunMart.HoursTillRestock.HalfADay = "Restocks today"
+    IGUI_PhunMart.HoursTillRestock.Soon = "Restocking soon"
 
 }

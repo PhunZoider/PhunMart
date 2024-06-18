@@ -418,11 +418,22 @@ Commands[PhunMart.commands.rebuildPerks] = function(playerObj, args)
     })
 end
 
+Commands[PhunMart.commands.rebuildTraits] = function(playerObj, args)
+    local results = PhunMart:getAllTrait()
+    PhunTools:printTable(results)
+    PhunTools:saveTable(args.filename or "PhunMart_TraitItems_DUMP.lua", results)
+    sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
+        type = "TRAITS",
+        value = args
+    })
+end
+
 Commands[PhunMart.commands.rebuildVehicles] = function(playerObj, args)
-    local results = PhunMart:exportVehicleBuild()
+    local results = PhunMart:getAllVehicles()
+    PhunTools:saveTable(args.filename or "PhunMart_VehicleItems_DUMP.lua", results)
     sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
         type = "VEHICLES",
-        value = args
+        value = results
     })
 end
 

@@ -18,5 +18,7 @@ Sandbox_EN = {
     Sandbox_DefaultItemProbability = "Default item probability",
     Sandbox_DefaultItemProbability_tooltip = "When no probability is specified, default to this chance (whole number as a percentage)",
 
+    Sandbox_DisplayHoursTillNextRestocking = "Display when next restocked",
+    Sandbox_DisplayHoursTillNextRestocking_tooltip = "If ticked, players will see an aproximation of when the next restocking will happen",
 
 }

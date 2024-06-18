@@ -9,70 +9,90 @@ local sandbox = SandboxVars
 local UI = PhunMartShopWindow
 local PhunMart = PhunMart
 UI.DrawType = {}
-UI.layout = {
-    window = {
-        width = 537,
-        height = 903
-    },
-    tabs = {
-        x = 45,
-        y = 232,
-        width = 299,
-        height = 523,
-        backgroundColor = {
-            r = 0,
-            g = 0,
-            b = 0,
-            a = 0.7
+UI.layouts = {
+    default = {
+        window = {
+            width = 537,
+            height = 903
+        },
+        tabs = {
+            x = 45,
+            y = 232,
+            width = 299,
+            height = 523,
+            backgroundColor = {
+                r = 0,
+                g = 0,
+                b = 0,
+                a = 0.7
+            }
+        },
+        previewPanel = {
+            x = 378,
+            y = 232,
+            width = 150,
+            height = 150,
+            backgroundColor = {
+                r = 0,
+                g = 0,
+                b = 0,
+                a = 0.7
+            }
+        },
+        pricePanel = {
+            x = 378,
+            y = 388,
+            width = 150,
+            height = 370,
+            backgroundColor = {
+                r = 0,
+                g = 0,
+                b = 0,
+                a = 0.7
+            }
+        },
+        detailsPanel = {
+            x = 378,
+            y = 552,
+            width = 150,
+            height = 150,
+            backgroundColor = {
+                r = 0,
+                g = 0,
+                b = 0,
+                a = 0.7
+            }
+        },
+        buyButton = {
+            x = 30,
+            y = 803,
+            width = 315,
+            height = 62
+        },
+        close = {
+            x = 505,
+            y = 10,
+            width = 25,
+            height = 25
+        },
+        restock = {
+            x = 378,
+            y = 803,
+            width = 70,
+            height = 25
+        },
+        reroll = {
+            x = 458,
+            y = 803,
+            width = 70,
+            height = 25
+        },
+        admin = {
+            x = 378,
+            y = 838,
+            width = 150,
+            height = 25
         }
-    },
-    previewPanel = {
-        x = 378,
-        y = 232,
-        width = 150,
-        height = 150,
-        backgroundColor = {
-            r = 0,
-            g = 0,
-            b = 0,
-            a = 0.7
-        }
-    },
-    pricePanel = {
-        x = 378,
-        y = 388,
-        width = 150,
-        height = 370,
-        backgroundColor = {
-            r = 0,
-            g = 0,
-            b = 0,
-            a = 0.7
-        }
-    },
-    detailsPanel = {
-        x = 378,
-        y = 552,
-        width = 150,
-        height = 150,
-        backgroundColor = {
-            r = 0,
-            g = 0,
-            b = 0,
-            a = 0.7
-        }
-    },
-    buyButton = {
-        x = 30,
-        y = 803,
-        width = 315,
-        height = 62
-    },
-    close = {
-        x = 505,
-        y = 10,
-        width = 25,
-        height = 25
     }
 }
 UI.cache = {
@@ -92,7 +112,6 @@ local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
 local FONT_SCALE = FONT_HGT_SMALL / 14
 
-
 function UI.OnOpenPanel(playerObj, key)
 
     local pNum = playerObj:getPlayerNum()
@@ -105,7 +124,7 @@ function UI.OnOpenPanel(playerObj, key)
                 UI.instances[pNum]:rebuild()
             end
             return UI.instances[pNum]
-        else 
+        else
             return UI.instances[pNum]
         end
     end
@@ -113,7 +132,7 @@ function UI.OnOpenPanel(playerObj, key)
     local core = getCore()
     local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14
     local core = getCore()
-    local width = UI.layout.window.width * FONT_SCALE
+    local width = UI.layouts.default.window.width * FONT_SCALE
     local height = 903 * FONT_SCALE
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
@@ -146,21 +165,25 @@ end
 function UI:createChildren()
     ISPanelJoypad.createChildren(self);
     -- Close button
-    local layout = self.layout.close
+    local layout = self.layouts.default.close
     self.closeButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "X", self, self.close)
     self.closeButton:initialise()
     self:addChild(self.closeButton)
 
     if isAdmin() then
-        self.restockButton = ISButton:new(layout.x - 110, layout.y, 100, layout.height, "Restock", self, self.restock)
+        layout = self.layouts.default.restock
+        self.restockButton =
+            ISButton:new(layout.x, layout.y, layout.width, layout.height, "Restock", self, self.restock)
         self.restockButton:initialise()
         self:addChild(self.restockButton)
 
-        self.rerollButton = ISButton:new(layout.x - 220, layout.y, 100, layout.height, "Reroll", self, self.reroll)
+        layout = self.layouts.default.reroll
+        self.rerollButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Reroll", self, self.reroll)
         self.rerollButton:initialise()
         self:addChild(self.rerollButton)
 
-        self.adminButton = ISButton:new(layout.x - 330, layout.y, 100, layout.height, "Admin", self, function()
+        layout = self.layouts.default.admin
+        self.adminButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Admin", self, function()
             PhunMartAdminUI.OnOpenPanel()
         end)
         self.adminButton:initialise()
@@ -168,28 +191,28 @@ function UI:createChildren()
 
     end
 
-    layout = self.layout.tabs
+    layout = self.layouts.default.tabs
     self.tabPanel = PhunMartUIItemsPanel:new(layout.x, layout.y, layout.width, layout.height, {
         viewer = self.player,
         backgroundColor = layout.backgroundColor
     })
     self:addChild(self.tabPanel)
 
-    layout = self.layout.previewPanel
+    layout = self.layouts.default.previewPanel
     self.preview = PhunMartUIItemPreviewPanel:new(layout.x, layout.y, layout.width, layout.height, {
         viewer = self.player,
         backgroundColor = layout.backgroundColor
     })
     self:addChild(self.preview)
 
-    layout = self.layout.pricePanel
+    layout = self.layouts.default.pricePanel
     self.pricePanel = PunMartUIPricePanel:new(layout.x, layout.y, layout.width, layout.height, {
         viewer = self.player,
         backgroundColor = layout.backgroundColor
     })
     self:addChild(self.pricePanel)
 
-    layout = self.layout.buyButton
+    layout = self.layouts.default.buyButton
     self.buyButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "BUY", self, self.onBuy)
     self.buyButton.backgroundColor = {
         r = 0,
@@ -446,21 +469,27 @@ end
 function UI:render()
     ISPanelJoypad.render(self);
 
-    if self.data then
-        self:drawText(self.data.key or "key", 10, 10, 1, 1, 1, 1, UIFont.Small);
-    else
-        self:drawText("No data", 10, 10, 1, 1, 1, 1, UIFont.Small);
-    end
     if isAdmin() then
-        if self.data and self.data.shop then
-            local diff = PhunTools:formatWholeNumber(self.data.shop.nextRestock -
-                                                         GameTime:getInstance():getWorldAgeHours())
-            -- when is next restocking?
-            local txt = tonumber(diff) == 1 and getText("IGUI_PhunMart.HourTillRestock") or
-                            getText("IGUI_PhunMart.HoursTillRestock", diff)
-            self:drawText(txt, 10, self.height - 20, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
-
+        -- if self.data then
+        --     self:drawText(self.data.key or "key", 10, 10, 1, 1, 1, 1, UIFont.Small);
+        -- else
+        --     self:drawText("No data", 10, 10, 1, 1, 1, 1, UIFont.Small);
+        -- end
+        if self.data and self.data.shop and (isAdmin() or sandbox.DisplayHoursTillNextRestocking) then
+            local hoursTillNextRestock = self.data.shop.nextRestock - GameTime:getInstance():getWorldAgeHours();
+            local txt = "";
+            if hoursTillNextRestock > 22 then
+                txt = getText("IGUI_PhunMart.HoursTillRestock.Days", math.ceil(hoursTillNextRestock / 24))
+            elseif hoursTillNextRestock >= 22 then
+                txt = getText("IGUI_PhunMart.HoursTillRestock.Day")
+            elseif hoursTillNextRestock >= 12 then
+                txt = getText("IGUI_PhunMart.HoursTillRestock.HalfADay")
+            else
+                txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
+            end
+            self:drawText(txt, self.layouts.default.buyButton.x, self.height - 20, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
         end
+
     end
     if self.data.shop and self.data.shop.requiresPower then
         local text = getText("IGUI_PhunMart.isPowered")
@@ -468,7 +497,7 @@ function UI:render()
             text = getText("IGUI_PhunMart.isNotPowered")
         end
         local width = getTextManager():MeasureStringX(UIFont.Small, text)
-        self:drawText(text, self.width - width - 10, self.height - 20, 0.7 , 0.7, 0.7, 1, UIFont.Small)    
+        self:drawText(text, self.width - width - 10, self.height - 20, 0.7, 0.7, 0.7, 1, UIFont.Small)
     end
 end
 

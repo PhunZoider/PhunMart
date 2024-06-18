@@ -19,6 +19,7 @@ PhunMart = {
         updateHistory = "updateHistory",
         rebuildExportItems = "rebuildExportItems",
         rebuildVehicles = "rebuildVehicles",
+        rebuildTraits = "rebuildTraits",
         rebuildPerks = "rebuildPerks",
         modifyTraits = "modifyTraits",
         defsUpdated = "defsUpdated",

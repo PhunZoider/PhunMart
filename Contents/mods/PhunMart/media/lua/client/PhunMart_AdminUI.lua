@@ -18,8 +18,41 @@ function PhunMartAdminUI.OnOpenPanel()
     end
 end
 
+function PhunMartAdminUI:promptForName(default, tag)
+    local modal = ISTextBox:new(0, 0, 280, 180, "Export items to Filename:", tostring(default), nil,
+        function(target, button, obj)
+            if button.internal == "OK" then
+                PhunMartAdminUI.doExport(self, target, button, obj)
+            end
+
+        end, self.viewer:getPlayerNum(), tag)
+    modal:initialise()
+    modal:addToUIManager()
+end
+
 function PhunMartAdminUI:initialise()
     ISPanel.initialise(self);
+end
+
+function PhunMartAdminUI.doExport(self, target, button, obj)
+
+    local filename = button.parent.entry:getText()
+    if not PhunTools:endsWith(filename, ".lua") then
+        filename = filename .. ".lua"
+    end
+
+    if obj == "VEHICLES" then
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildVehicles, {
+            filename = filename
+        })
+    elseif obj == "TRAITS" then
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildTraits, {
+            filename = filename
+        })
+    else
+
+    end
+    self:close()
 end
 
 function PhunMartAdminUI:createChildren()
@@ -38,37 +71,49 @@ function PhunMartAdminUI:createChildren()
     y = y + h + x
 
     self.exportItemsButton = ISButton:new(x, y, w, h, "Export items", self, function()
-        local p = getPlayer()
-        local name = PhunMart.name
-        local command = PhunMart.commands.rebuildExportItems
-        sendClientCommand(p, name, command, {})
-        PhunMartAdminUI.instance:close()
+
+        self:promptForName("default texty")
+        -- local p = getPlayer()
+        -- local name = PhunMart.name
+        -- local command = PhunMart.commands.rebuildExportItems
+        -- sendClientCommand(p, name, command, {})
+        -- PhunMartAdminUI.instance:close()
     end);
     self.exportItemsButton:initialise();
     self:addChild(self.exportItemsButton);
 
     y = y + h + x
 
-    self.exportTraitsButton = ISButton:new(x, y, w, h, "Rebuild Vehicles Export", self, function()
-        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildVehicles, {})
-        PhunMartAdminUI.instance:close()
+    self.exportTraitsButton = ISButton:new(x, y, w, h, "Vehicles Dump", self, function()
+        self:promptForName("PhunMart_VehicleItems-DUMP.lua", "VEHICLES")
+        -- sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildVehicles, {})
+        -- PhunMartAdminUI.instance:close()
     end);
     self.exportTraitsButton:initialise();
     self:addChild(self.exportTraitsButton);
 
     y = y + h + x
 
-    self.exportPerksButton = ISButton:new(x, y, w, h, "Rebuild Perks Export", self, function()
-        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildPerks, {})
+    self.exportPerksButton = ISButton:new(x, y, w, h, "Traits Dump", self, function()
+        self:promptForName("PhunMart_TraitItems-DUMP.lua", "TRAITS")
         PhunMartAdminUI.instance:close()
     end);
     self.exportPerksButton:initialise();
     self:addChild(self.exportPerksButton);
 
+    -- y = y + h + x
+
+    -- self.exportPerksButton = ISButton:new(x, y, w, h, "Rebuild Perks Export", self, function()
+    --     sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildPerks, {})
+    --     PhunMartAdminUI.instance:close()
+    -- end);
+    -- self.exportPerksButton:initialise();
+    -- self:addChild(self.exportPerksButton);
+
     y = y + h + x
 
     self.closeButton = ISButton:new(x, y, w, h, "Close", self, function()
-        PhunMartAdminUI.instance:close()
+        PhunMartAdminUI.OnOpenPanel():close()
     end);
     self.closeButton:initialise();
     self:addChild(self.closeButton);
@@ -86,6 +131,7 @@ function PhunMartAdminUI:new(x, y, width, height, player)
     o = ISPanel:new(x, y, width, height, player);
     setmetatable(o, self);
     self.__index = self;
+    o.viewer = player
     o.variableColor = {
         r = 0.9,
         g = 0.55,
