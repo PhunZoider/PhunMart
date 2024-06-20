@@ -15,6 +15,7 @@ return { --[[
     restock = 24,
     currency = "Base.Money", -- the default currency for shops
     backgroundImage = "machine-none",
+    minDistance = 100,
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18"}
 }, {
