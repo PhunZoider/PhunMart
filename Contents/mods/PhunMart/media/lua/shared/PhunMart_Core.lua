@@ -23,7 +23,9 @@ PhunMart = {
         rebuildPerks = "rebuildPerks",
         modifyTraits = "modifyTraits",
         defsUpdated = "defsUpdated",
-        serverPurchaseFailed = "serverPurchaseFailed"
+        serverPurchaseFailed = "serverPurchaseFailed",
+        dump = "dump",
+        itemDump = "itemDump"
 
     },
     events = {

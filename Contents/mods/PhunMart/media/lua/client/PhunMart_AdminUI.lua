@@ -42,11 +42,25 @@ function PhunMartAdminUI.doExport(self, target, button, obj)
     end
 
     if obj == "VEHICLES" then
+
+        PhunMart:getAllVehicles()
+
         sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildVehicles, {
             filename = filename
         })
     elseif obj == "TRAITS" then
         sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildTraits, {
+            filename = filename
+        })
+    elseif obj == "FOOD" then
+        -- sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.dump, {
+        --     category = "Food",
+        --     filename = filename
+        -- })
+        PhunTools:printTable(PhunMart:getAllItemTagAndCats())
+    elseif obj == "ALL" then
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.dump, {
+            category = "ALL",
             filename = filename
         })
     else
@@ -100,6 +114,40 @@ function PhunMartAdminUI:createChildren()
     end);
     self.exportPerksButton:initialise();
     self:addChild(self.exportPerksButton);
+
+    y = y + h + x
+
+    self.exportFoodItemsButton = ISButton:new(x, y, w, h, "Food Dump", self, function()
+        self:promptForName("PhunMart_FoodItems-DUMP.lua", "FOOD")
+
+        PhunMartAdminUI.instance:close()
+    end);
+    self.exportFoodItemsButton:initialise();
+    self:addChild(self.exportFoodItemsButton);
+
+    y = y + h + x
+
+    self.exporAllItemsButton = ISButton:new(x, y, w, h, "Item Dump", self, function()
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.itemDump, {
+            category = "ALL",
+            filenamePrefix = "PhunMart_AllItems-"
+        })
+        PhunMartAdminUI.instance:close()
+    end);
+    self.exporAllItemsButton:initialise();
+    self:addChild(self.exporAllItemsButton);
+
+    y = y + h + x
+
+    self.exportIncItemsButton = ISButton:new(x, y, w, h, "Incr Item Dump", self, function()
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.itemDump, {
+            category = "INCR",
+            filenamePrefix = "PhunMart_IncrItems-"
+        })
+        PhunMartAdminUI.instance:close()
+    end);
+    self.exportIncItemsButton:initialise();
+    self:addChild(self.exportIncItemsButton);
 
     -- y = y + h + x
 

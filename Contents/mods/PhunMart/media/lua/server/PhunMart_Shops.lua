@@ -243,6 +243,8 @@ function PhunMart:formatShop(data)
         sprites = data.sprites or base.sprites or {},
         reservations = data.reservations or base.reservations or {},
         currency = data.currency or base.currency or "Base.Money",
+        -- minimum distance between duplicate instances
+        minDistance = data.minDistance or base.minDistance or 100,
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false

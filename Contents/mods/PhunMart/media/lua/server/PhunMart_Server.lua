@@ -251,47 +251,70 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
     return items
 end
 
+function PhunMart:getInstanceDistances(location, ignoreKey)
+    local results = {}
+
+    for k, v in pairs(self.shops) do
+        if v.location and (ignoreKey == nil or k ~= ignoreKey) then
+            local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
+            if not results[v.key] or results[v.key] < min then
+                results[v.key] = min
+            end
+        end
+    end
+    print("Shop distances")
+    PhunTools:printTable(results)
+    print("---------")
+    return results
+end
+
 function PhunMart:getShopListFromKey(key)
 
+    local distances = self:getInstanceDistances(self:xyzFromKey(key), key)
     local zoneInfo = self:getZoneInfo(key)
     local shops = {}
     local totalProbability = 0
 
     for k, v in pairs(self.defs.shops) do
         if v.enabled and v.reservations == nil or v.reservations == false and not v.abstract then
-            if v.zones and type(v.zones) == "table" then
 
-                local difficultyMin = 0
-                local difficultyMax = 100
-                if v.zones.difficulty then
-                    if type(v.zones.difficulty) == "table" then
-                        difficultyMin = v.zones.difficulty.min or 0
-                        difficultyMax = v.zones.difficulty.max or 100
-                    else
-                        difficultyMin = v.zones.difficulty
+            if not v.minDistance or not distances[v.key] or (v.minDistance < distances[v.key]) then
+                if v.zones and type(v.zones) == "table" then
+
+                    local difficultyMin = 0
+                    local difficultyMax = 100
+                    if v.zones.difficulty then
+                        if type(v.zones.difficulty) == "table" then
+                            difficultyMin = v.zones.difficulty.min or 0
+                            difficultyMax = v.zones.difficulty.max or 100
+                        else
+                            difficultyMin = v.zones.difficulty
+                        end
                     end
-                end
 
-                local names = v.zones.names or {}
+                    local names = v.zones.names or {}
 
-                if zoneInfo ~= nil then
-                    if (zoneInfo.difficulty and
-                        (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <= difficultyMax)) or
-                        (#names > 0 and PhunTools:inArray(zoneInfo.name, names)) then
+                    if zoneInfo ~= nil then
+                        if (zoneInfo.difficulty and
+                            (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <= difficultyMax)) or
+                            (#names > 0 and PhunTools:inArray(zoneInfo.name, names)) then
 
-                        table.insert(shops, {
-                            key = k,
-                            probability = v.probability or sandbox.DefaultItemProbability or 1
-                        })
-                        totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
+                            table.insert(shops, {
+                                key = k,
+                                probability = v.probability or sandbox.DefaultItemProbability or 1
+                            })
+                            totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
+                        end
                     end
+                else
+                    table.insert(shops, {
+                        key = k,
+                        probability = v.probability or sandbox.DefaultItemProbability or 1
+                    })
+                    totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                 end
             else
-                table.insert(shops, {
-                    key = k,
-                    probability = v.probability or sandbox.DefaultItemProbability or 1
-                })
-                totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
+                print("Skipping " .. v.key .. " because there is another too close")
             end
         end
     end
@@ -333,6 +356,7 @@ function PhunMart:generateShop(vendingMachineOrKey)
         end
     end
 
+    local location = self:xyzFromKey(key)
     local shopInstance = {
         key = chosenShopDef.key or chosenShopDef.name,
         name = chosenShopDef.name,
@@ -342,6 +366,11 @@ function PhunMart:generateShop(vendingMachineOrKey)
         backgroundImage = chosenShopDef.backgroundImage or nil,
         requiresPower = chosenShopDef.requiresPower or false,
         layout = chosenShopDef.layout or nil,
+        location = {
+            x = location.x,
+            y = location.y,
+            z = location.z
+        },
         items = {}
     }
 
@@ -425,6 +454,40 @@ Commands[PhunMart.commands.rebuildTraits] = function(playerObj, args)
     sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
         type = "TRAITS",
         value = args
+    })
+end
+
+Commands[PhunMart.commands.dump] = function(playerObj, args)
+    local results = {}
+    local items = {
+        Food = true
+    }
+
+    if items[args.category] then
+        results = PhunMart:getItemsByCategory(args.category)
+    elseif args.category == "TRAITS" then
+        results = PhunMart:getAllTrait()
+    end
+    PhunTools:printTable(results)
+    PhunTools:saveTable(args.filename or "PhunMart_DUMP.lua", results)
+    sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.dump, {
+        category = args.category,
+        filename = args.filename,
+        value = args
+    })
+end
+
+Commands[PhunMart.commands.itemDump] = function(playerObj, args)
+
+    local results = PhunMart:getItemsGrouped(args.category ~= "ALL")
+    for k, v in pairs(results) do
+        PhunTools:saveTable(args.filenamePrefix .. k .. "-DUMP.lua", v)
+    end
+
+    sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.itemDump, {
+        category = args.category,
+        filename = args.filenamePrefix,
+        value = results
     })
 end
 
