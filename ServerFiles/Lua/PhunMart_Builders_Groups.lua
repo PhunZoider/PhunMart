@@ -351,9 +351,14 @@ return {
             strewberrie = "fruit"
         },
         categories = {
+            FoodA = true,
+            FoodN = true,
+            FoodP = true,
+            FoodB = true,
             Water = true,
             Food = true,
-            Cooking = true
+            Cooking = true,
+            Cook = true
         }
     },
     Clothing = {
@@ -446,9 +451,17 @@ return {
             Appearance = true,
             Clothing = true,
             Bag = true,
+            Appear = true,
+            ClothJew = true,
+            ClothHead = true,
+            ClothBody = true,
             ClothUnder = true,
             ClothBack = true,
-            ClothFeet = true
+            ClothFeet = true,
+            ClothAcc = true,
+            ClothLeg = true,
+            ClothArm = true,
+            ClothBag = true
         }
 
     },
@@ -457,6 +470,9 @@ return {
             ToolWeapon = true,
             Tool = true
         }
+    },
+    Paint = {
+        Paint = true
     },
     Household = {
         include = {"Base.Umbrella", "Base.UmbrellaBlack", "Base.UmbrellaRed", "Base.Plunger", "Base.Bleach",
@@ -469,25 +485,24 @@ return {
             Household = true
         }
     },
-    Drugs = {
-        categories = {
-            Drugs = true,
-            Accessory = true,
-            ClothBag = true,
-            MediaV = true,
-            SurFish = true,
-            Clean = true,
-            Fuel = true,
-            SurFarm = true,
-            SurTrap = true,
-            CraftMetal = true,
-            Elec = true,
-            CraftTailor = true,
-            MediaA = true,
-            Collect = true
+    -- Drugs = {
+    --     categories = {
+    --         Drugs = true,
+    --         MediaV = true,
+    --         Clean = true,
+    --         Fuel = true,
+    --         SurFarm = true,
+    --         SurTrap = true,
+    --         CraftMetal = true,
+    --         CraftTailor = true,
+    --         MediaA = true,
+    --         Collect = true,
+    --         SurCamp = true,
+    --         Cont = true,
+    --         Merch = true
 
-        }
-    },
+    --     }
+    -- },
     Weapons = {
         tabs = {
             melee = "Melee",
@@ -529,13 +544,15 @@ return {
             light = "accessory"
         },
         categories = {
+            WepBomb = true,
             Explosives = true,
             WeaponPart = true,
             Ammo = true,
             WeaponCrafted = true,
             WepFire = true,
             WepAmmoMag = true,
-            WepMelee = true
+            WepMelee = true,
+            WepPart = true
 
         }
     },
@@ -573,6 +590,7 @@ return {
             mortar = "tools"
         },
         categories = {
+            Med = true,
             FirstAid = true,
             Wound = true,
             Bandage = true
@@ -581,7 +599,9 @@ return {
     RadioShack = {
         categories = {
             Electronics = true,
-            Communications = true
+            Communications = true,
+            CraftElect = true,
+            Elec = true
         }
     },
     Fish = {
@@ -597,7 +617,8 @@ return {
         include = {"Base.Trout", "Base.Salmon", "Base.Catfish", "Base.BaitFish", "Base.Bass", "Base.Maki", "Base.Pike",
                    "Base.FishRoe", "Base.Maggots", "Base.Maggots2", "Base.Crayfish", "Base.Perch", "Base.Worm"},
         categories = {
-            Fishing = true
+            Fishing = true,
+            SurFish = true
         }
     },
     AutoZone = {
@@ -652,6 +673,7 @@ return {
 
         categories = {
             -- Junk = true,
+            Misc = true,
             -- Furniture = true,
             Material = true
             -- WaterContainer = true,
@@ -696,6 +718,11 @@ return {
             paper = "misc"
         },
         categories = {
+            LitW = true,
+            LitR = true,
+            LitE = true,
+            LitS = true,
+            LitC = true,
             Literature = true,
             SkillBook = true
         }

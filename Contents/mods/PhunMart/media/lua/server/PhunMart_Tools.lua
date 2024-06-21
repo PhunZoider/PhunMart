@@ -431,7 +431,8 @@ function PhunMart:BuildItems(group, skipExistingDefs)
 
             local row = {
                 name = fullType,
-                inherits = "base-" .. hint
+                inherits = "base-" .. hint,
+                d = displayCategory
             }
             local modId = item:getModID()
             local mod = modId and modId ~= "pz-vanilla" and modId or nil
