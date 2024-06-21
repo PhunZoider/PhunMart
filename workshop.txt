@@ -2,5 +2,7 @@ version=1
 id=3270428943
 title=PhunMart
 description=Shop Smart. Shop PhunMart. Your total vending solution.
+description=beta testing!
+description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 tags=Build 41
 visibility=public
