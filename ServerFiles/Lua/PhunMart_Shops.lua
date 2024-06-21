@@ -8,8 +8,8 @@ return { --[[
     key = "base:shop",
     label = "Vending Machine",
     fills = {
-        min = 2,
-        max = 5
+        min = 6,
+        max = 10
     },
     probability = 15,
     restock = 24,
@@ -28,14 +28,17 @@ return { --[[
         items = {{
             rolls = 7,
             filters = {
-                tags = "food,fruit,drink",
-                files = "PhunMart_FoodItems.lua"
+                tags = "foodfruit,fooddrink,foodbaking"
             }
         }, {
             rolls = 6,
             filters = {
-                tags = "veg,cooking,readytoeat",
-                files = "PhunMart_FoodItems.lua"
+                tags = "foodfruit,fooddrink,foodcooking,foodready"
+            }
+        }, {
+            rolls = 6,
+            filters = {
+                tags = "foodutensil,foodmeat,foodseafood,fooddairy,foodcanned,foodbulk"
             }
         }}
     },
@@ -45,8 +48,20 @@ return { --[[
     key = "base:junk_food",
     inherits = "base:food",
     label = "Phat Phoods",
-    filters = {
-        tags = "junk,breads,readytoeat,condiments,pie"
+    pools = {
+        items = {{
+            filters = {
+                tags = "foodjunk,foodbreads"
+            }
+        }, {
+            filters = {
+                tags = "foodready,foodcondiment"
+            }
+        }, {
+            filters = {
+                tags = "foodpie,foodalcohol"
+            }
+        }}
     },
     backgroundImage = "machine-phat-phoods"
 }, {
@@ -54,9 +69,20 @@ return { --[[
     key = "base:tools",
     inherits = "base:shop",
     backgroundImage = "machine-pity-the-tool",
-    filters = {
-        tags = "welding,tools,melee,mechanics",
-        files = "PhunMart_ToolItems.lua"
+    pools = {
+        items = {{
+            filters = {
+                tags = "toolwelding,toolmecanics"
+            }
+        }, {
+            filters = {
+                tags = "tools"
+            }
+        }, {
+            filters = {
+                tags = "toolcamping"
+            }
+        }}
     }
 }, {
     abstract = true,
@@ -66,8 +92,7 @@ return { --[[
     backgroundImage = "machine-budget-xp",
     currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     filters = {
-        tags = "perks1,perks2",
-        files = "PhunMart_PerkItems.lua"
+        tags = "perks1,perks2"
     }
 }, {
     abstract = true,
@@ -97,12 +122,11 @@ return { --[[
     abstract = true,
     key = "base:traits",
     inherits = "base:shop",
-    label = "NewU",
+    label = "TraiterJoe",
     requiresPower = true,
-    backgroundImage = "machine-new-u",
+    backgroundImage = "machine-traiter-joes",
     filters = {
-        tags = "positive,negative",
-        files = "PhunMart_TraitItems.lua"
+        tags = "positive,negative"
     }
 }, {
     abstract = true,
@@ -111,8 +135,74 @@ return { --[[
     label = "Wrent a Wreck",
     requiresPower = true,
     backgroundImage = "machine-wrent-a-wreck",
+    pools = {
+        items = {{
+            filters = {
+                tags = "vehicle-car"
+            }
+        }, {
+            filters = {
+                tags = "vehicle-van"
+            }
+        }, {
+            filters = {
+                tags = "vehicle-truck,vehicle-other"
+            }
+        }}
+    }
+}, {
+    abstract = true,
+    key = "base:carapart",
+    inherits = "base:shop",
+    label = "Car-A-Part",
+    backgroundImage = "machine-car-a-part",
     filters = {
-        files = "PhunMart_VehicleItems.lua"
+        tags = "autozone"
+    }
+}, {
+    abstract = true,
+    key = "base:csv",
+    inherits = "base:shop",
+    label = "CSV",
+    backgroundImage = "machine-csv",
+    filters = {
+        tags = "medical"
+    }
+}, {
+    abstract = true,
+    key = "base:electronics",
+    inherits = "base:shop",
+    label = "Electronics",
+    backgroundImage = "machine-electrics",
+    filters = {
+        tags = "electronics"
+    }
+}, {
+    abstract = true,
+    key = "base:hoes",
+    inherits = "base:shop",
+    label = "Hoes",
+    backgroundImage = "machine-hoes",
+    filters = {
+        tags = "gardening"
+    }
+}, {
+    abstract = true,
+    key = "base:crafts",
+    inherits = "base:shop",
+    label = "Michelles",
+    backgroundImage = "machine-michelles",
+    filters = {
+        tags = "crafts"
+    }
+}, {
+    abstract = true,
+    key = "base:fish",
+    inherits = "base:shop",
+    label = "Fish",
+    backgroundImage = "machine-phish4u",
+    filters = {
+        tags = "fish"
     }
 }, {
     abstract = true,
@@ -120,9 +210,64 @@ return { --[[
     inherits = "base:shop",
     label = "Final Ammendment",
     backgroundImage = "machine-final-ammendment",
-    filters = {
-        tags = "ammo,pistol,melee,wear",
-        files = "PhunMart_WeaponItems.lua"
+
+    pools = {
+        items = {{
+            filters = {
+                tags = "wepmelee"
+            }
+        }, {
+            filters = {
+                tags = "wepammo"
+            }
+        }, {
+            filters = {
+                tags = "wepmisc,wepcrafting"
+            }
+        }}
+    }
+}, {
+    abstract = true,
+    key = "base:guns2",
+    inherits = "base:shop",
+    label = "Final Ammendment3",
+    backgroundImage = "machine-final-ammendment",
+    zones = {
+        difficulty = 2
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "wepammo,weppistol"
+            }
+        }, {
+            filters = {
+                tags = "wepmisc,wepcrafting"
+            }
+        }}
+    }
+}, {
+    abstract = true,
+    key = "base:guns3",
+    inherits = "base:shop",
+    label = "Final Ammendment3",
+    backgroundImage = "machine-final-ammendment",
+    zones = {
+        difficulty = {
+            min = 3,
+            max = 4
+        }
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "weprifle,wepbulkammo"
+            }
+        }, {
+            filters = {
+                tags = "wepshotgun,wepexplosive"
+            }
+        }}
     }
 }, --[[
 
@@ -138,9 +283,8 @@ return { --[[
 }, {
     key = "SHOP:FOOD:phat_foods_alcohol",
     inherits = "base:junk_food",
-    reservations = {"10608_10336_0"},
     filters = {
-        tags = "alcohol"
+        tags = "foodalcohol"
     }
 }, {
     key = "SHOP:TOOLS:pitty_the_tool",

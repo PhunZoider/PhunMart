@@ -505,7 +505,7 @@ Commands[PhunMart.commands.requestRestock] = function(playerObj, args)
     if shop and shop.maxRestock > 0 and shop.restocks >= shop.maxRestock then
         shop = PhunMart:generateShop(machine)
     else
-        shop.restocks = shop.restocks + 1
+        shop.restocks = (shop.restocks or 0) + 1
     end
     shop.items = PhunMart:generateShopItems(args.key, sandbox.CumulativeItemGeneration == true)
 
@@ -598,7 +598,7 @@ function PhunMart:checkForRestocking()
             if shop and (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
                 shop = PhunMart:generateShop(machine)
             else
-                shop.restocks = shop.restocks + 1
+                shop.restocks = (shop.restocks or 0) + 1
             end
             shop.items = PhunMart:generateShopItems(k, sandbox.CumulativeItemGeneration == true)
             if not PhunMart.defs.shops[shop.key] then

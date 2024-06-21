@@ -1,390 +1,451 @@
 return {{
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-ammo:basic",
+    abstract = true,
+    key = "base-weapons",
+    tab = "Weapons",
+    tags = "weapons",
     inventory = {
-        min = 2,
+        min = 1,
         max = 5
     },
-    probability = 5,
-    tab = "Ammo",
-    tags = "ammo",
     price = {
         currency = {
-            min = 10,
-            max = 25
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-ammo:craft",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Crafting",
-    tags = "ammocraft",
-    price = {
-        currency = {
-            min = 5,
-            max = 15
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-ammo:clip",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Clips",
-    tags = "ammoclips",
-    price = {
-        currency = {
-            min = 5,
-            max = 15
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-explosives:misc",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Explosives",
-    tags = "explosives",
-    price = {
-        currency = {
-            min = 15,
-            max = 25
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weapon:rifle",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Rifles",
-    tags = "rifles",
-    price = {
-        currency = {
-            min = 1,
+            base = 1,
+            min = 3,
             max = 5
         }
     }
 }, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weapon:misc",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Misc",
-    tags = "melee",
-    probability = 5,
-    price = {
-        currency = {
-            min = 10,
-            max = 25
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weapon:shotgun",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Shotguns",
-    tags = "shotguns",
-    price = {
-        currency = {
-            min = 1,
-            max = 5
-        }
-    }
-}, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weapon:melee",
-    inventory = {
-        min = 2,
-        max = 5
-    },
+    abstract = true,
+    key = "base-weapons-wepmelee",
+    inherits = "base-weapons",
     tab = "Melee",
-    tags = "melee",
-    price = {
-        currency = {
-            min = 1,
-            max = 5
-        }
-    }
+    tags = "weapons,wepmelee"
 }, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weapon:pistol",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Pistols",
-    tag = "pistols",
-    price = {
-        currency = {
-            min = 1,
-            max = 5
-        }
-    }
+    abstract = true,
+    key = "base-weapons-wepexplosive",
+    inherits = "base-weapons",
+    tab = "Explosive",
+    tags = "weapons,wepexplosive"
 }, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weaponpart:wear",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Outfits",
-    tag = "outfits",
-    price = {
-        currency = {
-            min = 1,
-            max = 5
-        }
-    }
+    abstract = true,
+    key = "base-weapons-wepcrafting",
+    inherits = "base-weapons",
+    tab = "Crafting",
+    tags = "weapons,wepcrafting"
 }, {
-    abstract = true, -- don't validate this item or use it for anything other than inheriting from
-    key = "base-weaponpart:attachment",
-    inventory = {
-        min = 2,
-        max = 5
-    },
-    tab = "Attachments",
-    tag = "attachments",
-    price = {
-        currency = {
-            min = 1,
-            max = 5
-        }
-    }
+    abstract = true,
+    key = "base-weapons-wepbulkammo",
+    inherits = "base-weapons",
+    tags = "weapons,wepbulkammo"
 }, {
-    name = "Base.Bayonnet",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-wepammo",
+    inherits = "base-weapons",
+    tab = "Ammo",
+    tags = "weapons,wepammo"
 }, {
-    name = "Base.ChokeTubeFull",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-wepaccessory",
+    inherits = "base-weapons",
+    tags = "weapons,wepaccessory"
 }, {
-    name = "Base.ChokeTubeImproved",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-wepmisc",
+    inherits = "base-weapons",
+    tab = "Misc",
+    tags = "weapons,wepmisc"
 }, {
-    name = "Base.FiberglassStock",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-weppistol",
+    inherits = "base-weapons",
+    tab = "Pistol",
+    tags = "weapons,weppistol"
 }, {
-    name = "Base.GunLight",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-wepshotgun",
+    inherits = "base-weapons",
+    tab = "Shotgun",
+    tags = "weapons,wepshotgun"
 }, {
-    name = "Base.IronSight",
-    inherits = "base-weaponpart:attachment"
-}, {
-    name = "Base.Laser",
-    inherits = "base-weaponpart:attachment"
+    abstract = true,
+    key = "base-weapons-weprifle",
+    inherits = "base-weapons",
+    tab = "Rifle",
+    tags = "weapons,weprifle"
 }, {
     name = "Base.RecoilPad",
-    inherits = "base-weaponpart:attachment"
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.RedDot",
-    inherits = "base-weaponpart:attachment"
-}, {
-    name = "Base.Sling",
-    inherits = "base-weaponpart:attachment"
+    name = "Base.GunLight",
+    inherits = "base-weapons-wepaccessory"
 }, {
     name = "Base.x2Scope",
-    inherits = "base-weaponpart:attachment"
-}, {
-    name = "Base.x4Scope",
-    inherits = "base-weaponpart:attachment"
+    inherits = "base-weapons-wepaccessory"
 }, {
     name = "Base.x8Scope",
-    inherits = "base-weaponpart:attachment"
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.223Box",
-    inherits = "base-ammo:basic"
+    name = "Base.FiberglassStock",
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.223Bullets",
-    inherits = "base-ammo:basic"
+    name = "Base.RedDot",
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.308Box",
-    inherits = "base-ammo:basic"
+    name = "Base.Laser",
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.308Bullets",
-    inherits = "base-ammo:basic"
+    name = "Base.IronSight",
+    inherits = "base-weapons-wepaccessory"
 }, {
-    name = "Base.556Box",
-    inherits = "base-ammo:basic"
+    name = "Base.Bayonnet",
+    inherits = "base-weapons-wepaccessory"
+}, {
+    name = "Base.ChokeTubeFull",
+    inherits = "base-weapons-wepaccessory"
+}, {
+    name = "Base.ChokeTubeImproved",
+    inherits = "base-weapons-wepaccessory"
+}, {
+    name = "Base.x4Scope",
+    inherits = "base-weapons-wepaccessory"
 }, {
     name = "Base.556Bullets",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets38",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets38Box",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets44",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets44Box",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets45",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets45Box",
-    inherits = "base-ammo:basic"
+    inherits = "base-weapons-wepammo"
 }, {
     name = "Base.Bullets9mm",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.Bullets9mmBox",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.ShotgunShells",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.ShotgunShellsBox",
-    inherits = "base-ammo:basic"
-}, {
-    name = "Base.223Clip",
-    inherits = "base-ammo:clip"
-}, {
-    name = "Base.308Clip",
-    inherits = "base-ammo:clip"
-}, {
-    name = "Base.44Clip",
-    inherits = "base-ammo:clip"
-}, {
-    name = "Base.45Clip",
-    inherits = "base-ammo:clip"
-}, {
-    name = "Base.556Clip",
-    inherits = "base-ammo:clip"
-}, {
-    name = "Base.9mmClip",
-    inherits = "base-ammo:clip"
+    inherits = "base-weapons-wepammo"
 }, {
     name = "Base.M14Clip",
-    inherits = "base-ammo:clip"
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.308Clip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.223Clip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.Bullets44",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.Bullets45",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.556Clip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.Bullets38",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.223Bullets",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.9mmClip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.44Clip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.308Bullets",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.ShotgunShells",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.45Clip",
+    inherits = "base-weapons-wepammo"
+}, {
+    name = "Base.Bullets38Box",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.223Box",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.ShotgunShellsBox",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.Bullets45Box",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.Bullets44Box",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.556Box",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.Bullets9mmBox",
+    inherits = "base-weapons-wepbulkammo"
+}, {
+    name = "Base.308Box",
+    inherits = "base-weapons-wepbulkammo"
 }, {
     name = "Base.223BulletsMold",
-    inherits = "base-ammo:craft"
+    inherits = "base-weapons-wepcrafting"
 }, {
     name = "Base.308BulletsMold",
-    inherits = "base-ammo:craft"
-}, {
-    name = "Base.9mmBulletsMold",
-    inherits = "base-ammo:craft"
+    inherits = "base-weapons-wepcrafting"
 }, {
     name = "Base.ShotgunShellsMold",
-    inherits = "base-ammo:craft"
+    inherits = "base-weapons-wepcrafting"
 }, {
-    name = "Base.HuntingKnife",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.Katana",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.LeadPipe",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.Machete",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.MetalBar",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.MetalPipe",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.Nightstick",
-    inherits = "base-weapon:melee"
-}, {
-    name = "Base.Aerosolbomb",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.FlameTrap",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.FlameTrapRemote",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.FlameTrapTriggered",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.Molotov",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.NoiseTrap",
-    inherits = "base-explosives:misc"
-}, {
-    name = "Base.NoiseTrapRemote",
-    inherits = "base-explosives:misc"
+    name = "Base.9mmBulletsMold",
+    inherits = "base-weapons-wepcrafting"
 }, {
     name = "Base.PipeBomb",
-    inherits = "base-explosives:misc"
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.PipeBombRemote",
-    inherits = "base-explosives:misc"
+    name = "Base.SmokeBombTriggered",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.SmokeBomb",
-    inherits = "base-explosives:misc"
+    name = "Base.AerosolbombTriggered",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.NoiseTrap",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.NoiseTrapSensorV2",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.NoiseTrapSensorV1",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.NoiseTrapSensorV3",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.Aerosolbomb",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.AerosolbombRemote",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.NoiseTrapTriggered",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.SmokeBombSensorV3",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.SmokeBombSensorV1",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.SmokeBombSensorV2",
+    inherits = "base-weapons-wepexplosive"
 }, {
     name = "Base.SmokeBombRemote",
-    inherits = "base-explosives:misc"
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Chainsaw",
-    inherits = "base-weapon:misc"
+    name = "Base.FlameTrapSensorV3",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Pistol",
-    inherits = "base-weapon:pistol"
+    name = "Base.FlameTrapSensorV2",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Pistol2",
-    inherits = "base-weapon:pistol"
+    name = "Base.FlameTrapSensorV1",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Pistol3",
-    inherits = "base-weapon:pistol"
+    name = "Base.FlameTrapTriggered",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Revolver",
-    inherits = "base-weapon:pistol"
+    name = "Base.PipeBombRemote",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Revolver_Long",
-    inherits = "base-weapon:pistol"
+    name = "Base.PipeBombSensorV1",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Revolver_Short",
-    inherits = "base-weapon:pistol"
+    name = "Base.PipeBombSensorV2",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.AssaultRifle",
-    inherits = "base-weapon:rifle"
+    name = "Base.PipeBombSensorV3",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.AssaultRifle2",
-    inherits = "base-weapon:rifle"
+    name = "Base.AerosolbombSensorV3",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.HuntingRifle",
-    inherits = "base-weapon:rifle"
+    name = "Base.AerosolbombSensorV1",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.VarmintRifle",
-    inherits = "base-weapon:rifle"
+    name = "Base.AerosolbombSensorV2",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.DoubleBarrelShotgun",
-    inherits = "base-weapon:shotgun"
+    name = "Base.FlameTrapRemote",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.DoubleBarrelShotgunSawnoff",
-    inherits = "base-weapon:shotgun"
+    name = "Base.FlameTrap",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.Shotgun",
-    inherits = "base-weapon:shotgun"
+    name = "Base.NoiseTrapRemote",
+    inherits = "base-weapons-wepexplosive"
 }, {
-    name = "Base.ShotgunSawnoff",
-    inherits = "base-weapon:shotgun"
+    name = "Base.Molotov",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.PipeBombTriggered",
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.SmokeBomb",
+    inherits = "base-weapons-wepexplosive"
 }, {
     name = "Base.AmmoStraps",
-    inherits = "base-weaponpart:wear"
+    inherits = "base-weapons-wepexplosive"
+}, {
+    name = "Base.SpearHandFork",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "SapphCooking.SpearChefKnife1",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.SpearChefKnife2",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "Base.Stake",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.PlankNail",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearFork",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.Nightstick",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearHuntingKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SmashedBottle",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearScrewdriver",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearCrafted",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.Katana",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearScalpel",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.FlintKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearIcePick",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearBreadKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearSpoon",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.LeadPipe",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearScissors",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.HuntingKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearMachete",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.Machete",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.TableLeg",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.BaseballBatNails",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "SapphCooking.SpearChefKnife3",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "Base.DoubleBarrelShotgun",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.MetalBar",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.Chainsaw",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.MetalPipe",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.PickAxeHandleSpiked",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.DoubleBarrelShotgunSawnoff",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearLetterOpener",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.WoodenLance",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "Base.SpearButterKnife",
+    inherits = "base-weapons-wepmelee"
+}, {
+    name = "SapphCooking.ChefKnife1",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.ChefKnife2",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.ChefKnife3",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.SpearSpork",
+    inherits = "base-weapons-wepmelee",
+    mod = "sapphcooking"
+}, {
+    name = "Base.Sling",
+    inherits = "base-weapons-wepmisc"
+}, {
+    name = "Base.Revolver_Long",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.Revolver_Short",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.Pistol3",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.Pistol",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.Revolver",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.Pistol2",
+    inherits = "base-weapons-weppistol"
+}, {
+    name = "Base.AssaultRifle",
+    inherits = "base-weapons-weprifle"
+}, {
+    name = "Base.VarmintRifle",
+    inherits = "base-weapons-weprifle"
+}, {
+    name = "Base.AssaultRifle2",
+    inherits = "base-weapons-weprifle"
+}, {
+    name = "Base.HuntingRifle",
+    inherits = "base-weapons-weprifle"
+}, {
+    name = "Base.ShotgunSawnoff",
+    inherits = "base-weapons-wepshotgun"
+}, {
+    name = "Base.Shotgun",
+    inherits = "base-weapons-wepshotgun"
 }}

@@ -44,4 +44,4 @@ return { -- a table of all items we want to ignore when building
 "Base.FertilizerEmpty", "Base.CompostBag", "Base.PetrolBleachBottle", "Base.PetrolPopBottle", "Base.WhiskeyPetrol",
 "Base.EmptyPetrolCan", "Base.WaterBottlePetrol", "Base.WhiskeyPetrol", "Base.Wound_Chest_Scratch_Female",
 "Base.WinePetrol", "Base.LeatherStripsDirty", "Base.PaintbucketEmpty", "Base.TinCanEmpty", "Base.Flint",
-"Base.TinCanEmpty"}
+"Base.TinCanEmpty", "Base.BareHands"}

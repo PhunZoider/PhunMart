@@ -337,6 +337,7 @@ end
 
 -- add a file to the item processing queue
 function PhunMart:loadFileContentsToItemQueue(file)
+    print("Loading " .. file)
     local data = PhunTools:loadTable(file)
     for _, v in ipairs(data) do
         v.file = file

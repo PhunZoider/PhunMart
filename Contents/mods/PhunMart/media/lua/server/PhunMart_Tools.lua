@@ -357,7 +357,7 @@ end
 
 function PhunMart:BuildItems(group, skipExistingDefs)
 
-    local doDebug = group == "RadioShack"
+    local doDebug = group == "Weapons"
 
     local existingItems = {}
     if skipExistingDefs then
@@ -378,6 +378,11 @@ function PhunMart:BuildItems(group, skipExistingDefs)
         abstract = true,
         key = "base-" .. string.lower(group),
         tab = helpers.tabs[k] or group,
+        tags = string.lower(group),
+        inventory = {
+            min = 1,
+            max = 5
+        },
         price = {
             currency = {
                 base = 1,
@@ -392,7 +397,8 @@ function PhunMart:BuildItems(group, skipExistingDefs)
             abstract = true,
             key = "base-" .. string.lower(group) .. "-" .. string.lower(k),
             inherits = "base-" .. string.lower(group),
-            tab = helpers.tabs[k] or nil
+            tab = helpers.tabs[k] or nil,
+            tags = string.lower(group) .. "," .. string.lower(k)
         })
     end
 
@@ -415,11 +421,29 @@ function PhunMart:BuildItems(group, skipExistingDefs)
         local fullType = item:getFullType()
         local displayCategory = item:getDisplayCategory() or ""
 
+        -- local ddd = fullType == "Base.AssaultRifle2"
+
+        -- if ddd and doDebug then
+        --     print("---------------- WEP " .. group .. " ---------------- WEP ----------")
+        --     print("fullType", fullType)
+        --     print("displayCategory", displayCategory)
+        --     print(tostring(existingItems[fullType]))
+        --     print(tostring(helpers.items[fullType]))
+        --     print(tostring(helpers.itemCategories[displayCategory]))
+        --     PhunTools:printTable(helpers)
+        --     print(" ------------------------------------------")
+
+        -- end
+
         if not existingItems[fullType] and
             (helpers.items[fullType] == true or
                 (helpers.itemCategories[displayCategory] and helpers.items[fullType] ~= false)) then
 
             local hint = string.lower(group)
+
+            if ddd then
+                print("hint", hint)
+            end
 
             if helpers.hinters then
                 local test = resolveHint(fullType, helpers.hinters)
@@ -431,8 +455,8 @@ function PhunMart:BuildItems(group, skipExistingDefs)
 
             local row = {
                 name = fullType,
-                inherits = "base-" .. hint,
-                d = displayCategory
+                inherits = "base-" .. hint
+                -- d = displayCategory
             }
             local modId = item:getModID()
             local mod = modId and modId ~= "pz-vanilla" and modId or nil
