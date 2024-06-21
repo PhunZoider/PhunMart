@@ -228,11 +228,6 @@ function PhunMart:purchase(playerObj, shopKey, item)
                         end
                     end
                 end
-
-                if val > 0 then
-                    print("PhunMart: Player " .. playerObj:getUsername() .. " has outstanding " .. val .. " " .. key ..
-                              " to pay")
-                end
             end
         end
         sendClientCommand(playerObj, self.name, self.commands.buy, {

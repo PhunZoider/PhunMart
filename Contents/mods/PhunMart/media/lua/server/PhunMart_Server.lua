@@ -44,7 +44,6 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
         elseif not self.defs.items[v].enabled or self.defs.items[v].abstract then
             print("Skipping " .. v .. " because it is abstract or not enabled")
         else
-            print("Adding " .. v .. " to lookup (" .. (self.defs.items[v].probability or defaultProbaility or 1) .. ")")
             totalProbability = totalProbability + (self.defs.items[v].probability or defaultProbaility or 1)
             haslookup[v] = self.defs.items[v].probability or defaultProbaility or 1
         end
@@ -61,7 +60,6 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
         -- fill was a specific number so use specific amount
         rolls = fill
     end
-    print("Rolling " .. rolls .. " with total probability of " .. totalProbability)
 
     for sanity = 1, 10 do
         for k, v in pairs(haslookup) do
@@ -109,7 +107,6 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         elseif not self.defs.items[v].enabled then
             print("Skipping " .. v .. " because it is not enabled")
         else
-            print("Adding " .. v .. " to lookup (" .. (self.defs.items[v].probability or defaultProbaility or 1) .. ")")
             if (self.defs.items[v].probability or defaultProbaility or 1) >= 100 then
                 -- guarantee to be added
                 table.insert(results, v)
@@ -132,8 +129,6 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         rolls = fill or 1
     end
 
-    print("Rolling " .. rolls .. " against " .. #itemsKeys .. " items")
-
     for sanity = 1, 10 do
         if sanity > 1 then
             print("Sanity check " .. sanity .. " for " .. shop.key .. " " .. poolIndex)
@@ -141,14 +136,11 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         for _, v in ipairs(itemsKeys) do
             if ZombRand(100) <= (self.defs.items[v].probability or defaultProbaility) then
                 table.insert(results, v)
-                print("Result count = " .. #results .. ", rolls=" .. rolls .. ", using probabiltiy " ..
-                          (self.defs.items[v].probability or defaultProbaility))
                 if #results >= rolls then
                     break
                 end
             end
         end
-        print("2. Result count = " .. #results .. ", rolls=" .. rolls)
         if #results >= rolls then
             break
         end
@@ -182,10 +174,8 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
     -- different models for generating items
     local itemKeys = nil
     if cumulativeModel then
-        print("Using cumulative model")
         itemKeys = self:itemGenerationCumulativeModel(shop, self:getNextPoolKey(shop))
     else
-        print("Using chance model")
         itemKeys = self:itemGenerationChanceModel(shop, self:getNextPoolKey(shop))
     end
 
@@ -217,22 +207,22 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
             end
 
             for i, v in ipairs(item.conditions) do
-                print("Condition " .. i .. " type of v is " .. type(v))
+                -- print("Condition " .. i .. " type of v is " .. type(v))
 
                 if v.price then
-                    print("Price exists and its type is " .. type(v.price))
+                    -- print("Price exists and its type is " .. type(v.price))
                     local p = {}
                     for kk, vv in pairs(v.price) do
-                        print("Price key " .. kk .. " value " .. tostring(vv))
+                        -- print("Price key " .. kk .. " value " .. tostring(vv))
                         local priceKey = kk
                         if kk == "currency" then
                             priceKey = shop.currency or "Base.Money"
-                            print("Subsituting currency placeholder for " .. priceKey)
+                            -- print("Subsituting currency placeholder for " .. priceKey)
                         end
                         if type(vv) == "table" then
                             -- assert this is a range of min/max
                             local newValue = (vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10)
-                            print("newValue = " .. newValue)
+                            -- print("newValue = " .. newValue)
                             -- vv = newValue
                             p[priceKey] = newValue
                             -- instance.conditions[i].price[priceKey] = newValue
@@ -241,7 +231,7 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
                             -- instance.conditions[i].price[priceKey] = vv
                         end
                     end
-                    print("Price table is now")
+                    -- print("Price table is now")
                     instance.conditions[i].price = p
                 end
             end
@@ -262,9 +252,6 @@ function PhunMart:getInstanceDistances(location, ignoreKey)
             end
         end
     end
-    print("Shop distances")
-    PhunTools:printTable(results)
-    print("---------")
     return results
 end
 
@@ -333,7 +320,6 @@ end
 function PhunMart:generateShop(vendingMachineOrKey)
 
     local key = self:getKey(vendingMachineOrKey)
-    print("Generating shop for " .. key)
     local chosenShopDef = nil
     local resKey = nil
     if self.reservations[key] then
@@ -366,6 +352,8 @@ function PhunMart:generateShop(vendingMachineOrKey)
         backgroundImage = chosenShopDef.backgroundImage or nil,
         requiresPower = chosenShopDef.requiresPower or false,
         layout = chosenShopDef.layout or nil,
+        maxRestock = chosenShopDef.maxRestock or 0,
+        restocks = 0,
         location = {
             x = location.x,
             y = location.y,
@@ -449,7 +437,6 @@ end
 
 Commands[PhunMart.commands.rebuildTraits] = function(playerObj, args)
     local results = PhunMart:getAllTrait()
-    PhunTools:printTable(results)
     PhunTools:saveTable(args.filename or "PhunMart_TraitItems_DUMP.lua", results)
     sendServerCommand(playerObj, PhunMart.name, "RebuildResults", {
         type = "TRAITS",
@@ -468,7 +455,6 @@ Commands[PhunMart.commands.dump] = function(playerObj, args)
     elseif args.category == "TRAITS" then
         results = PhunMart:getAllTrait()
     end
-    PhunTools:printTable(results)
     PhunTools:saveTable(args.filename or "PhunMart_DUMP.lua", results)
     sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.dump, {
         category = args.category,
@@ -516,7 +502,13 @@ Commands[PhunMart.commands.requestRestock] = function(playerObj, args)
         return
     end
     local shop = PhunMart:getShop(args.key)
+    if shop and shop.maxRestock > 0 and shop.restocks >= shop.maxRestock then
+        shop = PhunMart:generateShop(machine)
+    else
+        shop.restocks = shop.restocks + 1
+    end
     shop.items = PhunMart:generateShopItems(args.key, sandbox.CumulativeItemGeneration == true)
+
     if not PhunMart.shoplist[args.key] or PhunMart.shoplist[args.key] ~= shop.name then
         PhunMart.shoplist[args.key] = shop.name
         ModData.transmit(PhunMart.consts.shoplist)
@@ -534,8 +526,6 @@ Commands[PhunMart.commands.requestShopGenerate] = function(playerObj, args)
     if not machine then
         return
     end
-    print("Generating shop for " .. args.key .. " because we received command requestShopGenerate from client (" ..
-              playerObj:getUsername() .. ")")
     local shop = PhunMart:generateShop(machine)
     local wallet = PhunMart:getPlayerData(playerObj:getUsername()).wallet or {}
     sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
@@ -548,9 +538,6 @@ end
 Commands[PhunMart.commands.requestShop] = function(playerObj, args)
     local shop = PhunMart:getShop(args.key)
     if not shop then
-        print("Generating shop for " .. args.key ..
-                  " because one does not exist and we received command requestShop from client (" ..
-                  playerObj:getUsername() .. ")")
         shop = PhunMart:generateShop(args.key)
     end
     if shop then
@@ -567,8 +554,6 @@ Commands[PhunMart.commands.buy] = function(playerObj, args)
     local success = PhunMart:purchase(playerObj, args.shopKey, args.item)
     local shop = PhunMart:getShop(args.shopKey)
     if not shop then
-        print("Generating shop for " .. args.key .. " because we received buy command from client (" ..
-                  playerObj:getUsername() .. ")???")
         shop = PhunMart:generateShop(args.shopKey)
     end
     if shop then
@@ -610,13 +595,17 @@ function PhunMart:checkForRestocking()
     for k, v in pairs(PhunMart.shops or {}) do
         if (v.nextRestock or 0) < now then
             local shop = PhunMart:getShop(k)
+            if shop and (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
+                shop = PhunMart:generateShop(machine)
+            else
+                shop.restocks = shop.restocks + 1
+            end
             shop.items = PhunMart:generateShopItems(k, sandbox.CumulativeItemGeneration == true)
             if not PhunMart.defs.shops[shop.key] then
                 print("PhunMart: ERROR! Shop " .. shop.key .. " no longer exists in defs")
                 shop = self:generateShop(k)
                 return
             end
-            print(" next restock: " .. (PhunMart.defs.shops[shop.key].restock or 24))
             shop.nextRestock = now + (PhunMart.defs.shops[shop.key].restock or 24)
             if not self.shoplist[k] or self.shoplist[k] ~= shop.name then
                 self.shoplist[k] = shop.name

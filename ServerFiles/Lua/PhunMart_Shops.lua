@@ -13,6 +13,7 @@ return { --[[
     },
     probability = 15,
     restock = 24,
+    maxRestock = 2,
     currency = "Base.Money", -- the default currency for shops
     backgroundImage = "machine-none",
     minDistance = 100,

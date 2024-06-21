@@ -243,6 +243,7 @@ function PhunMart:formatShop(data)
         sprites = data.sprites or base.sprites or {},
         reservations = data.reservations or base.reservations or {},
         currency = data.currency or base.currency or "Base.Money",
+        maxRestock = data.maxRestock or base.maxRestock or 0, -- maximum number of restocks before shop will re-roll. nil or 0 for never
         -- minimum distance between duplicate instances
         minDistance = data.minDistance or base.minDistance,
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true

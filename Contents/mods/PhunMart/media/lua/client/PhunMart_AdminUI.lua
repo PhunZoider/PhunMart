@@ -52,12 +52,6 @@ function PhunMartAdminUI.doExport(self, target, button, obj)
         sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.rebuildTraits, {
             filename = filename
         })
-    elseif obj == "FOOD" then
-        -- sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.dump, {
-        --     category = "Food",
-        --     filename = filename
-        -- })
-        PhunTools:printTable(PhunMart:getAllItemTagAndCats())
     elseif obj == "ALL" then
         sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.dump, {
             category = "ALL",
@@ -114,16 +108,6 @@ function PhunMartAdminUI:createChildren()
     end);
     self.exportPerksButton:initialise();
     self:addChild(self.exportPerksButton);
-
-    y = y + h + x
-
-    self.exportFoodItemsButton = ISButton:new(x, y, w, h, "Food Dump", self, function()
-        self:promptForName("PhunMart_FoodItems-DUMP.lua", "FOOD")
-
-        PhunMartAdminUI.instance:close()
-    end);
-    self.exportFoodItemsButton:initialise();
-    self:addChild(self.exportFoodItemsButton);
 
     y = y + h + x
 
@@ -210,10 +194,6 @@ function PhunMartAdminUI:new(x, y, width, height, player)
 end
 
 local Commands = {}
-
-Commands["RebuildResults"] = function(arguments)
-    PhunMart:debug("Rebuilding results", arguments)
-end
 
 -- Listen for commands from the server
 Events.OnServerCommand.Add(function(module, command, arguments)
