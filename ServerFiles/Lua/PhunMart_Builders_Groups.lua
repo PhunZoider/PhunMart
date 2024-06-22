@@ -540,9 +540,7 @@ return {
             wepmisc = "Misc",
             weppistol = "Pistol",
             wepshotgun = "Shotgun",
-            weprifle = "Rifle",
-            wepcrafting = "Crafting",
-            wepmisc = "Misc"
+            weprifle = "Rifle"
 
         },
         hinters = {
