@@ -20,6 +20,12 @@ function PhunMartCloseOnWanderAway(playerObj)
     end
 end
 
+function PhunMartCloseAll()
+    for _, v in pairs(PhunMartShopWindow.instances) do
+        v:close()
+    end
+end
+
 function PhunMartShowUI(playerObj, machine)
     local key = PhunMart:getKey(machine)
     local instance = PhunMartShopWindow.instances[playerObj:getPlayerNum()]
@@ -38,7 +44,7 @@ function PhunMartShowinstance(playerObj)
     end
 end
 
-function PhunMartUpdateShop(key, shop, wallet)
+function PhunMartUpdateShop(key, shop)
     for _, v in pairs(PhunMartShopWindow.instances) do
         if v.data and v.data.key == key then
             v:setData({

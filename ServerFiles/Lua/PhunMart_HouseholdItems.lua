@@ -116,4 +116,28 @@ return {{
 }, {
     name = "Base.Mop",
     inherits = "base-household"
+}, {
+    name = "FunctionalAppliances.FAPaperTowel",
+    inherits = "base-household",
+    mod = "FunctionalAppliances"
+}, {
+    name = "FunctionalAppliances.FAPaperNapkins",
+    inherits = "base-household",
+    mod = "FunctionalAppliances"
+}, {
+    name = "SOMW.FireplacePoker",
+    inherits = "base-household",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.WalkingCane",
+    inherits = "base-household",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "Base.Cologne",
+    inherits = "base-medical",
+    mod = "EssentialCrafting"
+}, {
+    name = "Base.Perfume",
+    inherits = "base-medical",
+    mod = "EssentialCrafting"
 }}

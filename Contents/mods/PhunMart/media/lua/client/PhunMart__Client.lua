@@ -290,6 +290,10 @@ Commands[PhunMart.commands.payWithInventory] = function(arguments)
     end
 end
 
+Commands[PhunMart.commands.closeAllShops] = function()
+    PhunMartCloseAll()
+end
+
 Commands[PhunMart.commands.openWindow] = function(arguments)
     local vendingMachine = PhunMart:getMachineByLocation(getPlayer(), arguments.x, arguments.y, arguments.z)
     if vendingMachine then
@@ -299,7 +303,7 @@ end
 
 Commands[PhunMart.commands.requestShop] = function(arguments)
     PhunMart.shops[arguments.key] = arguments.shop
-    PhunMartUpdateShop(arguments.key, arguments.shop, arguments.wallet)
+    PhunMartUpdateShop(arguments.key, arguments.shop)
 end
 
 Commands[PhunMart.commands.modifyTraits] = function(arguments)
@@ -334,6 +338,7 @@ end)
 Events.OnGameStart.Add(function()
     -- one off tick to request purchase history
     Events.EveryOneMinute.Add(requestHistory)
+
 end)
 
 -- Listen for commands from the server
@@ -350,4 +355,14 @@ Events.OnReceiveGlobalModData.Add(function(tableName, tableData)
     end
 
 end)
+
+-- Client fixes for other mods
+if FA and FA.updateVendingMachine then
+    -- Functional Appliances
+    -- overwrite their handing of vending machines
+    local oldFn = FA.updateVendingMachine
+    FA.updateVendingMachine = function(vendingMaching, fill)
+        return vendingMaching
+    end
+end
 

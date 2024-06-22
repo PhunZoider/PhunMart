@@ -114,4 +114,8 @@ return {{
 }, {
     name = "Base.Shovel2",
     inherits = "base-gardening-gardentools"
+}, {
+    name = "SOMW.GardenShears",
+    inherits = "base-gardening-gardentools",
+    mod = "SimpleOverhaulMeleeWeapons"
 }}

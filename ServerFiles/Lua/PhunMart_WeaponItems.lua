@@ -448,4 +448,916 @@ return {{
 }, {
     name = "Base.Shotgun",
     inherits = "base-weapons-wepshotgun"
+}, {
+    name = "VFECombination.Combination556M16Magazine_20",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.1022",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.SKS",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.38Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.308Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Spas12",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.9mmPack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.9mmCrate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Coupled556",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.308Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CampCarbine",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.22Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MP5SD",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.762Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.TheZapper",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.M41APulse",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.M16Bayonet",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.44Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.556Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M60_Link",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.44Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.BuckRogersGun",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.223Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MK23SOCOM",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.45Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.38Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MekLeth",
+    inherits = "base-weapons",
+    mod = "PertsPartyTiles"
+}, {
+    name = "Base.MK2",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M60_Link_Die",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MP5",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CAR15DFolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.223Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Mini14Unfolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Coupled762",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MK2SD",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AK47",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Boltgun",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.MAC10Unfolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CZ75",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.22Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.SKSSpiker",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MAC10Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Glock",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.44Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.FAL",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CAR15",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.762Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MP5Unfolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_21",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.45Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Rusty",
+    inherits = "base-weapons",
+    mod = "NewEkron"
+}, {
+    name = "Base.556Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Mini14Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Glock18",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.223Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShellHolder",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AK47Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.762Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MP5Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Mini14",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Fisticuffs",
+    inherits = "base-weapons",
+    mod = "BrutalHandwork"
+}, {
+    name = "Base.45Case",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Tec9",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M60MMG_Bipod",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.E11Blaster",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.38Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CAR15D",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.9mmCase",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.308Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.SKSSpikerBayonet",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.556Pack",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.UziUnfolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.MP5HK",
+    inherits = "base-weapons",
+    mod = "Pitstop"
+}, {
+    name = "Base.22Crate",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Spas12Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.CAR15Folded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.FALClassic",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AK47Unfolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.P229",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M60MMG",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.UziFolded",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "UndeadSurvivor.DruidBow(WIP)",
+    inherits = "base-weapons",
+    mod = "UndeadSuvivor"
+}, {
+    name = "BZMFirearms.LawgiverMKII2012",
+    inherits = "base-weapons",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "Tikitown.Tikitorch_Brown",
+    inherits = "base-weapons",
+    mod = "tikitown"
+}, {
+    name = "Tikitown.Tikitorch_Special",
+    inherits = "base-weapons",
+    mod = "tikitown"
+}, {
+    name = "Tikitown.Tikitorch_Red",
+    inherits = "base-weapons",
+    mod = "tikitown"
+}, {
+    name = "Tikitown.Tikitorch_Base",
+    inherits = "base-weapons",
+    mod = "tikitown"
+}, {
+    name = "Tikitown.Tikitorch_Blue",
+    inherits = "base-weapons",
+    mod = "tikitown"
+}, {
+    name = "SOMW.GardenShearBlade",
+    inherits = "base-weapons",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.LShapedLugWrench",
+    inherits = "base-weapons",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.ShortTreeBranch",
+    inherits = "base-weapons",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SharpTrowel",
+    inherits = "base-weapons",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.Kukri",
+    inherits = "base-weapons",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "VFECombination.Combination556M16Magazine_25",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_24",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_23",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_22",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_29",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_28",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_27",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_26",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_9",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_8",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_1",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_0",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_3",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_2",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_5",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_10",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_4",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_31",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_7",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_30",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_6",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_14",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_13",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_12",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_11",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_18",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_17",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_16",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_15",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16Magazine_19",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.HeadhunterScope",
+    inherits = "base-weapons-wepaccessory",
+    mod = "UndeadSuvivor"
+}, {
+    name = "Base.ShotgunSawnoffNoStock",
+    inherits = "base-weapons-wepaccessory",
+    mod = "VFExpansion1"
+}, {
+    name = "Tikitown.LaserTag_Cartridge",
+    inherits = "base-weapons-wepaccessory",
+    mod = "tikitown"
+}, {
+    name = "Tikitown.LaserTag_Gun",
+    inherits = "base-weapons-wepaccessory",
+    mod = "tikitown"
+}, {
+    name = "Base.DoubleBarrelShotgunSawnoffNoStock",
+    inherits = "base-weapons-wepaccessory",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.308BulletsLinked",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShotgunShellsCase",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.FALClip",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShotgunShellsCrate",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.Combination556M16NoClip_1",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.CombinationShotgunShellNoClip_1",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShotgunShellsPack",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.762Bullets",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.22Bullets",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.CombinationM500ShotgunShellNoClip_4",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.CombinationM500ShotgunShellNoClip_3",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.CombinationM500ShotgunShellNoClip_2",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "VFECombination.CombinationM500ShotgunShellNoClip_1",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "BZMFirearms.LawgiverMKII2012Clip",
+    inherits = "base-weapons-wepammo",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "VFECombination.Combination308NoClip_1",
+    inherits = "base-weapons-wepammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M60_Links_Box",
+    inherits = "base-weapons-wepbulkammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.22Box",
+    inherits = "base-weapons-wepbulkammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.762Box",
+    inherits = "base-weapons-wepbulkammo",
+    mod = "VFExpansion1"
+}, {
+    name = "Vac.44MagnumBulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac"
+}, {
+    name = "Vac.762BulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac_vfe_patch"
+}, {
+    name = "Vac.38SpecialBulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac"
+}, {
+    name = "Vac.556mmBulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac"
+}, {
+    name = "Vac.22BulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac_vfe_patch"
+}, {
+    name = "Vac.45AutoBulletsMold",
+    inherits = "base-weapons-wepcrafting",
+    mod = "vac"
+}, {
+    name = "Base.ShellStraps",
+    inherits = "base-weapons-wepexplosive",
+    mod = "VFExpansion1"
+}, {
+    name = "MonmouthWeapons.SpearGungnir",
+    inherits = "base-weapons-wepmelee",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "Base.SpearBayonet",
+    inherits = "base-weapons-wepmelee",
+    mod = "VFExpansion1"
+}, {
+    name = "SOMW.LongMetalBar",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearCampyKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearMilitaryKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.LongLeadPipe",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearKukri",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearMilitaryMachete",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearTantoKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.ShovelAxe",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.BaseballBatBarbedWire",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearHuntingKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearMachete",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.ButterflyKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearSharpTrowel",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpear",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearGardenShearBlade",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearIcePick",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.MilitaryMachete",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.MilitaryKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearMilitaryMachete",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.CricketBat",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearSharpTrowel",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.CombatKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.Shovel2Axe",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.LongMetalPipe",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearHandFork",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearBreadKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.ShovelSpear",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearCombatKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.TantoKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "Base.556BattlePack",
+    inherits = "base-weapons-wepmelee",
+    mod = "VFExpansion1"
+}, {
+    name = "SOMW.CricketBatNails",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.BaseballBatWire",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearCampyKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.HalfPlank",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearMilitaryKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.SpearTantoKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "UndeadSurvivor.PrepperKnifeSwing",
+    inherits = "base-weapons-wepmelee",
+    mod = "UndeadSuvivor"
+}, {
+    name = "UndeadSurvivor.StalkerKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "UndeadSuvivor"
+}, {
+    name = "SOMW.CampyKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearScrewdriver",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "UndeadSurvivor.AmazonaSpear",
+    inherits = "base-weapons-wepmelee",
+    mod = "UndeadSuvivor"
+}, {
+    name = "SOMW.BaseballBatScrews",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "UndeadSurvivor.PrepperKnifeKnock",
+    inherits = "base-weapons-wepmelee",
+    mod = "UndeadSuvivor"
+}, {
+    name = "SOMW.PlankSpearKukri",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "UndeadSurvivor.PrepperKnifeStab",
+    inherits = "base-weapons-wepmelee",
+    mod = "UndeadSuvivor"
+}, {
+    name = "SOMW.SpearChippedStone",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.PlankSpearGardenShearBlade",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "Tikitown.TikitownBattery",
+    inherits = "base-weapons-wepmelee",
+    mod = "tikitown"
+}, {
+    name = "SOMW.PlankSpearCombatKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.HalfPlankNails",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.Shovel2Spear",
+    inherits = "base-weapons-wepmelee",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "Base.AZZK_pistol",
+    inherits = "base-weapons-weppistol",
+    mod = "PertsPartyTiles"
+}, {
+    name = "Base.FutureRevolver",
+    inherits = "base-weapons-weppistol",
+    mod = "Pitstop"
+}, {
+    name = "Base.CyberPistol",
+    inherits = "base-weapons-weppistol",
+    mod = "Pitstop"
+}, {
+    name = "Base.M2400_Rifle",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AssaultRifleMasterkey",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.DeadlyHeadhunterRifle",
+    inherits = "base-weapons-weprifle",
+    mod = "UndeadSuvivor"
+}, {
+    name = "Base.SniperRifle",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AssaultRifleBayonet",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.LeverRifle2",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AssaultRifleM1",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.LeverRifle",
+    inherits = "base-weapons-weprifle",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.FutureAssaultRifle",
+    inherits = "base-weapons-weprifle",
+    mod = "Pitstop"
+}, {
+    name = "Base.HeadhunterRifle",
+    inherits = "base-weapons-weprifle",
+    mod = "UndeadSuvivor"
+}, {
+    name = "Base.ShotgunSemi2",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.AssaultRifleMasterkeyShotgun",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShotgunSilent",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.Shotgun2",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.FutureShotgun",
+    inherits = "base-weapons-wepshotgun",
+    mod = "Pitstop"
+}, {
+    name = "Base.Shotgun2Bayonet",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.ShotgunSemi",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.M2400_Shotgun",
+    inherits = "base-weapons-wepshotgun",
+    mod = "VFExpansion1"
 }}

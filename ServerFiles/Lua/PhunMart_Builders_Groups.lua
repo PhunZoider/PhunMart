@@ -450,7 +450,17 @@ return {
             bunny = "clothspecial",
             boobtube = "clothshirt",
             lipstick = "clothaccessories",
-            hospital = "clothspecial"
+            hospital = "clothspecial",
+            pack = "clothbag",
+            helment = "clothhat",
+            bomber = "clothcoat",
+            legs = "clothpants",
+            armor = "clothspecial",
+            mullet = "clothaccessories",
+            mask = "clothaccessories",
+            feather = "clothaccessories",
+            cloak = "clothcoat",
+            boot = "clothshoes"
         },
         categories = {
             Accessory = true,
@@ -497,7 +507,7 @@ return {
                    "Base.Pencil", "Base.Soap", "Base.BluePen", "Base.ClosedUmbrellaBlack", "Base.Pen", "Base.Soap2",
                    "Base.ClosedUmbrellaBlue", "Base.CleaningLiquid", "Base.BathTowel", "Base.UmbrellaBlue",
                    "Base.Extinguisher", "Base.RippedSheets", "Base.CleaningLiquid2", "Base.ChairLeg", "Base.Mop",
-                   "Base.WineInGlass", "Base.CocktailGlass"},
+                   "Base.WineInGlass", "Base.CocktailGlass", "Base.Perfume", "Base.Cologne"},
         categories = {
             Household = true
         }
@@ -628,7 +638,10 @@ return {
             garlic = "medcomponent",
             bandaid = "medbandage",
             mortar = "medtools",
-            zombox = "medpills"
+            zombox = "medpills",
+            serum = "medpills",
+            medicine = "medpills",
+            syringe = "medtools"
         },
         categories = {
             Med = true,
@@ -638,6 +651,7 @@ return {
         }
     },
     Electronics = {
+        include = {"AutoGate.GateComponents"},
         categories = {
             Electronics = true,
             Communications = true,
@@ -704,7 +718,11 @@ return {
             handle = "caraccessories",
             mirror = "caraccessories",
             crate = "carstorage",
-            strip = "caraccessories"
+            strip = "caraccessories",
+            ecto1equipment = "caraccessories",
+            m998sparemount = "cartires",
+            fixaflat = "cartires",
+            wheel = "cartires"
         },
         categories = {
             VehicleMaintenance = true
@@ -741,6 +759,7 @@ return {
         }
     },
     Literature = {
+        include = {"BicPen.BicPen"},
         tabs = {
             book = "Books",
             magazine = "Magazines",
@@ -756,7 +775,9 @@ return {
             doodle = "litmisc",
             comic = "magazine",
             schematic = "schematic",
-            paper = "litmisc"
+            paper = "litmisc",
+            pen = "litmisc",
+            manual = "litmisc"
         },
         categories = {
             LitW = true,

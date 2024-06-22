@@ -44,4 +44,10 @@ return { -- a table of all items we want to ignore when building
 "Base.FertilizerEmpty", "Base.CompostBag", "Base.PetrolBleachBottle", "Base.PetrolPopBottle", "Base.WhiskeyPetrol",
 "Base.EmptyPetrolCan", "Base.WaterBottlePetrol", "Base.WhiskeyPetrol", "Base.Wound_Chest_Scratch_Female",
 "Base.WinePetrol", "Base.LeatherStripsDirty", "Base.PaintbucketEmpty", "Base.TinCanEmpty", "Base.Flint",
-"Base.TinCanEmpty", "Base.BareHands"}
+"Base.TinCanEmpty", "Base.BareHands", "WaterDispenser.WaterJugPetrolFull", "Base.BucketAsphaltMixtureFull",
+"FunctionalAppliances.FAPaperTowelWet", "EHE.PreventionFlyer", "EHE.QuarantineFlyer", "EHE.EmergencyFlyer",
+"EHE.EvacuationFlyer", "Base.PriestPrayer", "MonmouthNotes.SpikesNote", "Base.CrazedRamblings3",
+"Base.CrazedRamblings2", "Base.CrazedRamblings4", "DrawOnTheMap.SheetPaperMap", "EHE.NoticeFlyer",
+"Tikitown.Tikitown_quest1_map1", "Tikitown.Tikitown_quest1_map2", "Tikitown.Tikitown_quest1_map3",
+"Tikitown.Tikitown_quest1_map4", "ISA.Stash_Louisville1", "ISA.Stash_RosewoodE1", "ISA.Stash_RiversideW1",
+"Base.Lightsaber03", "Base.Lightsaber02", "Base.Lightsaber01", "Base.EnergySword", "Base.MndoBrush"}

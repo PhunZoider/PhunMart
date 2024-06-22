@@ -157,4 +157,40 @@ return {{
 }, {
     name = "Base.Hat_SurgicalCap_Green",
     inherits = "base-medical-medtools"
+}, {
+    name = "Base.AdrenalineSyringe",
+    inherits = "base-medical-medtools",
+    mod = "BB_FirstAidOverhaul_Alt"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenRedWhiteMedicine-medpills",
+    inherits = "base-medical",
+    mod = "CanteensAndBottles"
+}, {
+    name = "Base.Syringe1",
+    inherits = "base-medical-medtools",
+    mod = "BB_FirstAidOverhaul_Alt"
+}, {
+    name = "Base.EmptySyringe",
+    inherits = "base-medical",
+    mod = "BB_FirstAidOverhaul_Alt"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenGreenWhiteSerum-medpills",
+    inherits = "base-medical",
+    mod = "CanteensAndBottles"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenWhiteRedMedicine-medpills",
+    inherits = "base-medical",
+    mod = "CanteensAndBottles"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenWhiteGreenSerum-medpills",
+    inherits = "base-medical",
+    mod = "CanteensAndBottles"
+}, {
+    name = "Base.AlcoholBandage2Dirty",
+    inherits = "base-medical-medbandage",
+    mod = "BB_FirstAidOverhaul_Alt"
+}, {
+    name = "Base.AlcoholBandage2",
+    inherits = "base-medical-medbandage",
+    mod = "BB_FirstAidOverhaul_Alt"
 }}

@@ -56,4 +56,40 @@ return {{
 }, {
     name = "Base.MuldraughMap",
     inherits = "base-maps"
+}, {
+    name = "Base.Eerie Country Map",
+    inherits = "base-maps",
+    mod = "EerieCountry"
+}, {
+    name = "Base.TaylorsvilleMap",
+    inherits = "base-maps",
+    mod = "Taylorsville"
+}, {
+    name = "Base.monmouthcountymap",
+    inherits = "base-maps",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "Base.Homepie",
+    inherits = "base-maps",
+    mod = "Myhometown"
+}, {
+    name = "Base.UtopiaMap",
+    inherits = "base-maps",
+    mod = "Utopia"
+}, {
+    name = "Base.li_townshipmap",
+    inherits = "base-maps",
+    mod = "lakeivytownship"
+}, {
+    name = "Base.RabbitHashMap",
+    inherits = "base-maps",
+    mod = "RabbitHashKY"
+}, {
+    name = "Base.GreenportLootableMap",
+    inherits = "base-maps",
+    mod = "Greenport"
+}, {
+    name = "Base.BedfordMap",
+    inherits = "base-maps",
+    mod = "BedfordFalls"
 }}

@@ -25,7 +25,13 @@ PhunMart = {
         defsUpdated = "defsUpdated",
         serverPurchaseFailed = "serverPurchaseFailed",
         dump = "dump",
-        itemDump = "itemDump"
+        itemDump = "itemDump",
+        reloadItems = "reloadItems",
+        reloadShops = "reloadShops",
+        reloadAll = "reloadAll",
+        restockAllShops = "restockAllShops",
+        rerollAllShops = "rerollAllShops",
+        closeAllShops = "closeAllShops"
 
     },
     events = {

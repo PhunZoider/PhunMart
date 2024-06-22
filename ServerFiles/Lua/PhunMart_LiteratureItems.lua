@@ -417,4 +417,404 @@ return {{
     name = "damnCraft.HoodSchematics",
     inherits = "base-literature-schematic",
     mod = "damnlib"
+}, {
+    name = "BicPen.BicPen",
+    inherits = "base-literature-litmisc",
+    mod = "4ColorBicPenFix"
+}, {
+    name = "Base.LegalBook",
+    inherits = "base-literature-book",
+    mod = "PertsPartyTiles"
+}, {
+    name = "BZMClothing.TobinsSpiritGuideBook",
+    inherits = "base-literature-book",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "DrivingSkill.DrivingSkill_BookDriving4",
+    inherits = "base-literature-book",
+    mod = "DrivingSkill"
+}, {
+    name = "DrivingSkill.DrivingSkill_BookDriving3",
+    inherits = "base-literature-book",
+    mod = "DrivingSkill"
+}, {
+    name = "DrivingSkill.DrivingSkill_BookDriving2",
+    inherits = "base-literature-book",
+    mod = "DrivingSkill"
+}, {
+    name = "DrivingSkill.DrivingSkill_BookDriving1",
+    inherits = "base-literature-book",
+    mod = "DrivingSkill"
+}, {
+    name = "DrivingSkill.DrivingSkill_BookDriving5",
+    inherits = "base-literature-book",
+    mod = "DrivingSkill"
+}, {
+    name = "Literacy.BookStrength1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookStrength3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookBlunt1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookStrength2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookStrength5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookBlunt3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookStrength4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookBlunt2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlunt4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookBlunt5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlunt3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookBlunt4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlunt5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSpear4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSpear5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLongBlade5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSpear1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLongBlade4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSpear2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLongBlade3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSpear3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookNimble3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookNimble2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookNimble5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookNimble4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLongBlade2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLongBlade1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlade1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookReloading4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookReloading5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlade2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookReloading1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlade3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookReloading2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlade4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookReloading3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlade5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookMaintenance1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAxe3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAxe4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAxe1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAxe2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLightfoot5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLightfoot4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLightfoot3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLightfoot2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookLightfoot1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSprinting1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSprinting2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSprinting3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookMaintenance5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSprinting4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookMaintenance4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSprinting5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookMaintenance3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookMaintenance2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSneak3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSneak4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSneak5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSneak1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAxe5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSneak2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAiming1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAiming5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAiming4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAiming3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookNimble1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookAiming2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookFitness2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookFitness1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookFitness4",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookFitness3",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookFitness5",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlunt2",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "Literacy.BookSmallBlunt1",
+    inherits = "base-literature-book",
+    mod = "Literacy"
+}, {
+    name = "SpoonEssentialCrafting.SheetPaperX",
+    inherits = "base-literature-litmisc",
+    mod = "EssentialCrafting"
+}, {
+    name = "Base.VFECraftingMag1",
+    inherits = "base-literature-magazine",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.BMMagazineCars",
+    inherits = "base-literature-magazine",
+    mod = "BuildingMenu"
+}, {
+    name = "Base.BMMagazineSecretEntrances",
+    inherits = "base-literature-magazine",
+    mod = "BuildingMenu"
+}, {
+    name = "Base.BMMagazineGlass",
+    inherits = "base-literature-magazine",
+    mod = "BuildingMenu"
+}, {
+    name = "ISA.ISAMag1",
+    inherits = "base-literature-magazine",
+    mod = "ISA_41"
+}, {
+    name = "LightSensors.LSElectronicsMag",
+    inherits = "base-literature-magazine",
+    mod = "LightSensor"
+}, {
+    name = "SensorsTraps.LSElectronicsMagTraps",
+    inherits = "base-literature-magazine",
+    mod = "LightSensor"
+}, {
+    name = "MonmouthItems.BaCI1_Comic",
+    inherits = "base-literature-magazine",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthItems.BaCI2_Comic",
+    inherits = "base-literature-magazine",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthItems.BaCI3_Comic",
+    inherits = "base-literature-magazine",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "Literacy.LiteracyMag",
+    inherits = "base-literature-magazine",
+    mod = "Literacy"
+}, {
+    name = "SAPPHEATER.HeaterMag1",
+    inherits = "base-literature-magazine",
+    mod = "SAPPHEATER_fixed"
+}, {
+    name = "SAPPHEATER.HeaterMag2",
+    inherits = "base-literature-magazine",
+    mod = "SAPPHEATER_fixed"
+}, {
+    name = "SAPPHEATER.HeaterMag3",
+    inherits = "base-literature-magazine",
+    mod = "SAPPHEATER_fixed"
+}, {
+    name = "AutoGate.AutoGateMag",
+    inherits = "base-literature-magazine",
+    mod = "AutomaticGateMotors"
+}, {
+    name = "TrueMusicJukebox.InstructionManual",
+    inherits = "base-literature-magazine",
+    mod = "TrueMusicJukebox"
 }}

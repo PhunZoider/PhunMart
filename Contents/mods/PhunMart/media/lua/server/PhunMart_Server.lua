@@ -171,12 +171,15 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
         return
     end
 
+    local poolKey = self:getNextPoolKey(shop)
+    local pool = shop.pools.items[poolKey]
+
     -- different models for generating items
     local itemKeys = nil
     if cumulativeModel then
-        itemKeys = self:itemGenerationCumulativeModel(shop, self:getNextPoolKey(shop))
+        itemKeys = self:itemGenerationCumulativeModel(shop, poolKey)
     else
-        itemKeys = self:itemGenerationChanceModel(shop, self:getNextPoolKey(shop))
+        itemKeys = self:itemGenerationChanceModel(shop, poolKey)
     end
 
     local items = {}
@@ -219,17 +222,17 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
                             priceKey = shop.currency or "Base.Money"
                             -- print("Subsituting currency placeholder for " .. priceKey)
                         end
+                        local priced = vv
+                        local basePrice = pool.basePrice or shop.basePrice or 0
                         if type(vv) == "table" then
                             -- assert this is a range of min/max
                             local newValue = (vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10)
                             -- print("newValue = " .. newValue)
                             -- vv = newValue
-                            p[priceKey] = newValue
+                            p[priceKey] = basePrice + newValue
                             -- instance.conditions[i].price[priceKey] = newValue
-                        else
-                            p[priceKey] = vv
-                            -- instance.conditions[i].price[priceKey] = vv
                         end
+                        priced = p[priceKey]
                     end
                     -- print("Price table is now")
                     instance.conditions[i].price = p
@@ -419,6 +422,32 @@ end
 
 local Commands = {}
 
+Commands[PhunMart.commands.rerollAllShops] = function(playerObj, args)
+    print("Rerolling all shops")
+    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
+    PhunMart.shops = {}
+end
+
+Commands[PhunMart.commands.restockAllShops] = function(playerObj, args)
+    print("Restocking all shops")
+    PhunMart:checkForRestocking(true)
+end
+
+Commands[PhunMart.commands.reloadAll] = function(playerObj, args)
+    print("Reloading all")
+    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
+    PhunMart:loadAll()
+end
+
+Commands[PhunMart.commands.reloadItems] = function(playerObj, args)
+    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
+    PhunMart:loadAllItems()
+end
+
+Commands[PhunMart.commands.reloadShops] = function(playerObj, args)
+    PhunMart:loadAllShops()
+end
+
 Commands[PhunMart.commands.rebuildExportItems] = function(playerObj, args)
     local results = PhunMart:exportItems()
     sendServerCommand(playerObj, PhunMart.name, "rebuildExportItems", {
@@ -496,6 +525,7 @@ end
 
 -- generates shop or regenerates inventory
 Commands[PhunMart.commands.requestRestock] = function(playerObj, args)
+    print("Requesting restock for " .. args.key)
     local location = PhunMart:xyzFromKey(args.key)
     local machine = PhunMart:getMachineByLocation(playerObj, location.x, location.y, location.z)
     if not machine then
@@ -527,11 +557,9 @@ Commands[PhunMart.commands.requestShopGenerate] = function(playerObj, args)
         return
     end
     local shop = PhunMart:generateShop(machine)
-    local wallet = PhunMart:getPlayerData(playerObj:getUsername()).wallet or {}
     sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
         key = PhunMart:getKey(machine),
-        shop = shop,
-        wallet = wallet
+        shop = shop
     })
 end
 
@@ -541,11 +569,9 @@ Commands[PhunMart.commands.requestShop] = function(playerObj, args)
         shop = PhunMart:generateShop(args.key)
     end
     if shop then
-        local wallet = PhunMart:getPlayerData(playerObj:getUsername()).wallet or {}
         sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
             key = args.key,
-            shop = shop,
-            wallet = wallet
+            shop = shop
         })
     end
 end
@@ -557,14 +583,12 @@ Commands[PhunMart.commands.buy] = function(playerObj, args)
         shop = PhunMart:generateShop(args.shopKey)
     end
     if shop then
-        -- local wallet = PhunMart:getPlayerData(playerObj:getUsername()).wallet or {}
         sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.buy, {
             playerIndex = playerObj:getPlayerNum(),
             success = success,
             key = args.shopKey,
             item = args.item,
             shop = shop
-            -- wallet = wallet
         })
     end
 end
@@ -590,10 +614,10 @@ Events.OnCharacterDeath.Add(function(playerObj)
     end
 end)
 
-function PhunMart:checkForRestocking()
+function PhunMart:checkForRestocking(forceRestock)
     local now = GameTime:getInstance():getWorldAgeHours()
     for k, v in pairs(PhunMart.shops or {}) do
-        if (v.nextRestock or 0) < now then
+        if forceRestock == true or ((v.nextRestock or 0) < now) then
             local shop = PhunMart:getShop(k)
             if shop and (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
                 shop = PhunMart:generateShop(machine)
@@ -626,10 +650,10 @@ function PhunMart:loadAllItems()
     print("- PhunMart: LOADING ITEMDEFS")
     print("-")
     print("---------------------")
-
-    PhunMart:loadFilesForItemQueue()
-    PhunMart:processFilesToItemQueue()
-    local results = PhunMart:processItemTransformQueue()
+    self.defs.items = {}
+    self:loadFilesForItemQueue()
+    self:processFilesToItemQueue()
+    local results = self:processItemTransformQueue()
     local total = 0
 
     for k, v in pairs(results.all) do
@@ -666,8 +690,9 @@ function PhunMart:loadAllShops()
     print("- PhunMart: LOADING Shops")
     print("-")
     print("---------------------")
-    PhunMart:loadFilesForShopQueue()
-    PhunMart:processFilesToShopQueue()
+    self.defs.shops = {}
+    self:loadFilesForShopQueue()
+    self:processFilesToShopQueue()
     local results = PhunMart:processShopTransformQueue()
     local total = 0
     for k, v in pairs(results.all) do
@@ -701,8 +726,8 @@ end
 
 function PhunMart:loadAll()
     local startTime = getTimestampMs()
-    PhunMart:loadAllItems()
-    PhunMart:loadAllShops()
+    self:loadAllItems()
+    self:loadAllShops()
     print("====================================")
     print(" PhunMart Data Loaded in " .. PhunTools:differenceInSeconds(startTime, getTimestampMs()) .. " seconds")
     print("====================================")

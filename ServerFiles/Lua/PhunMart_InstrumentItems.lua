@@ -56,4 +56,12 @@ return {{
 }, {
     name = "Base.GuitarElectricBassRed",
     inherits = "base-instruments"
+}, {
+    name = "Base.JeanBeanWand",
+    inherits = "base-instruments",
+    mod = "Pitstop"
+}, {
+    name = "MonmouthWeapons.NakGuitarAcoustic",
+    inherits = "base-instruments",
+    mod = "MonmouthCounty_new"
 }}

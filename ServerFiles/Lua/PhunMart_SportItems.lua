@@ -77,4 +77,28 @@ return {{
 }, {
     name = "Base.CanoePadel",
     inherits = "base-sports"
+}, {
+    name = "Base.SausageWeapon",
+    inherits = "base-sports",
+    mod = "Pitstop"
+}, {
+    name = "Base.JadeCandyCane",
+    inherits = "base-sports",
+    mod = "Pitstop"
+}, {
+    name = "Base.HoverboardMelee",
+    inherits = "base-sports",
+    mod = "Pitstop"
+}, {
+    name = "Base.GhostTrap",
+    inherits = "base-sports",
+    mod = "Pitstop"
+}, {
+    name = "Tikitown.Titanium_Baseball_Bat",
+    inherits = "base-sports",
+    mod = "tikitown"
+}, {
+    name = "SOMW.AluminumBaseballBat",
+    inherits = "base-sports",
+    mod = "SimpleOverhaulMeleeWeapons"
 }}

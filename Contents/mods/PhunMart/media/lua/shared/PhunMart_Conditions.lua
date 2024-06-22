@@ -1,7 +1,5 @@
 require "PhunMart_Core"
-require "PhunWallet_Core"
 
-local PhunWallet = PhunWallet
 local Conditions = {}
 
 local RICH_PREFIX = "<LINE> <INDENT:4> "
@@ -550,17 +548,6 @@ Conditions.price = function(self, playerObj, item, price, results)
 
             local itemInstance = getScriptManager():getItem(k)
 
-            -- is PhunWallet installed and is it managing this item as a currency?
-            -- if PhunWallet and PhunWallet.currencies[k] then
-            --     self.currencies[k] = {
-            --         type = "PhunWallet"
-            --     }
-            --     if itemInstance then
-            --         self.currencies[k].label = itemInstance:getDisplayName()
-            --     else
-            --         self.currencies[k].label = k
-            --     end
-            -- else
             if itemInstance then
                 self.currencies[k] = {
                     type = "item",
@@ -612,18 +599,6 @@ Conditions.price = function(self, playerObj, item, price, results)
             else
                 v.value = v.value - count
             end
-            -- elseif v.type == "PhunWallet" and v.value > 0 then
-            --     -- assert that PhunWallet is being used to manage this currency
-            --     local wallet = PhunWallet:getPlayerData(playerObj).wallet or {}
-            --     local current = wallet.current or {}
-
-            --     if current[k] then
-            --         if current[k] > v.value then
-            --             v.value = 0
-            --         else
-            --             v.value = v.value - current[k]
-            --         end
-            --     end
         elseif v.type == "trait" and v.value > 0 then
             -- player is "paying" with a trait
             if playerObj:HasTrait(k) then

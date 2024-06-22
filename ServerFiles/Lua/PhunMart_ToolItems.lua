@@ -157,4 +157,112 @@ return {{
     name = "damnCraft.PlasticWeldingGun",
     inherits = "base-tools-toolwelding",
     mod = "damnlib"
+}, {
+    name = "Base.OverlookFireAxe",
+    inherits = "base-tools",
+    mod = "PertsPartyTiles"
+}, {
+    name = "Base.EntrenchingToolBlack_Blade",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.EntrenchingTool_Blade",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.EntrenchingTool_Folded",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.BatLeth",
+    inherits = "base-tools",
+    mod = "PertsPartyTiles"
+}, {
+    name = "Base.DjackzVinyl",
+    inherits = "base-tools",
+    mod = "Pitstop"
+}, {
+    name = "Base.EntrenchingToolBlack_Blunt",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.EntrenchingToolBlack_Folded",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "Base.EntrenchingTool_Blunt",
+    inherits = "base-tools",
+    mod = "VFExpansion1"
+}, {
+    name = "BZMClothing.Saw",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "BZMClothing.GardenSaw",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "EHE.SignalFlare",
+    inherits = "base-tools",
+    mod = "ExpandedHelicopterEvents"
+}, {
+    name = "EHE.HandFlare",
+    inherits = "base-tools",
+    mod = "ExpandedHelicopterEvents"
+}, {
+    name = "MonmouthWeapons.Crowbarski",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthWeapons.AxeBZMCrafted",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthWeapons.PickAxePink",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthWeapons.Hammer_Reinforced",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "MonmouthWeapons.CrowbarScorpion",
+    inherits = "base-tools",
+    mod = "MonmouthCounty_new"
+}, {
+    name = "SOMW.EntrenchingShovel",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.IceAxe",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.GardenScythe",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.GardenBrushCutter",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.HandFile",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.UniAxe",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.AxeHammer",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.HookMachete",
+    inherits = "base-tools",
+    mod = "SimpleOverhaulMeleeWeapons"
+}, {
+    name = "SOMW.CampingHatchet",
+    inherits = "base-tools-toolcamping",
+    mod = "SimpleOverhaulMeleeWeapons"
 }}

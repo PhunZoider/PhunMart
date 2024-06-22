@@ -76,19 +76,19 @@ function PhunMartAdminUI:createChildren()
     self.title:instantiate();
     self:addChild(self.title);
 
-    y = y + h + x
+    -- y = y + h + x
 
-    self.exportItemsButton = ISButton:new(x, y, w, h, "Export items", self, function()
+    -- self.exportItemsButton = ISButton:new(x, y, w, h, "Export items", self, function()
 
-        self:promptForName("default texty")
-        -- local p = getPlayer()
-        -- local name = PhunMart.name
-        -- local command = PhunMart.commands.rebuildExportItems
-        -- sendClientCommand(p, name, command, {})
-        -- PhunMartAdminUI.instance:close()
-    end);
-    self.exportItemsButton:initialise();
-    self:addChild(self.exportItemsButton);
+    --     self:promptForName("default texty")
+    --     -- local p = getPlayer()
+    --     -- local name = PhunMart.name
+    --     -- local command = PhunMart.commands.rebuildExportItems
+    --     -- sendClientCommand(p, name, command, {})
+    --     -- PhunMartAdminUI.instance:close()
+    -- end);
+    -- self.exportItemsButton:initialise();
+    -- self:addChild(self.exportItemsButton);
 
     y = y + h + x
 
@@ -132,6 +132,34 @@ function PhunMartAdminUI:createChildren()
     end);
     self.exportIncItemsButton:initialise();
     self:addChild(self.exportIncItemsButton);
+
+    y = y + h + x
+
+    self.restockAllButton = ISButton:new(x, y, w, h, "Restock All", self, function()
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.restockAllShops, {})
+        PhunMartAdminUI.instance:close()
+    end);
+    self.restockAllButton:initialise();
+    self:addChild(self.restockAllButton);
+
+    y = y + h + x
+
+    self.reloadAllButton = ISButton:new(x, y, w, h, "Reload All Defs", self, function()
+        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.reloadAll, {})
+        PhunMartAdminUI.instance:close()
+    end);
+    self.reloadAllButton:initialise();
+    self:addChild(self.reloadAllButton);
+
+    y = y + h + x
+
+    self.rerollAllButton = ISButton:new(x, y, w, h, "Reroll All", self, function()
+        local pm = PhunMart
+        sendClientCommand(getPlayer(), pm.name, pm.commands.rerollAllShops, {})
+        PhunMartAdminUI.instance:close()
+    end);
+    self.rerollAllButton:initialise();
+    self:addChild(self.rerollAllButton);
 
     -- y = y + h + x
 
