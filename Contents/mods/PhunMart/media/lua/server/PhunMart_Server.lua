@@ -185,7 +185,7 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
     local items = {}
     for _, v in ipairs(itemKeys) do
 
-        local item = self.defs.items[v]
+        local item = PhunTools:deepCopyTable(self.defs.items[v])
         local qty = 0
 
         if type(item.inventory) == "table" then
@@ -210,37 +210,40 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
             end
 
             for i, v in ipairs(item.conditions) do
-                -- print("Condition " .. i .. " type of v is " .. type(v))
 
                 if v.price then
+
                     -- print("Price exists and its type is " .. type(v.price))
+
                     local p = {}
                     for kk, vv in pairs(v.price) do
-                        -- print("Price key " .. kk .. " value " .. tostring(vv))
+
                         local priceKey = kk
+                        local value = vv
+
                         if kk == "currency" then
                             priceKey = shop.currency or "Base.Money"
-                            -- print("Subsituting currency placeholder for " .. priceKey)
                         end
-                        local priced = vv
+                        -- local priced = vv
                         local basePrice = pool.basePrice or shop.basePrice or 0
+
                         if type(vv) == "table" then
-                            -- assert this is a range of min/max
-                            local newValue = (vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10)
-                            -- print("newValue = " .. newValue)
-                            -- vv = newValue
-                            p[priceKey] = basePrice + newValue
-                            -- instance.conditions[i].price[priceKey] = newValue
+                            value = (vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10)
+                        else
+                            value = vv
                         end
-                        priced = p[priceKey]
+
+                        p[priceKey] = basePrice + value
                     end
-                    -- print("Price table is now")
+
                     instance.conditions[i].price = p
+
                 end
             end
             items[item.key] = instance
         end
     end
+
     return items
 end
 
@@ -354,8 +357,10 @@ function PhunMart:generateShop(vendingMachineOrKey)
         nextRestock = GameTime:getInstance():getWorldAgeHours() + (chosenShopDef.restock or 24),
         backgroundImage = chosenShopDef.backgroundImage or nil,
         requiresPower = chosenShopDef.requiresPower or false,
+        currency = chosenShopDef.currency or "Base.Money",
         layout = chosenShopDef.layout or nil,
         maxRestock = chosenShopDef.maxRestock or 0,
+        basePrice = chosenShopDef.basePrice or 0,
         restocks = 0,
         location = {
             x = location.x,

@@ -127,10 +127,12 @@ function PhunMart:getKey(obj)
     if type(obj) == "string" then
         return obj
     end
-    if obj.getX then
-        return obj:getX() .. "_" .. obj:getY() .. "_" .. obj:getZ()
-    elseif obj.x then
-        return obj.x .. "_" .. obj.y .. "_" .. obj.z
+    if obj then
+        if obj.getX then
+            return obj:getX() .. "_" .. obj:getY() .. "_" .. obj:getZ()
+        elseif obj.x then
+            return obj.x .. "_" .. obj.y .. "_" .. obj.z
+        end
     end
 end
 

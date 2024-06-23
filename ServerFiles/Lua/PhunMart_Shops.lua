@@ -5,7 +5,7 @@ return { --[[
 
 --]] {
     abstract = true,
-    key = "base:shop",
+    key = "base-shop",
     label = "Vending Machine",
     fills = {
         min = 6,
@@ -23,7 +23,7 @@ return { --[[
 
     label = "Good Phoods",
     key = "shop-good-foods",
-    inherits = "base:shop",
+    inherits = "base-shop",
     pools = {
         items = {{
             filters = {
@@ -99,6 +99,7 @@ return { --[[
     inherits = "base-shop",
     label = "Gifted Xperiences",
     backgroundImage = "machine-gifted-xp",
+    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     zones = {
         difficulty = 2
     },
@@ -111,6 +112,7 @@ return { --[[
     inherits = "base-shop",
     label = "Luxury Xperiences",
     backgroundImage = "machine-luxury-xp",
+    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     zones = {
         difficulty = {
             min = 3
@@ -124,6 +126,7 @@ return { --[[
     key = "shop-traits",
     inherits = "base-shop",
     label = "TraiterJoe",
+    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     requiresPower = true,
     backgroundImage = "machine-traiter-joes",
     filters = {
@@ -200,7 +203,7 @@ return { --[[
     key = "shop-electronics",
     inherits = "base-shop",
     label = "Electronics",
-    backgroundImage = "machine-electrics",
+    backgroundImage = "machine-electronics",
     filters = {
         tags = "electronics"
     }
@@ -225,7 +228,7 @@ return { --[[
 }, {
 
     key = "shop-fish",
-    inherits = "base:shop",
+    inherits = "base-shop",
     label = "Fish",
     backgroundImage = "machine-phish4u",
     filters = {

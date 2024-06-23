@@ -193,4 +193,12 @@ return {{
     name = "Base.AlcoholBandage2",
     inherits = "base-medical-medbandage",
     mod = "BB_FirstAidOverhaul_Alt"
+}, {
+    name = "Base.Cologne",
+    inherits = "base-medical-medpills",
+    mod = "EssentialCrafting"
+}, {
+    name = "Base.Perfume",
+    inherits = "base-medical-medpills",
+    mod = "EssentialCrafting"
 }}

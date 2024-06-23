@@ -132,12 +132,4 @@ return {{
     name = "SOMW.WalkingCane",
     inherits = "base-household",
     mod = "SimpleOverhaulMeleeWeapons"
-}, {
-    name = "Base.Cologne",
-    inherits = "base-medical",
-    mod = "EssentialCrafting"
-}, {
-    name = "Base.Perfume",
-    inherits = "base-medical",
-    mod = "EssentialCrafting"
 }}
