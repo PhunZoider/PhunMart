@@ -25,6 +25,7 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
+        PhunTools:printTable(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -88,6 +89,7 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
+        PhunTools:printTable(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -250,11 +252,13 @@ end
 function PhunMart:getInstanceDistances(location, ignoreKey)
     local results = {}
 
-    for k, v in pairs(self.shops) do
-        if v.location and (ignoreKey == nil or k ~= ignoreKey) then
-            local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
-            if not results[v.key] or results[v.key] < min then
-                results[v.key] = min
+    if location then
+        for k, v in pairs(self.shops or {}) do
+            if v.location and v.location.x and (ignoreKey == nil or k ~= ignoreKey) then
+                local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
+                if not results[v.key] or results[v.key] < min then
+                    results[v.key] = min
+                end
             end
         end
     end
@@ -269,7 +273,7 @@ function PhunMart:getShopListFromKey(key)
     local totalProbability = 0
 
     for k, v in pairs(self.defs.shops) do
-        if v.enabled and v.reservations == nil or v.reservations == false and not v.abstract then
+        if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract then
 
             if not v.minDistance or not distances[v.key] or (v.minDistance < distances[v.key]) then
                 if v.zones and type(v.zones) == "table" then

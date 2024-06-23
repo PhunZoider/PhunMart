@@ -175,7 +175,7 @@ return { --[[
     pools = {
         items = {{
             filters = {
-                tags = "base-vehicle-special"
+                tags = "vehicle-special"
             }
         }}
     }
@@ -231,8 +231,12 @@ return { --[[
     inherits = "base-shop",
     label = "Fish",
     backgroundImage = "machine-phish4u",
-    filters = {
-        tags = "fish"
+    pools = {
+        items = {{
+            filters = {
+                tags = "fish,tackle"
+            }
+        }}
     }
 }, {
 
