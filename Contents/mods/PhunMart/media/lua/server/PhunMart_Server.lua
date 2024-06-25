@@ -330,6 +330,10 @@ end
 function PhunMart:generateShop(vendingMachineOrKey)
 
     local key = self:getKey(vendingMachineOrKey)
+    if not key then
+        print("PhunMart:Error No key found for " .. tostring(vendingMachineOrKey))
+        return
+    end
     local chosenShopDef = nil
     local resKey = nil
     if self.reservations[key] then
@@ -625,30 +629,47 @@ end)
 
 function PhunMart:checkForRestocking(forceRestock)
     local now = GameTime:getInstance():getWorldAgeHours()
+    local toRemove = {}
     for k, v in pairs(PhunMart.shops or {}) do
         if forceRestock == true or ((v.nextRestock or 0) < now) then
             local shop = PhunMart:getShop(k)
-            if shop and (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
-                shop = PhunMart:generateShop(machine)
+            if shop and shop.items then
+                if (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
+                    shop = PhunMart:generateShop(machine)
+                else
+                    shop.restocks = (shop.restocks or 0) + 1
+                end
+                if shop then
+                    shop.items = self:generateShopItems(k, sandbox.CumulativeItemGeneration == true)
+                    if not PhunMart.defs.shops[shop.key] then
+                        print("PhunMart: ERROR! Shop " .. shop.key .. " no longer exists in defs")
+                        shop = self:generateShop(k)
+                        return
+                    end
+                    shop.nextRestock = now + (PhunMart.defs.shops[shop.key].restock or 24)
+                    if not self.shoplist[k] or self.shoplist[k] ~= shop.name then
+                        self.shoplist[k] = shop.name
+                        ModData.transmit(self.consts.shoplist)
+                    end
+                    sendServerCommand(PhunMart.name, PhunMart.commands.requestShop, {
+                        key = k,
+                        shop = shop
+                    })
+                else
+                    -- shop should have regenned, but it didn't?
+                    print("PhunMart: ERROR! Shop " .. tostring(k) .. " no longer exists")
+                    toRemove[k] = true
+                end
+
             else
-                shop.restocks = (shop.restocks or 0) + 1
+                print("PhunMart: ERROR! Shop " .. tostring(k) .. " no longer exists")
+                toRemove[k] = true
             end
-            shop.items = PhunMart:generateShopItems(k, sandbox.CumulativeItemGeneration == true)
-            if not PhunMart.defs.shops[shop.key] then
-                print("PhunMart: ERROR! Shop " .. shop.key .. " no longer exists in defs")
-                shop = self:generateShop(k)
-                return
-            end
-            shop.nextRestock = now + (PhunMart.defs.shops[shop.key].restock or 24)
-            if not self.shoplist[k] or self.shoplist[k] ~= shop.name then
-                self.shoplist[k] = shop.name
-                ModData.transmit(self.consts.shoplist)
-            end
-            sendServerCommand(PhunMart.name, PhunMart.commands.requestShop, {
-                key = k,
-                shop = shop
-            })
         end
+    end
+
+    for k, _ in pairs(toRemove) do
+        PhunMart.shops[k] = nil
     end
 end
 

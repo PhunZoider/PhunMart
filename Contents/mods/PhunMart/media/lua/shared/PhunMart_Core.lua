@@ -272,7 +272,7 @@ function PhunMart:getZoneInfo(key)
         if location and location.x then
             return self.maps:getLocation(location.x, location.y)
         else
-            print("PhunMart: Warning: Could not get location info for " .. key)
+            print("PhunMart: Warning: Could not get location info for " .. tostring(key))
         end
     end
 
