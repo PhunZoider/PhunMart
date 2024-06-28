@@ -9,7 +9,7 @@ return {{
     },
     price = {
         currency = {
-            base = 1,
+            base = 3,
             min = 3,
             max = 5
         }
@@ -19,10 +19,19 @@ return {{
     key = "base-fish-tackle",
     inherits = "base-fish",
     tab = "Tackle",
-    tags = "fish,tackle"
+    tags = "fish,tackle",
+    price = {
+        currency = 3
+    }
 }, {
-    name = "Base.Salmon",
-    inherits = "base-fish"
+    abstract = true,
+    key = "base-fish-bait",
+    inherits = "base-fish",
+    tab = "Bait",
+    tags = "fish,bait",
+    price = {
+        currency = 2
+    }
 }, {
     name = "Base.Trout",
     inherits = "base-fish"
@@ -34,9 +43,6 @@ return {{
     inherits = "base-fish"
 }, {
     name = "Base.Catfish",
-    inherits = "base-fish"
-}, {
-    name = "Base.Maki",
     inherits = "base-fish"
 }, {
     name = "Base.Bass",
@@ -52,13 +58,14 @@ return {{
     inherits = "base-fish-tackle"
 }, {
     name = "Base.FishingRodBreak",
-    inherits = "base-fish-tackle"
+    inherits = "base-fish-tackle",
+    enabled = false
 }, {
     name = "Base.Maggots",
-    inherits = "base-fish-tackle"
+    inherits = "base-fish-bait"
 }, {
     name = "Base.Maggots2",
-    inherits = "base-fish-tackle"
+    inherits = "base-fish-bait"
 }, {
     name = "Base.BaitFish",
     inherits = "base-fish-tackle"
@@ -67,7 +74,7 @@ return {{
     inherits = "base-fish-tackle"
 }, {
     name = "Base.Worm",
-    inherits = "base-fish-tackle"
+    inherits = "base-fish-bait"
 }, {
     name = "Base.FishingNet",
     inherits = "base-fish-tackle"
@@ -76,7 +83,8 @@ return {{
     inherits = "base-fish-tackle"
 }, {
     name = "Base.BrokenFishingNet",
-    inherits = "base-fish-tackle"
+    inherits = "base-fish-tackle",
+    enabled = false
 }, {
     name = "Base.FishingTackle2",
     inherits = "base-fish-tackle"

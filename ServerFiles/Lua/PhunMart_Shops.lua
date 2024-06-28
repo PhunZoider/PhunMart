@@ -12,9 +12,9 @@ return { --[[
         max = 10
     },
     probability = 15,
-    restock = 24,
-    maxRestock = 2,
-    currency = "Base.Money", -- the default currency for shops
+    restock = 48,
+    maxRestock = 1000,
+    currency = "PhunMart.SilverDollar", -- the default currency for shops
     backgroundImage = "machine-none",
     minDistance = 100,
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
@@ -41,7 +41,78 @@ return { --[[
     },
     backgroundImage = "machine-good-phoods"
 }, {
-
+    label = "Collectors",
+    key = "shop-collectables",
+    inherits = "base-shop",
+    zones = {
+        difficulty = 1
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "collectables1,scrap-silver"
+            }
+        }}
+    },
+    backgroundImage = "machine-collectors"
+}, {
+    label = "Collectors2",
+    key = "shop-collectables2",
+    inherits = "base-shop",
+    fills = {
+        min = 3,
+        max = 7
+    },
+    zones = {
+        difficulty = 2
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "collectables2,scrap-silver,scrap-gold"
+            }
+        }}
+    },
+    backgroundImage = "machine-collectors"
+}, {
+    label = "Collectors3",
+    key = "shop-collectables3",
+    inherits = "base-shop",
+    fills = {
+        min = 2,
+        max = 4
+    },
+    zones = {
+        difficulty = 3
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "collectables3,scrap-gold,scrap-gems"
+            }
+        }}
+    },
+    backgroundImage = "machine-collectors"
+}, {
+    label = "Collectors4",
+    key = "shop-collectables4",
+    inherits = "base-shop",
+    fills = {
+        min = 2,
+        max = 4
+    },
+    zones = {
+        difficulty = 4
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "collectables4,scrap-gold,scrap-gems"
+            }
+        }}
+    },
+    backgroundImage = "machine-collectors"
+}, {
     key = "shop-phat-foods",
     inherits = "base-shop",
     label = "Phat Phoods",
@@ -89,7 +160,7 @@ return { --[[
     label = "Budget Xperiences",
     inherits = "base-shop",
     backgroundImage = "machine-budget-xp",
-    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
+    currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     filters = {
         tags = "perks1,perks2"
     }
@@ -99,7 +170,7 @@ return { --[[
     inherits = "base-shop",
     label = "Gifted Xperiences",
     backgroundImage = "machine-gifted-xp",
-    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
+    currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     zones = {
         difficulty = 2
     },
@@ -112,7 +183,7 @@ return { --[[
     inherits = "base-shop",
     label = "Luxury Xperiences",
     backgroundImage = "machine-luxury-xp",
-    currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
+    currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     zones = {
         difficulty = {
             min = 3
@@ -244,7 +315,6 @@ return { --[[
     inherits = "base-shop",
     label = "Final Ammendment",
     backgroundImage = "machine-final-ammendment",
-
     pools = {
         items = {{
             filters = {
@@ -265,6 +335,7 @@ return { --[[
     inherits = "base-shop",
     label = "Final Ammendment2",
     backgroundImage = "machine-final-ammendment",
+    currency = "PhunMart.CheeseToken", -- the default currency for shops
     zones = {
         difficulty = {
             min = 2
@@ -285,6 +356,7 @@ return { --[[
     key = "shop-weapons-3",
     inherits = "base-shop",
     label = "Final Ammendment3",
+    currency = "PhunMart.CheeseToken", -- the default currency for shops
     backgroundImage = "machine-final-ammendment",
     zones = {
         difficulty = {

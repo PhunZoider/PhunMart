@@ -104,14 +104,14 @@ return {{
 }, {
     name = "SportsCar_ez",
     inherits = "base-vehicle-basic",
-    disabled = true
+    enabled = false
 }, {
     name = "SUV",
     inherits = "base-vehicle-truck"
 }, {
     name = "ModernCar_ez",
     inherits = "base-vehicle-basic",
-    deisabled = true
+    enabled = false
 }, {
     name = "Van_Transit",
     inherits = "base-vehicle-van"
@@ -135,7 +135,8 @@ return {{
     inherits = "base-vehicle-basic"
 }, {
     name = "ModernCar_Martin",
-    inherits = "base-vehicle-basic"
+    inherits = "base-vehicle-basic",
+    enabled = false
 }, {
     name = "Trailer",
     inherits = "base-vehicle-other"

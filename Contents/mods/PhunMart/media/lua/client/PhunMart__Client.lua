@@ -72,7 +72,13 @@ function PhunMart:completeTransaction(args)
 
         for _, v in ipairs(args.item.receive) do
             if v.type == "ITEM" then
-                playerObj:getInventory():AddItem(v.name, v.quantity)
+                print("PROCESSING " .. tostring(v.name) .. " -- " .. tostring(v.label) .. " -- " .. tostring(v.quantity))
+                if PhunWallet and PhunWallet.currencies[v.label] then
+                    PhunWallet.queue:add(playerObj, v.label, v.quantity)
+                else
+                    playerObj:getInventory():AddItem(v.name, v.quantity)
+                end
+
             elseif v.type == "PERK" then
                 local perk = PerkFactory.getPerkFromName(v.name or v.label)
                 local qty = v.quantity or 1
@@ -251,6 +257,12 @@ end
 local function setup()
     Events.EveryOneMinute.Remove(setup)
     ModData.request(PhunMart.consts.shoplist)
+    if FAVendingMachine and FAVendingMachine.doBuildMenu then
+        FAVendingMachine.doBuildMenu = function(player, menu, square, VendingMachine)
+        end
+        FAVendingMachine.onUseVendingMachine = function(junk, player, VendingMachine, tempSetting)
+        end
+    end
 end
 Events.EveryOneMinute.Add(setup)
 
@@ -364,5 +376,6 @@ if FA and FA.updateVendingMachine then
     FA.updateVendingMachine = function(vendingMaching, fill)
         return vendingMaching
     end
+
 end
 

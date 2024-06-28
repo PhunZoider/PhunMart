@@ -19,7 +19,28 @@ return {{
     key = "base-gardening-gardenseeds",
     inherits = "base-gardening",
     tab = "Seeds",
-    tags = "gardening,gardenseeds"
+    quantity = 10,
+    tags = "gardening,gardenseeds",
+    price = {
+        currency = {
+            base = 1,
+            min = 3,
+            max = 5
+        }
+    }
+}, {
+    abstract = true,
+    key = "base-gardening-gseedpacket",
+    inherits = "base-gardening",
+    tab = "Seeds",
+    tags = "gardening,gardenseeds",
+    price = {
+        currency = {
+            base = 10,
+            min = 3,
+            max = 5
+        }
+    }
 }, {
     abstract = true,
     key = "base-gardening-gardentools",
@@ -31,28 +52,28 @@ return {{
     inherits = "base-gardening-gardenseeds"
 }, {
     name = "farming.RedRadishBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.CarrotSeed",
     inherits = "base-gardening-gardenseeds"
 }, {
     name = "farming.PotatoBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.CabbageSeed",
     inherits = "base-gardening-gardenseeds"
 }, {
     name = "farming.StrewberrieBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.StrewberrieSeed",
     inherits = "base-gardening-gardenseeds"
 }, {
     name = "farming.TomatoBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.BroccoliBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.BroccoliSeed",
     inherits = "base-gardening-gardenseeds"
@@ -64,10 +85,10 @@ return {{
     inherits = "base-gardening-gardenseeds"
 }, {
     name = "farming.CarrotBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "farming.CabbageBagSeed",
-    inherits = "base-gardening-gardenseeds"
+    inherits = "base-gardening-gseedpacket"
 }, {
     name = "Base.LeafRake",
     inherits = "base-gardening-gardentools"

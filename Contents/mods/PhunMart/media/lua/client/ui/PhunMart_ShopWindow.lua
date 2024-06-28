@@ -13,13 +13,13 @@ UI.layouts = {
     default = {
         window = {
             width = 537,
-            height = 903
+            height = 728
         },
         tabs = {
             x = 45,
-            y = 232,
+            y = 145,
             width = 299,
-            height = 523,
+            height = 476,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -29,7 +29,7 @@ UI.layouts = {
         },
         previewPanel = {
             x = 378,
-            y = 232,
+            y = 145,
             width = 150,
             height = 150,
             backgroundColor = {
@@ -41,9 +41,9 @@ UI.layouts = {
         },
         pricePanel = {
             x = 378,
-            y = 388,
+            y = 305,
             width = 150,
-            height = 370,
+            height = 316,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -53,9 +53,9 @@ UI.layouts = {
         },
         detailsPanel = {
             x = 378,
-            y = 552,
+            y = 305,
             width = 150,
-            height = 150,
+            height = 316,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -65,7 +65,7 @@ UI.layouts = {
         },
         buyButton = {
             x = 30,
-            y = 803,
+            y = 645,
             width = 315,
             height = 62
         },
@@ -77,19 +77,19 @@ UI.layouts = {
         },
         restock = {
             x = 378,
-            y = 803,
+            y = 643,
             width = 70,
             height = 25
         },
         reroll = {
             x = 458,
-            y = 803,
+            y = 643,
             width = 70,
             height = 25
         },
         admin = {
             x = 378,
-            y = 838,
+            y = 678,
             width = 150,
             height = 25
         }
@@ -133,7 +133,7 @@ function UI.OnOpenPanel(playerObj, key)
     local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14
     local core = getCore()
     local width = UI.layouts.default.window.width * FONT_SCALE
-    local height = 903 * FONT_SCALE
+    local height = UI.layouts.default.window.height * FONT_SCALE
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
 
@@ -487,7 +487,7 @@ function UI:render()
             else
                 txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
             end
-            self:drawText(txt, self.layouts.default.buyButton.x, self.height - 20, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+            self:drawText(txt, self.layouts.default.buyButton.x, self.height - 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
         end
 
     end

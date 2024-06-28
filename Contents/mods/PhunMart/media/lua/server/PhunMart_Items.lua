@@ -216,7 +216,7 @@ function PhunMart:formatItem(data)
         -- provided own receive values
         for _, v in ipairs(receive) do
             table.insert(receives, {
-                type = string.upper(v.type) or type,
+                type = string.upper(v.type or type),
                 label = v.label or v.name or name,
                 quantity = v.quantity or 1,
                 tag = v.tag or nil,
@@ -279,7 +279,7 @@ function PhunMart:formatItem(data)
         tab = data.tab or base.tab or nil,
         mod = data.mod or base.mod or nil,
         quantity = data.quantity or base.quantity or 1,
-        inventory = data.inventory or base.inventory or nil,
+        inventory = nil,
         display = display,
         receive = receives,
         conditions = conditions,
@@ -288,6 +288,12 @@ function PhunMart:formatItem(data)
         abstract = data.abstract or nil,
         enabled = data.enabled ~= false
     }
+
+    if data.inventory ~= nil then
+        formatted.inventory = data.inventory
+    elseif base.inventory ~= nil then
+        formatted.inventory = base.inventory
+    end
 
     if string.len(data.tags or base.tags or "") > 0 then
         formatted.tags = data.tags or base.tags or ""

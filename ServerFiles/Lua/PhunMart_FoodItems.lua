@@ -1134,7 +1134,13 @@ return {{
     mod = "sapphcooking"
 }, {
     name = "Base.SushiEgg",
-    inherits = "base-food-fooddairy"
+    inherits = "base-food-foodsnack"
+}, {
+    name = "Base.Maki",
+    inherits = "base-food-foodsnack"
+}, {
+    name = "Base.Salmon",
+    inherits = "base-food-foodmeat"
 }, {
     name = "SapphCooking.MozzarelaCheese",
     inherits = "base-food-fooddairy",

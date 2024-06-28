@@ -142,7 +142,7 @@ return {{
     name = "Base.BellyButton_StudSilver",
     inherits = "base-clothing-clothaccessories"
 }, {
-    name = "Base.Necklace_Gold",
+    name = "Base.BellyButton_StudSilver",
     inherits = "base-clothing-clothaccessories"
 }, {
     name = "Base.NecklaceLong_SilverDiamond",

@@ -352,7 +352,7 @@ return {{
     display = {
         label = "Emaciated"
     },
-    disabled = true, -- this would be free points
+    enabled = false, -- this would be free points
     receive = {{
         type = "trait",
         name = "Emaciated"
@@ -419,7 +419,7 @@ return {{
     display = {
         label = "Feeble"
     },
-    disabled = true, -- can be abused
+    enabled = false, -- can be abused
     receive = {{
         type = "trait",
         name = "Feeble"
@@ -668,7 +668,7 @@ return {{
 }, {
     inherits = "base-trait:positive",
     name = "Lucky",
-    disabled = true, -- for mp?
+    enabled = false, -- for mp?
     inventory = {
         min = 1,
         max = 3
@@ -721,7 +721,7 @@ return {{
     display = {
         label = "Obese"
     },
-    disabled = true, -- could be abused for free points
+    enabled = false, -- could be abused for free points
     receive = {{
         type = "trait",
         name = "Obese"
@@ -759,7 +759,7 @@ return {{
     display = {
         label = "Out of Shape"
     },
-    disabled = true, -- can be abused
+    enabled = false, -- can be abused
     receive = {{
         type = "trait",
         name = "Out of Shape"
@@ -788,7 +788,7 @@ return {{
     display = {
         label = "Overweight"
     },
-    disabled = true, -- could be abused
+    enabled = false, -- could be abused
     receive = {{
         type = "trait",
         name = "Overweight"
@@ -854,7 +854,7 @@ return {{
     display = {
         label = "Insomniac"
     },
-    disabled = true, -- not for MP
+    enabled = false, -- not for MP
     receive = {{
         type = "trait",
         name = "Insomniac"
@@ -910,7 +910,7 @@ return {{
     display = {
         label = "NeedsMoreSleep"
     },
-    disabled = true, -- not for MP
+    enabled = false, -- not for MP
     receive = {{
         type = "trait",
         name = "NeedsMoreSleep"
@@ -1074,7 +1074,7 @@ return {{
     display = {
         label = "Underweight"
     },
-    disabled = true, -- could be abused
+    enabled = false, -- could be abused
     receive = {{
         type = "trait",
         name = "Underweight"
@@ -1094,7 +1094,7 @@ return {{
     display = {
         label = "Unfit"
     },
-    disabled = true, -- could be abused
+    enabled = false, -- could be abused
     receive = {{
         type = "trait",
         name = "Unfit"
@@ -1114,7 +1114,7 @@ return {{
     display = {
         label = "Unlucky"
     },
-    disabled = true, -- not available in MP?
+    enabled = false, -- not available in MP?
     receive = {{
         type = "trait",
         name = "Unlucky"
@@ -1132,7 +1132,7 @@ return {{
     display = {
         label = "Very Underweight"
     },
-    disabled = true, -- could be abused
+    enabled = false, -- could be abused
     receive = {{
         type = "trait",
         name = "Very Underweight"
@@ -1152,7 +1152,7 @@ return {{
 }, {
     inherits = "base-trait:positive",
     name = "NeedsLessSleep",
-    disabled = true, -- not for mp
+    enabled = false, -- not for mp
     inventory = {
         min = 1,
         max = 3
@@ -1169,7 +1169,7 @@ return {{
     display = {
         label = "Weak"
     },
-    disabled = true,
+    enabled = false,
     receive = {{
         type = "trait",
         name = "Weak"

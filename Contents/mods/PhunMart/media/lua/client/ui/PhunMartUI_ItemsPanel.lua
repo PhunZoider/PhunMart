@@ -246,6 +246,21 @@ function PhunMartUIItemsPanel:doDrawItem(y, item, alt)
         return
     end
 
+    local inventoryVal = 0
+    local itemAlpha = 1
+    local textAlpha = 0.5
+    local isOutOfStock = false
+    local isInfiniteInventory = item.item.inventory == false
+    if isInfiniteInventory then
+        inventoryVal = " - "
+    elseif item.item.inventory == 0 then
+        inventoryVal = "out of stock"
+        itemAlpha = 0.5
+        isOutOfStock = true
+    else
+        inventoryVal = PhunTools:formatWholeNumber(item.item.inventory)
+    end
+
     local display = item.item.display or {}
 
     self:drawRectBorder(0, y, self:getWidth(), item.height, 0.5, self.borderColor.r, self.borderColor.g,
@@ -260,11 +275,11 @@ function PhunMartUIItemsPanel:doDrawItem(y, item, alt)
     -- y = y + self.itemPadY
     if display.textureVal then
         local textured = self:drawTextureScaledAspect2(display.textureVal, x, y + 10, self.textureHeight,
-            self.textureHeight, 1, 1, 1, 1)
+            self.textureHeight, itemAlpha, 1, 1, 1)
     end
     if display.overlayVal then
         local textured = self:drawTextureScaledAspect2(display.overlayVal, x, y + 10, self.textureHeight,
-            self.textureHeight, 1, 1, 1, 1)
+            self.textureHeight, itemAlpha, 1, 1, 1)
 
     end
     x = x + self.itemPadY + self.textureHeight
@@ -272,11 +287,9 @@ function PhunMartUIItemsPanel:doDrawItem(y, item, alt)
 
     local txt = nil
 
-    if item.item.inventory ~= nil then
-        txt = getText("IGUI_PhunMartInventoryAmount", PhunTools:formatWholeNumber(item.item.inventory))
-        self:drawText(txt, x, (y + FONT_HGT_LARGE + 3 * FONT_SCALE) + 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
-        x = x + getTextManager():MeasureStringX(UIFont.Small, txt)
-    end
+    txt = getText("IGUI_PhunMartInventoryAmount", inventoryVal)
+    self:drawText(txt, x, (y + FONT_HGT_LARGE + 3 * FONT_SCALE) + 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+    x = x + getTextManager():MeasureStringX(UIFont.Small, txt)
 
     x = x2
     self:drawText(display.labelVal, x, y + 10, 0.7, 0.7, 0.7, 1.0, self.font)
