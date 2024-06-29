@@ -107,6 +107,7 @@ return {{
     price = {
         currency = 10
     },
+    enabled = false,
     traits = {
         Athletic = false,
         Overweight = false,
@@ -450,6 +451,7 @@ return {{
         min = 1,
         max = 3
     },
+    enabled = false, -- could be abused
     price = {
         currency = 6
     },
@@ -538,6 +540,7 @@ return {{
         name = "PhunMart.TraiterToken",
         quantity = 4
     }},
+    enabled = false,
     traits = {
         HeartyAppitite = false,
         ["Very Underweight"] = false,
@@ -1004,6 +1007,7 @@ return {{
 }, {
     inherits = "base-trait:positive",
     name = "Stout",
+    enabled = false,
     price = {
         currency = 6
     },
@@ -1016,6 +1020,7 @@ return {{
 }, {
     inherits = "base-trait:positive",
     name = "Strong",
+    enabled = false,
     price = {
         currency = 10
     },
