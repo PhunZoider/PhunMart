@@ -18,7 +18,8 @@ return { --[[
     backgroundImage = "machine-none",
     minDistance = 100,
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
-              "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18"}
+              "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18",
+              "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
 }, {
 
     label = "Good Phoods",

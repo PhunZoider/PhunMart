@@ -335,7 +335,9 @@ end
 local function requestHistory()
     for i = 0, getOnlinePlayers():size() - 1 do
         local p = getOnlinePlayers():get(i)
-        sendClientCommand(p, PhunMart.name, PhunMart.commands.updateHistory, {})
+        if p:isLocalPlayer() then
+            sendClientCommand(p, PhunMart.name, PhunMart.commands.updateHistory, {})
+        end
     end
     Events.EveryOneMinute.Remove(requestHistory)
 end

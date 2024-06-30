@@ -145,7 +145,8 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.Screws",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    quantity = 10
 }, {
     name = "Base.Plank",
     inherits = "base-crafts"
