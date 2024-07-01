@@ -62,6 +62,7 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
         rolls = fill
     end
 
+    print("Rolls: " .. rolls)
     for sanity = 1, 10 do
         for k, v in pairs(haslookup) do
             local rand = ZombRand(1, totalProbability or 100)
@@ -75,6 +76,8 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
         end
         if #results >= rolls then
             break
+        else
+            print("Results (" .. #results .. ") are less than rolls")
         end
     end
     return results

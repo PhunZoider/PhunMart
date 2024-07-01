@@ -164,7 +164,6 @@ local function buildPool(shop)
         end
         pools.items[1].keys = shop.items
     end
-
     return pools
 
 end

@@ -456,8 +456,7 @@ function PhunMart:filterItemListByTags(tag, includeTagless, itemList)
             local add = false
             if v.tags then
                 for _, f in ipairs(tags) do
-
-                    if v.tags:contains(f) then
+                    if v.tags:contains("," .. f .. ",") then
                         add = true
                         break
                     end
