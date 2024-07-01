@@ -19,10 +19,25 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.Gravelbag",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    price = {
+        currency = {
+            base = 25,
+            min = 1,
+            max = 9
+        }
+    }
 }, {
     name = "Base.Twigs",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    quantity = 4,
+    price = {
+        currency = {
+            base = 1,
+            min = 1,
+            max = 2
+        }
+    }
 }, {
     name = "Base.Coal",
     inherits = "base-crafts"
@@ -49,7 +64,15 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.Staples",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    quantity = 10,
+    price = {
+        currency = {
+            base = 1,
+            min = 1,
+            max = 2
+        }
+    }
 }, {
     name = "Base.Dirtbag",
     inherits = "base-crafts"
@@ -109,7 +132,14 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.Handle",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    price = {
+        currency = {
+            base = 1,
+            min = 1,
+            max = 2
+        }
+    }
 }, {
     name = "Base.Glue",
     inherits = "base-crafts"
@@ -133,7 +163,14 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.PropaneTank",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    price = {
+        currency = {
+            base = 100,
+            min = 10,
+            max = 20
+        }
+    }
 }, {
     name = "Base.GunPowder",
     inherits = "base-crafts"
