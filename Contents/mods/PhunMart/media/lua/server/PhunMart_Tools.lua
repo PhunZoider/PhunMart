@@ -357,7 +357,7 @@ end
 
 function PhunMart:BuildItems(group, skipExistingDefs)
 
-    local doDebug = group == "Weapons"
+    local doDebug = false -- group == "Weapons"
 
     local existingItems = {}
     if skipExistingDefs then

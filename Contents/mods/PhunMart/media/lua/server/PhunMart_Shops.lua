@@ -57,6 +57,8 @@ function PhunMart:validateShops()
         else
             local issues = self:validateShopDef(v)
             if #issues > 0 then
+                print("Issue with shop " .. v.key .. " (" .. #issues .. " issues)")
+                PhunTools:printTable(v)
                 v.enabled = false
                 results.issues[v.key] = issues
                 results.invalid = results.invalid + 1
@@ -83,29 +85,29 @@ local function formatFilter(filters)
 end
 
 local function buildPool(shop)
-    local base = {}
-    if shop.inherits then
-        local b = PhunMart.defs.shops[shop.inherits] and PhunTools:deepCopyTable(PhunMart.defs.shops[shop.inherits]) or
-                      nil
-        if b then
-            base = b
-        end
-    end
+    -- local base = {}
+    -- if shop.inherits then
+    --     local b = PhunMart.defs.shops[shop.inherits] and PhunTools:deepCopyTable(PhunMart.defs.shops[shop.inherits]) or
+    --                   nil
+    --     if b then
+    --         base = b
+    --     end
+    -- end
 
     local pools = {
         items = {}
     } -- default to empty pool
 
     -- copy over any inherited pools
-    for k, v in pairs(base.pools or {}) do
-        if k ~= "items" then
-            pools[k] = v
-        else
-            for _, i in ipairs(v) do
-                table.insert(pools.items, i)
-            end
-        end
-    end
+    -- for k, v in pairs(base.pools or {}) do
+    --     if k ~= "items" then
+    --         pools[k] = v
+    --     else
+    --         for _, i in ipairs(v) do
+    --             table.insert(pools.items, i)
+    --         end
+    --     end
+    -- end
 
     if shop.filters then
         -- top level filter, move into first pool item
@@ -219,13 +221,6 @@ function PhunMart:formatShop(data)
         end
     end
 
-    data.pools = buildPool(data)
-    if not data.abstract then
-
-        populatePoolItems(data.pools)
-
-    end
-
     -- if data.key == "shop-weapons-3" or data.key == "shop-fish" then
     --     PhunTools:printTable(data)
     -- end
@@ -253,10 +248,19 @@ function PhunMart:formatShop(data)
         maxRestock = data.maxRestock or base.maxRestock or 0, -- maximum number of restocks before shop will re-roll. nil or 0 for never
         -- minimum distance between duplicate instances
         minDistance = data.minDistance or base.minDistance,
+        type = data.type or base.type or nil,
+        broken = false,
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false
     }
+
+    if base.broken ~= nil then
+        formatted.broken = base.broken
+    end
+    if data.broken ~= nil then
+        data.broken = data.broken
+    end
 
     if formatted.reservations and #formatted.reservations > 0 then
         for _, v in ipairs(formatted.reservations) do
@@ -268,6 +272,38 @@ function PhunMart:formatShop(data)
         end
     else
         formatted.reservations = false
+    end
+
+    formatted.pools = PhunTools:mergeTables(base.pools, buildPool(data))
+    -- if base.pools then
+    --     pools = PhunTools:deepCopyTable(base.pools)
+    -- end
+    -- if data.pools then
+    --     if pools == nil then
+    --         pools = data.pools
+    --     else
+    --         if data.pools.items then
+    --             if pools.items == nil then
+    --                 pools.items = data.pools.items
+    --             else
+    --                 for i, v in ipairs(data.pools.items) do
+    --                     if pools.items[i] then
+    --                         for k, vv in pairs(v) do
+    --                             print(k, " <-------------")
+    --                             pools.items[i][k] = vv
+    --                         end
+    --                     else
+    --                         pools.items[i] = v
+    --                     end
+    --                     table.insert(pools.items, v)
+    --                 end
+    --             end
+    --         end
+    --     end
+    -- end
+
+    if not formatted.abstract and not formatted.broken then
+        populatePoolItems(formatted.pools)
     end
 
     return formatted

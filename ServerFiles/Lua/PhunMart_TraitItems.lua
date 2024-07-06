@@ -24,6 +24,37 @@ return {{
     type = "TRAIT",
     tags = "negativetrade"
 }, {
+    abstract = true, -- don't validate this item or use it for anything other than inheriting from
+    key = "base-trait:negative",
+    display = {
+        type = "TRAIT"
+    },
+    inventory = {
+        min = 1,
+        max = 3
+    },
+    maxCharLimit = 1,
+    tab = "Negative",
+    type = "TRAIT",
+    tags = "negative"
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Agoraphobic",
+    display = {
+        label = "Agoraphobic"
+    },
+    receive = {{
+        type = "trait",
+        name = "Agoraphobic",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 4
+    },
+    traits = {
+        Agoraphobic = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Agoraphobic"
@@ -42,6 +73,23 @@ return {{
         Desensitized = false,
         Claustophobic = false,
         AdrenalineJunkie = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:AllThumbs",
+    display = {
+        label = "AllThumbs"
+    },
+    price = {
+        currency = 2
+    },
+    receive = {{
+        type = "trait",
+        name = "AllThumbs",
+        tag = "REMOVE"
+    }},
+    traits = {
+        AllThumbs = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -182,6 +230,23 @@ return {{
         NightVision = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Claustophobic",
+    display = {
+        label = "Claustophobic"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Claustophobic",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Claustophobic = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Claustophobic"
@@ -202,6 +267,23 @@ return {{
         Desensitized = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Clumsy",
+    display = {
+        label = "Clumsy"
+    },
+    receive = {{
+        type = "trait",
+        name = "Clumsy",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 1
+    },
+    traits = {
+        Clumsy = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Clumsy"
@@ -217,6 +299,23 @@ return {{
     traits = {
         Clumsy = false,
         Graceful = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Conspicuous",
+    display = {
+        label = "Conspicuous"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "Conspicuous",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Conspicuous = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -251,6 +350,23 @@ return {{
         Cook = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Cowardly",
+    display = {
+        label = "Cowardly"
+    },
+    price = {
+        currency = 2
+    },
+    receive = {{
+        type = "trait",
+        name = "Cowardly",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Cowardly = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Cowardly"
@@ -268,6 +384,23 @@ return {{
         Brave = false,
         Desensitized = false,
         AdrenalineJunkie = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Deaf",
+    display = {
+        label = "Deaf"
+    },
+    price = {
+        currency = 12
+    },
+    receive = {{
+        type = "trait",
+        name = "Deaf",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Deaf = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -320,6 +453,23 @@ return {{
         AllThumbs = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Disorganized",
+    display = {
+        label = "Disorganized"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "Disorganized",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Disorganized = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Disorganized"
@@ -347,6 +497,23 @@ return {{
     traits = {
         EagleEyed = false,
         ShortSighted = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Emaciated",
+    display = {
+        label = "Emaciated"
+    },
+    price = {
+        currency = 1
+    },
+    receive = {{
+        type = "trait",
+        name = "Emaciated",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Emaciated = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -399,6 +566,23 @@ return {{
         Illiterate = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Hemophobic",
+    display = {
+        label = "Hemophobic"
+    },
+    price = {
+        currency = 5
+    },
+    receive = {{
+        type = "trait",
+        name = "Hemophobic",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Hemophobic = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Hemophobic"
@@ -414,6 +598,23 @@ return {{
     traits = {
         Hemophobic = true,
         Desensitized = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Feeble",
+    display = {
+        label = "Feeble"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Feeble",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Feeble = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -510,6 +711,23 @@ return {{
         Handy = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:HardOfHearing",
+    display = {
+        label = "HardOfHearing"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "HardOfHearing",
+        tag = "REMOVE"
+    }},
+    traits = {
+        HardOfHearing = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "HardOfHearing"
@@ -526,6 +744,23 @@ return {{
         HardOfHearing = false,
         KeenHearing = false,
         Deaf = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:HeartyAppitite",
+    display = {
+        label = "HeartyAppitite"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "HeartyAppitite",
+        tag = "REMOVE"
+    }},
+    traits = {
+        HeartyAppitite = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -554,6 +789,23 @@ return {{
     },
     traits = {
         Herbalist = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:HighThirst",
+    display = {
+        label = "HighThirst"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "HighThirst",
+        tag = "REMOVE"
+    }},
+    traits = {
+        HighThirst = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -589,6 +841,23 @@ return {{
     },
     traits = {
         Hunter = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Illiterate",
+    display = {
+        label = "Illiterate"
+    },
+    price = {
+        currency = 8
+    },
+    receive = {{
+        type = "trait",
+        name = "Illiterate",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Illiterate = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -720,6 +989,23 @@ return {{
         Nutritionist = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Obese",
+    display = {
+        label = "Obese"
+    },
+    price = {
+        currency = 10
+    },
+    receive = {{
+        type = "trait",
+        name = "Obese",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Obese = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Obese"
@@ -758,6 +1044,23 @@ return {{
         Disorganized = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Out of Shape",
+    display = {
+        label = "Out of Shape"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Out of Shape",
+        tag = "REMOVE"
+    }},
+    traits = {
+        ["Out of Shape"] = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Out of Shape"
@@ -769,7 +1072,7 @@ return {{
     }, {
         type = "item",
         name = "PhunMart.TraiterToken",
-        quantity = 6
+        quantity = 2
     }},
     traits = {
         ["Out of Shape"] = false,
@@ -785,6 +1088,23 @@ return {{
     },
     traits = {
         Outdoorsman = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Overweight",
+    display = {
+        label = "Overweight"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Overweight",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Overweight = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -810,6 +1130,23 @@ return {{
         Fit = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Pacifist",
+    display = {
+        label = "Pacifist"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "Pacifist",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Pacifist = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Pacifist"
@@ -824,6 +1161,23 @@ return {{
     }},
     traits = {
         Pacifist = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:ProneToIllness",
+    display = {
+        label = "ProneToIllness"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "ProneToIllness",
+        tag = "REMOVE"
+    }},
+    traits = {
+        ProneToIllness = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -846,11 +1200,29 @@ return {{
     inherits = "base-trait:positive",
     name = "Resilient",
     price = {
-        ["Price.Money"] = 4
+        currency = 4
     },
     traits = {
         Resilient = false,
         ProneToIllness = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Insomniac",
+    display = {
+        label = "Insomniac"
+    },
+    enabled = false, -- not for MP
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Insomniac",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Insomniac = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -892,6 +1264,23 @@ return {{
         -- Tailor = falses
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:ShortSighted",
+    display = {
+        label = "ShortSighted"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "ShortSighted",
+        tag = "REMOVE"
+    }},
+    traits = {
+        ShortSighted = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "ShortSighted"
@@ -907,6 +1296,24 @@ return {{
     traits = {
         ShortSighted = false,
         EagleEyed = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:NeedsMoreSleep",
+    display = {
+        label = "NeedsMoreSleep"
+    },
+    enabled = false, -- not for MP
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "NeedsMoreSleep",
+        tag = "REMOVE"
+    }},
+    traits = {
+        NeedsMoreSleep = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -927,6 +1334,23 @@ return {{
         NeedsLessSleep = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:SlowHealer",
+    display = {
+        label = "SlowHealer"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "SlowHealer",
+        tag = "REMOVE"
+    }},
+    traits = {
+        SlowHealer = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "SlowHealer"
@@ -942,6 +1366,23 @@ return {{
     traits = {
         SlowHealer = false,
         FastHealer = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:SlowLearner",
+    display = {
+        label = "SlowLearner"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "SlowLearner",
+        tag = "REMOVE"
+    }},
+    traits = {
+        SlowLearner = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -961,6 +1402,23 @@ return {{
         FastLearner = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:SlowReader",
+    display = {
+        label = "SlowReader"
+    },
+    price = {
+        currency = 2
+    },
+    receive = {{
+        type = "trait",
+        name = "SlowReader",
+        tag = "REMOVE"
+    }},
+    traits = {
+        SlowReader = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "SlowReader"
@@ -977,6 +1435,23 @@ return {{
         SlowReader = false,
         FastReader = false,
         Illiterate = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Smoker",
+    display = {
+        label = "Smoker"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "Smoker",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Smoker = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -1031,6 +1506,23 @@ return {{
         Stout = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:SundayDriver",
+    display = {
+        label = "SundayDriver"
+    },
+    price = {
+        currency = 1
+    },
+    receive = {{
+        type = "trait",
+        name = "SundayDriver",
+        tag = "REMOVE"
+    }},
+    traits = {
+        SundayDriver = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "SundayDriver"
@@ -1058,6 +1550,23 @@ return {{
         Thinskinned = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Thinskinned",
+    display = {
+        label = "Thinskinned"
+    },
+    price = {
+        currency = 8
+    },
+    receive = {{
+        type = "trait",
+        name = "Thinskinned",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Thinskinned = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Thinskinned"
@@ -1073,6 +1582,23 @@ return {{
     traits = {
         Thinskinned = false,
         ThickSkinned = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Underweight",
+    display = {
+        label = "Underweight"
+    },
+    price = {
+        currency = 6
+    },
+    receive = {{
+        type = "trait",
+        name = "Underweight",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Underweight = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -1095,6 +1621,23 @@ return {{
         Obese = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Unfit",
+    display = {
+        label = "Unfit"
+    },
+    price = {
+        currency = 10
+    },
+    receive = {{
+        type = "trait",
+        name = "Unfit",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Unfit = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Unfit"
@@ -1115,6 +1658,23 @@ return {{
         ["Out of Shape"] = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Unlucky",
+    display = {
+        label = "Unlucky"
+    },
+    price = {
+        currency = 4
+    },
+    receive = {{
+        type = "trait",
+        name = "Unlucky",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Unlucky = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Unlucky"
@@ -1131,6 +1691,23 @@ return {{
     traits = {
         Unlucky = false,
         Lucky = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Very Underweight",
+    display = {
+        label = "Very Underweight"
+    },
+    price = {
+        currency = 10
+    },
+    receive = {{
+        type = "trait",
+        name = "Very Underweight",
+        tag = "REMOVE"
+    }},
+    traits = {
+        ["Very Underweight"] = true
     }
 }, {
     inherits = "base-trait:negativetrade",
@@ -1170,6 +1747,23 @@ return {{
         NeedsMoreSleep = false
     }
 }, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:Weak",
+    display = {
+        label = "Weak"
+    },
+    price = {
+        currency = 10
+    },
+    receive = {{
+        type = "trait",
+        name = "Weak",
+        tag = "REMOVE"
+    }},
+    traits = {
+        Weak = true
+    }
+}, {
     inherits = "base-trait:negativetrade",
     display = {
         label = "Weak"
@@ -1188,6 +1782,23 @@ return {{
         Strong = false,
         Stout = false,
         Feeble = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    key = "TRAIT:NEG:WeakStomach",
+    display = {
+        label = "WeakStomach"
+    },
+    price = {
+        currency = 3
+    },
+    receive = {{
+        type = "trait",
+        name = "WeakStomach",
+        tag = "REMOVE"
+    }},
+    traits = {
+        WeakStomach = true
     }
 }, {
     inherits = "base-trait:negativetrade",

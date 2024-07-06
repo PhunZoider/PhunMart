@@ -496,7 +496,8 @@ return {{
 }, {
     name = "VFECombination.Combination556M16Magazine_20",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "Base.1022",
     inherits = "base-weapons",
@@ -523,7 +524,7 @@ return {{
     mod = "VFExpansion1"
 }, {
     name = "Base.9mmCrate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.Coupled556",
@@ -531,7 +532,7 @@ return {{
     mod = "VFExpansion1"
 }, {
     name = "Base.308Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.CampCarbine",
@@ -563,11 +564,11 @@ return {{
     mod = "VFExpansion1"
 }, {
     name = "Base.44Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.556Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.M60_Link",
@@ -584,7 +585,7 @@ return {{
     mod = "Pitstop"
 }, {
     name = "Base.223Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.MK23SOCOM",
@@ -592,11 +593,11 @@ return {{
     mod = "VFExpansion1"
 }, {
     name = "Base.45Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.38Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.MekLeth",
@@ -689,7 +690,8 @@ return {{
 }, {
     name = "VFECombination.Combination556M16Magazine_21",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "Base.45Pack",
     inherits = "base-weapons-packammo",
@@ -724,7 +726,7 @@ return {{
     mod = "VFExpansion1"
 }, {
     name = "Base.762Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.MP5Folded",
@@ -788,7 +790,7 @@ return {{
     mod = "Pitstop"
 }, {
     name = "Base.22Crate",
-    inherits = "base-weapons",
+    inherits = "base-weapons-wepcrateammo",
     mod = "VFExpansion1"
 }, {
     name = "Base.Spas12Folded",
@@ -869,123 +871,153 @@ return {{
 }, {
     name = "VFECombination.Combination556M16Magazine_25",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_24",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_23",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_22",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_29",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_28",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_27",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_26",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_9",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_8",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_1",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_0",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_3",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_2",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_5",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_10",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_4",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_31",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_7",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_30",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_6",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_14",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_13",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_12",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_11",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_18",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_17",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_16",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_15",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.Combination556M16Magazine_19",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "Base.HeadhunterScope",
     inherits = "base-weapons-wepaccessory",
@@ -1026,11 +1058,13 @@ return {{
 }, {
     name = "VFECombination.Combination556M16NoClip_1",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.CombinationShotgunShellNoClip_1",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "Base.ShotgunShellsPack",
     inherits = "base-weapons-packammo",
@@ -1047,19 +1081,23 @@ return {{
 }, {
     name = "VFECombination.CombinationM500ShotgunShellNoClip_4",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.CombinationM500ShotgunShellNoClip_3",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.CombinationM500ShotgunShellNoClip_2",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "VFECombination.CombinationM500ShotgunShellNoClip_1",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "BZMFirearms.LawgiverMKII2012Clip",
     inherits = "base-weapons-clips",
@@ -1067,7 +1105,8 @@ return {{
 }, {
     name = "VFECombination.Combination308NoClip_1",
     inherits = "base-weapons-clips",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    enabled = false
 }, {
     name = "Base.M60_Links_Box",
     inherits = "base-weapons-wepbulkammo",

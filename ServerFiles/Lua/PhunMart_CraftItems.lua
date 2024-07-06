@@ -81,7 +81,15 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.NailsBox",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    price = {
+        currency = {
+            base = 25,
+            min = 3,
+            max = 6
+        }
+
+    }
 }, {
     name = "Base.Doorknob",
     inherits = "base-crafts"
@@ -99,7 +107,15 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.ScrewsBox",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    price = {
+        currency = {
+            base = 25,
+            min = 3,
+            max = 6
+        }
+
+    }
 }, {
     name = "Base.Pipe",
     inherits = "base-crafts"
@@ -157,7 +173,8 @@ return {{
     inherits = "base-crafts"
 }, {
     name = "Base.Nails",
-    inherits = "base-crafts"
+    inherits = "base-crafts",
+    quantity = 10
 }, {
     name = "Base.Stone",
     inherits = "base-crafts"

@@ -59,4 +59,8 @@ return {{
 }, {
     name = "Base.PaintGrey",
     inherits = "base-paint"
+}, {
+    name = "PhunSafePaint.RepellentPaint",
+    inherits = "base-paint",
+    mod = "PhunSafePaint"
 }}

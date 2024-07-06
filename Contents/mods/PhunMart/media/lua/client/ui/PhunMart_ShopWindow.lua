@@ -119,7 +119,8 @@ function UI.OnOpenPanel(playerObj, key)
 
     if UI.instances[pNum] then
         if UI.instances[pNum].data.key == key then
-            triggerEvent(PhunMart.events.OnWindowOpened, UI.instances[pNum].player)
+            self:highlight()
+            triggerEvent(PhunMart.events.OnWindowOpened, UI.instances[pNum].player, key)
             if UI.instances[pNum] and UI.instances[pNum].rebuild then
                 UI.instances[pNum]:rebuild()
             end
@@ -150,12 +151,40 @@ function UI.OnOpenPanel(playerObj, key)
     if instance.rebuild then
         instance:rebuild()
     end
-    triggerEvent(PhunMart.events.OnWindowOpened, instance.player)
+
+    triggerEvent(PhunMart.events.OnWindowOpened, instance.player, key)
+    instance:highlight()
     UI.instances[pNum] = instance
     if pNum == 0 then
         ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
     end
     return UI.instances[pNum]
+end
+
+function UI:highlight()
+    local xyz = PhunMart:xyzFromKey(self.data.key)
+    local square = getSquare(xyz.x, xyz.y, xyz.z)
+    local sprites = {}
+
+    local objects = square:getObjects();
+    for j = 0, objects:size() - 1 do
+        local obj = objects:get(j);
+        local sprite = obj:getSprite();
+        for i, v in ipairs(PhunMart.shopSprites) do
+            if v == sprite:getName() then
+                obj:setHighlighted(true, false);
+                break
+            end
+        end
+    end
+
+end
+
+function UI:removeHighlight()
+    local xyz = PhunMart:xyzFromKey(self.data.key)
+    local square = getSquare(xyz.x, xyz.y, xyz.z)
+    PhunTools:removeHighlightedSquares({square})
+
 end
 
 function UI:initialise()
@@ -184,7 +213,8 @@ function UI:createChildren()
 
         layout = self.layouts.default.admin
         self.adminButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Admin", self, function()
-            PhunMartAdminUI.OnOpenPanel()
+            PhunMartUIShopAdmin.OnOpenPanel(self.player, self.data.key)
+            -- PhunMartAdminUI.OnOpenPanel()
         end)
         self.adminButton:initialise()
         self:addChild(self.adminButton)
@@ -502,7 +532,8 @@ function UI:render()
 end
 
 function UI:close()
-    triggerEvent(PhunMart.events.OnWindowClosed, self.player)
+    triggerEvent(PhunMart.events.OnWindowClosed, self.player, self.data.key)
+    self:removeHighlight()
     self:setVisible(false);
     self:removeFromUIManager();
     UI.instances[self.pIndex] = nil

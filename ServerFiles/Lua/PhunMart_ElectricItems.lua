@@ -26,13 +26,12 @@ return {{
 }, {
     name = "Base.Generator",
     inherits = "base-electronics",
-    price {
+    price = {
         currency = {
             base = 100,
             min = 5,
             max = 10
         }
-
     }
 }, {
     name = "Base.LightBulbBlue",
@@ -103,13 +102,12 @@ return {{
 }, {
     name = "Base.Receiver",
     inherits = "base-electronics",
-    price {
+    price = {
         currency = {
             base = 15,
             min = 3,
             max = 4
         }
-
     }
 }, {
     name = "Base.TimerCrafted",

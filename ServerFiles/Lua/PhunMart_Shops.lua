@@ -21,10 +21,25 @@ return { --[[
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18",
               "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
 }, {
+    label = "Broken",
+    broken = true,
+    distance = 0,
+    key = "broken-shop",
+    inherits = "base-shop",
+
+    pools = {
+        items = {}
+    },
+    minDistance = 1,
+    probability = 5,
+    backgroundImage = "machine-broken"
+}, {
 
     label = "Good Phoods",
     key = "shop-good-foods",
     inherits = "base-shop",
+    type = "FOOD",
+    minDistance = 10,
     pools = {
         items = {{
             filters = {
@@ -44,6 +59,7 @@ return { --[[
 }, {
     label = "Collectors",
     key = "shop-collectables",
+    type = "COLLECTABLES",
     inherits = "base-shop",
     zones = {
         difficulty = 1
@@ -60,6 +76,7 @@ return { --[[
     label = "Collectors2",
     key = "shop-collectables2",
     inherits = "base-shop",
+    type = "COLLECTABLES",
     fills = {
         min = 3,
         max = 7
@@ -79,6 +96,7 @@ return { --[[
     label = "Collectors3",
     key = "shop-collectables3",
     inherits = "base-shop",
+    type = "COLLECTABLES",
     fills = {
         min = 2,
         max = 4
@@ -98,6 +116,7 @@ return { --[[
     label = "Collectors4",
     key = "shop-collectables4",
     inherits = "base-shop",
+    type = "COLLECTABLES",
     fills = {
         min = 2,
         max = 4
@@ -116,6 +135,8 @@ return { --[[
 }, {
     key = "shop-phat-foods",
     inherits = "base-shop",
+    type = "FOOD",
+    minDistance = 10,
     label = "Phat Phoods",
     pools = {
         items = {{
@@ -138,6 +159,7 @@ return { --[[
 
     key = "shop-tools",
     inherits = "base-shop",
+    type = "TOOLS",
     backgroundImage = "machine-pity-the-tool",
     basePrice = 4,
     pools = {
@@ -161,6 +183,7 @@ return { --[[
     label = "Budget Xperiences",
     inherits = "base-shop",
     backgroundImage = "machine-budget-xp",
+    type = "XP",
     currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     filters = {
         tags = "perks1,perks2"
@@ -171,6 +194,7 @@ return { --[[
     inherits = "base-shop",
     label = "Gifted Xperiences",
     backgroundImage = "machine-gifted-xp",
+    type = "XP",
     currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     zones = {
         difficulty = 2
@@ -184,6 +208,7 @@ return { --[[
     inherits = "base-shop",
     label = "Luxury Xperiences",
     backgroundImage = "machine-luxury-xp",
+    type = "XP",
     currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     zones = {
         difficulty = {
@@ -198,17 +223,19 @@ return { --[[
     key = "shop-traits",
     inherits = "base-shop",
     label = "TraiterJoe",
+    type = "TRAITS",
     currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     requiresPower = true,
     backgroundImage = "machine-traiter-joes",
     filters = {
-        tags = "positive"
+        tags = "positive,negative"
     }
 }, {
 
     key = "shop-vehicles",
     inherits = "base-shop",
     label = "Wrent a Wreck",
+    type = "VEHICLES",
     currency = "PhunMart.CheeseToken", -- the default currency for shops
     basePrice = 10,
     requiresPower = true,
@@ -235,6 +262,7 @@ return { --[[
     key = "shop-vehicles2",
     inherits = "base-shop",
     label = "Wrent a Wreck2",
+    type = "VEHICLES",
     currency = "PhunMart.CheeseToken", -- the default currency for shops
     requiresPower = true,
     backgroundImage = "machine-wrent-a-wreck",
@@ -256,6 +284,7 @@ return { --[[
     key = "shop-carapart",
     inherits = "base-shop",
     label = "Car-A-Part",
+    type = "CARPARTS",
     backgroundImage = "machine-car-a-part",
     basePrice = 25,
     filters = {
@@ -266,6 +295,7 @@ return { --[[
     key = "shop-csv",
     inherits = "base-shop",
     label = "CSV",
+    type = "MEDICAL",
     backgroundImage = "machine-csv",
     filters = {
         tags = "medical"
@@ -275,6 +305,7 @@ return { --[[
     key = "shop-electronics",
     inherits = "base-shop",
     label = "Electronics",
+    type = "ELECTRONICS",
     backgroundImage = "machine-electronics",
     filters = {
         tags = "electronics"
@@ -284,6 +315,7 @@ return { --[[
     key = "shop-hoes",
     inherits = "base-shop",
     label = "Hoes",
+    type = "GARDENING",
     backgroundImage = "machine-hoes",
     filters = {
         tags = "gardening"
@@ -293,15 +325,17 @@ return { --[[
     key = "shop-crafts",
     inherits = "base-shop",
     label = "Michelles",
+    type = "CRAFTS",
     backgroundImage = "machine-michelles",
     filters = {
-        tags = "crafts"
+        tags = "crafts,paint"
     }
 }, {
 
     key = "shop-fish",
     inherits = "base-shop",
     label = "Fish",
+    type = "FISH",
     backgroundImage = "machine-phish4u",
     pools = {
         items = {{
@@ -315,6 +349,7 @@ return { --[[
     key = "shop-weapons",
     inherits = "base-shop",
     label = "Final Ammendment",
+    type = "WEAPONS",
     backgroundImage = "machine-final-ammendment",
     pools = {
         items = {{
@@ -336,6 +371,7 @@ return { --[[
     inherits = "base-shop",
     label = "Final Ammendment2",
     backgroundImage = "machine-final-ammendment",
+    type = "WEAPONS",
     currency = "PhunMart.CheeseToken", -- the default currency for shops
     zones = {
         difficulty = {
@@ -358,6 +394,7 @@ return { --[[
     inherits = "base-shop",
     label = "Final Ammendment3",
     currency = "PhunMart.CheeseToken", -- the default currency for shops
+    type = "WEAPONS",
     backgroundImage = "machine-final-ammendment",
     zones = {
         difficulty = {

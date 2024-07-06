@@ -39,12 +39,14 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
     local defaultProbaility = pool.probability or shop.pools.probability or shop.probability or
                                   sandbox.DefaultItemProbability or 1
 
+    local poolItemCount = 0
     for _, v in ipairs(preKeys) do
         if not self.defs.items[v] then
             print(self.name .. ":Error Item " .. v .. " in shop " .. shop.key .. " is not found in defs")
         elseif not self.defs.items[v].enabled or self.defs.items[v].abstract then
             print("Skipping " .. v .. " because it is abstract or not enabled")
         else
+            poolItemCount = poolItemCount + 1
             totalProbability = totalProbability + (self.defs.items[v].probability or defaultProbaility or 1)
             haslookup[v] = self.defs.items[v].probability or defaultProbaility or 1
         end
@@ -62,8 +64,12 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
         rolls = fill
     end
 
+    if rolls > poolItemCount then
+        rolls = poolItemCount
+    end
     print("Rolls: " .. rolls)
-    for sanity = 1, 10 do
+
+    for sanity = 1, 50 do
         for k, v in pairs(haslookup) do
             local rand = ZombRand(1, totalProbability or 100)
             if not hash[k] and rand <= v then
@@ -103,7 +109,7 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
 
     local defaultProbaility = pool.probability or shop.pools.probability or shop.probability or
                                   sandbox.DefaultItemProbability or 1
-
+    local poolItemCount = 0
     for _, v in ipairs(preKeys) do
         if not self.defs.items[v] then
             print(self.name .. ":Error Item " .. v .. " in shop " .. shop.key .. " is not found in defs")
@@ -112,6 +118,7 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         elseif not self.defs.items[v].enabled then
             print("Skipping " .. v .. " because it is not enabled")
         else
+            poolItemCount = poolItemCount + 1
             if (self.defs.items[v].probability or defaultProbaility or 1) >= 100 then
                 -- guarantee to be added
                 table.insert(results, v)
@@ -133,8 +140,12 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         -- fill was a specific number so use specific amount
         rolls = fill or 1
     end
+    if rolls > poolItemCount then
+        rolls = poolItemCount
+    end
 
-    for sanity = 1, 10 do
+    print("Rolls: " .. rolls .. " for " .. shop.key .. " " .. poolIndex .. " containing " .. #itemsKeys .. " items")
+    for sanity = 1, 50 do
         if sanity > 1 then
             print("Sanity check " .. sanity .. " for " .. shop.key .. " " .. poolIndex)
         end
@@ -252,15 +263,38 @@ function PhunMart:generateShopItems(machineOrKey, cumulativeModel)
     return items
 end
 
-function PhunMart:getInstanceDistances(location, ignoreKey)
+-- function PhunMart:getInstanceDistances(location, ignoreKey)
+--     local results = {}
+
+--     if location then
+--         for k, v in pairs(self.shops or {}) do
+--             print("Checking " .. k .. " with type= " .. tostring(v.type) .. " against " .. ignoreKey)
+--             if v.location and v.location.x and (ignoreKey == nil or k ~= ignoreKey) then
+--                 local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
+--                 if not results[v.key] or results[v.key] < min then
+--                     results[v.key] = min
+--                 end
+--             end
+--         end
+--     end
+--     return results
+-- end
+
+function PhunMart:getInstanceDistancesByType(locationKey)
     local results = {}
+
+    local location = self:xyzFromKey(locationKey)
 
     if location then
         for k, v in pairs(self.shops or {}) do
-            if v.location and v.location.x and (ignoreKey == nil or k ~= ignoreKey) then
+            -- print("Checking " .. tostring(v.key) .. " at " .. tostring(k) .. " with type= " .. tostring(v.type) ..
+            --           " against " .. tostring(locationKey))
+            -- PhunTools:printTable(v or {})
+            if v.location and v.location.x and (k ~= locationKey) then
                 local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
-                if not results[v.key] or results[v.key] < min then
-                    results[v.key] = min
+                print(tostring(v.type) .. " <-- " .. v.key)
+                if not results[v.type] or results[v.type] < min then
+                    results[v.type] = min
                 end
             end
         end
@@ -268,17 +302,35 @@ function PhunMart:getInstanceDistances(location, ignoreKey)
     return results
 end
 
-function PhunMart:getShopListFromKey(key)
+function PhunMart:getShopListFromKey(key, reduceDistance)
 
-    local distances = self:getInstanceDistances(self:xyzFromKey(key), key)
+    local distances = self:getInstanceDistancesByType(key)
+
+    print("Distances")
+    print("----------")
+    PhunTools:printTable(distances)
+    print("----------")
+
     local zoneInfo = self:getZoneInfo(key)
     local shops = {}
     local totalProbability = 0
 
+    local distanceReduction = reduceDistance or 0
+
     for k, v in pairs(self.defs.shops) do
         if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract then
 
-            if not v.minDistance or not distances[v.key] or (v.minDistance < distances[v.key]) then
+            local minDistance = (v.minDistance or 0)
+            local distanceKey = v.type or v.key
+
+            print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and reduce is " ..
+                      tostring(distanceReduction) .. " and distance is " .. tostring(distances[distanceKey]) ..
+                      " using distanceKey " .. tostring(distanceKey))
+            if distanceReduction > 0 and minDistance > distanceReduction then
+                minDistance = minDistance - distanceReduction
+            end
+
+            if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey]) then
                 if v.zones and type(v.zones) == "table" then
 
                     local difficultyMin = 0
@@ -324,13 +376,24 @@ function PhunMart:getShopListFromKey(key)
             list = shops,
             totalProbability = totalProbability
         }
+    elseif distanceReduction < 100 then
+        -- we should consider making this a broken shop
+        return self:getShopListFromKey(key, distanceReduction + 10)
     else
         print("No shops found for " .. key)
+        table.insert(shops, {
+            key = "broken-shop",
+            probability = 100
+        })
+        return {
+            list = shops,
+            totalProbability = 100
+        }
     end
 
 end
 
-function PhunMart:generateShop(vendingMachineOrKey)
+function PhunMart:generateShop(vendingMachineOrKey, forceKey)
 
     local key = self:getKey(vendingMachineOrKey)
     if not key then
@@ -338,25 +401,30 @@ function PhunMart:generateShop(vendingMachineOrKey)
         return
     end
     local chosenShopDef = nil
-    local resKey = nil
-    if self.reservations[key] then
-        resKey = self.reservations[key]
-        print("Reservations found for " .. key .. " ( " .. resKey .. ")")
-    end
-    if resKey and self.defs.shops[resKey] and self.defs.shops[resKey].enabled then
-        chosenShopDef = self.defs.shops[resKey]
-    else
-        local shopCandidates = self:getShopListFromKey(key)
-        local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
-        local cumulative = 0
+    if not forceKey then
+        local resKey = nil
+        if self.reservations[key] then
+            resKey = self.reservations[key]
+            print("Reservations found for " .. key .. " ( " .. resKey .. ")")
+        end
+        if resKey and self.defs.shops[resKey] and self.defs.shops[resKey].enabled then
+            chosenShopDef = self.defs.shops[resKey]
+        else
+            local shopCandidates = self:getShopListFromKey(key)
 
-        for _, entry in ipairs(shopCandidates.list) do
-            cumulative = cumulative + entry.probability
-            if rand <= cumulative then
-                chosenShopDef = self.defs.shops[entry.key]
-                break
+            local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
+            local cumulative = 0
+
+            for _, entry in ipairs(shopCandidates.list) do
+                cumulative = cumulative + entry.probability
+                if rand <= cumulative then
+                    chosenShopDef = self.defs.shops[entry.key]
+                    break
+                end
             end
         end
+    else
+        chosenShopDef = self.defs.shops[forceKey]
     end
 
     local location = self:xyzFromKey(key)
@@ -372,6 +440,7 @@ function PhunMart:generateShop(vendingMachineOrKey)
         layout = chosenShopDef.layout or nil,
         maxRestock = chosenShopDef.maxRestock or 0,
         basePrice = chosenShopDef.basePrice or 0,
+        type = chosenShopDef.type or chosenShopDef.key or chosenShopDef.name,
         restocks = 0,
         location = {
             x = location.x,
@@ -438,10 +507,77 @@ end
 
 local Commands = {}
 
+Commands[PhunMart.commands.requestShopDefs] = function(playerObj, args)
+    print("Requesting shop defs")
+    sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShopDefs, {
+        playerIndex = playerObj:getPlayerNum(),
+        shops = PhunMart.defs.shops
+    })
+end
+
+Commands[PhunMart.commands.requestItemDefs] = function(playerObj, args)
+    print("Requesting item defs")
+
+    -- because this can be so massive, we will need to chunk it down
+    local row = 0
+    local chunkIteration = 0
+    local chunk = 100
+    local totalRows = 0
+    local firstSend = true
+    for k, v in pairs(PhunMart.defs.items) do
+        totalRows = totalRows + 1
+    end
+
+    local data = {}
+    for k, v in pairs(PhunMart.defs.items) do
+        row = row + 1
+        chunkIteration = chunkIteration + 1
+        data[k] = v
+        if row % chunk == 0 then
+            sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestItemDefs, {
+                playerIndex = playerObj:getPlayerNum(),
+                items = data,
+                row = row,
+                totalRows = totalRows,
+                firstSend = firstSend,
+                completed = false
+            })
+            firstSend = false
+            data = {}
+            print("Sent " .. chunkIteration .. " item defs")
+        end
+
+    end
+    -- send remaining
+    sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestItemDefs, {
+        playerIndex = playerObj:getPlayerNum(),
+        items = data,
+        row = row,
+        totalRows = totalRows,
+        firstSend = firstSend,
+        completed = true
+    })
+    print("Sent " .. totalRows .. " item defs")
+end
+
+Commands[PhunMart.commands.updateShop] = function(playerObj, args)
+
+    print("updating shop")
+    local resend = false
+    if args.shop then
+        local shop = PhunMart:generateShop(args.key, args.shop)
+        resend = true
+    end
+    if resend then
+        sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
+            key = args.key,
+            shop = PhunMart:getShop(args.key)
+        })
+    end
+end
+
 Commands[PhunMart.commands.rerollAllShops] = function(playerObj, args)
-    print("Rerolling all shops")
-    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
-    PhunMart.shops = {}
+    PhunMart:resetShops()
 end
 
 Commands[PhunMart.commands.restockAllShops] = function(playerObj, args)
@@ -630,6 +766,17 @@ Events.OnCharacterDeath.Add(function(playerObj)
     end
 end)
 
+function PhunMart:resetShops()
+    -- close any open shops on clients
+    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
+    self.shops = {}
+    ModData.add(self.consts.shops, self.shops)
+
+    self.shoplist = {}
+    ModData.add(self.consts.shoplist, self.shoplist)
+    ModData.transmit(self.consts.shoplist)
+end
+
 function PhunMart:checkForRestocking(forceRestock)
     local now = GameTime:getInstance():getWorldAgeHours()
     local toRemove = {}
@@ -752,6 +899,14 @@ function PhunMart:loadAllShops()
         print("\t" .. k)
         for _, issue in pairs(v) do
             print("\t- " .. issue)
+        end
+    end
+
+    for k, v in pairs(self.defs.shops) do
+        if v.enabled then
+            print(" - " .. k .. " is enabled")
+        else
+            print(" - " .. k .. " is disabled")
         end
     end
 

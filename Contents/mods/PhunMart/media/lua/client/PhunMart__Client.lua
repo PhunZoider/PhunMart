@@ -13,8 +13,8 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
 
     local itemType = item:getFullType()
 
-    if itemType == "PhunMart.VehicleKeySpawner" then
-        -- prevent transfering this anywhere. Its only meant to spawn a car!
+    if itemType == "PhunMart.VehicleKeySpawner" or itemType == "PhunMart.SafehousePaint" then
+        -- prevent transfering this anywhere. Its only meant for this person!
         return {
             ignoreAction = true
         }
@@ -56,16 +56,15 @@ function PhunMart:completeTransaction(args)
 
         local hooks = self.hooks.purchase
         if hooks and #hooks > 0 then
-            for _, v in ipairs(args.item.conditions[1]) do
-                if v.type == "price" then
-                    local key = v.key
-                    local val = tonumber(v.value)
+            if args.item.conditions[1] and args.item.conditions[1].price then
+                for key, val in pairs(args.item.conditions[1].price) do
                     for _, v in ipairs(hooks) do
                         if v then
                             -- should mutate val if handled in hook
-                            v(playerObj, key, val)
+                            v(playerObj, key, tonumber(val))
                         end
                     end
+
                 end
             end
         end
@@ -104,7 +103,6 @@ function PhunMart:completeTransaction(args)
                     name = v.name or v.label
                 }
                 playerObj:getInventory():AddItem(item)
-
             else
 
                 local hooks = self.hooks.receiveItem
@@ -327,6 +325,29 @@ Commands[PhunMart.commands.modifyTraits] = function(arguments)
             local target = inv:getItemFromTypeRecurse(v.name)
             target:getContainer():DoRemoveItem(target)
         end
+    end
+end
+
+Commands[PhunMart.commands.requestShopDefs] = function(arguments)
+    PhunMart.defs.shops = arguments.shops
+    triggerEvent(PhunMart.events.OnShopDefsReloaded, arguments.shops)
+end
+
+Commands[PhunMart.commands.requestItemDefs] = function(arguments)
+
+    print("Receiving ", arguments.row, " of ", arguments.totalRows)
+
+    if arguments.firstSend then
+        PhunMart.defs.items = arguments.items
+    else
+        for k, v in pairs(arguments.items) do
+            PhunMart.defs.items[k] = v
+        end
+    end
+
+    if arguments.completed then
+        triggerEvent(PhunMart.events.OnShopItemDefsReloaded, PhunMart.defs.items)
+        print("Received all item defs")
     end
 end
 
