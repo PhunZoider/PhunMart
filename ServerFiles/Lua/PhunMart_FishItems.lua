@@ -51,6 +51,9 @@ return {{
     name = "Base.Crayfish",
     inherits = "base-fish"
 }, {
+    name = "Base.Crappie",
+    inherits = "base-fish"
+}, {
     name = "Base.Perch",
     inherits = "base-fish"
 }, {

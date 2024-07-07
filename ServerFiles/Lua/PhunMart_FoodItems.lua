@@ -2433,9 +2433,6 @@ return {{
     name = "Base.QuaggaCakes",
     inherits = "base-food-foodpie"
 }, {
-    name = "Base.Crappie",
-    inherits = "base-food-foodpie"
-}, {
     name = "Base.FruitSalad",
     inherits = "base-food-foodready"
 }, {

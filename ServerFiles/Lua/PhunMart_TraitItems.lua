@@ -991,6 +991,7 @@ return {{
 }, {
     inherits = "base-trait:negative",
     key = "TRAIT:NEG:Obese",
+    enabled = false, -- only for char creation
     display = {
         label = "Obese"
     },
@@ -1049,6 +1050,7 @@ return {{
     display = {
         label = "Out of Shape"
     },
+    enabled = false, -- only for char creation
     price = {
         currency = 6
     },
@@ -1092,6 +1094,7 @@ return {{
 }, {
     inherits = "base-trait:negative",
     key = "TRAIT:NEG:Overweight",
+    enabled = false, -- only for char creation
     display = {
         label = "Overweight"
     },
@@ -1586,6 +1589,7 @@ return {{
 }, {
     inherits = "base-trait:negative",
     key = "TRAIT:NEG:Underweight",
+    enabled = false, -- only for char creation
     display = {
         label = "Underweight"
     },
@@ -1629,6 +1633,7 @@ return {{
     price = {
         currency = 10
     },
+    enabled = false, -- only for char creation
     receive = {{
         type = "trait",
         name = "Unfit",
@@ -1695,6 +1700,7 @@ return {{
 }, {
     inherits = "base-trait:negative",
     key = "TRAIT:NEG:Very Underweight",
+    enabled = false, -- only for char creation
     display = {
         label = "Very Underweight"
     },
@@ -1749,6 +1755,7 @@ return {{
 }, {
     inherits = "base-trait:negative",
     key = "TRAIT:NEG:Weak",
+    enabled = false, -- only for char creation
     display = {
         label = "Weak"
     },

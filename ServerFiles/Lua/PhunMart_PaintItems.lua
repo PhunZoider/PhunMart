@@ -62,5 +62,8 @@ return {{
 }, {
     name = "PhunSafePaint.RepellentPaint",
     inherits = "base-paint",
+    price = {
+        ["PhunMart.CheeseToken"] = 10
+    },
     mod = "PhunSafePaint"
 }}
