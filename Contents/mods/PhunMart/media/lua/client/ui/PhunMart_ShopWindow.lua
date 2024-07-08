@@ -180,6 +180,16 @@ function UI:highlight()
 
 end
 
+function UI:isKeyConsumed(key)
+    return key == Keyboard.KEY_ESCAPE
+end
+
+function UI:onKeyRelease(key)
+    if key == Keyboard.KEY_ESCAPE then
+        self:close()
+    end
+end
+
 function UI:removeHighlight()
     local xyz = PhunMart:xyzFromKey(self.data.key)
     local square = getSquare(xyz.x, xyz.y, xyz.z)
@@ -499,28 +509,23 @@ end
 function UI:render()
     ISPanelJoypad.render(self);
 
-    if isAdmin() then
-        -- if self.data then
-        --     self:drawText(self.data.key or "key", 10, 10, 1, 1, 1, 1, UIFont.Small);
-        -- else
-        --     self:drawText("No data", 10, 10, 1, 1, 1, 1, UIFont.Small);
-        -- end
-        if self.data and self.data.shop and (isAdmin() or sandbox.DisplayHoursTillNextRestocking) then
-            local hoursTillNextRestock = self.data.shop.nextRestock - GameTime:getInstance():getWorldAgeHours();
-            local txt = "";
-            if hoursTillNextRestock > 22 then
-                txt = getText("IGUI_PhunMart.HoursTillRestock.Days", math.ceil(hoursTillNextRestock / 24))
-            elseif hoursTillNextRestock >= 22 then
-                txt = getText("IGUI_PhunMart.HoursTillRestock.Day")
-            elseif hoursTillNextRestock >= 12 then
-                txt = getText("IGUI_PhunMart.HoursTillRestock.HalfADay")
-            else
-                txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
-            end
-            self:drawText(txt, self.layouts.default.buyButton.x, self.height - 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+    local sb = sandbox
+    print(tostring(sb.PhunMartShowNextRestockDate))
+    if self.data and self.data.shop and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
+        local hoursTillNextRestock = self.data.shop.nextRestock - GameTime:getInstance():getWorldAgeHours();
+        local txt = "";
+        if hoursTillNextRestock > 22 then
+            txt = getText("IGUI_PhunMart.HoursTillRestock.Days", math.ceil(hoursTillNextRestock / 24))
+        elseif hoursTillNextRestock >= 22 then
+            txt = getText("IGUI_PhunMart.HoursTillRestock.Day")
+        elseif hoursTillNextRestock >= 12 then
+            txt = getText("IGUI_PhunMart.HoursTillRestock.HalfADay")
+        else
+            txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
         end
-
+        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     end
+
     if self.data.shop and self.data.shop.requiresPower then
         local text = getText("IGUI_PhunMart.isPowered")
         if self.data.shop.isUnplugged then
@@ -569,6 +574,7 @@ function UI:new(x, y, width, height, player)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o.moveWithMouse = true;
+    o:setWantKeyEvents(true)
     return o
 end
 

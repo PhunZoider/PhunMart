@@ -52,10 +52,10 @@ option PhunMart.ValidateDefsOnStartup
     translation = PhunMartValidateDefsOnStartup
 }
 
-option PhunMart.DisplayHoursTillNextRestocking
+option PhunMart.PhunMartShowNextRestockDate
 { 
     type = boolean, 
     default = true, 
     page = PhunMart, 
-    translation = PhunMartValidateDefsOnStartup
+    translation = PhunMartShowNextRestockDate
 }

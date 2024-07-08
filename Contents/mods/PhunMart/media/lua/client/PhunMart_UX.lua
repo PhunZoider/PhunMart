@@ -56,7 +56,6 @@ function PhunMartUpdateShop(key, shop)
 end
 
 Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, key)
-    print("CLOSED " .. key)
     local pIndex = playerObj:getPlayerNum()
     if teathers[pIndex] then
         Events.OnPlayerMove.Remove(PhunMartCloseOnWanderAway)
@@ -65,7 +64,6 @@ Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, key)
 end)
 
 Events[PhunMart.events.OnWindowOpened].Add(function(playerObj, key)
-    print("OPENED " .. key)
     local pIndex = playerObj:getPlayerNum()
     if not teathers[pIndex] then
         Events.OnPlayerMove.Add(PhunMartCloseOnWanderAway)
