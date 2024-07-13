@@ -773,7 +773,7 @@ function PhunMart:checkForRestocking(forceRestock)
             local shop = PhunMart:getShop(k)
             if shop and shop.items then
                 if (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
-                    shop = PhunMart:generateShop(machine)
+                    shop = PhunMart:generateShop(k)
                 else
                     shop.restocks = (shop.restocks or 0) + 1
                 end
@@ -796,6 +796,7 @@ function PhunMart:checkForRestocking(forceRestock)
                             shop = shop
                         })
                     else
+                        shop.restockDeferred = true
                         print("Deferring shop item gen")
                     end
 

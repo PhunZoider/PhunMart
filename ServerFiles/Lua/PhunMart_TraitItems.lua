@@ -34,7 +34,7 @@ return {{
         max = 3
     },
     maxCharLimit = 1,
-    tab = "Negative",
+    tab = "Remove",
     type = "TRAIT",
     tags = "negative"
 }, {
@@ -967,6 +967,7 @@ return {{
 }, {
     inherits = "base-trait:positive",
     name = "NightOwl",
+    enabled = false, -- not for MP
     professions = {
         securityguard = false
     },
