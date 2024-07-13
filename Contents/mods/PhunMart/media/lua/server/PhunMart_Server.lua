@@ -702,10 +702,11 @@ Commands[PhunMart.commands.requestShop] = function(playerObj, args)
     end
     print("shop.restockDeferred ", tostring(shop.restockDeferred), " shop.nextRestock ", tostring(shop.nextRestock),
         " now is ", tostring(GameTime:getInstance():getWorldAgeHours()))
-
-    -- do not defer generation as someone is requesting now
-    shop.items = PhunMart:generateShopItems(args.key, sandbox.CumulativeItemGeneration == true)
-    shop.restockDeferred = false
+    if shop.restockDeferred == true then
+        print("Restocking shop " .. args.key)
+        shop.items = PhunMart:generateShopItems(args.key, sandbox.CumulativeItemGeneration == true)
+        shop.restockDeferred = false
+    end
 
     if shop then
         sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
