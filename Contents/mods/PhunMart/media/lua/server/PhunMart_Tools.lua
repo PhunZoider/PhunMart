@@ -421,20 +421,6 @@ function PhunMart:BuildItems(group, skipExistingDefs)
         local fullType = item:getFullType()
         local displayCategory = item:getDisplayCategory() or ""
 
-        -- local ddd = fullType == "Base.AssaultRifle2"
-
-        -- if ddd and doDebug then
-        --     print("---------------- WEP " .. group .. " ---------------- WEP ----------")
-        --     print("fullType", fullType)
-        --     print("displayCategory", displayCategory)
-        --     print(tostring(existingItems[fullType]))
-        --     print(tostring(helpers.items[fullType]))
-        --     print(tostring(helpers.itemCategories[displayCategory]))
-        --     PhunTools:printTable(helpers)
-        --     print(" ------------------------------------------")
-
-        -- end
-
         if not existingItems[fullType] and
             (helpers.items[fullType] == true or
                 (helpers.itemCategories[displayCategory] and helpers.items[fullType] ~= false)) then

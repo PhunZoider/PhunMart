@@ -510,7 +510,7 @@ function UI:render()
     ISPanelJoypad.render(self);
 
     local sb = sandbox
-    print(tostring(sb.PhunMartShowNextRestockDate))
+
     if self.data and self.data.shop and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
         local hoursTillNextRestock = self.data.shop.nextRestock - GameTime:getInstance():getWorldAgeHours();
         local txt = "";

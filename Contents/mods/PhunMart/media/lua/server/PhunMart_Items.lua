@@ -186,8 +186,6 @@ function PhunMart:formatItem(data)
         end
     end
 
-    PhunTools:printTable(data)
-
     local doDebug = (data.display and data.display.type == "PERK") or (base.display and base.display.type == "PERK")
 
     local type = data.display.type or base.display.type or data.type or base.type or "ITEM"
