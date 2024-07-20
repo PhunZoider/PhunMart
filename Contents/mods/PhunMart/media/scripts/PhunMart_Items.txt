@@ -37,5 +37,14 @@ module PhunMart
 	    Icon = TraiterToken,
         DisplayCategory = Currency, 
     }
+
+    item PhunMartShop
+    {
+        Type = Moveable,
+        Icon			= default,
+        DisplayName		= PhunMartShop,
+        WorldObjectSprite = phunmart_01_0,
+		Tags = PhunMartShop
+    }
  
 }

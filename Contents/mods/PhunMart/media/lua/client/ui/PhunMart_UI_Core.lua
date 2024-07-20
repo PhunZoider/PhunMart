@@ -1,5 +1,5 @@
 require "ui/PhunMartUI_ItemsPanel"
-require "ui/PhunMartUI_ItemPreviewPanel"
+require "ui/PhunMart_ItemPreviewPanel"
 local PhunMart = PhunMart;
 local sandbox = SandboxVars.PhunMart
 PhunMartShopUI = ISPanelJoypad:derive("PhunMartShopWindow");

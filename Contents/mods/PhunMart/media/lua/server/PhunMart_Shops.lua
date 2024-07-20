@@ -217,7 +217,7 @@ function PhunMart:formatShop(data)
     if data.inherits then
         local b = self.defs.shops[data.inherits]
         if b then
-            base = b
+            base = PhunTools:deepCopyTable(b)
         end
     end
 
@@ -240,7 +240,6 @@ function PhunMart:formatShop(data)
         file = data.file or nil,
         mod = data.mod or base.mod or nil,
         abstract = data.abstract,
-        sprites = data.sprites or base.sprites or {},
         reservations = data.reservations or base.reservations or {},
         currency = data.currency or base.currency or "Base.Money",
         basePrice = data.basePrice or base.basePrice or 0,
@@ -250,10 +249,17 @@ function PhunMart:formatShop(data)
         minDistance = data.minDistance or base.minDistance,
         type = data.type or base.type or nil,
         broken = false,
+        sprites = base.sprites or {},
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false
     }
+
+    if data.sprites then
+        for k, v in pairs(data.sprites) do
+            formatted.sprites[k] = v
+        end
+    end
 
     if base.broken ~= nil then
         formatted.broken = base.broken

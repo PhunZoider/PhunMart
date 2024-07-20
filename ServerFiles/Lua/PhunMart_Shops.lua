@@ -16,7 +16,7 @@ return { --[[
     maxRestock = 1000,
     currency = "PhunMart.SilverDollar", -- the default currency for shops
     backgroundImage = "machine-none",
-    minDistance = 100,
+    minDistance = 500,
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18",
               "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
@@ -34,12 +34,10 @@ return { --[[
     probability = 5,
     backgroundImage = "machine-broken"
 }, {
-
     label = "Good Phoods",
     key = "shop-good-foods",
     inherits = "base-shop",
     type = "FOOD",
-    minDistance = 10,
     pools = {
         items = {{
             filters = {
@@ -55,7 +53,11 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-good-phoods"
+    backgroundImage = "machine-good-phoods",
+    sprites = {
+        east = "phunmart_01_0",
+        south = "phunmart_01_1"
+    }
 }, {
     label = "Collectors",
     key = "shop-collectables",
@@ -71,7 +73,11 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-collectors"
+    backgroundImage = "machine-collectors",
+    sprites = {
+        east = "phunmart_01_2",
+        south = "phunmart_01_3"
+    }
 }, {
     label = "Collectors2",
     key = "shop-collectables2",
@@ -91,7 +97,11 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-collectors"
+    backgroundImage = "machine-collectors",
+    sprites = {
+        east = "phunmart_01_2",
+        south = "phunmart_01_3"
+    }
 }, {
     label = "Collectors3",
     key = "shop-collectables3",
@@ -111,7 +121,11 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-collectors"
+    backgroundImage = "machine-collectors",
+    sprites = {
+        east = "phunmart_01_2",
+        south = "phunmart_01_3"
+    }
 }, {
     label = "Collectors4",
     key = "shop-collectables4",
@@ -131,12 +145,15 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-collectors"
+    backgroundImage = "machine-collectors",
+    sprites = {
+        east = "phunmart_01_2",
+        south = "phunmart_01_3"
+    }
 }, {
     key = "shop-phat-foods",
     inherits = "base-shop",
     type = "FOOD",
-    minDistance = 10,
     label = "Phat Phoods",
     pools = {
         items = {{
@@ -154,7 +171,11 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-phat-phoods"
+    backgroundImage = "machine-phat-phoods",
+    sprites = {
+        east = "phunmart_01_22",
+        south = "phunmart_01_23"
+    }
 }, {
 
     key = "shop-tools",
@@ -176,6 +197,10 @@ return { --[[
                 tags = "toolcamping"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_6",
+        south = "phunmart_01_7"
     }
 }, {
 
@@ -187,6 +212,10 @@ return { --[[
     currency = "PhunMart.CheeseToken", -- change default currency to traiter tokens
     filters = {
         tags = "perks1,perks2"
+    },
+    sprites = {
+        east = "phunmart_01_32",
+        south = "phunmart_01_33"
     }
 }, {
 
@@ -201,6 +230,10 @@ return { --[[
     },
     filters = {
         tags = "perks2,perks3,boosts1,boosts2"
+    },
+    sprites = {
+        east = "phunmart_01_28",
+        south = "phunmart_01_29"
     }
 }, {
 
@@ -217,6 +250,10 @@ return { --[[
     },
     filters = {
         tags = "perks3,perks4,boosts3,boosts4"
+    },
+    sprites = {
+        east = "phunmart_01_27",
+        south = "phunmart_01_28"
     }
 }, {
 
@@ -224,11 +261,16 @@ return { --[[
     inherits = "base-shop",
     label = "TraiterJoe",
     type = "TRAITS",
+    minDistance = 5000,
     currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     requiresPower = true,
     backgroundImage = "machine-traiter-joes",
     filters = {
         tags = "positive,negative"
+    },
+    sprites = {
+        east = "phunmart_01_14",
+        south = "phunmart_01_15"
     }
 }, {
 
@@ -256,6 +298,10 @@ return { --[[
                 tags = "vehicle-truck,vehicle-other"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_10",
+        south = "phunmart_01_11"
     }
 }, {
 
@@ -278,6 +324,10 @@ return { --[[
                 tags = "vehicle-special"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_10",
+        south = "phunmart_01_11"
     }
 }, {
 
@@ -289,6 +339,10 @@ return { --[[
     basePrice = 25,
     filters = {
         tags = "autozone"
+    },
+    sprites = {
+        east = "phunmart_01_12",
+        south = "phunmart_01_13"
     }
 }, {
 
@@ -299,6 +353,10 @@ return { --[[
     backgroundImage = "machine-csv",
     filters = {
         tags = "medical"
+    },
+    sprites = {
+        east = "phunmart_01_16",
+        south = "phunmart_01_17"
     }
 }, {
 
@@ -309,6 +367,10 @@ return { --[[
     backgroundImage = "machine-electronics",
     filters = {
         tags = "electronics"
+    },
+    sprites = {
+        east = "phunmart_01_18",
+        south = "phunmart_01_19"
     }
 }, {
 
@@ -319,6 +381,10 @@ return { --[[
     backgroundImage = "machine-hoes",
     filters = {
         tags = "gardening"
+    },
+    sprites = {
+        east = "phunmart_01_24",
+        south = "phunmart_01_25"
     }
 }, {
 
@@ -329,6 +395,10 @@ return { --[[
     backgroundImage = "machine-michelles",
     filters = {
         tags = "crafts,paint"
+    },
+    sprites = {
+        east = "phunmart_01_30",
+        south = "phunmart_01_31"
     }
 }, {
 
@@ -343,6 +413,10 @@ return { --[[
                 tags = "fish,tackle"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_20",
+        south = "phunmart_01_21"
     }
 }, {
 
@@ -365,6 +439,10 @@ return { --[[
                 tags = "wepmisc,wepcrafting"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_8",
+        south = "phunmart_01_9"
     }
 }, {
     key = "shop-weapons2",
@@ -388,6 +466,10 @@ return { --[[
                 tags = "wepmisc,wepcrafting"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_8",
+        south = "phunmart_01_9"
     }
 }, {
     key = "shop-weapons-3",
@@ -411,5 +493,9 @@ return { --[[
                 tags = "wepshotgun,wepexplosive"
             }
         }}
+    },
+    sprites = {
+        east = "phunmart_01_8",
+        south = "phunmart_01_9"
     }
 }}

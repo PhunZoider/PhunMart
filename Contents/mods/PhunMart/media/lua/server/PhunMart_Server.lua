@@ -271,14 +271,32 @@ function PhunMart:getInstanceDistancesByType(locationKey)
     if location then
         for k, v in pairs(self.shops or {}) do
             if v.location and v.location.x and (k ~= locationKey) then
-                local min = math.min(math.abs(v.location.x - location.x), math.abs(v.location.y - location.y))
+                local dx = location.x - v.location.x
+                local dy = location.y - v.location.y
+                local distance = math.sqrt(dx * dx + dy * dy)
                 print(tostring(v.type) .. " <-- " .. v.key)
-                if not results[v.type] or results[v.type] < min then
-                    results[v.type] = min
+                if not results[v.type] or results[v.type] < distance then
+                    results[v.type] = distance
                 end
             end
         end
     end
+    return results
+end
+
+function PhunMart:getInstanceDistancesByType2(x, y)
+    local results = {}
+    print("Getting distances for " .. x .. "," .. y)
+    for k, v in pairs(self.shops or {}) do
+        local dx = x - v.location.x
+        local dy = y - v.location.y
+        table.insert(results, {
+            shop = v,
+            distance = math.sqrt(dx * dx + dy * dy)
+        })
+    end
+    print("Distances")
+    PhunTools:printTable(results)
     return results
 end
 
@@ -358,7 +376,8 @@ function PhunMart:getShopListFromKey(key, reduceDistance)
         }
     elseif distanceReduction < 100 then
         -- we should consider making this a broken shop
-        return self:getShopListFromKey(key, distanceReduction + 10)
+        return nil;
+        -- return self:getShopListFromKey(key, distanceReduction + 10)
     else
         print("No shops found for " .. key)
         table.insert(shops, {
@@ -391,7 +410,10 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
             chosenShopDef = self.defs.shops[resKey]
         else
             local shopCandidates = self:getShopListFromKey(key)
-
+            if shopCandidates == nil then
+                print("No shop candidates found for " .. key)
+                return nil
+            end
             local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
             local cumulative = 0
 
@@ -438,6 +460,48 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
     shopInstance.items = self:generateShopItems(key, sandbox.CumulativeItemGeneration == true)
     shopInstance.restockDeferred = false
     return shopInstance
+end
+
+function PhunMart:getFormattedShop(vendingMachineOrKey, forceKey)
+
+    local data = self:getShop(vendingMachineOrKey)
+
+    if not data or type(data) ~= "table" then
+        return
+    end
+    local result = {
+        tabs = {}
+    }
+    local tabKeys = {}
+
+    for k, v in pairs(data) do
+        if k == "items" then
+            for i, item in pairs(v) do
+                if not item.tab then
+                    item.tab = "Misc"
+                end
+                if result.tabs[item.tab] == nil then
+                    result.tabs[item.tab] = {
+                        items = {}
+                    }
+                    table.insert(tabKeys, item.tab)
+                end
+
+                PhunMart:setDisplayValues(item)
+
+                table.insert(result.tabs[item.tab].items, item)
+            end
+        else
+            result[k] = v
+        end
+    end
+
+    table.sort(tabKeys, function(a, b)
+        return a < b
+    end)
+    result.tabKeys = tabKeys
+    result.isUnplugged = result.requiresPower == true and sandbox.PhunMart.PoweredMachinesEnabled == true
+    return result
 end
 
 function PhunMart:purchase(playerObj, shopKey, item)
@@ -929,4 +993,67 @@ end)
 -- Events.OnInitGlobalModData.Add(loadDefs)
 Events.OnInitGlobalModData.Add(function()
     PhunMart:loadAll()
+
+    for k, _ in pairs(Events) do
+        print(k)
+    end
 end)
+
+-- South
+-- 01_19
+-- 01_17
+
+-- EAST
+-- 01_16
+-- 01_18
+
+Events.OnFillContainer.Add(function(roomtype, containertype, container)
+    -- print("OnFillContainer: " .. tostring(roomtype) .. " " .. tostring(containertype))
+    if containertype and (containertype == "vendingpop" or containertype == "vendingsnack") then
+        local parent = container:getParent()
+        if parent and parent.getModData then
+            local data = parent:getModData()
+            if not data or not data.PhunMart then
+                -- do we convert to machines?
+
+                local rng = ZombRand(1, 10)
+
+                if rng < 3 then
+                    data = {
+                        tested = true
+                    }
+                else
+                    -- if containertype == "vendingpop" then
+                    local spriteName = parent:getSprite():getName()
+                    local direction = nil
+
+                    if spriteName == "location_shop_accessories_01_17" then
+                        -- south facing machine
+                        direction = "south"
+                    elseif spriteName == "location_shop_accessories_01_19" then
+                        -- south facing machine
+                        direction = "south"
+                    elseif spriteName == "location_shop_accessories_01_16" then
+                        -- east facing
+                        direction = "east"
+                    elseif spriteName == "location_shop_accessories_01_18" then
+                        -- east facing
+                        direction = "east"
+                    end
+
+                    if direction ~= nil then
+                        local square = parent:getSquare()
+                        -- square:transmitRemoveItemFromSquare(parent)
+                        local isoObject = SPhunMartSystem.instance:generateRandomShopOnSquare(square, direction, parent)
+                    else
+                        data = {
+                            tested = true
+                        }
+                    end
+
+                end
+            end
+        end
+    end
+end)
+

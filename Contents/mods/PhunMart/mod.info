@@ -5,3 +5,5 @@ authors=UburGeek
 description=Shop Smart. Shop PhunMart. Your total vending solution.
 poster=poster.png
 require=PhunTools
+pack=phunmart
+tiledef=phunmart 1420
