@@ -91,3 +91,13 @@ function SPhunMartObject:toModData(modData)
     modData.doRestock = self.doRestock
 end
 
+function SPhunMartObject:adjustInventory(itemKey, count)
+
+    print("SPhunMartObject:toModData")
+    modData.shop = self.shop
+    modData.direction = self.direction
+    modData.created = self.created
+    modData.stocked = self.stocked
+    modData.doRestock = self.doRestock
+end
+

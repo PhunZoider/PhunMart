@@ -1,21 +1,22 @@
 require "TimedActions/ISBaseTimedAction"
-local PhunMart = PhunMart
-ISPhunMartOpenShop = ISBaseTimedAction:derive("ISPhunMartOpenShop");
 
-function ISPhunMartOpenShop:isValid()
+PM_OpenAction = ISBaseTimedAction:derive("PM_OpenAction");
+local PhunMart = PhunMart
+
+function PM_OpenAction:isValid()
     return true
 end
 
-function ISPhunMartOpenShop:waitToStart()
+function PM_OpenAction:waitToStart()
     self.character:faceLocation(self.machine.data.location.x, self.machine.data.location.y)
     return self.character:shouldBeTurning()
 end
 
-function ISPhunMartOpenShop:update()
+function PM_OpenAction:update()
     self.character:faceThisObject(self.trailer)
 end
 
-function ISPhunMartOpenShop:start()
+function PM_OpenAction:start()
     self:setActionAnim("Loot")
     self.character:SetVariable("LootPosition", "Mid")
     sendClientCommand(self.character, PhunMart.name, PhunMart.commands.requestShop, {
@@ -23,16 +24,16 @@ function ISPhunMartOpenShop:start()
     })
 end
 
-function ISPhunMartOpenShop:stop()
+function PM_OpenAction:stop()
     ISBaseTimedAction.stop(self);
 end
 
-function ISPhunMartOpenShop:perform()
+function PM_OpenAction:perform()
     PhunMartShowinstance(self.character)
     ISBaseTimedAction.perform(self);
 end
 
-function ISPhunMartOpenShop:new(character, machine, time)
+function PM_OpenAction:new(character, machine, time)
     local o = {}
     setmetatable(o, self)
     self.__index = self

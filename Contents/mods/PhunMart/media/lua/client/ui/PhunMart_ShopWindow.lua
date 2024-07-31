@@ -112,7 +112,16 @@ local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
 local FONT_SCALE = FONT_HGT_SMALL / 14
 
-function UI.OnOpenPanel(playerObj, shop)
+function UI.OnOpenPanel(playerObj, location)
+
+    local obj = CPhunMartSystem.instance:getLuaObjectAt(location.x, location.y, location.z)
+    if not obj then
+        return
+    end
+    local shop = obj.shop
+    if not shop then
+        return
+    end
 
     local core = getCore()
     local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14
@@ -130,7 +139,7 @@ function UI.OnOpenPanel(playerObj, shop)
                 instances[pIndex]:addToUIManager();
                 instances[pIndex]:setVisible(true);
             end
-            triggerEvent(PhunMart.events.OnWindowOpened, playerObj, shop.key)
+            triggerEvent(PhunMart.events.OnWindowOpened, playerObj, location)
             return instances[pIndex]
         else
             instances[pIndex]:close()
@@ -145,21 +154,13 @@ function UI.OnOpenPanel(playerObj, shop)
     instance:addToUIManager();
     instance:setVisible(false);
 
-    local tabKeys = {}
-    for k, v in pairs(shop.tabs) do
-        table.insert(tabKeys, k)
+    local tabKey = table.concat(shop.tabKeys, ",")
+    if instance.tabKey ~= tabKey then
+        instance.tabKey = tabKey
+        instance:rebuild(shop)
     end
 
-    local tabKey = table.concat(tabKeys, ",")
-    if self.tabKey ~= tabKey then
-        self.tabKey = tabKey
-        self:rebuild(shop)
-    end
-
-    if instance.rebuild then
-        instance:rebuild()
-    end
-    triggerEvent(PhunMart.events.OnWindowOpened, instance.player, key)
+    triggerEvent(PhunMart.events.OnWindowOpened, instance.player, location)
     -- instance:highlight()
     local pNum = playerObj:getPlayerNum()
 
@@ -168,9 +169,7 @@ function UI.OnOpenPanel(playerObj, shop)
         ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
     end
 
-    print("shopKey ", shop:getTabKey())
-
-    local open = ISPhunMartOpenShop:new(playerObj, instance, 75)
+    local open = PM_OpenAction:new(playerObj, instance, 75)
     ISTimedActionQueue.add(open)
 
     return instance
@@ -243,7 +242,7 @@ function UI:onKeyRelease(key)
 end
 
 function UI:removeHighlight()
-    local xyz = PhunMart:xyzFromKey(self.data.key)
+    local xyz = self.data.location
     local square = getSquare(xyz.x, xyz.y, xyz.z)
     PhunTools:removeHighlightedSquares({square})
 
@@ -275,7 +274,7 @@ function UI:createChildren()
 
         layout = self.layouts.default.admin
         self.adminButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Admin", self, function()
-            PhunMartUIShopAdmin.OnOpenPanel(self.player, self.data.key)
+            PhunMartUIShopAdmin.OnOpenPanel(self.player, self.data.location)
             -- PhunMartAdminUI.OnOpenPanel()
         end)
         self.adminButton:initialise()
@@ -413,7 +412,7 @@ function UI:onBuy()
     local item = self.pricePanel.selectedItem
     local visible = self.disabledBuyButton:getIsVisible()
     if item and not visible then
-        PhunMart:purchase(self.player, self.data.key, item.item)
+        PhunMart:purchaseRequest(self.player, PhunMart:getKey(self.data.location), item.item)
     end
 end
 
@@ -421,52 +420,59 @@ local cache = {}
 
 function UI:rebuild(data)
 
-    if not data or type(data) ~= "table" then
-        return
-    end
-    local result = {
-        tabs = {}
-    }
-    local tabKeys = {}
+    -- if not data or type(data) ~= "table" then
+    --     return
+    -- end
+    -- local result = {
+    --     tabs = {}
+    -- }
+    -- local tabKeys = {}
 
-    for k, v in pairs(data) do
-        if k == "items" then
-            for i, item in pairs(v) do
-                if not item.tab then
-                    item.tab = "Misc"
-                end
-                if result.tabs[item.tab] == nil then
-                    result.tabs[item.tab] = {
-                        items = {}
-                    }
-                    table.insert(tabKeys, item.tab)
-                end
+    -- for k, v in pairs(data) do
+    --     if k == "items" then
+    --         for i, item in pairs(v) do
+    --             if not item.tab then
+    --                 item.tab = "Misc"
+    --             end
+    --             if result.tabs[item.tab] == nil then
+    --                 result.tabs[item.tab] = {
+    --                     items = {}
+    --                 }
+    --                 table.insert(tabKeys, item.tab)
+    --             end
 
-                PhunMart:setDisplayValues(item)
+    --             PhunMart:setDisplayValues(item)
 
-                table.insert(result.tabs[item.tab].items, item)
-            end
-        else
-            result[k] = v
+    --             table.insert(result.tabs[item.tab].items, item)
+    --         end
+    --     else
+    --         result[k] = v
+    --     end
+    -- end
+
+    -- table.sort(tabKeys, function(a, b)
+    --     return a < b
+    -- end)
+    -- result.tabKeys = tabKeys
+    -- local unplugged = result.requiresPower == true and sandbox.PhunMart.PoweredMachinesEnabled == true
+    -- if unplugged then
+    --     if not self.data.location and self.data.key then
+    --         self.data.location = PhunMart:xyzFromKey(self.data.key)
+    --     end
+    --     if self.data.location then
+    --         unplugged = not PhunTools:isPowered(self.data.location)
+    --     end
+    -- end
+    -- result.isUnplugged = unplugged
+    -- self.data.shop = result
+
+    for k, v in pairs(self.data.tabs) do
+        for kk, vv in pairs(v.items) do
+            PhunMart:setDisplayValues(vv)
         end
     end
 
-    table.sort(tabKeys, function(a, b)
-        return a < b
-    end)
-    result.tabKeys = tabKeys
-    local unplugged = result.requiresPower == true and sandbox.PhunMart.PoweredMachinesEnabled == true
-    if unplugged then
-        if not self.data.location and self.data.key then
-            self.data.location = PhunMart:xyzFromKey(self.data.key)
-        end
-        if self.data.location then
-            unplugged = not PhunTools:isPowered(self.data.location)
-        end
-    end
-    result.isUnplugged = unplugged
-    self.data.shop = result
-    self.tabPanel:setShop(result)
+    self.tabPanel:setShop(self.data)
 end
 
 function UI:reroll()
@@ -539,7 +545,7 @@ end
 function UI:prerender()
     ISPanelJoypad.prerender(self);
 
-    local shop = self.shop
+    local shop = self.data
     if shop then
         if not self.backgroundTexture or self.backgroundTexture ~= shop.backgroundImage then
             if shop.backgroundImage then

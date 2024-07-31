@@ -1,12 +1,13 @@
 require "ui/PhunMart_ShopWindow"
-local PhunMart = PhunMart
+require "TimedActions/PM_OpenAction"
 
-local teathers = {}
+local PhunMart = PhunMart
+local PM_OpenAction = PM_OpenAction
 
 function PhunMartCloseOnWanderAway(playerObj)
     for _, v in pairs(PhunMartShopWindow.instances) do
         if v.pIndex == playerObj:getPlayerNum() then
-            local location = PhunMart:xyzFromKey(v.data.key)
+            local location = v.data.location
             if location then
                 local x = playerObj:getX()
                 local y = playerObj:getY()
@@ -26,16 +27,16 @@ function PhunMartCloseAll()
     end
 end
 
-function PhunMartShowUI(playerObj, machine)
-    local key = PhunMart:getKey(machine)
-    local instance = PhunMartShopWindow.instances[playerObj:getPlayerNum()]
-    if instance and instance.data and instance.data.key and instance.data.key ~= key then
-        instance:close()
-    end
-    PhunMartShopWindow.OnOpenPanel(playerObj, key)
-    local open = ISPhunMartOpenShop:new(playerObj, machine, 75)
-    ISTimedActionQueue.add(open)
-end
+-- function PhunMartShowUI(playerObj, machine)
+--     local key = PhunMart:getKey(machine)
+--     local instance = PhunMartShopWindow.instances[playerObj:getPlayerNum()]
+--     if instance and instance.data and instance.data.key and instance.data.key ~= key then
+--         instance:close()
+--     end
+--     PhunMartShopWindow.OnOpenPanel(playerObj, key)
+--     local open = PM_OpenAction:new(playerObj, machine, 75)
+--     ISTimedActionQueue.add(open)
+-- end
 
 function PhunMartShowinstance(playerObj)
     local instance = PhunMartShopWindow.instances[playerObj:getPlayerNum()]
@@ -54,20 +55,4 @@ function PhunMartUpdateShop(key, shop)
         end
     end
 end
-
-Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, key)
-    local pIndex = playerObj:getPlayerNum()
-    if teathers[pIndex] then
-        Events.OnPlayerMove.Remove(PhunMartCloseOnWanderAway)
-        teathers[pIndex] = nil
-    end
-end)
-
-Events[PhunMart.events.OnWindowOpened].Add(function(playerObj, key)
-    local pIndex = playerObj:getPlayerNum()
-    if not teathers[pIndex] then
-        Events.OnPlayerMove.Add(PhunMartCloseOnWanderAway)
-        teathers[pIndex] = true
-    end
-end)
 

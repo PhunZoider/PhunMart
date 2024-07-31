@@ -28,8 +28,6 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
 
     local isoObject
 
-    -- PhunTools:printTable(shop)
-
     local sprite = PhunMart.defs.shops[shop.key].sprites[direction]
     print("sprite: ", sprite)
 
@@ -74,7 +72,14 @@ function SPhunMartSystem:generateRandomShopOnSquare(square, direction, removeOnS
     direction = direction or "south"
     print("===============> SPhunMartSystem:generateRandomShopOnSquare ", tostring(square), " d=", tostring(direction))
 
-    local shop = PhunMart:getFormattedShop(square)
+    -- local shop = PhunMart:getFormattedShop(square)
+    -- if shop == nil then
+    --     local instance = PhunMart:generateShop(square)
+    --     if instance then
+    --         shop = PhunMart:getFormattedShop(square)
+    --     end
+    -- end
+    local shop = PhunMart:generateShop(square)
     if shop ~= nil then
         square:transmitRemoveItemFromSquare(removeOnSuccess)
         self.addToWorld(square, shop, direction)
@@ -108,13 +113,13 @@ function SPhunMartSystem:isValidIsoObject(isoObject)
     return instanceof(isoObject, "IsoThumpable") and isoObject:getName() == "PhunMartShop"
 end
 
-function SPhunMartSystem:convertOldModData()
-    -- If the gos_xxx.bin file existed, don't touch GameTime modData in case mods are using it.
-    print("SPhunMartSystem:convertOldModData")
-    -- Global rainbarrel data was never saved anywhere.
-    -- Rainbarrels wouldn't update unless they had been loaded in a session.
-    --	local modData = GameTime:getInstance():getModData()
-end
+-- function SPhunMartSystem:convertOldModData()
+--     -- If the gos_xxx.bin file existed, don't touch GameTime modData in case mods are using it.
+--     print("SPhunMartSystem:convertOldModData")
+--     -- Global rainbarrel data was never saved anywhere.
+--     -- Rainbarrels wouldn't update unless they had been loaded in a session.
+--     --	local modData = GameTime:getInstance():getModData()
+-- end
 
 function SPhunMartSystem:receiveCommand(playerObj, command, args)
     print("SPhunMartSystem:receiveCommand ", tostring(playerObj), " c= ", tostring(command), " a=", tostring(args))

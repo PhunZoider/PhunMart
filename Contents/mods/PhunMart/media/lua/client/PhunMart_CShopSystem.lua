@@ -20,9 +20,12 @@ function CPhunMartSystem:newLuaObjectAt(x, y, z)
     print("CPhunMartSystem:newLuaObjectAt", tostring(x), tostring(y), tostring(z))
     self:noise("adding luaObject " .. x .. ',' .. y .. ',' .. z)
     local globalObject = self.system:newObject(x, y, z)
-    -- local nl = self.processNewLua
-    -- nl:addItem(x, y, z)
     return self:newLuaObject(globalObject)
+end
+
+function CPhunMartSystem:OnLuaObjectUpdated(luaObject)
+    -- luaObject fields were updated with new values from the server
+    print("CPhunMartSystem:OnLuaObjectUpdated")
 end
 
 CGlobalObjectSystem.RegisterSystemClass(CPhunMartSystem)
