@@ -2,7 +2,7 @@ if not isClient() then
     return
 end
 require "PhunMart_UX"
-require "TimedActions/ISInventoryTransferAction"
+require 'ISInventoryTransferAction'
 
 local PhunMart = PhunMart
 

@@ -6,22 +6,33 @@ local PhunMart = PhunMart
 local vendingContextMenu = function(playerObj, context, worldobjects)
 
     local player = getSpecificPlayer(playerObj);
+    local object = nil;
+    local objType = nil;
+    local machine = nil;
 
-    local found = nil
+    local objFound = false;
 
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
         local square = wObj:getSquare()
         if square then
-            found = CPhunMartSystem.instance:getLuaObjectOnSquare(square)
-            break
+            machine = PhunMart:getMachineFromSquare(square)
+            if machine ~= nil then
+                break
+            end
+
         end
     end
 
-    if found and found.shop then
-        context:addOption(found.shop.label or "Vending Machine", player, function()
-            PhunMartShopWindow.OnOpenPanel(player, found.shop)
-        end)
+    if machine == nil then
+        return
     end
+    local pv = PhunMart
+    local key = pv:getKey(machine)
+    local shop = pv.shoplist[key] or "View vending machine"
+
+    context:addOption(shop, player, function()
+        PhunMartShowUI(player, machine)
+    end, machine, objType)
 
 end
 

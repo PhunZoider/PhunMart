@@ -7,7 +7,7 @@ function ISPhunMartOpenShop:isValid()
 end
 
 function ISPhunMartOpenShop:waitToStart()
-    self.character:faceLocation(self.machine.data.location.x, self.machine.data.location.y)
+    self.character:faceThisObject(self.machine)
     return self.character:shouldBeTurning()
 end
 
@@ -37,7 +37,7 @@ function ISPhunMartOpenShop:new(character, machine, time)
     setmetatable(o, self)
     self.__index = self
     o.character = character;
-    o.key = PhunMart:getKey(machine.data.location)
+    o.key = PhunMart:getKey(machine)
     o.machine = machine;
     o.stopOnWalk = true;
     o.stopOnRun = true;
