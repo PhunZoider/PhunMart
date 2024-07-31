@@ -4,19 +4,11 @@
 if isClient() then
     return
 end
-
+local PM = PhunMart
 require "Map/SGlobalObjectSystem"
-local sprites = {
-    goodPhoods = {
-        east = "phunmart_01_0",
-        south = "phunmart_01_1"
-    }
-}
-
 SPhunMartSystem = SGlobalObjectSystem:derive("SPhunMartSystem")
 
 function SPhunMartSystem:new()
-    print("----> SPhunMartSystem:new")
     local o = SGlobalObjectSystem.new(self, "phunmart")
     return o
 end
@@ -27,8 +19,6 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
     direction = direction or "south"
 
     local isoObject
-
-    -- PhunTools:printTable(shop)
 
     local sprite = PhunMart.defs.shops[shop.key].sprites[direction]
     print("sprite: ", sprite)
@@ -55,10 +45,8 @@ end
 function SPhunMartSystem:initSystem()
 
     SGlobalObjectSystem.initSystem(self)
-    -- Specify GlobalObjectSystem fields that should be saved.
     self.system:setModDataKeys({})
-    -- Specify GlobalObject fields that should be saved.
-    self.system:setObjectModDataKeys({'shop', 'created', 'stocked'})
+    self.system:setObjectModDataKeys({})
 
 end
 
@@ -74,7 +62,7 @@ function SPhunMartSystem:generateRandomShopOnSquare(square, direction, removeOnS
     direction = direction or "south"
     print("===============> SPhunMartSystem:generateRandomShopOnSquare ", tostring(square), " d=", tostring(direction))
 
-    local shop = PhunMart:getFormattedShop(square)
+    local shop = PM:getFormattedShop(square)
     if shop ~= nil then
         square:transmitRemoveItemFromSquare(removeOnSuccess)
         self.addToWorld(square, shop, direction)
@@ -108,60 +96,10 @@ function SPhunMartSystem:isValidIsoObject(isoObject)
     return instanceof(isoObject, "IsoThumpable") and isoObject:getName() == "PhunMartShop"
 end
 
-function SPhunMartSystem:convertOldModData()
-    -- If the gos_xxx.bin file existed, don't touch GameTime modData in case mods are using it.
-    print("SPhunMartSystem:convertOldModData")
-    -- Global rainbarrel data was never saved anywhere.
-    -- Rainbarrels wouldn't update unless they had been loaded in a session.
-    --	local modData = GameTime:getInstance():getModData()
-end
-
 function SPhunMartSystem:receiveCommand(playerObj, command, args)
     print("SPhunMartSystem:receiveCommand ", tostring(playerObj), " c= ", tostring(command), " a=", tostring(args))
     SPhunMartServerCommands[command](playerObj, args)
 end
 
-function SPhunMartSystem:flagForRestocks()
-
-    local refs = {}
-    local defs = PhunMart.defs.shops
-    for k, v in ipairs(defs) do
-        refs[v.key] = v.restock
-    end
-
-    local now = getGameTime():getWorldAgeHours()
-
-    for i = 1, self:getLuaObjectCount() do
-        local luaObject = self:getLuaObjectByIndex(i)
-        if not luaObject.doRestock then
-            if (luaObject.stocked or 0) + (refs[luaObject.shop.key] or 0) < now then
-                luaObject.doRestock = true
-                luaObject:saveData()
-            end
-        end
-    end
-end
-
-function SPhunMartSystem:EveryTenMinutes()
-    local sec = math.floor(getGameTime():getTimeOfDay() * 3600)
-    local currentHour = math.floor(sec / 3600)
-    local day = getGameTime():getDay()
-end
-
 SGlobalObjectSystem.RegisterSystemClass(SPhunMartSystem)
-
--- -- -- -- --
-
-local noise = function(msg)
-    print("PhunMar noise: " .. msg)
-    SPhunMartSystem.instance:noise(msg)
-end
-
--- every 10 minutes we check if it's raining, to fill our water barrel
-local function EveryTenMinutes()
-    SPhunMartSystem.instance:flagForRestocks()
-end
-
--- every 10 minutes we check if it's raining, to fill our water barrel
-Events.EveryTenMinutes.Add(EveryTenMinutes)
 

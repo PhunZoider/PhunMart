@@ -902,7 +902,7 @@ function PhunMart:loadAllItems()
     print("Added " .. results.all.success .. " items from:")
 
     for k, v in pairs(results.files) do
-        print(" - Lua/" .. k .. " loaded " .. v.success .. " items")
+        print(" - Lua/" .. tostring(k) .. " loaded " .. tostring(v.success) .. " items")
     end
 
     results = self:validateItems()
@@ -941,7 +941,7 @@ function PhunMart:loadAllShops()
     print("Added " .. results.all.success .. " shops from:")
 
     for k, v in pairs(results.files) do
-        print(" - Lua/" .. k .. " loaded " .. (v and v.success or 0) .. " items")
+        print(" - Lua/" .. tostring(k) .. " loaded " .. tostring(v and v.success or 0) .. " items")
     end
 
     results = self:validateShops()
@@ -1043,7 +1043,6 @@ Events.OnFillContainer.Add(function(roomtype, containertype, container)
 
                     if direction ~= nil then
                         local square = parent:getSquare()
-                        -- square:transmitRemoveItemFromSquare(parent)
                         local isoObject = SPhunMartSystem.instance:generateRandomShopOnSquare(square, direction, parent)
                     else
                         data = {

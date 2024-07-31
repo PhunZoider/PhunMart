@@ -5,6 +5,21 @@ end
 require "Map/SGlobalObject"
 
 SPhunMartObject = SGlobalObject:derive("SPhunMartObject")
+local PM = PhunMart
+local fields = {
+    power_required = {
+        type = "boolean",
+        default = false
+    },
+    base = {
+        type = "string",
+        default = "default"
+    },
+    direction = {
+        type = "string",
+        default = "south"
+    }
+}
 
 function SPhunMartObject:new(luaSystem, globalObject)
     print("=======SPhunMartObject:new ", tostring(self))
@@ -14,17 +29,22 @@ end
 
 function SPhunMartObject:initNew()
     print("SPhunMartObject:initNew")
+    for k, v in pairs(fields) do
+        self[k] = v.default
+    end
 end
 
 function SPhunMartObject.initModData(modData)
-    print("SPhunMartObject.initModData")
-    self.doRestock = false
-    modData.doRestock = false
+    PM:debug('SPhunMartObject:stateFromIsoObject', modData)
+    for k, v in pairs(fields) do
+        if modData[k] == nil and self[k] == nil then
+            modData[k] = v.default
+        end
+    end
 end
 
 function SPhunMartObject:stateFromIsoObject(isoObject)
-    print("SPhunMartObject:stateFromIsoObject")
-    print("Do we determine the shop type from here?")
+    PM:debug('SPhunMartObject:stateFromIsoObject', isoObject)
     self:initNew()
     self:fromModData(isoObject:getModData())
 
@@ -75,19 +95,17 @@ end
 
 function SPhunMartObject:fromModData(modData)
     print("SPhunMartObject:fromModData")
-    self.shop = modData.shop
-    self.direction = modData.direction
-    self.created = modData.created
-    self.stocked = modData.stocked
-    self.doRestock = modData.doRestock
+    for k, v in pairs(modData) do
+        if fields[k] then
+            self[k] = fields[k].type == "number" and tonumber(v) or v
+        end
+    end
 end
 
 function SPhunMartObject:toModData(modData)
     print("SPhunMartObject:toModData")
-    modData.shop = self.shop
-    modData.direction = self.direction
-    modData.created = self.created
-    modData.stocked = self.stocked
-    modData.doRestock = self.doRestock
+    for k, v in pairs(fields) do
+        modData[k] = self[k]
+    end
 end
 
