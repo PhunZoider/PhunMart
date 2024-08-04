@@ -101,7 +101,7 @@ function PhunMartUIShopAdminItems:rebuild(pools)
                 if not items[item] and pm.defs.items[item] then
                     local def = pm.defs.items[item]
                     local clone = PhunTools:deepCopyTable(def)
-                    PhunMart:setDisplayValues(clone)
+                    -- PhunMart:setDisplayValues(clone)
                     table.insert(items, clone)
                 end
             end

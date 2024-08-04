@@ -228,7 +228,7 @@ function UI:createChildren()
         viewer = self.player,
         backgroundColor = layout.backgroundColor
     })
-    self.tabPanel:setShop(self.shopObj)
+    -- self.tabPanel:setShop(self.shopObj)
     self:addChild(self.tabPanel)
 
     layout = self.layouts.default.previewPanel
@@ -406,17 +406,21 @@ function UI:prerender()
         end
     end
     local selected = self.tabPanel:getSelected()
-    local item = shop.items[selected.text]
-    self.preview:setItem(item)
-    self.pricePanel:setItem(item)
-    local canBuy = self.pricePanel.canBuy.passed == true
-    if canBuy then
-        -- is there inventory?
-        if item.inventory ~= false and item.inventory < 1 then
-            canBuy = false
+    if selected then
+        local item = shop.items[selected.text]
+        self.preview:setItem(item, selected.item)
+        self.pricePanel:setItem(item, selected.item)
+        local canBuy = self.pricePanel.canBuy.passed == true
+        if canBuy then
+            -- is there inventory?
+            if item.inventory ~= false and item.inventory < 1 then
+                canBuy = false
+            end
         end
+        self.disabledBuyButton:setVisible(not canBuy)
+    else
+        self.disabledBuyButton:setVisible(true)
     end
-    self.disabledBuyButton:setVisible(not canBuy)
 end
 
 function UI:render()

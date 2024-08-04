@@ -4,6 +4,7 @@ CPhunMartObject = CGlobalObject:derive("CPhunMartObject")
 
 function CPhunMartObject:new(luaSystem, globalObject)
     local o = CGlobalObject.new(self, luaSystem, globalObject)
+    o.poop = true
     return o
 end
 

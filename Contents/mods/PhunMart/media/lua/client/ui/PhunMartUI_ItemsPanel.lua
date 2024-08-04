@@ -52,14 +52,13 @@ function PhunMartUIItemsPanel:new(x, y, width, height, options)
     o.viewer = opts.viewer or getPlayer()
     o.tabFont = opts.tabFont or UIFont.Medium
     o.selections = {}
-    o.shop = opts.shop or {}
     o.tabHeight = opts.tabHeight or FONT_HGT_MEDIUM + 6
     PhunMartUIItemsPanel.instance = o;
     return o;
 end
 
 function PhunMartUIItemsPanel:getSelected()
-    local shop = self.shop or (self.parent and self.parent.shopObj)
+    local shop = self.parent and self.parent.shopObj
     if shop and not shop.isUnplugged then
         if self.tabPanel and self.tabPanel.activeView then
             return self.tabPanel.activeView.view.items[self.tabPanel.activeView.view.selected]
@@ -67,48 +66,50 @@ function PhunMartUIItemsPanel:getSelected()
     end
 end
 
-function PhunMartUIItemsPanel:rebuildTabs(skipCheck)
-    if not self.shop then
+function PhunMartUIItemsPanel:rebuildTabs(reset)
+
+    if reset then
+        self.shopId = nil
+        self.lastRestock = nil
+    end
+
+    local shop = self.parent and self.parent.shopObj
+    if not shop then
         return
     end
-    if skipCheck == true or
-        (self.shop ~= nil and self.shop.tabChangeKey ~= nil and self.shop.tabChangeKey ~= self.tabChangeKey) then
-        -- shop has changed, rebuild the tabs
-        self.tabChangeKey = self.shop.tabChangeKey
-        self:removeViews()
-        local firstTab = nil
-        local firstRow = nil
-        for _, tabName in ipairs(self.shop.tabs) do
 
-            local scrollingList = ISScrollingListBox:new(1, 0, self.tabPanel.width - 2,
-                self.tabPanel.height - self.tabPanel.tabHeight)
+    self.shopId = shop.id
+    self.lastRestock = shop.lastRestock
 
-            scrollingList.itemPadY = 10 * FONT_SCALE
-            scrollingList.itemheight = FONT_HGT_LARGE + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
-            scrollingList.textureHeight = scrollingList.itemheight - scrollingList.itemPadY * 2
-            scrollingList.mouseoverselected = -1
-            scrollingList.background = false
-            scrollingList:initialise()
-            scrollingList.doDrawItem = self.doDrawItem
-            scrollingList.selectionMode = "single"
-            scrollingList.onMouseDown = self.onMouseDown
-            scrollingList.onMouseMove = self.doOnMouseMove
-            scrollingList.onMouseMoveOutside = self.doOnMouseMoveOutside
-            scrollingList.onMouseDoubleClick = self.doOnMouseDoubleClick
-            self.tabPanel:addView(tabName, scrollingList)
+    self:removeViews()
+    local firstTab = nil
+    local firstRow = nil
+    for _, tabName in ipairs(shop.tabs) do
 
-            for itemKey, entry in pairs(self.shop.items) do
-                if entry.tab == tabName then
-                    scrollingList:addItem(itemKey, entry)
-                end
+        local scrollingList = ISScrollingListBox:new(1, 0, self.tabPanel.width - 2,
+            self.tabPanel.height - self.tabPanel.tabHeight)
+
+        scrollingList.itemPadY = 10 * FONT_SCALE
+        scrollingList.itemheight = FONT_HGT_LARGE + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
+        scrollingList.textureHeight = scrollingList.itemheight - scrollingList.itemPadY * 2
+        scrollingList.mouseoverselected = -1
+        scrollingList.background = false
+        scrollingList:initialise()
+        scrollingList.doDrawItem = self.doDrawItem
+        scrollingList.selectionMode = "single"
+        scrollingList.onMouseDown = self.onMouseDown
+        scrollingList.onMouseMove = self.doOnMouseMove
+        scrollingList.onMouseMoveOutside = self.doOnMouseMoveOutside
+        scrollingList.onMouseDoubleClick = self.doOnMouseDoubleClick
+        self.tabPanel:addView(tabName, scrollingList)
+
+        for itemKey, entry in pairs(shop.items) do
+            if entry.tab == tabName then
+                scrollingList:addItem(itemKey, PhunMart:getDisplayValues(entry))
             end
         end
     end
-end
 
-function PhunMartUIItemsPanel:setShop(shop)
-    self.shop = shop
-    self:rebuildTabs(true)
 end
 
 function PhunMartUIItemsPanel:createChildren()
@@ -197,6 +198,13 @@ end
 
 function PhunMartUIItemsPanel:tabPanelRender()
     ISScrollingListBox.render(self)
+
+    local shop = self.parent.parent.shopObj
+
+    if shop.id ~= self.parent.shopId or shop.lastRestock ~= self.parent.lastRestock then
+        self.parent:rebuildTabs()
+    end
+
     local inset = 1
     local x = inset + self.scrollX
     local widthOfAllTabs = self:getWidthOfAllTabs()
@@ -254,6 +262,7 @@ function PhunMartUIItemsPanel:doDrawItem(y, row, alt)
         return
     end
     local item = shop.items[row.text]
+    local display = row.item or {}
 
     local inventoryVal = 0
     local itemAlpha = 1
@@ -269,8 +278,6 @@ function PhunMartUIItemsPanel:doDrawItem(y, row, alt)
     else
         inventoryVal = PhunTools:formatWholeNumber(item.inventory)
     end
-
-    local display = item.display or {}
 
     self:drawRectBorder(0, y, self:getWidth(), row.height, 0.5, self.borderColor.r, self.borderColor.g,
         self.borderColor.b)
@@ -310,10 +317,8 @@ function PhunMartUIItemsPanel:prerender()
 
     ISPanel.prerender(self)
 
-    -- rebuild tabs if tabChangeKey has changed
-    self:rebuildTabs()
-    local shop = self.shop or (self.parent and self.parent.shopObj)
-    self.noPower:setVisible(shop.isUnplugged == true)
+    local shop = self.parent and self.parent.shopObj
+    self.noPower:setVisible(shop and shop.isUnplugged == true)
 
 end
 
@@ -340,8 +345,10 @@ function PhunMartUIItemsPanel:doOnMouseMove(dx, dy)
     if not self.dragging and self.rowAt then
         if self:isMouseOver() then
             local row = self:rowAt(self:getMouseX(), self:getMouseY())
-            if row then
-                item = self.items[row] and self.items[row].item
+            if row > 0 then
+                local shop = self.parent.parent.parent.shopObj
+                local display = self.items[row] and self.items[row].item
+                local item = shop.items[self.items[row].text]
                 if item then
                     tooltip = self.parent.parent.tooltip
                     if item.display.type == "ITEM" then

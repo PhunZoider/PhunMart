@@ -5,14 +5,14 @@ require "PhunMart_UX"
 
 local PhunMart = PhunMart
 
-function PhunMart:setDisplayValues(item)
+function PhunMart:getDisplayValues(item)
 
-    local display = item.display or {}
-    display.textureVal = display.textureVal or PhunMart:getTextureFromItem(display)
-    display.labelVal = display.labelVal or PhunMart:getLabelFromItem(display) or item.key
-    display.overlayVal = display.overlayVal or PhunMart:getOverlayFromItem(display)
-    display.descriptionVal = display.descriptionVal or PhunMart:getDescriptionFromItem(display)
-    item.display = display
+    local display = {}
+    display.textureVal = display.textureVal or PhunMart:getTextureFromItem(item.display or {})
+    display.labelVal = display.labelVal or PhunMart:getLabelFromItem(item.display or {}) or item.key
+    display.overlayVal = display.overlayVal or PhunMart:getOverlayFromItem(item.display or {})
+    display.descriptionVal = display.descriptionVal or PhunMart:getDescriptionFromItem(item.display or {})
+    return display
 end
 
 function PhunMart:getHistoricItem(playerObj, item)
@@ -42,7 +42,7 @@ function PhunMart:canBuy(playerObj, item)
         conditions = {}
     }
 
-    for _, condition in ipairs(item.conditions) do
+    for _, condition in ipairs(item.conditions or {}) do
 
         local result = {}
         for k, v in pairs(condition) do
@@ -58,7 +58,7 @@ function PhunMart:canBuy(playerObj, item)
 
     -- check there is inventory available to sell. 
     -- item.inventory == false == infinite stock
-    if item.inventory ~= false and item.inventory < 1 then
+    if item.inventory ~= false and (item.inventory or 0) < 1 then
         summary.passed = false
         table.insert(summary.conditions, {
             type = "inventory",

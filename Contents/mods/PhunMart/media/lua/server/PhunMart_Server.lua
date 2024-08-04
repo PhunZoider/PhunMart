@@ -432,6 +432,7 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
 
     local location = self:xyzFromKey(key)
     local shopInstance = {
+        id = key,
         key = chosenShopDef.key or chosenShopDef.name,
         name = chosenShopDef.name,
         label = chosenShopDef.label or "Vending Machine",
@@ -461,27 +462,24 @@ end
 
 function PhunMart:setShopInstanceItems(shopInstance)
 
-    local tabKeys = {}
     local checked = {}
+    if not shopInstance.tabs then
+        shopInstance.tabs = {}
+    end
     for i, item in pairs(shopInstance.items) do
         if not item.tab then
             item.tab = "Misc"
         end
         if checked[item.tab] == nil then
             checked[item.tab] = true
-            -- shop.tabs[item.tab] = {
-            --     items = {}
-            -- }
-            table.insert(tabKeys, item.tab)
+            table.insert(shopInstance.tabs, item.tab)
         end
-        -- table.insert(shop.tabs[item.tab].items, item)
     end
 
-    table.sort(tabKeys, function(a, b)
+    table.sort(shopInstance.tabs, function(a, b)
         return a < b
     end)
 
-    shopInstance.tabKeys = tabKeys
     shopInstance.restockDeferred = false
     shopInstance.lastRestock = GameTime:getInstance():getWorldAgeHours()
 

@@ -32,12 +32,10 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
     end
     isoObject = IsoThumpable.new(square:getCell(), square, sprite, false, {})
 
-    isoObject:setModData({
-        key = shop.key,
-        id = square:getX() .. "_" .. square:getY() .. "_" .. square:getZ(),
-        label = shop.label,
-        direction = direction
-    })
+    shop.id = square:getX() .. "_" .. square:getY() .. "_" .. square:getZ()
+    shop.direction = direction
+
+    isoObject:setModData(shop)
 
     isoObject:setName("PhunMartShop")
     square:AddSpecialObject(isoObject, -1)
@@ -49,8 +47,12 @@ function SPhunMartSystem:initSystem()
 
     SGlobalObjectSystem.initSystem(self)
     self.lockedShopIds = {}
+    -- Specify GlobalObjectSystem fields that should be saved.
     self.system:setModDataKeys({})
-    self.system:setObjectModDataKeys({})
+
+    -- Specify GlobalObject fields that should be saved.
+    self.system:setObjectModDataKeys({'id', 'key', 'label', 'fills', 'lastRestock', 'location', 'tabs', 'items',
+                                      'playerName'})
 
 end
 
@@ -133,7 +135,6 @@ function SPhunMartSystem:requestShop(shopId, playerObj, forceRestock)
     end
 
     local obj = self:getLuaObjectAt(shop.location.x, shop.location.y, shop.location.z)
-    obj:lock(playerObj)
 
     print("shop.restockDeferred ", tostring(shop.restockDeferred), " shop.nextRestock ", tostring(shop.nextRestock),
         " now is ", tostring(GameTime:getInstance():getWorldAgeHours()), " force = ", tostring(forceRestock))
@@ -159,6 +160,8 @@ function SPhunMartSystem:requestShop(shopId, playerObj, forceRestock)
     end
 
     shop.playerName = playerObj:getUsername()
+    obj:fromModData(shop)
+    obj:lock(playerObj)
     table.insert(self.lockedShopIds, {
         shopId = shopId,
         playerName = shop.playerName,
