@@ -112,15 +112,12 @@ local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
 local FONT_SCALE = FONT_HGT_SMALL / 14
 
-function UI.OnOpenPanel(playerObj, location)
+function UI.OnOpenPanel(playerObj, obj)
 
-    local obj = CPhunMartSystem.instance:getLuaObjectAt(location.x, location.y, location.z)
     if not obj then
         return
-    end
-    local shop = obj.shop
-    if not shop then
-        return
+    else
+        CPhunMartSystem.instance:refreshShop(obj, playerObj)
     end
 
     local core = getCore()
@@ -134,12 +131,11 @@ function UI.OnOpenPanel(playerObj, location)
     local instances = PhunMartShopWindow.instances
     if instances[pIndex] then
         if instances[pIndex].data.key == shop.key then
-            -- instances[pIndex]:highlight()
             if not instances[pIndex]:isVisible() then
                 instances[pIndex]:addToUIManager();
                 instances[pIndex]:setVisible(true);
             end
-            triggerEvent(PhunMart.events.OnWindowOpened, playerObj, location)
+            triggerEvent(PhunMart.events.OnWindowOpened, playerObj, obj)
             return instances[pIndex]
         else
             instances[pIndex]:close()
@@ -149,19 +145,14 @@ function UI.OnOpenPanel(playerObj, location)
     local instance = UI:new(x, y, width, height, playerObj);
     instance:initialise();
     instance:instantiate();
-    instance.data = shop
+    instance.shopObj = obj
+    instance.tabPanel.shop = instance.shopObj
+
+    instance.data = {}
     instance.player = playerObj
     instance:addToUIManager();
     instance:setVisible(false);
 
-    local tabKey = table.concat(shop.tabKeys, ",")
-    if instance.tabKey ~= tabKey then
-        instance.tabKey = tabKey
-        instance:rebuild(shop)
-    end
-
-    triggerEvent(PhunMart.events.OnWindowOpened, instance.player, location)
-    -- instance:highlight()
     local pNum = playerObj:getPlayerNum()
 
     UI.instances[pNum] = instance
@@ -174,55 +165,6 @@ function UI.OnOpenPanel(playerObj, location)
 
     return instance
 end
-
--- function UI.OnOpenPanelOLD(playerObj, key)
-
---     local pNum = playerObj:getPlayerNum()
---     local recycle = false
-
---     if UI.instances[pNum] then
---         if UI.instances[pNum].data.key == key then
---             self:highlight()
---             triggerEvent(PhunMart.events.OnWindowOpened, UI.instances[pNum].player, key)
---             if UI.instances[pNum] and UI.instances[pNum].rebuild then
---                 UI.instances[pNum]:rebuild()
---             end
---             return UI.instances[pNum]
---         else
---             return UI.instances[pNum]
---         end
---     end
-
---     local core = getCore()
---     local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14
---     local core = getCore()
---     local width = UI.layouts.default.window.width * FONT_SCALE
---     local height = UI.layouts.default.window.height * FONT_SCALE
---     local x = (core:getScreenWidth() - width) / 2
---     local y = (core:getScreenHeight() - height) / 2
-
---     local instance = UI:new(x, y, width, height, playerObj);
---     instance:initialise();
---     instance:instantiate();
---     instance.data = {
---         key = key,
---         location = PhunMart:xyzFromKey(key)
---     }
---     instance.player = playerObj
---     instance:addToUIManager();
---     instance:setVisible(false);
---     if instance.rebuild then
---         instance:rebuild()
---     end
-
---     triggerEvent(PhunMart.events.OnWindowOpened, instance.player, key)
---     instance:highlight()
---     UI.instances[pNum] = instance
---     if pNum == 0 then
---         ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
---     end
---     return UI.instances[pNum]
--- end
 
 function UI:highlight()
 
@@ -242,8 +184,7 @@ function UI:onKeyRelease(key)
 end
 
 function UI:removeHighlight()
-    local xyz = self.data.location
-    local square = getSquare(xyz.x, xyz.y, xyz.z)
+    local square = getSquare(self.shopObj.x, self.shopObj.y, self.shopObj.z)
     PhunTools:removeHighlightedSquares({square})
 
 end
@@ -287,6 +228,7 @@ function UI:createChildren()
         viewer = self.player,
         backgroundColor = layout.backgroundColor
     })
+    self.tabPanel:setShop(self.shopObj)
     self:addChild(self.tabPanel)
 
     layout = self.layouts.default.previewPanel
@@ -409,70 +351,24 @@ function UI:onJoypadDirRight()
 end
 
 function UI:onBuy()
-    local item = self.pricePanel.selectedItem
-    local visible = self.disabledBuyButton:getIsVisible()
-    if item and not visible then
-        PhunMart:purchaseRequest(self.player, PhunMart:getKey(self.data.location), item.item)
+
+    if self.disabledBuyButton:getIsVisible() then
+        -- buy is disabled
+        return
     end
+
+    local selected = self.pricePanel.selectedItem
+    if not selected then
+        return
+    end
+
+    CPhunMartSystem.instance:requestPurchase(self.shopObj, selected.key, self.player)
 end
 
 local cache = {}
 
-function UI:rebuild(data)
+function UI:rebuild()
 
-    -- if not data or type(data) ~= "table" then
-    --     return
-    -- end
-    -- local result = {
-    --     tabs = {}
-    -- }
-    -- local tabKeys = {}
-
-    -- for k, v in pairs(data) do
-    --     if k == "items" then
-    --         for i, item in pairs(v) do
-    --             if not item.tab then
-    --                 item.tab = "Misc"
-    --             end
-    --             if result.tabs[item.tab] == nil then
-    --                 result.tabs[item.tab] = {
-    --                     items = {}
-    --                 }
-    --                 table.insert(tabKeys, item.tab)
-    --             end
-
-    --             PhunMart:setDisplayValues(item)
-
-    --             table.insert(result.tabs[item.tab].items, item)
-    --         end
-    --     else
-    --         result[k] = v
-    --     end
-    -- end
-
-    -- table.sort(tabKeys, function(a, b)
-    --     return a < b
-    -- end)
-    -- result.tabKeys = tabKeys
-    -- local unplugged = result.requiresPower == true and sandbox.PhunMart.PoweredMachinesEnabled == true
-    -- if unplugged then
-    --     if not self.data.location and self.data.key then
-    --         self.data.location = PhunMart:xyzFromKey(self.data.key)
-    --     end
-    --     if self.data.location then
-    --         unplugged = not PhunTools:isPowered(self.data.location)
-    --     end
-    -- end
-    -- result.isUnplugged = unplugged
-    -- self.data.shop = result
-
-    for k, v in pairs(self.data.tabs) do
-        for kk, vv in pairs(v.items) do
-            PhunMart:setDisplayValues(vv)
-        end
-    end
-
-    self.tabPanel:setShop(self.data)
 end
 
 function UI:reroll()
@@ -489,63 +385,14 @@ end
 
 function UI:restock()
     if isAdmin() then
-        UI.data = {
-            key = self.data.key
-        }
-        self:rebuild()
-        sendClientCommand(PhunMart.name, PhunMart.commands.requestRestock, {
-            key = self.data.key
-        })
-    end
-end
-
--- function UI:setData(data)
-
---     -- get current selected state
---     local activeView = self.tabPanel.activeView
---     local currentTab = nil
---     local currentSelection = nil
---     if activeView then
---         local selected = activeView.view.selected
---         currentTab = activeView.name
---         currentSelection = activeView.view.items[selected]
---     end
---     local doRebuild = false
---     if self.data == nil or self.data.shop == nil and data.shop then
---         doRebuild = true
---     end
---     self.data = data
---     if doRebuild then
---         self:rebuild(data.shop)
---     end
---     if currentTab and currentSelection and currentSelection.index then
---         local activeView
---         for _, view in ipairs(self.tabPanel.viewList) do
---             if view.name == currentTab then
---                 activeView = view.view
---                 break
---             end
---         end
---         if activeView then
---             activeView.selected = currentSelection.index
---             self.tabPanel:activateView(currentTab)
---         end
---     end
--- end
-
-function UI:getShop()
-    if self.data and self.data.shop then
-        if not self.data.shop.tabs then
-            self:rebuild(self.data.shop)
-        end
-        return self.data.shop
+        self.shopObj:restock()
     end
 end
 
 function UI:prerender()
     ISPanelJoypad.prerender(self);
 
-    local shop = self.data
+    local shop = self.shopObj
     if shop then
         if not self.backgroundTexture or self.backgroundTexture ~= shop.backgroundImage then
             if shop.backgroundImage then
@@ -559,9 +406,17 @@ function UI:prerender()
         end
     end
     local selected = self.tabPanel:getSelected()
-    self.preview:setItem(selected)
-    self.pricePanel:setItem(selected)
-    self.disabledBuyButton:setVisible(self.pricePanel.canBuy.passed ~= true)
+    local item = shop.items[selected.text]
+    self.preview:setItem(item)
+    self.pricePanel:setItem(item)
+    local canBuy = self.pricePanel.canBuy.passed == true
+    if canBuy then
+        -- is there inventory?
+        if item.inventory ~= false and item.inventory < 1 then
+            canBuy = false
+        end
+    end
+    self.disabledBuyButton:setVisible(not canBuy)
 end
 
 function UI:render()
@@ -569,8 +424,8 @@ function UI:render()
 
     local sb = sandbox
 
-    if self.data and self.data.shop and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
-        local hoursTillNextRestock = self.data.shop.nextRestock - GameTime:getInstance():getWorldAgeHours();
+    if self.shopObj and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
+        local hoursTillNextRestock = self.shopObj.nextRestock - GameTime:getInstance():getWorldAgeHours();
         local txt = "";
         if hoursTillNextRestock > 22 then
             txt = getText("IGUI_PhunMart.HoursTillRestock.Days", math.ceil(hoursTillNextRestock / 24))
@@ -584,9 +439,9 @@ function UI:render()
         self:drawText(txt, self.layouts.default.buyButton.x, self.height - 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     end
 
-    if self.data.shop and self.data.shop.requiresPower then
+    if self.shopObj and self.shopObj.requiresPower then
         local text = getText("IGUI_PhunMart.isPowered")
-        if self.data.shop.isUnplugged then
+        if self.shopObj.isUnplugged then
             text = getText("IGUI_PhunMart.isNotPowered")
         end
         local width = getTextManager():MeasureStringX(UIFont.Small, text)
@@ -594,8 +449,17 @@ function UI:render()
     end
 end
 
+function UI:setVisible(visible)
+    local current = self:getIsVisible()
+    ISPanelJoypad.setVisible(self, visible)
+    if visible and not current then
+        self.tabPanel:rebuildTabs(true)
+        self:bringToTop()
+    end
+end
+
 function UI:close()
-    triggerEvent(PhunMart.events.OnWindowClosed, self.player, self.data.key)
+    triggerEvent(PhunMart.events.OnWindowClosed, self.player, self.shopObj)
     self:removeHighlight()
     self:setVisible(false);
     self:removeFromUIManager();

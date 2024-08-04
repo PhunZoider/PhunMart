@@ -47,7 +47,12 @@ end)
 
 local teathers = {}
 
-Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, location)
+Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, shop)
+
+    sendClientCommand(playerObj, PhunMart.name, PhunMart.commands.closeShop, {
+        shopId = shop.id
+    })
+
     local pIndex = playerObj:getPlayerNum()
     if teathers[pIndex] then
         Events.OnPlayerMove.Remove(PhunMartCloseOnWanderAway)

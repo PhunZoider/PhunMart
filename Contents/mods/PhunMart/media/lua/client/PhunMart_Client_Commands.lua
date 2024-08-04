@@ -36,7 +36,17 @@ Commands[PhunMart.commands.payWithInventory] = function(arguments)
 end
 
 Commands[PhunMart.commands.closeAllShops] = function()
-    PhunMartCloseAll()
+    for _, v in pairs(PhunMartShopWindow.instances) do
+        v:close()
+    end
+end
+
+Commands[PhunMart.commands.closeShop] = function(arguments)
+    for _, v in pairs(PhunMartShopWindow.instances) do
+        if v.shopObj.id == arguments.shopId then
+            v:close()
+        end
+    end
 end
 
 Commands[PhunMart.commands.openWindow] = function(arguments)
@@ -47,8 +57,7 @@ Commands[PhunMart.commands.openWindow] = function(arguments)
 end
 
 Commands[PhunMart.commands.requestShop] = function(arguments)
-    PhunMart.shops[arguments.key] = arguments.shop
-    PhunMartUpdateShop(arguments.key, arguments.shop)
+    CPhunMartSystem.instance:updateShop(arguments.shop)
 end
 
 Commands[PhunMart.commands.modifyTraits] = function(arguments)
@@ -85,7 +94,6 @@ Commands[PhunMart.commands.requestItemDefs] = function(arguments)
         print("Received all item defs")
     end
 end
-
 
 -- Listen for commands from the server
 Events.OnServerCommand.Add(function(module, command, arguments)

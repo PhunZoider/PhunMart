@@ -17,9 +17,9 @@ local vendingContextMenu = function(playerObj, context, worldobjects)
         end
     end
 
-    if found and found.shop then
-        context:addOption(found.shop.label or "Vending Machine", player, function()
-            PhunMartShopWindow.OnOpenPanel(player, found.shop.location)
+    if found and found.id then
+        context:addOption(found.label or "Vending Machine", player, function()
+            PhunMartShopWindow.OnOpenPanel(player, found)
         end)
     end
 

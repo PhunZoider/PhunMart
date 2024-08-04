@@ -96,21 +96,21 @@ end
 
 function PhunMartUIItemPreviewPanel:setItem(item)
     self.selectedItem = item
-    if item and item.item and self.previewPanel then
-        self.previewPanel3d:setVisible(item.item.display.type == "VEHICLE")
-        self.previewPanel:setVisible(item.item.display.type ~= "VEHICLE")
-        if item.item.display.textureVal then
-            self.previewPanel.texture = item.item.display.textureVal
+    if item then
+        self.previewPanel3d:setVisible(item.display.type == "VEHICLE")
+        self.previewPanel:setVisible(item.display.type ~= "VEHICLE")
+        if item.display.textureVal then
+            self.previewPanel.texture = item.display.textureVal
         else
             self.previewPanel.texture = nil
         end
-        if item.item.display.overlayVal then
-            self.previewPanel.overlay = item.item.display.overlayVal
+        if item.display.overlayVal then
+            self.previewPanel.overlay = item.display.overlayVal
         else
             self.previewPanel.overlay = nil
         end
-        if item.item.display.type == "VEHICLE" then
-            if self.previewPanel3d.vehicleName ~= item.item.display.label then
+        if item.display.type == "VEHICLE" then
+            if self.previewPanel3d.vehicleName ~= item.display.label then
                 if not self.previewPanel3d.initialized then
                     self.previewPanel3d.initialized = true
                     self.previewPanel3d.javaObject:fromLua1("setDrawGrid", false)
@@ -120,7 +120,7 @@ function PhunMartUIItemPreviewPanel:setItem(item)
                     self.previewPanel3d.javaObject:fromLua2("dragView", 0, 30)
                     self.previewPanel3d.javaObject:fromLua1("setZoom", 6)
                 end
-                self.previewPanel3d.vehicleName = item.item.display.label
+                self.previewPanel3d.vehicleName = item.display.label
                 self.previewPanel3d.javaObject:fromLua2("setVehicleScript", "vehicle", self.previewPanel3d.vehicleName)
             end
         end

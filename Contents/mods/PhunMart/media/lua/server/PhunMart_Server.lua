@@ -259,7 +259,8 @@ function PhunMart:generateShopItems(shopInstance, cumulativeModel)
             items[item.key] = instance
         end
     end
-
+    shopInstance.items = items
+    self:setShopInstanceItems(shopInstance)
     return items
 end
 
@@ -453,127 +454,71 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
         isUnplugged = chosenShopDef.requiresPower == true and sandbox.PoweredMachinesEnabled == true
     }
 
-    local items = self:generateShopItems(shopInstance, sandbox.CumulativeItemGeneration == true)
-    print("Items")
-    PhunTools:printTable(items)
-    self:setShopInstanceItems(shopInstance, items)
+    shopInstance.items = self:generateShopItems(shopInstance, sandbox.CumulativeItemGeneration == true)
     self.shops[key] = shopInstance
     return shopInstance
 end
 
-function PhunMart:setShopInstanceItems(shop, items)
+function PhunMart:setShopInstanceItems(shopInstance)
 
     local tabKeys = {}
-    for i, item in pairs(items) do
+    local checked = {}
+    for i, item in pairs(shopInstance.items) do
         if not item.tab then
             item.tab = "Misc"
         end
-        if shop.tabs[item.tab] == nil then
-            shop.tabs[item.tab] = {
-                items = {}
-            }
+        if checked[item.tab] == nil then
+            checked[item.tab] = true
+            -- shop.tabs[item.tab] = {
+            --     items = {}
+            -- }
             table.insert(tabKeys, item.tab)
         end
-        table.insert(shop.tabs[item.tab].items, item)
+        -- table.insert(shop.tabs[item.tab].items, item)
     end
 
     table.sort(tabKeys, function(a, b)
         return a < b
     end)
-    shop.tabKeys = tabKeys
-    shop.restockDeferred = false
+
+    shopInstance.tabKeys = tabKeys
+    shopInstance.restockDeferred = false
+    shopInstance.lastRestock = GameTime:getInstance():getWorldAgeHours()
 
 end
 
-function PhunMart:purchase(playerObj, shopKey, item)
-    PhunTools:debug("PhunMart:purchase", shopKey)
-    local s = PhunMart:getShop(shopKey)
-    local obj = SPhunMartSystem.instance:getLuaObjectAt(s.location.x, s.location.y, s.location.z)
-    local shop = obj.shop
-    print("Purchasing " .. item.key .. " from " .. shopKey)
-    PhunTools:printTable(shop)
+function PhunMart:addToPurchaseHistory(playerObj, item)
 
-    -- patching this lookup for now
-    local shopItem = nil
-    local tabName = nil
-    local tabIndex = nil
-
-    for k, v in pairs(shop.tabs) do
-        print("Checking tab " .. k)
-        for i, vv in ipairs(v.items) do
-            if vv.key == item.key then
-                shopItem = vv
-                tabIndex = i
-                tabName = k
-                break
-            end
-        end
-        if shopItem then
-            break
-        end
+    -- add to players purchase history
+    local pd = PhunMart:getPlayerData(playerObj)
+    pd.purchases = pd.purchases or {}
+    local historyKey = item.key or item.name
+    if not pd.purchases[historyKey] then
+        pd.purchases[historyKey] = {}
     end
+    local history = pd.purchases[historyKey] or {}
 
-    print("Shop item")
-    PhunTools:printTable(shopItem)
+    pd.purchases[historyKey] = {
+        name = item.name,
+        purchases = (history.purchases or 1) + 1,
+        quantity = (history.quantity or 0) + (item.quantity or 1),
+        modified = getTimestamp(),
+        evo = getGameTime():getWorldAgeHours(),
+        charEvo = playerObj:getHoursSurvived(),
+        charPurchases = (pd.lives or 1) + 1
+    }
+    table.insert(PhunMart.history, {
+        player = playerObj:getUsername(),
+        item = item.name,
+        quantity = item.quantity or 1,
+        modified = getTimestamp(),
+        evo = getGameTime():getWorldAgeHours()
+    })
 
-    if shopItem then
-
-        -- check there is sufficient inventory and adjust 
-        if shopItem.inventory ~= false then
-            if shopItem.inventory < 1 then
-                sendServerCommand(playerObj, self.name, self.commands.serverPurchaseFailed, {
-                    playerIndex = playerObj:getPlayerNum(),
-                    message = "OOS"
-                })
-                return false
-            end
-            obj.shop.tabs[tabName].items[tabIndex].inventory = shopItem.inventory - 1
-            obj:saveData()
-        end
-
-        -- add to players purchase history
-        local pd = PhunMart:getPlayerData(playerObj)
-        pd.purchases = pd.purchases or {}
-        local historyKey = item.key or item.name
-        if not pd.purchases[historyKey] then
-            pd.purchases[historyKey] = {}
-        end
-        local history = pd.purchases[historyKey] or {}
-
-        pd.purchases[historyKey] = {
-            name = item.name,
-            purchases = (history.purchases or 1) + 1,
-            quantity = (history.quantity or 0) + (item.quantity or 1),
-            modified = getTimestamp(),
-            evo = getGameTime():getWorldAgeHours(),
-            charEvo = playerObj:getHoursSurvived(),
-            charPurchases = (pd.lives or 1) + 1
-        }
-        table.insert(PhunMart.history, {
-            player = playerObj:getUsername(),
-            item = item.name,
-            quantity = item.quantity or 1,
-            modified = getTimestamp(),
-            evo = getGameTime():getWorldAgeHours()
-        })
-
-        sendServerCommand(playerObj, self.name, self.commands.updateHistory, {
-            playerIndex = playerObj:getPlayerNum(),
-            history = pd
-        })
-        return true
-    end
-
-    -- if shop.items[item.key].inventory ~= false then
-    --     if shop.items[item.key].inventory < 1 then
-    --         sendServerCommand(playerObj, self.name, self.commands.serverPurchaseFailed, {
-    --             playerIndex = playerObj:getPlayerNum(),
-    --             message = "OOS"
-    --         })
-    --         return false
-    --     end
-    --     shop.items[item.key].inventory = shop.items[item.key].inventory - 1
-    -- end
+    sendServerCommand(playerObj, self.name, self.commands.updateHistory, {
+        playerIndex = playerObj:getPlayerNum(),
+        history = pd
+    })
 
 end
 
@@ -747,33 +692,6 @@ Commands[PhunMart.commands.updateHistory] = function(playerObj, args)
     })
 end
 
--- generates shop or regenerates inventory
-Commands[PhunMart.commands.requestRestock] = function(playerObj, args)
-    print("Requesting restock for " .. args.key)
-    local location = PhunMart:xyzFromKey(args.key)
-    local machine = PhunMart:getMachineByLocation(playerObj, location.x, location.y, location.z)
-    if not machine then
-        return
-    end
-    local shop = PhunMart:getShop(args.key)
-    if shop and shop.maxRestock > 0 and shop.restocks >= shop.maxRestock then
-        shop = PhunMart:generateShop(machine)
-    else
-        shop.restocks = (shop.restocks or 0) + 1
-    end
-    local items = PhunMart:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
-    PhunMart:setShopInstanceItems(shop, items)
-    shop.restockDeferred = false
-    -- if not PhunMart.shoplist[args.key] or PhunMart.shoplist[args.key] ~= shop.name then
-    --     PhunMart.shoplist[args.key] = shop.name
-    --     ModData.transmit(PhunMart.consts.shoplist)
-    -- end
-    sendServerCommand(PhunMart.name, PhunMart.commands.requestShop, {
-        key = args.key,
-        shop = shop
-    })
-end
-
 -- generates or re-generates shop and inventory
 Commands[PhunMart.commands.requestShopGenerate] = function(playerObj, args)
     local location = PhunMart:xyzFromKey(args.key)
@@ -786,45 +704,6 @@ Commands[PhunMart.commands.requestShopGenerate] = function(playerObj, args)
         key = PhunMart:getKey(machine),
         shop = shop
     })
-end
-
-Commands[PhunMart.commands.requestShop] = function(playerObj, args)
-    local shop = PhunMart:getShop(args.key)
-    if not shop then
-        shop = PhunMart:generateShop(args.key)
-    end
-    print("shop.restockDeferred ", tostring(shop.restockDeferred), " shop.nextRestock ", tostring(shop.nextRestock),
-        " now is ", tostring(GameTime:getInstance():getWorldAgeHours()))
-    if shop.restockDeferred == true then
-        print("Restocking shop " .. args.key)
-        local items = PhunMart:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
-        self:setShopInstanceItems(shop, items)
-        shop.restockDeferred = false
-    end
-
-    if shop then
-        sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.requestShop, {
-            key = args.key,
-            shop = shop
-        })
-    end
-end
-
-Commands[PhunMart.commands.buy] = function(playerObj, args)
-    local success = PhunMart:purchase(playerObj, args.shopKey, args.item)
-    local shop = PhunMart:getShop(args.shopKey)
-    if not shop then
-        shop = PhunMart:generateShop(args.shopKey)
-    end
-    if shop then
-        sendServerCommand(playerObj, PhunMart.name, PhunMart.commands.buy, {
-            playerIndex = playerObj:getPlayerNum(),
-            success = success,
-            key = args.shopKey,
-            item = args.item,
-            shop = shop
-        })
-    end
 end
 
 Commands[PhunMart.commands.spawnVehicle] = function(playerObj, args)
@@ -867,7 +746,7 @@ function PhunMart:checkForRestocking(forceRestock)
             local shop = PhunMart:getShop(k)
             if shop and shop.tabs then
                 if (shop.maxRestock or 0) > 0 and (shop.restocks or 0) >= (shop.maxRestock or 0) then
-                    shop = PhunMart:generateShop(k)
+                    shop = self:generateShop(k)
                 else
                     shop.restocks = (shop.restocks or 0) + 1
                 end
@@ -875,8 +754,6 @@ function PhunMart:checkForRestocking(forceRestock)
                     shop.nextRestock = now + (PhunMart.defs.shops[shop.key].restock or 24)
                     if forceRestock then
                         local items = self:generateShopItems(self:getShop(k), sandbox.CumulativeItemGeneration == true)
-                        self:setShopInstanceItems(shop, items)
-                        shop.restockDeferred = false
                         if not PhunMart.defs.shops[shop.key] then
                             print("PhunMart: ERROR! Shop " .. shop.key .. " no longer exists in defs")
                             shop = self:generateShop(k)
@@ -912,180 +789,4 @@ function PhunMart:checkForRestocking(forceRestock)
         PhunMart.shops[k] = nil
     end
 end
-
-function PhunMart:loadAllItems()
-
-    print("---------------------")
-    print("-")
-    print("- PhunMart: LOADING ITEMDEFS")
-    print("-")
-    print("---------------------")
-    self.defs.items = {}
-    self:loadFilesForItemQueue()
-    self:processFilesToItemQueue()
-    local results = self:processItemTransformQueue()
-    local total = 0
-
-    for k, v in pairs(results.all) do
-        total = total + v
-    end
-
-    print("Added " .. results.all.success .. " items from:")
-
-    for k, v in pairs(results.files) do
-        print(" - Lua/" .. tostring(k) .. " loaded " .. tostring(v.success) .. " items")
-    end
-
-    results = self:validateItems()
-
-    print("Validated " .. results.total .. " items")
-    print(" - Skipped " .. (results.abstract + results.disabled) .. " as they were marked as abstract or disabled")
-    print(" - " .. results.valid .. " items passed, " .. results.invalid .. " item failed")
-    local header = false
-    for k, v in pairs(results.issues) do
-        if not header then
-            print(" - The following issues were found (and the item was disabled):")
-            header = true
-        end
-        print("\t" .. k)
-        for _, issue in pairs(v) do
-            print("\t- " .. issue)
-        end
-    end
-end
-
-function PhunMart:loadAllShops()
-    print("---------------------")
-    print("-")
-    print("- PhunMart: LOADING Shops")
-    print("-")
-    print("---------------------")
-    self.defs.shops = {}
-    self:loadFilesForShopQueue()
-    self:processFilesToShopQueue()
-    local results = PhunMart:processShopTransformQueue()
-    local total = 0
-    for k, v in pairs(results.all) do
-        total = total + v
-    end
-
-    print("Added " .. results.all.success .. " shops from:")
-
-    for k, v in pairs(results.files) do
-        print(" - Lua/" .. k .. " loaded " .. (v and v.success or 0) .. " items")
-    end
-
-    results = self:validateShops()
-
-    print("Validated " .. results.total .. " shops")
-    print(" - Skipped " .. (results.abstract + results.disabled) .. " as they were marked as abstract or disabled")
-    print(" - " .. results.valid .. " shops passed, " .. results.invalid .. " shops failed")
-    local header = false
-    for k, v in pairs(results.issues) do
-        if not header then
-            print(" - The following issues were found (and the shop was disabled):")
-            header = true
-        end
-        print("\t" .. k)
-        for _, issue in pairs(v) do
-            print("\t- " .. issue)
-        end
-    end
-
-    for k, v in pairs(self.defs.shops) do
-        if v.enabled then
-            print(" - " .. k .. " is enabled")
-        else
-            print(" - " .. k .. " is disabled")
-        end
-    end
-
-end
-
-function PhunMart:loadAll()
-    local startTime = getTimestampMs()
-    self:loadAllItems()
-    self:loadAllShops()
-    print("====================================")
-    print(" PhunMart Data Loaded in " .. PhunTools:differenceInSeconds(startTime, getTimestampMs()) .. " seconds")
-    print("====================================")
-end
-
-Events.EveryHours.Add(function()
-    PhunMart:checkForRestocking()
-end)
-
-Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
-    if module == PhunMart.name and Commands[command] then
-        Commands[command](playerObj, arguments)
-    end
-end)
-
--- Events.OnInitGlobalModData.Add(loadDefs)
-Events.OnInitGlobalModData.Add(function()
-    PhunMart:loadAll()
-
-    for k, _ in pairs(Events) do
-        print(k)
-    end
-end)
-
--- South
--- 01_19
--- 01_17
-
--- EAST
--- 01_16
--- 01_18
-
-Events.OnFillContainer.Add(function(roomtype, containertype, container)
-    -- print("OnFillContainer: " .. tostring(roomtype) .. " " .. tostring(containertype))
-    if containertype and (containertype == "vendingpop" or containertype == "vendingsnack") then
-        local parent = container:getParent()
-        if parent and parent.getModData then
-            local data = parent:getModData()
-            if not data or not data.PhunMart then
-                -- do we convert to machines?
-
-                local rng = ZombRand(1, 10)
-
-                if rng < 3 then
-                    data = {
-                        tested = true
-                    }
-                else
-                    -- if containertype == "vendingpop" then
-                    local spriteName = parent:getSprite():getName()
-                    local direction = nil
-
-                    if spriteName == "location_shop_accessories_01_17" then
-                        -- south facing machine
-                        direction = "south"
-                    elseif spriteName == "location_shop_accessories_01_19" then
-                        -- south facing machine
-                        direction = "south"
-                    elseif spriteName == "location_shop_accessories_01_16" then
-                        -- east facing
-                        direction = "east"
-                    elseif spriteName == "location_shop_accessories_01_18" then
-                        -- east facing
-                        direction = "east"
-                    end
-
-                    if direction ~= nil then
-                        local square = parent:getSquare()
-                        local isoObject = SPhunMartSystem.instance:generateRandomShopOnSquare(square, direction, parent)
-                    else
-                        data = {
-                            -- PhunMart = {
-                            --     tested = true
-                            -- }
-                        }
-                    end
-
-                end
-            end
-        end
-    end
-end)
 

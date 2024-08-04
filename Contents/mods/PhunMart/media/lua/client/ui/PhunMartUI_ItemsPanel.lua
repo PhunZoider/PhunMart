@@ -59,48 +59,56 @@ function PhunMartUIItemsPanel:new(x, y, width, height, options)
 end
 
 function PhunMartUIItemsPanel:getSelected()
-    if not self.shop.isUnplugged then
+    local shop = self.shop or (self.parent and self.parent.shopObj)
+    if shop and not shop.isUnplugged then
         if self.tabPanel and self.tabPanel.activeView then
             return self.tabPanel.activeView.view.items[self.tabPanel.activeView.view.selected]
         end
     end
 end
 
-function PhunMartUIItemsPanel:setShop(shop)
+function PhunMartUIItemsPanel:rebuildTabs(skipCheck)
+    if not self.shop then
+        return
+    end
+    if skipCheck == true or
+        (self.shop ~= nil and self.shop.tabChangeKey ~= nil and self.shop.tabChangeKey ~= self.tabChangeKey) then
+        -- shop has changed, rebuild the tabs
+        self.tabChangeKey = self.shop.tabChangeKey
+        self:removeViews()
+        local firstTab = nil
+        local firstRow = nil
+        for _, tabName in ipairs(self.shop.tabs) do
 
-    self:removeViews()
-    local firstTab = nil
-    local firstRow = nil
-    for _, tabName in pairs(shop.tabKeys) do
+            local scrollingList = ISScrollingListBox:new(1, 0, self.tabPanel.width - 2,
+                self.tabPanel.height - self.tabPanel.tabHeight)
 
-        local scrollingList = ISScrollingListBox:new(1, 0, self.tabPanel.width - 2,
-            self.tabPanel.height - self.tabPanel.tabHeight)
+            scrollingList.itemPadY = 10 * FONT_SCALE
+            scrollingList.itemheight = FONT_HGT_LARGE + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
+            scrollingList.textureHeight = scrollingList.itemheight - scrollingList.itemPadY * 2
+            scrollingList.mouseoverselected = -1
+            scrollingList.background = false
+            scrollingList:initialise()
+            scrollingList.doDrawItem = self.doDrawItem
+            scrollingList.selectionMode = "single"
+            scrollingList.onMouseDown = self.onMouseDown
+            scrollingList.onMouseMove = self.doOnMouseMove
+            scrollingList.onMouseMoveOutside = self.doOnMouseMoveOutside
+            scrollingList.onMouseDoubleClick = self.doOnMouseDoubleClick
+            self.tabPanel:addView(tabName, scrollingList)
 
-        scrollingList.itemPadY = 10 * FONT_SCALE
-        scrollingList.itemheight = FONT_HGT_LARGE + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
-        scrollingList.textureHeight = scrollingList.itemheight - scrollingList.itemPadY * 2
-        scrollingList.mouseoverselected = -1
-        scrollingList.background = false
-        scrollingList:initialise()
-        scrollingList.doDrawItem = self.doDrawItem
-        scrollingList.selectionMode = "single"
-        scrollingList.onMouseDown = self.onMouseDown
-        scrollingList.onMouseMove = self.doOnMouseMove
-        scrollingList.onMouseMoveOutside = self.doOnMouseMoveOutside
-        self.tabPanel:addView(tabName, scrollingList)
-
-        for _, entry in ipairs(shop.tabs[tabName].items) do
-            if firstRow == nil then
-                firstRow = entry
-                firstTab = tabName
+            for itemKey, entry in pairs(self.shop.items) do
+                if entry.tab == tabName then
+                    scrollingList:addItem(itemKey, entry)
+                end
             end
-            if not entry.type then
-                entry.type = "ITEM"
-            end
-            local row = scrollingList:addItem(entry.type, entry)
         end
     end
+end
+
+function PhunMartUIItemsPanel:setShop(shop)
     self.shop = shop
+    self:rebuildTabs(true)
 end
 
 function PhunMartUIItemsPanel:createChildren()
@@ -239,40 +247,41 @@ function PhunMartUIItemsPanel:tabPanelRender()
 
 end
 
-function PhunMartUIItemsPanel:doDrawItem(y, item, alt)
+function PhunMartUIItemsPanel:doDrawItem(y, row, alt)
 
     local shop = self.parent.parent.shop
     if not shop then
         return
     end
+    local item = shop.items[row.text]
 
     local inventoryVal = 0
     local itemAlpha = 1
     local textAlpha = 0.5
     local isOutOfStock = false
-    local isInfiniteInventory = item.item.inventory == false
+    local isInfiniteInventory = item.inventory == false
     if isInfiniteInventory then
         inventoryVal = " - "
-    elseif item.item.inventory == 0 then
+    elseif item.inventory == 0 then
         inventoryVal = "out of stock"
         itemAlpha = 0.5
         isOutOfStock = true
     else
-        inventoryVal = PhunTools:formatWholeNumber(item.item.inventory)
+        inventoryVal = PhunTools:formatWholeNumber(item.inventory)
     end
 
-    local display = item.item.display or {}
+    local display = item.display or {}
 
-    self:drawRectBorder(0, y, self:getWidth(), item.height, 0.5, self.borderColor.r, self.borderColor.g,
+    self:drawRectBorder(0, y, self:getWidth(), row.height, 0.5, self.borderColor.r, self.borderColor.g,
         self.borderColor.b)
 
-    if self.selected == item.index then
-        self:drawRect(0, (y), self:getWidth(), item.height - 1, 0.3, 0.7, 0.35, 0.15);
+    if self.selected == row.index then
+        self:drawRect(0, (y), self:getWidth(), row.height - 1, 0.3, 0.7, 0.35, 0.15);
     end
 
     local x = self.itemPadY
     local x2 = self.itemPadY
-    -- y = y + self.itemPadY
+
     if display.textureVal then
         local textured = self:drawTextureScaledAspect2(display.textureVal, x, y + 10, self.textureHeight,
             self.textureHeight, itemAlpha, 1, 1, 1)
@@ -294,12 +303,24 @@ function PhunMartUIItemsPanel:doDrawItem(y, item, alt)
     x = x2
     self:drawText(display.labelVal, x, y + 10, 0.7, 0.7, 0.7, 1.0, self.font)
 
-    return y + item.height
+    return y + row.height
 end
 
 function PhunMartUIItemsPanel:prerender()
+
     ISPanel.prerender(self)
-    self.noPower:setVisible(self.shop.isUnplugged == true)
+
+    -- rebuild tabs if tabChangeKey has changed
+    self:rebuildTabs()
+    local shop = self.shop or (self.parent and self.parent.shopObj)
+    self.noPower:setVisible(shop.isUnplugged == true)
+
+end
+
+function PhunMartUIItemsPanel:doOnMouseDoubleClick(x, y)
+    if self.selected then
+        self.parent.parent.parent:onBuy()
+    end
 end
 
 function PhunMartUIItemsPanel:doOnMouseMoveOutside(dx, dy)

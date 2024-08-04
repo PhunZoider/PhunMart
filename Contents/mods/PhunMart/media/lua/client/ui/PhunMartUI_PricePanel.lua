@@ -76,7 +76,7 @@ function PunMartUIPricePanel:updateConditionResults()
         inventory = {}
     }
 
-    local item = (self.selectedItem and self.selectedItem.item) or nil
+    local item = self.selectedItem or nil
     if not item then
         return
     end
@@ -201,7 +201,7 @@ function PunMartUIPricePanel:updateConditionResults()
 
     local receives = {}
     local toolTipReceives = ""
-    local selectedItem = self.selectedItem.item
+    local selectedItem = self.selectedItem
     -- what do they receive?
     for _, r in ipairs(selectedItem.receive or {}) do
         if r.type == "TRAIT" then
@@ -221,33 +221,12 @@ function PunMartUIPricePanel:updateConditionResults()
     allRichTexts[1] = " <SIZE:medium> <INDENT:0> " .. getText("IGUI_PhunMart.YouWillReceive") ..
                           " <LINE> <TEXT> <INDENT:4> " .. table.concat(receives, " <LINE> <INDENT:4> ") .. " <BR> " ..
                           allRichTexts[1]
-    -- for now, only accpt first condition set
-    -- if #allTooltips[1] > 0 then
-    --     local receives = {}
-    --     local prefix = ""
-    --     -- what do they receive?
-    --     for _, r in ipairs(self.selectedItem.item.receive or {}) do
-    --         if r.type == "TRAIT" then
-    --             if r.tag == "REMOVE" then
-    --                 table.insert(receives, " - " .. getText("IGUI_PhunMart.Receives.traitRemoved", PhunMart:getLabelFromItem(r)))
-    --             else
-    --                 table.insert(receives, " - " .. getText("IGUI_PhunMart.Receives.traitAdded", PhunMart:getLabelFromItem(r)))
-    --             end
-    --         else
-    --             table.insert(receives, " - " .. getText("IGUI_PhunMart.PriceDesc", r.quantity, PhunMart:getLabelFromItem(r)))
-    --         end 
-    --         prefix = getText("IGUI_PhunMart.YouWillReceive") .. "\n" .. table.concat(receives, "\n") .. "\n\n"
-    --         allRichTexts[1] = " <H3> <INDENT:0> <TEXT> " .. getText("IGUI_PhunMart.YouWillReceive") .. " <LINE> <INDENT:4> " .. table.concat(receives, " <LINE> <INDENT:4> ") .. " <BR> " .. allRichTexts[1]
-    --     end
 
     local desc = (#allTooltips[1] > 0 and ("\n\n" .. table.concat(allTooltips[1], "\n"))) or ""
     if item.description then
         desc = desc .. "\n\n" .. item.description
     end
     self.tooltip.description = toolTipReceives .. desc
-    -- else
-    --     self.tooltip.description = ""
-    -- end
 
     self.richText = allRichTexts[1]
     self.rich:setText(self.richText)
@@ -259,7 +238,7 @@ end
 function PunMartUIPricePanel:prerender()
     ISPanel.prerender(self);
     local selection = self.selectedItem
-    if selection and selection.item then
+    if selection then
         self.panel:setVisible(true)
         self:updateConditionResults()
 

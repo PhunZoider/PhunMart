@@ -14,9 +14,11 @@ PhunMart = {
         requestShopDefs = "requestShopDefs",
         requestItemDefs = "requestItemDefs",
         requestShop = "requestShop",
+        closedShop = "closedShop",
+        shopChanged = "shopChanged",
         updateShop = "updateShop",
         openWindow = "openWindow",
-        requestRestock = "requestRestock",
+        restock = "restock",
         spawnVehicle = "spawnVehicle",
         payWithInventory = "payWithInventory",
         updateHistory = "updateHistory",
@@ -34,7 +36,8 @@ PhunMart = {
         reloadAll = "reloadAll",
         restockAllShops = "restockAllShops",
         rerollAllShops = "rerollAllShops",
-        closeAllShops = "closeAllShops"
+        closeAllShops = "closeAllShops",
+        closeShop = "closeShop"
 
     },
     events = {

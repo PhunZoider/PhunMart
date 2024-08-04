@@ -8,7 +8,7 @@ function PM_OpenAction:isValid()
 end
 
 function PM_OpenAction:waitToStart()
-    self.character:faceLocation(self.machine.data.location.x, self.machine.data.location.y)
+    self.character:faceLocation(self.machine.x, self.machine.y)
     return self.character:shouldBeTurning()
 end
 
@@ -29,7 +29,7 @@ function PM_OpenAction:stop()
 end
 
 function PM_OpenAction:perform()
-    PhunMartShowinstance(self.character)
+    self.machine:setVisible(true)
     ISBaseTimedAction.perform(self);
 end
 
@@ -38,7 +38,7 @@ function PM_OpenAction:new(character, machine, time)
     setmetatable(o, self)
     self.__index = self
     o.character = character;
-    o.key = PhunMart:getKey(machine.data.location)
+    o.key = machine.id
     o.machine = machine;
     o.stopOnWalk = true;
     o.stopOnRun = true;

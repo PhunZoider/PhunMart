@@ -18,21 +18,9 @@ function ISPhunMartShop:create(x, y, z, north, sprite)
     self.sq = cell:getGridSquare(x, y, z);
 
     self.javaObject = IsoThumpable.new(cell, self.sq, sprite, north, self);
-    -- buildUtil.setInfo(self.javaObject, self);
-    -- buildUtil.consumeMaterial(self);
-
-    -- self.javaObject:setMaxHealth(self:getHealth());
-    -- self.javaObject:setHealth(self.javaObject:getMaxHealth());
 
     -- add the item to the ground
     self.sq:AddSpecialObject(self.javaObject);
-
-    -- self.javaObject:setSpecialTooltip(true)
-    -- self.javaObject:transmitCompleteItemToServer();
-    -- OnObjectAdded event will create the SRainBarrelGlobalObject on the server.
-    -- This is only needed for singleplayer which doesn't trigger OnObjectAdded.
-    -- triggerEvent("OnObjectAdded", self.javaObject)
-    -- ~ 	print("add a barrel at : " .. x .. "," .. y);
 end
 
 function ISPhunMartShop:onMouseLeftClick(x, y)
@@ -50,10 +38,6 @@ function ISPhunMartShop:screate(square, type, direction)
     self.javaObject = IsoThumpable.new(cell, self.sq, sprite, false, {});
     self.sq:AddSpecialObject(self.javaObject);
     self.javaObject:transmitCompleteItemToClients()
-
-    -- self.javaObject.onMouseLeftClick = function(x, y)
-    --     print("left click")
-    -- end
 
     return self.javaObject;
 end
