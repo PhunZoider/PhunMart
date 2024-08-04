@@ -126,25 +126,3 @@ function PhunMart:purchaseRequest(playerObj, shopKey, item)
     end
 end
 
--- function PhunMart:restock(vendingMachine)
---     local args = {
---         location = {
---             x = vendingMachine:getX(),
---             y = vendingMachine:getY(),
---             z = vendingMachine:getZ()
---         }
---     }
---     sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.requestRestock, args)
--- end
-
--- Client fixes for other mods
-if FA and FA.updateVendingMachine then
-    -- Functional Appliances
-    -- overwrite their handing of vending machines
-    local oldFn = FA.updateVendingMachine
-    FA.updateVendingMachine = function(vendingMaching, fill)
-        return vendingMaching
-    end
-
-end
-

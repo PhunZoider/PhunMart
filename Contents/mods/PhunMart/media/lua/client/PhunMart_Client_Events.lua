@@ -44,26 +44,3 @@ Events.OnReceiveGlobalModData.Add(function(tableName, tableData)
     end
 
 end)
-
-local teathers = {}
-
-Events[PhunMart.events.OnWindowClosed].Add(function(playerObj, shop)
-
-    sendClientCommand(playerObj, PhunMart.name, PhunMart.commands.closeShop, {
-        shopId = shop.id
-    })
-
-    local pIndex = playerObj:getPlayerNum()
-    if teathers[pIndex] then
-        Events.OnPlayerMove.Remove(PhunMartCloseOnWanderAway)
-        teathers[pIndex] = nil
-    end
-end)
-
-Events[PhunMart.events.OnWindowOpened].Add(function(playerObj, location)
-    local pIndex = playerObj:getPlayerNum()
-    if not teathers[pIndex] then
-        Events.OnPlayerMove.Add(PhunMartCloseOnWanderAway)
-        teathers[pIndex] = true
-    end
-end)
