@@ -464,6 +464,7 @@ end
 
 function UI:close()
     triggerEvent(PhunMart.events.OnWindowClosed, self.player, self.shopObj)
+    CPhunMartSystem.instance:close(self.shopObj, self.player)
     self:removeHighlight()
     self:setVisible(false);
     self:removeFromUIManager();

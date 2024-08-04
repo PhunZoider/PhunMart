@@ -49,6 +49,13 @@ function CPhunMartSystem:restock(shop, playerObj)
     })
 end
 
+function CPhunMartSystem:close(shop, playerObj)
+    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.closeShop, {
+        shopId = shop.id,
+        location = shop.location
+    })
+end
+
 function CPhunMartSystem:updateShop(shop)
     -- print("CPhunMartSystem:updateShop")
     -- local obj = self:getLuaObjectAt(shop.location.x, shop.location.y, shop.location.z)

@@ -174,12 +174,9 @@ function SPhunMartSystem:requestShop(shopId, playerObj, forceRestock)
 
 end
 
-function SPhunMartSystem:releaseShop(shopId)
-    local shop = PM:getShop(shopId)
-    if shop then
-        local obj = self:getLuaObjectAt(shop.location.x, shop.location.y, shop.location.z)
-        SPhunMartSystem.lockedShopIds[shopId] = nil
-    end
+function SPhunMartSystem:releaseShop(shopId, location, playerObj)
+    local obj = self:getLuaObjectAt(location.x, location.y, location.z)
+    SPhunMartSystem.lockedShopIds[shopId] = nil
 end
 
 function SPhunMartSystem:restock(shopId, playerObj)
@@ -200,8 +197,8 @@ function SPhunMartSystem:checkLocks()
         end
     end
 
-    PM:debug("Players", #self.lockedShopIds)
-    PM:debug("locked", self.lockedShopIds)
+    -- PM:debug("Players", #self.lockedShopIds)
+    -- PM:debug("locked", self.lockedShopIds)
 
     local doRemove = {}
     for i = #self.lockedShopIds, 1, -1 do
@@ -226,10 +223,9 @@ function SPhunMartSystem:checkLocks()
             local dx = data.location.x - square:getX()
             local dy = data.location.y - square:getY()
             local distance = math.sqrt(dx * dx + dy * dy)
-            print("Distance to player ", data.playerName, " is ", distance)
             if distance > 5 then
                 -- player is too far away
-                print("Player ", data.playerName, " is too far away")
+                print("Player ", data.playerName, " is too far away from shop ", data.shopId)
                 sendServerCommand(playerObj, PM.name, PM.commands.closeShop, {
                     shopId = data.shopId
                 })

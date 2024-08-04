@@ -21,7 +21,7 @@ Commands[PM.commands.restock] = function(playerObj, args)
 end
 
 Commands[PM.commands.closeShop] = function(playerObj, args)
-    SPhunMartSystem.instance:releaseShop(args.shopId)
+    SPhunMartSystem.instance:getLuaObjectAt(args.location.x, args.location.y, args.location.z):unlock()
 end
 
 SPhunMartServerCommands = Commands

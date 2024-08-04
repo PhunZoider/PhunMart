@@ -7,26 +7,67 @@ require "Map/SGlobalObject"
 SPhunMartObject = SGlobalObject:derive("SPhunMartObject")
 local PM = PhunMart
 local fields = {
-    power_required = {
-        type = "boolean",
-        default = false
+    id = {
+        type = "string",
+        default = "0_0_0"
     },
     key = {
         type = "string",
         default = "default"
     },
+    label = {
+        type = "string",
+        default = "PhunMart"
+    },
     direction = {
         type = "string",
         default = "south"
     },
-    id = {
+    lockedBy = {
         type = "string",
-        default = "0_0_0"
+        default = nil
     },
-    label = {
+    lastRestock = {
+        type = "number",
+        default = 0
+    },
+    backgroundImage = {
         type = "string",
-        default = "PhunMart"
+        default = "machine-none.png"
+    },
+    requiresPower = {
+        type = "boolean",
+        default = false
+    },
+    currency = {
+        type = "string",
+        default = "Base.Money"
+    },
+    basePrice = {
+        type = "number",
+        default = 0
+    },
+    type = {
+        type = "string",
+        default = ""
+    },
+    location = {
+        type = "table",
+        default = {
+            x = 0,
+            y = 0,
+            z = 0
+        }
+    },
+    tabs = {
+        type = "table",
+        default = {}
+    },
+    items = {
+        type = "table",
+        default = {}
     }
+
 }
 
 function SPhunMartObject:new(luaSystem, globalObject)
@@ -43,7 +84,7 @@ function SPhunMartObject:initNew()
 end
 
 function SPhunMartObject.initModData(modData)
-    PM:debug('SPhunMartObject:stateFromIsoObject', modData)
+    PM:debug('SPhunMartObject:initModData', modData)
     for k, v in pairs(fields) do
         if modData[k] == nil and self[k] == nil then
             modData[k] = v.default
@@ -77,8 +118,7 @@ function SPhunMartObject:stateToIsoObject(isoObject)
 end
 
 function SPhunMartObject:unlock()
-
-    self.playerName = nil
+    self.lockedBy = nil
     self:saveData()
     SPhunMartSystem.instance:removeShopIdLockData(self.id)
     print("Unlocked " .. self.id)
@@ -86,7 +126,7 @@ end
 
 function SPhunMartObject:lock(player)
     print("SPhunMartObject:lock")
-    self.playerName = player:getUsername()
+    self.lockedBy = player:getUsername()
     self:saveData()
 end
 
@@ -114,6 +154,7 @@ function SPhunMartObject:saveData()
     if isoObject then
         self:toModData(isoObject:getModData())
         isoObject:transmitModData()
+        print("transmitted")
     end
 end
 
