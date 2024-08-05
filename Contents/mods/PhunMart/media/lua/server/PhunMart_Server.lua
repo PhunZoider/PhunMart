@@ -25,7 +25,6 @@ function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
-        PhunTools:printTable(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -98,7 +97,6 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
     if not pool or not pool.keys or #pool.keys == 0 then
         -- HOUSTON WE HAVE A PROBLEM
         print("No pool or keys for " .. shop.key .. ", pi=" .. poolIndex)
-        PhunTools:printTable(shop)
         return {}
     end
     local preKeys = PhunTools:shuffleTable(pool.keys)
@@ -284,35 +282,38 @@ function PhunMart:getInstanceDistancesByType(locationKey)
     return results
 end
 
-function PhunMart:getShopListFromKey(key, reduceDistance)
-
-    local distances = self:getInstanceDistancesByType(key)
+function PhunMart:getShopListFromKey(location)
+    self:debug("getShopListFromKey", location)
+    local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
     print("Distances")
     print("----------")
     PhunTools:printTable(distances)
     print("----------")
 
-    local zoneInfo = self:getZoneInfo(key)
+    local zoneInfo = self:getZoneInfo(location)
+
     local shops = {}
     local totalProbability = 0
 
-    local distanceReduction = reduceDistance or 0
+    local distanceReduction = 0
 
     for k, v in pairs(self.defs.shops) do
         if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract then
 
             local minDistance = (v.minDistance or 0)
             local distanceKey = v.type or v.key
+            local distance = distances[distanceKey] and distances[distanceKey].distance or 0
 
             print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and reduce is " ..
-                      tostring(distanceReduction) .. " and distance is " .. tostring(distances[distanceKey]) ..
-                      " using distanceKey " .. tostring(distanceKey))
+                      tostring(distanceReduction) .. " and distance is " .. tostring(distance) .. " using distanceKey " ..
+                      tostring(distanceKey))
+
             if distanceReduction > 0 and minDistance > distanceReduction then
                 minDistance = minDistance - distanceReduction
             end
 
-            if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey]) then
+            if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey].distance) then
                 if v.zones and type(v.zones) == "table" then
 
                     local difficultyMin = 0
@@ -324,21 +325,35 @@ function PhunMart:getShopListFromKey(key, reduceDistance)
                         else
                             difficultyMin = v.zones.difficulty
                         end
+                        print(" - Difficulty range " .. tostring(difficultyMin) .. " to " .. tostring(difficultyMax))
                     end
 
-                    local names = v.zones.names or {}
+                    local names = v.zones.keys or {}
 
                     if zoneInfo ~= nil then
-                        if (zoneInfo.difficulty and
-                            (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <= difficultyMax)) or
-                            (#names > 0 and PhunTools:inArray(zoneInfo.name, names)) then
+
+                        local difficultyOk = (zoneInfo.difficulty and
+                                                 (zoneInfo.difficulty >= difficultyMin and zoneInfo.difficulty <=
+                                                     difficultyMax))
+                        local nameOk = names[zoneInfo.key] ~= false
+
+                        if difficultyOk and nameOk then
 
                             table.insert(shops, {
                                 key = k,
                                 probability = v.probability or sandbox.DefaultItemProbability or 1
                             })
                             totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
+                        else
+                            if not difficultyOk then
+                                print(" - Skipping " .. v.key .. " because difficulty is out of range")
+                            end
+                            if not nameOk then
+                                print(" - Skipping " .. v.key .. " because zone " .. zoneInfo.key .. " is not allowed")
+                            end
                         end
+                    else
+                        print(" - Skipping " .. v.key .. " because no zone info")
                     end
                 else
                     table.insert(shops, {
@@ -348,7 +363,7 @@ function PhunMart:getShopListFromKey(key, reduceDistance)
                     totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                 end
             else
-                print("Skipping " .. v.key .. " because there is another too close")
+                print(" - Skipping " .. v.key .. " because there is another too close")
             end
         end
     end
@@ -379,6 +394,7 @@ end
 function PhunMart:generateShop(vendingMachineOrKey, forceKey)
 
     local key = self:getKey(vendingMachineOrKey)
+    local location = self:xyzFromKey(key)
     if not key then
         print("PhunMart:Error No key found for " .. tostring(vendingMachineOrKey))
         return
@@ -393,7 +409,7 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
         if resKey and self.defs.shops[resKey] and self.defs.shops[resKey].enabled then
             chosenShopDef = self.defs.shops[resKey]
         else
-            local shopCandidates = self:getShopListFromKey(key)
+            local shopCandidates = self:getShopListFromKey(location)
             if shopCandidates == nil then
                 print("No shop candidates found for " .. key)
                 return nil
@@ -445,10 +461,8 @@ end
 
 function PhunMart:setShopInstanceItems(shopInstance)
 
-    local checked = {}
-    if not shopInstance.tabs then
-        shopInstance.tabs = {}
-    end
+    local checked = {};
+    shopInstance.tabs = {}
     for i, item in pairs(shopInstance.items) do
         if not item.tab then
             item.tab = "Misc"

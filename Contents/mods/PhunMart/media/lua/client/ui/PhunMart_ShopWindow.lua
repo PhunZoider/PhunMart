@@ -365,10 +365,7 @@ function UI:reroll()
         UI.data = {
             key = self.data.key
         }
-        self:rebuild()
-        sendClientCommand(PhunMart.name, PhunMart.commands.requestShopGenerate, {
-            key = self.data.key
-        })
+        self.shopObj:reroll()
     end
 end
 

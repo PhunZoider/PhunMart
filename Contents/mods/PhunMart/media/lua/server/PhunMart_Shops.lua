@@ -12,7 +12,6 @@ function PhunMart:validateShopDef(shop)
             table.insert(issues, "Missing key")
         end
         if not shop.pools or not shop.pools.items or #shop.pools.items < 0 then
-            PhunTools:printTable(shop)
             table.insert(issues, "Missing or misconfigured pools " .. tostring(shop.pools) .. " " ..
                 tostring((shop.pools or {}).items) .. " ")
         else
@@ -235,7 +234,7 @@ function PhunMart:formatShop(data)
         layout = data.layout or base.layout or nil,
         pools = data.pools,
         methods = data.methods or base.methods or {},
-        zones = data.zones or base.zones or nil,
+        zones = base.zones or nil,
         difficulty = data.difficulty or base.difficulty or nil,
         file = data.file or nil,
         mod = data.mod or base.mod or nil,
@@ -258,6 +257,13 @@ function PhunMart:formatShop(data)
     if data.sprites then
         for k, v in pairs(data.sprites) do
             formatted.sprites[k] = v
+        end
+    end
+
+    if data.zones then
+        formatted.zones = formatted.zones or {}
+        for k, v in pairs(data.zones) do
+            formatted.zones[k] = v
         end
     end
 

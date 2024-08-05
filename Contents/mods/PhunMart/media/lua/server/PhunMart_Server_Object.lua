@@ -88,7 +88,6 @@ function SPhunMartObject:initNew()
 end
 
 function SPhunMartObject.initModData(modData)
-    PM:debug('SPhunMartObject:initModData', modData)
     for k, v in pairs(fields) do
         if modData[k] == nil and self[k] == nil then
             modData[k] = v.default
@@ -97,7 +96,6 @@ function SPhunMartObject.initModData(modData)
 end
 
 function SPhunMartObject:stateFromIsoObject(isoObject)
-    PM:debug('SPhunMartObject:stateFromIsoObject', isoObject)
     self:initNew()
     self:fromModData(isoObject:getModData())
 
@@ -163,7 +161,6 @@ function SPhunMartObject:saveData()
 end
 
 function SPhunMartObject:fromModData(modData)
-    PM:debug("SPhunMartObject:fromModData", modData)
     for k, v in pairs(modData) do
         if fields[k] then
             self[k] = fields[k].type == "number" and tonumber(v) or v

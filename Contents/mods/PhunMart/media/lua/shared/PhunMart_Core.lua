@@ -261,7 +261,7 @@ function PhunMart:xyzFromKey(key)
     }
 end
 
-function PhunMart:getZoneInfo(key)
+function PhunMart:getZoneInfo(location)
 
     if self.maps == nil then
         local mods = getActivatedMods()
@@ -275,12 +275,9 @@ function PhunMart:getZoneInfo(key)
     if self.maps == false or self.maps == nil then
         return nil
     else
-        local location = self:xyzFromKey(key)
-        if location and location.x then
-            return self.maps:getLocation(location.x, location.y)
-        else
-            print("PhunMart: Warning: Could not get location info for " .. tostring(key))
-        end
+
+        return self.maps:getLocation(location.x, location.y)
+
     end
 
 end
@@ -300,26 +297,6 @@ function PhunMart:getMachineByLocation(playerObj, x, y, z)
     end
 
     return nil
-end
-
-function PhunMart:getData(vendingMachine)
-
-    local key = self:getKey(vendingMachine)
-    if not self.shops or not self.shops[key] or self.shops[key].nextRestock < PhunTools.EvoDays then
-        if isClient() then
-            sendClientCommand(getPlayer(), self.name, self.commands.requestShopGenerate, {
-                location = {
-                    x = vendingMachine:getX(),
-                    y = vendingMachine:getY(),
-                    z = vendingMachine:getZ()
-                }
-            })
-            return nil
-        else
-            self:generateShop(key)
-        end
-    end
-    return self.shops[key]
 end
 
 function PhunMart:isMachine(object)

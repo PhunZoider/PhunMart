@@ -38,7 +38,17 @@ end
 function CPhunMartSystem:restock(shop, playerObj)
     print("CPhunMartSystem:restock")
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.restock, {
-        shopId = shop.id
+        shopId = shop.id,
+        location = shop.location
+    })
+end
+
+function CPhunMartSystem:reroll(shop, target, playerObj)
+    print("CPhunMartSystem:reroll")
+    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShopGenerate, {
+        shopId = shop.id,
+        target = target,
+        location = shop.location
     })
 end
 
@@ -96,10 +106,6 @@ Events.OnObjectLeftMouseButtonUp.Add(function(object, x, y)
         object:setHighlighted(true, false);
         _lastHighlighted = object
         local hasModData = object:getModData()
-        print("hasModData: ", tostring(hasModData))
-        if not hasModData then
-            PhunTools:printTable(hasModData)
-        end
     end
 end)
 
@@ -107,7 +113,6 @@ Events.OnObjectRightMouseButtonUp.Add(function(object, x, y)
     if _lastHighlighted then
         _lastHighlighted:setHighlighted(false, false);
     end
-    print(tostring(object), " ", object:getName())
     if object and CPhunMartSystem:isValidIsoObject(object) then
         object:setHighlighted(true, false);
         _lastHighlighted = object

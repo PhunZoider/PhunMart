@@ -77,6 +77,20 @@ function SPhunMartSystem:generateRandomShopOnSquare(square, direction, removeOnS
 
 end
 
+function SPhunMartSystem:reroll(location, target)
+
+    local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
+    local shop = PM:generateShop(location, target)
+    shopObj:fromModData(shop)
+    shopObj:changeSprite()
+    shopObj:saveData()
+    sendServerCommand(PM.name, PM.commands.updateShop, {
+        id = shop.id,
+        location = shop.location
+    })
+
+end
+
 function SPhunMartSystem:newLuaObjectAt(x, y, z)
     print("===============> SPhunMartSystem:newLuaObjectAt", tostring(x), tostring(y), tostring(z))
     self:noise("adding luaObject " .. x .. ',' .. y .. ',' .. z)
@@ -209,8 +223,33 @@ function SPhunMartSystem:releaseShop(shopId, location, playerObj)
     SPhunMartSystem.lockedShopIds[shopId] = nil
 end
 
-function SPhunMartSystem:restock(shopId, playerObj)
-    self:requestShop(shopId, playerObj, true)
+function SPhunMartSystem:restock(shop, playerObj)
+    self:requestShop(shop.id, playerObj, true)
+end
+
+function SPhunMartSystem:closestShopTypesTo(location)
+
+    local shops = {}
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            local dx = location.x - obj.location.x
+            local dy = location.y - obj.location.y
+            local distance = math.sqrt(dx * dx + dy * dy)
+
+            if shops[obj.type or obj.key] == nil or shops[obj.type or obj.key].distance < distance then
+                shops[obj.type or obj.key] = {
+                    distance = distance,
+                    key = obj.key,
+                    type = obj.type,
+                    location = obj.location
+                }
+            end
+        end
+    end
+
+    return shops
+
 end
 
 function SPhunMartSystem:checkLocks()

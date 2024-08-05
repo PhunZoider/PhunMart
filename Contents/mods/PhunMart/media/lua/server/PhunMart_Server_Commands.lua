@@ -20,9 +20,10 @@ Commands[PM.commands.buy] = function(playerObj, args)
     print("success ", tostring(success))
 end
 
--- Commands[PM.commands.restock] = function(playerObj, args)
---     SPhunMartSystem.instance:restock(args.shopId, playerObj)
--- end
+Commands[PM.commands.restock] = function(playerObj, args)
+    -- use the request stock feature with forceRestock=true 
+    SPhunMartSystem.instance:requestShop(args.location, playerObj, true)
+end
 
 Commands[PM.commands.closeShop] = function(playerObj, args)
     SPhunMartSystem.instance:getLuaObjectAt(args.location.x, args.location.y, args.location.z):unlock()
@@ -83,7 +84,6 @@ end
 
 Commands[PM.commands.updateShop] = function(playerObj, args)
 
-    print("updating shop")
     local resend = false
     if args.shop then
         local shop = PM:generateShop(args.key, args.shop)
@@ -200,16 +200,7 @@ end
 
 -- generates or re-generates shop and inventory
 Commands[PM.commands.requestShopGenerate] = function(playerObj, args)
-    local location = PM:xyzFromKey(args.key)
-    local machine = PM:getMachineByLocation(playerObj, location.x, location.y, location.z)
-    if not machine then
-        return
-    end
-    local shop = PM:generateShop(machine)
-    sendServerCommand(playerObj, PM.name, PM.commands.requestShop, {
-        key = PM:getKey(machine),
-        shop = shop
-    })
+    SPhunMartSystem.instance:reroll(args.location, args.target)
 end
 
 Commands[PM.commands.spawnVehicle] = function(playerObj, args)
