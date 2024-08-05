@@ -130,16 +130,7 @@ function UI.OnOpenPanel(playerObj, obj)
     local pIndex = playerObj:getPlayerNum()
     local instances = PhunMartShopWindow.instances
     if instances[pIndex] then
-        if instances[pIndex].data.key == shop.key then
-            if not instances[pIndex]:isVisible() then
-                instances[pIndex]:addToUIManager();
-                instances[pIndex]:setVisible(true);
-            end
-            triggerEvent(PhunMart.events.OnWindowOpened, playerObj, obj)
-            return instances[pIndex]
-        else
-            instances[pIndex]:close()
-        end
+        instances[pIndex]:close()
     end
 
     local instance = UI:new(x, y, width, height, playerObj);
@@ -154,14 +145,14 @@ function UI.OnOpenPanel(playerObj, obj)
     instance:setVisible(false);
 
     local pNum = playerObj:getPlayerNum()
+    instance:setVisible(true)
+    -- UI.instances[pNum] = instance
+    -- if pNum == 0 then
+    --     ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
+    -- end
 
-    UI.instances[pNum] = instance
-    if pNum == 0 then
-        ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
-    end
-
-    local open = PM_OpenAction:new(playerObj, instance, 75)
-    ISTimedActionQueue.add(open)
+    -- local open = PM_OpenAction:new(playerObj, instance, 75)
+    -- ISTimedActionQueue.add(open)
 
     return instance
 end
@@ -389,11 +380,19 @@ function UI:restock()
     end
 end
 
+local updateShopIterations = 0
+
 function UI:prerender()
     ISPanelJoypad.prerender(self);
 
     local shop = self.shopObj
+
     if shop then
+        updateShopIterations = updateShopIterations + 1
+        if updateShopIterations > 10 then
+            updateShopIterations = 0
+            shop:updateFromIsoObject()
+        end
         if not self.backgroundTexture or self.backgroundTexture ~= shop.backgroundImage then
             if shop.backgroundImage then
                 self.backgroundTexture = getTexture("media/textures/" .. shop.backgroundImage .. ".png")

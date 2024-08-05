@@ -1,17 +1,20 @@
 if not isServer() then
     return
 end
+require "PhunMart_Server_Commands"
+require "PhunMart_Server_System"
+
 local PhunMart = PhunMart
+local SPhunMartServerCommands = SPhunMartServerCommands
+local SPhunMartSystem = SPhunMartSystem
 
-Events.EveryHours.Add(function()
-    PhunMart:checkForRestocking()
+Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
+    if module == PhunMart.name and SPhunMartServerCommands[command] then
+        print("Command ", command, " received from ", playerObj:getUsername())
+        PhunTools:printTable(arguments)
+        SPhunMartServerCommands[command](playerObj, arguments)
+    end
 end)
-
--- Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
---     if module == PhunMart.name and Commands[command] then
---         Commands[command](playerObj, arguments)
---     end
--- end)
 PhunTools:RunOnceWhenServerEmpties(PhunMart.name, function()
     SPhunMartSystem.instance:checkLocks()
 end)

@@ -52,7 +52,8 @@ function SPhunMartSystem:initSystem()
 
     -- Specify GlobalObject fields that should be saved.
     self.system:setObjectModDataKeys({'id', 'key', 'label', 'fills', 'lastRestock', 'location', 'tabs', 'items',
-                                      'playerName'})
+                                      'playerName', 'direction', 'backgroundImage', 'layout', 'requiresPower',
+                                      'currency', 'basePrice', 'type', 'lockedBy', 'restocked'})
 
 end
 
@@ -87,54 +88,66 @@ function SPhunMartSystem:isValidIsoObject(isoObject)
     return instanceof(isoObject, "IsoThumpable") and isoObject:getName() == "PhunMartShop"
 end
 
-function SPhunMartSystem:purchase(shopId, itemId, playerObj)
-    local shop = PM:getShop(shopId)
-    if shop then
-        local item = shop.items[itemId]
-        if item then
-            if item.inventory ~= false then
-                if item.inventory < 1 then
-                    sendServerCommand(playerObj, PM.name, PM.commands.serverPurchaseFailed, {
-                        playerIndex = playerObj:getPlayerNum(),
-                        message = "OOS"
-                    })
-                    return false
-                end
-                item.inventory = item.inventory - 1
-            end
+function SPhunMartSystem:purchase(location, itemId, playerObj)
 
-            -- add to players purchase history
-            PM:addToPurchaseHistory(playerObj, item)
-
-            -- push shop changes to client
-            self:requestShop(shopId, playerObj)
-
-            sendServerCommand(playerObj, PM.name, PM.commands.buy, {
-                playerIndex = playerObj:getPlayerNum(),
-                success = true,
-                shopId = shopId,
-                item = item
-            })
-
-            return true
-        end
+    local shop = self:getLuaObjectAt(location.x, location.y, location.z)
+    if not shop then
+        print("ERROR! shop not found for " .. location.location.x .. "," .. location.location.y .. "," ..
+                  location.location.z)
+        return false
     end
+
+    local item = shop.items[itemId]
+    if not item then
+        print("ERROR! item not found for " .. itemId)
+        return false
+    end
+
+    if item then
+        if item.inventory ~= false then
+            if item.inventory < 1 then
+                sendServerCommand(playerObj, PM.name, PM.commands.serverPurchaseFailed, {
+                    playerIndex = playerObj:getPlayerNum(),
+                    message = "OOS"
+                })
+                return false
+            end
+            item.inventory = item.inventory - 1
+            shop:saveData()
+        end
+
+        -- add to players purchase history
+        PM:addToPurchaseHistory(playerObj, item)
+
+        -- push shop changes to client
+        -- self:requestShop(shopId, playerObj)
+
+        sendServerCommand(playerObj, PM.name, PM.commands.buy, {
+            playerIndex = playerObj:getPlayerNum(),
+            success = true,
+            shopId = shop.id,
+            location = shop.location,
+            item = item
+        })
+
+        return true
+    end
+
 end
 
-function SPhunMartSystem:requestShop(shopId, playerObj, forceRestock)
+function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
 
-    local shop = PM:getShop(shopId)
+    local shop = self:getLuaObjectAt(location.x, location.y, location.z)
+
     if not shop then
         print("ERROR! shop not found for " .. shopId)
         return
     end
 
-    if shop.playerName and shop.playerName ~= playerObj:getUsername() then
-        print("ERROR! shop locked by " .. shop.playerName)
+    if shop.lockedBy and shop.lockedBy ~= playerObj:getUsername() then
+        print("ERROR! shop locked by " .. shop.lockedBy)
         return
     end
-
-    local obj = self:getLuaObjectAt(shop.location.x, shop.location.y, shop.location.z)
 
     print("shop.restockDeferred ", tostring(shop.restockDeferred), " shop.nextRestock ", tostring(shop.nextRestock),
         " now is ", tostring(GameTime:getInstance():getWorldAgeHours()), " force = ", tostring(forceRestock))
@@ -159,17 +172,16 @@ function SPhunMartSystem:requestShop(shopId, playerObj, forceRestock)
         end
     end
 
-    shop.playerName = playerObj:getUsername()
-    obj:fromModData(shop)
-    obj:lock(playerObj)
+    -- obj:fromModData(shop)
+    shop:lock(playerObj)
     table.insert(self.lockedShopIds, {
-        shopId = shopId,
+        shopId = shop.id,
         playerName = shop.playerName,
         location = shop.location
     })
-    sendServerCommand(playerObj, PM.name, PM.commands.requestShop, {
-        id = shopId,
-        shop = shop
+    sendServerCommand(playerObj, PM.name, PM.commands.updateShop, {
+        id = shop.id,
+        location = shop.location
     })
 
 end
@@ -204,8 +216,7 @@ function SPhunMartSystem:checkLocks()
     for i = #self.lockedShopIds, 1, -1 do
 
         local data = self.lockedShopIds[i]
-        print("Checking ", data.playerName, " is near ", data.shopId)
-        local shop = PM:getShop(data.shopId)
+
         local playerObj = players[data.playerName]
         if not playerObj then
             -- player is no longer on server

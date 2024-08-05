@@ -2,7 +2,6 @@ local PhunMart = PhunMart
 
 local function setup()
     Events.EveryOneMinute.Remove(setup)
-    ModData.request(PhunMart.consts.shoplist)
     if FAVendingMachine and FAVendingMachine.doBuildMenu then
         FAVendingMachine.doBuildMenu = function(player, menu, square, VendingMachine)
         end
@@ -34,13 +33,5 @@ end)
 Events.OnGameStart.Add(function()
     -- one off tick to request purchase history
     Events.EveryOneMinute.Add(requestHistory)
-
-end)
-
--- received moddata table
-Events.OnReceiveGlobalModData.Add(function(tableName, tableData)
-    if tableName == PhunMart.consts.shoplist then
-        PhunMart.shoplist = tableData
-    end
 
 end)

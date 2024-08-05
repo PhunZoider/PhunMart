@@ -4,7 +4,6 @@ PhunMart = {
     inied = false,
     consts = {
         shops = "PhunMartShops",
-        shoplist = "PhunMartShopList",
         players = "PhunMartPlayers",
         history = "PhunMartHistory"
     },
@@ -101,8 +100,6 @@ end
 
 function PhunMart:ini()
 
-    self.settings = ModData.getOrCreate(self.name)
-    self.shoplist = ModData.getOrCreate(self.consts.shoplist)
     self.shops = ModData.getOrCreate(self.consts.shops)
 
     if not self.shops then

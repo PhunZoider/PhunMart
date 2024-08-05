@@ -18,19 +18,12 @@ function CPhunMartSystem:newLuaObject(globalObject)
     return o
 end
 
--- function CPhunMartSystem:newLuaObjectAt(x, y, z)
---     print("CPhunMartSystem:newLuaObjectAt", tostring(x), tostring(y), tostring(z))
---     self:noise("adding luaObject " .. x .. ',' .. y .. ',' .. z)
---     local globalObject = self.system:newObject(x, y, z)
---     -- local nl = self.processNewLua
---     -- nl:addItem(x, y, z)
---     return self:newLuaObject(globalObject)
--- end
-
 function CPhunMartSystem:refreshShop(obj, playerObj)
     print("CPhunMartSystem:refreshShop")
+    obj:updateFromIsoObject()
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShop, {
-        id = obj.id
+        id = obj.id,
+        location = obj.location
     })
 end
 
@@ -38,7 +31,8 @@ function CPhunMartSystem:requestPurchase(obj, itemId, playerObj)
     print("CPhunMartSystem:requestPurchase")
     self:sendCommand(playerObj, PM.commands.buy, {
         shopId = obj.id,
-        itemId = itemId
+        itemId = itemId,
+        location = obj.location
     })
 end
 
@@ -54,31 +48,13 @@ function CPhunMartSystem:close(shop, playerObj)
         shopId = shop.id,
         location = shop.location
     })
+
 end
 
-function CPhunMartSystem:updateShop(shop)
-    -- print("CPhunMartSystem:updateShop")
-    -- local obj = self:getLuaObjectAt(shop.location.x, shop.location.y, shop.location.z)
-
-    -- obj.id = shop.location.x .. "_" .. shop.location.y .. "_" .. shop.location.z
-    -- local tabChangeKey = ","
-    -- for k, v in pairs(shop) do
-    --     if k == "tabKeys" then
-    --         obj.tabs = {}
-    --         for _, tabKey in ipairs(v) do
-    --             table.insert(obj.tabs, tabKey)
-    --             tabChangeKey = tabChangeKey .. tabKey .. ","
-    --         end
-    --     elseif k == "items" then
-    --         obj.items = v
-    --         for kk, vv in pairs(obj.items) do
-    --             PM:setDisplayValues(vv)
-    --         end
-    --     else
-    --         obj[k] = v
-    --     end
-    -- end
-    -- obj.tabChangeKey = tabChangeKey
+function CPhunMartSystem:updateShop(location)
+    print("CPhunMartSystem:updateShop")
+    local obj = self:getLuaObjectAt(location.x, location.y, location.z)
+    obj:updateFromIsoObject()
 end
 
 CGlobalObjectSystem.RegisterSystemClass(CPhunMartSystem)

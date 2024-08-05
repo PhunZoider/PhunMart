@@ -1,5 +1,5 @@
 require "Map/CGlobalObject"
-
+local PM = PhunMart
 CPhunMartObject = CGlobalObject:derive("CPhunMartObject")
 
 function CPhunMartObject:new(luaSystem, globalObject)
@@ -15,4 +15,8 @@ end
 
 function CPhunMartObject:restock()
     CPhunMartSystem.instance:restock(self)
+end
+
+function CPhunMartObject:open(playerObj)
+    PhunMart_OpenAction:openShop(playerObj, self)
 end

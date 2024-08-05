@@ -56,8 +56,8 @@ Commands[PhunMart.commands.openWindow] = function(arguments)
     end
 end
 
-Commands[PhunMart.commands.requestShop] = function(arguments)
-    -- CPhunMartSystem.instance:updateShop(arguments.shop)
+Commands[PhunMart.commands.updateShop] = function(arguments)
+    CPhunMartSystem.instance:updateShop(arguments.location)
 end
 
 Commands[PhunMart.commands.modifyTraits] = function(arguments)

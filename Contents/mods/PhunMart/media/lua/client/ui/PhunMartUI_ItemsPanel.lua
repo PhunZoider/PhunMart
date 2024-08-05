@@ -262,6 +262,9 @@ function PhunMartUIItemsPanel:doDrawItem(y, row, alt)
         return
     end
     local item = shop.items[row.text]
+    if not item then
+        return y
+    end
     local display = row.item or {}
 
     local inventoryVal = 0

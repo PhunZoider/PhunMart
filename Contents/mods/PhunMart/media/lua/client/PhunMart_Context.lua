@@ -18,45 +18,15 @@ local vendingContextMenu = function(playerObj, context, worldobjects)
     end
 
     if found and found.id then
-        context:addOption(found.label or "Vending Machine", player, function()
-            PhunMartShopWindow.OnOpenPanel(player, found)
+        context:addOption("View vending machine " .. found.label or "View Vending Machine", player, function()
+            found:open(player)
+            -- PhunMartShopWindow.OnOpenPanel(player, found)
         end)
     end
 
 end
 
 Events.OnPreFillWorldObjectContextMenu.Add(vendingContextMenu);
-
-local onSquareLoad = function(square)
-    local object = nil;
-    local objType = nil;
-    local objFound = false;
-    local machine = nil;
-    if square then
-        machine = PhunMart:getMachineFromSquare(square)
-        if machine ~= nil then
-            return
-        end
-    end
-
-    if machine == nil then
-        return
-    end
-    local key = PhunMart:getKey(machine)
-    local shop = PhunMart:getShop(key)
-    if not shop then
-        -- first time loading ?
-        sendClientCommand(getPlayer(), PhunMart.name, PhunMart.commands.requestShop, {
-            key = key
-        })
-    end
-
-    -- prevent shit from being put into vending machines
-    machine:getContainer():emptyIt();
-    machine:getContainer():setAcceptItemFunction("AcceptItemFunction.PhunMart");
-    machine:setNoPicking(true);
-    square:RecalcProperties();
-end
 
 Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, context, items)
     local item = nil
@@ -89,5 +59,3 @@ Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, context, items)
         end
     end
 end)
-
--- Events.LoadGridsquare.Add(onSquareLoad);

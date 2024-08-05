@@ -35,6 +35,10 @@ local fields = {
         type = "string",
         default = "machine-none.png"
     },
+    layout = {
+        type = "string",
+        default = "default"
+    },
     requiresPower = {
         type = "boolean",
         default = false

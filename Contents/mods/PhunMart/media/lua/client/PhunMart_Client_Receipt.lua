@@ -1,45 +1,43 @@
 local PhunMart = PhunMart
-
+local PhunWallet = PhunWallet
 
 PhunMart.applyReceipt = {}
 
 PhunMart.applyReceipt["ITEM"] = function(playerObj, item)
-    
+
     if PhunWallet and PhunWallet.currencies[item.label] then
         PhunWallet.queue:add(playerObj, item.label, item.quantity)
     else
         playerObj:getInventory():AddItem(item.name, item.quantity)
     end
 
-    playerObj:getInventory():AddItem(item.name, item.quantity)
-
 end
 
 PhunMart.applyReceipt["PERK"] = function(playerObj, item)
-    
+
     local perk = PerkFactory.getPerkFromName(item.name or item.label)
     local qty = item.quantity or 1
     playerObj:getXp():AddXP(perk, qty, true, false, false)
-    
+
 end
 
 PhunMart.applyReceipt["BOOST"] = function(playerObj, item)
-    
+
     local perk = PerkFactory.getPerkFromName(item.name or item.label)
     local existing = playerObj:getXp():getPerkBoost(perk) or 0
     playerObj:getXp():setPerkBoost(perk, item.quantity + existing);
-    
+
 end
 
 PhunMart.applyReceipt["TRAIT"] = function(playerObj, item)
-    
+
     local trait = TraitFactory.getTrait(item.name or item.label)
     if item.tag == "REMOVE" then
         playerObj:getTraits():remove(trait:getType())
     else
         playerObj:getTraits():add(trait:getType())
     end
-    
+
 end
 
 PhunMart.applyReceipt["VEHICLE"] = function(playerObj, item)
@@ -53,5 +51,5 @@ PhunMart.applyReceipt["VEHICLE"] = function(playerObj, item)
         name = item.name or item.label
     }
     playerObj:getInventory():AddItem(key)
-    
+
 end
