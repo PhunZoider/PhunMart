@@ -116,8 +116,6 @@ function UI.OnOpenPanel(playerObj, obj)
 
     if not obj then
         return
-    else
-        CPhunMartSystem.instance:refreshShop(obj, playerObj)
     end
 
     local core = getCore()

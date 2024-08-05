@@ -36,7 +36,8 @@ PhunMart = {
         restockAllShops = "restockAllShops",
         rerollAllShops = "rerollAllShops",
         closeAllShops = "closeAllShops",
-        closeShop = "closeShop"
+        closeShop = "closeShop",
+        requestLock = "requestLock"
 
     },
     events = {

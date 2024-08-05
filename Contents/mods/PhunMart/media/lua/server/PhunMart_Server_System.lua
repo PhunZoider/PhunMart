@@ -140,7 +140,7 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
     local shop = self:getLuaObjectAt(location.x, location.y, location.z)
 
     if not shop then
-        print("ERROR! shop not found for " .. shopId)
+        print("ERROR! shop not found for " .. shop.id)
         return
     end
 
@@ -149,10 +149,9 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
         return
     end
 
-    print("shop.restockDeferred ", tostring(shop.restockDeferred), " shop.nextRestock ", tostring(shop.nextRestock),
-        " now is ", tostring(GameTime:getInstance():getWorldAgeHours()), " force = ", tostring(forceRestock))
-
     local lastRestocked = shop.lastRestock
+
+    print("lastRestocked ", tostring(lastRestocked))
 
     if lastRestocked == nil then
         PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
@@ -161,6 +160,7 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
     else
         local frequency = PM.defs.shops[shop.key].restock or 24
         local hoursSinceLastRestock = GameTime:getInstance():getWorldAgeHours() - lastRestocked
+        print("hoursSinceLastRestock ", tostring(hoursSinceLastRestock), " frequency", tostring(frequency))
         if hoursSinceLastRestock > frequency then
             -- shop should have been restocked by now
             local times = math.floor(hoursSinceLastRestock / frequency)
@@ -176,7 +176,7 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
     shop:lock(playerObj)
     table.insert(self.lockedShopIds, {
         shopId = shop.id,
-        playerName = shop.playerName,
+        playerName = shop.lockedBy or "???",
         location = shop.location
     })
     sendServerCommand(playerObj, PM.name, PM.commands.updateShop, {
@@ -184,6 +184,24 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
         location = shop.location
     })
 
+end
+
+function SPhunMartSystem:requestLock(location, playerObj)
+    local obj = self:getLuaObjectAt(location.x, location.y, location.z)
+    local success = true
+    local lockedBy = nil
+    if obj.lockedBy then
+        success = false
+        lockedBy = obj.lockedBy
+    else
+        self:requestShop(location, playerObj)
+    end
+    sendServerCommand(playerObj, PM.name, PM.commands.requestLock, {
+        id = obj.id,
+        location = location,
+        success = success,
+        lockedBy = lockedBy
+    })
 end
 
 function SPhunMartSystem:releaseShop(shopId, location, playerObj)
@@ -208,10 +226,6 @@ function SPhunMartSystem:checkLocks()
             players[playerObj:getUsername()] = playerObj
         end
     end
-
-    -- PM:debug("Players", #self.lockedShopIds)
-    -- PM:debug("locked", self.lockedShopIds)
-
     local doRemove = {}
     for i = #self.lockedShopIds, 1, -1 do
 
@@ -263,11 +277,11 @@ end
 
 function SPhunMartSystem:OnClientCommand(command, playerObj, args)
     print("SPhunMartSystem:OnClientCommand ", tostring(command), " p= ", tostring(playerObj), " a=", tostring(args))
-    if SPhunMartServerCommands[command] == nil then
+    if SPhunMartServerCommands[command] ~= nil then
+        SPhunMartServerCommands[command](playerObj, args)
         print("SPhunMartSystem:OnClientCommand ", tostring(command), " not found")
-        return
     end
-    SPhunMartServerCommands[command](playerObj, args)
+    -- SPhunMartServerCommands[command](playerObj, args)
 end
 
 function SPhunMartSystem:receiveCommand(playerObj, command, args)

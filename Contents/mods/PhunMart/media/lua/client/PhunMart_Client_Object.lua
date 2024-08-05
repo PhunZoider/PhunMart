@@ -18,5 +18,6 @@ function CPhunMartObject:restock()
 end
 
 function CPhunMartObject:open(playerObj)
+    CPhunMartSystem.instance:requestLock(self, playerObj)
     PhunMart_OpenAction:openShop(playerObj, self)
 end

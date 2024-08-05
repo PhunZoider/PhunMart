@@ -11,6 +11,10 @@ local Commands = {}
 --     SPhunMartSystem.instance:requestShop(args.location, playerObj)
 -- end
 
+Commands[PM.commands.requestLock] = function(playerObj, args)
+    SPhunMartSystem.instance:requestLock(args.location, playerObj)
+end
+
 Commands[PM.commands.buy] = function(playerObj, args)
     local success = SPhunMartSystem.instance:purchase(args.location, args.itemId, playerObj)
     print("success ", tostring(success))

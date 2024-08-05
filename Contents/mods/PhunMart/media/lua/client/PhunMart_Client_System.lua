@@ -14,14 +14,13 @@ end
 function CPhunMartSystem:newLuaObject(globalObject)
     print("CPhunMartSystem:newLuaObject")
     local o = CPhunMartObject:new(self, globalObject)
-    o.pee = true
     return o
 end
 
-function CPhunMartSystem:refreshShop(obj, playerObj)
-    print("CPhunMartSystem:refreshShop")
+function CPhunMartSystem:requestLock(obj, playerObj)
+    print("CPhunMartSystem:requestLock")
     obj:updateFromIsoObject()
-    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShop, {
+    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestLock, {
         id = obj.id,
         location = obj.location
     })
@@ -48,13 +47,19 @@ function CPhunMartSystem:close(shop, playerObj)
         shopId = shop.id,
         location = shop.location
     })
-
 end
 
 function CPhunMartSystem:updateShop(location)
     print("CPhunMartSystem:updateShop")
     local obj = self:getLuaObjectAt(location.x, location.y, location.z)
     obj:updateFromIsoObject()
+end
+
+function CPhunMartSystem:OnServerCommand(command, args)
+    print("CPhunMartSystem:OnServerCommand")
+    if CPhunMartCommands[command] then
+        CPhunMartCommands[command](args)
+    end
 end
 
 CGlobalObjectSystem.RegisterSystemClass(CPhunMartSystem)

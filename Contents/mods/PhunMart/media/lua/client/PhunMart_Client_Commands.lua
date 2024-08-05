@@ -14,6 +14,12 @@ Commands[PhunMart.commands.serverPurchaseFailed] = function(arguments)
 
 end
 
+Commands[PhunMart.commands.requestLock] = function(arguments)
+    local shop = CPhunMartSystem.instance:getLuaObjectAt(arguments.location.x, arguments.location.y,
+        arguments.location.z)
+    shop:updateFromIsoObject()
+end
+
 Commands[PhunMart.commands.updateHistory] = function(arguments)
     local player = getSpecificPlayer(arguments.playerIndex)
     PhunMart.players[player:getUsername()] = arguments.history
@@ -95,8 +101,11 @@ Commands[PhunMart.commands.requestItemDefs] = function(arguments)
     end
 end
 
+CPhunMartCommands = Commands
+
 -- Listen for commands from the server
 Events.OnServerCommand.Add(function(module, command, arguments)
+    print("Received command ", module, command)
     if module == PhunMart.name and Commands[command] then
         Commands[command](arguments)
     end

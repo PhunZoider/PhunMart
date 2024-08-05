@@ -4,7 +4,7 @@ PhunMart_OpenAction = ISBaseTimedAction:derive("PhunMart_OpenAction");
 local PhunMart = PhunMart
 
 function PhunMart_OpenAction:isValid()
-    return true
+    return self.shopObj.lockedBy == nil or self.shopObj.lockedBy == self.character:getUsername()
 end
 
 function PhunMart_OpenAction:waitToStart()
@@ -141,6 +141,12 @@ local function getOpeningPositions(playerObj, shopObj)
 end
 
 function PhunMart_OpenAction:openShop(playerObj, shopObj)
+
+    if shopObj.lockedBy and shopObj.lockedBy ~= playerObj:getUsername() then
+        playerObj:Say("Shop is being used by " .. shopObj.lockedBy)
+        return
+    end
+
     -- get the squares we can open from
     local squares = getOpeningPositions(playerObj, shopObj)
     local square = nil
