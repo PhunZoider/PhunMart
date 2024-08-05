@@ -189,7 +189,7 @@ end
 function SPhunMartSystem:requestLock(location, playerObj)
     local obj = self:getLuaObjectAt(location.x, location.y, location.z)
     local success = true
-    local lockedBy = nil
+    local lockedBy = false
     if obj.lockedBy then
         success = false
         lockedBy = obj.lockedBy
@@ -265,14 +265,18 @@ function SPhunMartSystem:checkLocks()
     end
 end
 
-function SPhunMartSystem:removeShopIdLockData(shopId)
-    print("SPhunMartSystem:removeShopIdLockData ", tostring(shopId), " t= ", tostring(#self.lockedShopIds))
+function SPhunMartSystem:removeShopIdLockData(shop)
+    print("SPhunMartSystem:removeShopIdLockData ", tostring(shop), " t= ", tostring(#self.lockedShopIds))
     for i = #self.lockedShopIds, 1, -1 do
         local data = self.lockedShopIds[i]
-        if data.shopId == shopId then
+        if data.shopId == shop.id then
             table.remove(self.lockedShopIds, i)
         end
     end
+    sendServerCommand(PM.name, PM.commands.updateShop, {
+        id = shop.id,
+        location = shop.location
+    })
 end
 
 function SPhunMartSystem:OnClientCommand(command, playerObj, args)

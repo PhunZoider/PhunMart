@@ -4,7 +4,7 @@ PhunMart_OpenAction = ISBaseTimedAction:derive("PhunMart_OpenAction");
 local PhunMart = PhunMart
 
 function PhunMart_OpenAction:isValid()
-    return self.shopObj.lockedBy == nil or self.shopObj.lockedBy == self.character:getUsername()
+    return not self.shopObj.lockedBy or self.shopObj.lockedBy == self.character:getUsername()
 end
 
 function PhunMart_OpenAction:waitToStart()

@@ -3,7 +3,7 @@ if not isClient() then
 end
 
 local PhunMart = PhunMart
-local vendingContextMenu = function(playerObj, context, worldobjects)
+local vendingContextMenu = function(playerObj, context, worldobjects, test)
 
     local player = getSpecificPlayer(playerObj);
 
@@ -18,10 +18,20 @@ local vendingContextMenu = function(playerObj, context, worldobjects)
     end
 
     if found and found.id then
-        context:addOption("View vending machine " .. found.label or "View Vending Machine", player, function()
+        local caption = "View vending machine "
+        local option = context:addOptionOnTop(caption, player, function()
             found:open(player)
-            -- PhunMartShopWindow.OnOpenPanel(player, found)
         end)
+
+        local toolTip = ISWorldObjectContextMenu.addToolTip();
+        toolTip:setVisible(false);
+        toolTip:setName(found.label or "View Vending Machine");
+        toolTip.description = (found.lockedBy and found.lockedBy ~= player:getUsername() and
+                                  "This vending machine is currently in use by " .. found.lockedBy) or ""
+
+        option.toolTip = toolTip;
+        option.notAvailable = found.lockedBy and found.lockedBy ~= player:getUsername()
+
     end
 
 end

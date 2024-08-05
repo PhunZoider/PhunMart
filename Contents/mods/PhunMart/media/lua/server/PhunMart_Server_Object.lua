@@ -122,9 +122,9 @@ function SPhunMartObject:stateToIsoObject(isoObject)
 end
 
 function SPhunMartObject:unlock()
-    self.lockedBy = nil
+    self.lockedBy = false
     self:saveData()
-    SPhunMartSystem.instance:removeShopIdLockData(self.id)
+    SPhunMartSystem.instance:removeShopIdLockData(self)
     print("Unlocked " .. self.id)
 end
 
