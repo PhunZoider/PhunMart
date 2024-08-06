@@ -362,9 +362,6 @@ end
 
 function UI:reroll()
     if isAdmin() then
-        UI.data = {
-            key = self.data.key
-        }
         self.shopObj:reroll()
     end
 end

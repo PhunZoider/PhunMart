@@ -20,12 +20,6 @@ Events.OnInitGlobalModData.Add(function()
     PhunMart:ini()
 end)
 
-Events.OnGameStart.Add(function()
-    AcceptItemFunction.PhunMart = function(container, item)
-        return false
-    end
-end)
-
 local function pickSquare(x, y)
     local playerIndex = self.gameState:fromLua0("getPlayerIndex")
     local z = self.gameState:fromLua0("getZ")

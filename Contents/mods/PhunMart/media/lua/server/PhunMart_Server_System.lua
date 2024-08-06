@@ -91,6 +91,28 @@ function SPhunMartSystem:reroll(location, target)
 
 end
 
+function SPhunMartSystem:rerollAll()
+
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            self:reroll(obj.location)
+        end
+    end
+
+end
+
+function SPhunMartSystem:restockAll()
+
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            obj.lastRestock = 0
+        end
+    end
+
+end
+
 function SPhunMartSystem:newLuaObjectAt(x, y, z)
     print("===============> SPhunMartSystem:newLuaObjectAt", tostring(x), tostring(y), tostring(z))
     self:noise("adding luaObject " .. x .. ',' .. y .. ',' .. z)
@@ -183,6 +205,7 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
             PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
             -- now overwrite the last restock time to our newRetock figure
             shop.lastRestock = newRestock
+            print("times missed restock ", tostring(times), " newRestock ", tostring(newRestock))
         end
     end
 

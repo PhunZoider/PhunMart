@@ -98,14 +98,12 @@ Commands[PM.commands.updateShop] = function(playerObj, args)
 end
 
 Commands[PM.commands.rerollAllShops] = function(playerObj, args)
-    PM:resetShops()
+    SPhunMartSystem.instance:rerollAll()
 end
 
 Commands[PM.commands.restockAllShops] = function(playerObj, args)
     print("Restocking all shops")
-    for k, v in pairs(PM.shops) do
-        v.lastRetock = -1000
-    end
+    SPhunMartSystem.instance:restockAll()
 end
 
 Commands[PM.commands.reloadAll] = function(playerObj, args)

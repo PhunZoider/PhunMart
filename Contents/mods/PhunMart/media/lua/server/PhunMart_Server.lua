@@ -2,7 +2,6 @@ if not isServer() then
     return
 end
 local sandbox = SandboxVars.PhunMart
-require 'Items/AcceptItemFunction'
 local PhunMart = PhunMart
 local PhunTools = PhunTools
 
@@ -11,10 +10,6 @@ PhunMart.defs = {
     items = {},
     currencies = {}
 }
-
-function AcceptItemFunction.PhunMart(container, item)
-    return false
-end
 
 function PhunMart:itemGenerationCumulativeModel(shop, poolIndex)
 
@@ -262,28 +257,8 @@ function PhunMart:generateShopItems(shopInstance, cumulativeModel)
     return items
 end
 
-function PhunMart:getInstanceDistancesByType(locationKey)
-    local results = {}
-
-    local location = self:xyzFromKey(locationKey)
-
-    if location then
-        for k, v in pairs(self.shops or {}) do
-            if v.location and v.location.x and (k ~= locationKey) then
-                local dx = location.x - v.location.x
-                local dy = location.y - v.location.y
-                local distance = math.sqrt(dx * dx + dy * dy)
-                if not results[v.type] or results[v.type] < distance then
-                    results[v.type] = distance
-                end
-            end
-        end
-    end
-    return results
-end
-
 function PhunMart:getShopListFromKey(location)
-    self:debug("getShopListFromKey", location)
+
     local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
     print("Distances")
@@ -296,8 +271,6 @@ function PhunMart:getShopListFromKey(location)
     local shops = {}
     local totalProbability = 0
 
-    local distanceReduction = 0
-
     for k, v in pairs(self.defs.shops) do
         if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract then
 
@@ -305,13 +278,8 @@ function PhunMart:getShopListFromKey(location)
             local distanceKey = v.type or v.key
             local distance = distances[distanceKey] and distances[distanceKey].distance or 0
 
-            print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and reduce is " ..
-                      tostring(distanceReduction) .. " and distance is " .. tostring(distance) .. " using distanceKey " ..
-                      tostring(distanceKey))
-
-            if distanceReduction > 0 and minDistance > distanceReduction then
-                minDistance = minDistance - distanceReduction
-            end
+            print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
+                      tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
 
             if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey].distance) then
                 if v.zones and type(v.zones) == "table" then
@@ -373,20 +341,9 @@ function PhunMart:getShopListFromKey(location)
             list = shops,
             totalProbability = totalProbability
         }
-    elseif distanceReduction < 100 then
-        -- we should consider making this a broken shop
-        return nil;
-        -- return self:getShopListFromKey(key, distanceReduction + 10)
+
     else
-        print("No shops found for " .. key)
-        table.insert(shops, {
-            key = "broken-shop",
-            probability = 100
-        })
-        return {
-            list = shops,
-            totalProbability = 100
-        }
+        self:debug("No shop candidates found for", location)
     end
 
 end
@@ -514,16 +471,6 @@ function PhunMart:addToPurchaseHistory(playerObj, item)
         playerIndex = playerObj:getPlayerNum(),
         history = pd
     })
-
-end
-
-local Commands = {}
-
-function PhunMart:resetShops()
-    -- close any open shops on clients
-    sendServerCommand(PhunMart.name, PhunMart.commands.closeAllShops, {})
-    self.shops = {}
-    ModData.add(self.consts.shops, self.shops)
 
 end
 
