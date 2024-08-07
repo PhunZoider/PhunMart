@@ -105,7 +105,6 @@ CPhunMartCommands = Commands
 
 -- Listen for commands from the server
 Events.OnServerCommand.Add(function(module, command, arguments)
-    print("Received command ", module, command)
     if module == PhunMart.name and Commands[command] then
         Commands[command](arguments)
     end

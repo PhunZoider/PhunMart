@@ -474,3 +474,30 @@ function PhunMart:addToPurchaseHistory(playerObj, item)
 
 end
 
+local spritesSheets = {"01", "02", "03"}
+local spritePos = {
+    east = 0,
+    south = 1,
+    west = 2,
+    north = 3
+}
+
+function PhunMart:resolveSprite(sheet, row, direction, nopower)
+
+    -- print("resolveSprite ", tostring(sheet), " ", tostring(row), " ", tostring(direction), " ", tostring(nopower))
+
+    local actualRow = (row - 1) * 8
+
+    local rowbit = actualRow + spritePos[direction]
+    if nopower then
+        -- is powered down
+        rowbit = rowbit + 4
+    end
+
+    local spite = "phunmart_" .. spritesSheets[sheet] .. "_" .. rowbit
+    -- print("resolveSprite ", tostring(spite), " sheet=", tostring(sheet), " row=", tostring(row), " dir=",
+    --     tostring(direction), " noPower=", tostring(nopower), " actualRow=", tostring(actualRow), " rowbit=",
+    --     tostring(rowbit))
+    return spite
+end
+

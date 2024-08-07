@@ -16,8 +16,7 @@ Commands[PM.commands.requestLock] = function(playerObj, args)
 end
 
 Commands[PM.commands.buy] = function(playerObj, args)
-    local success = SPhunMartSystem.instance:purchase(args.location, args.itemId, playerObj)
-    print("success ", tostring(success))
+    SPhunMartSystem.instance:purchase(args.location, args.itemId, playerObj)
 end
 
 Commands[PM.commands.restock] = function(playerObj, args)
@@ -30,7 +29,6 @@ Commands[PM.commands.closeShop] = function(playerObj, args)
 end
 
 Commands[PM.commands.requestShopDefs] = function(playerObj, args)
-    print("Requesting shop defs")
     sendServerCommand(playerObj, PM.name, PM.commands.requestShopDefs, {
         playerIndex = playerObj:getPlayerNum(),
         shops = PM.defs.shops
@@ -38,8 +36,6 @@ Commands[PM.commands.requestShopDefs] = function(playerObj, args)
 end
 
 Commands[PM.commands.requestItemDefs] = function(playerObj, args)
-    print("Requesting item defs")
-
     -- because this can be so massive, we will need to chunk it down
     local row = 0
     local chunkIteration = 0

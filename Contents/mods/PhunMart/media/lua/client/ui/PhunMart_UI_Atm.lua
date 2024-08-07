@@ -1,6 +1,6 @@
 require "ui/PhunMart_UI_Core"
 local pickle = PhunMartShopUI
-print("ooooooooooooooo\n\n", tostring(pickle))
+
 if not isClient() then
     return
 end

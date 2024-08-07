@@ -23,14 +23,11 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
 
     local isoObject
 
-    local sprite = PhunMart.defs.shops[shop.key].sprites[direction]
-    print("sprite: ", sprite)
+    isoObject = IsoThumpable.new(square:getCell(), square, "phunmart_01_1", false, {})
 
-    if not sprite then
-        print("no sprite for ", shop.key, " ", direction)
-        return
-    end
-    isoObject = IsoThumpable.new(square:getCell(), square, sprite, false, {})
+    -- if shop.requiresPower then
+    --     isoObject:createLightSource(10, 5, 5, 5, 5)
+    -- end
 
     shop.id = square:getX() .. "_" .. square:getY() .. "_" .. square:getZ()
     shop.direction = direction
@@ -67,8 +64,6 @@ end
 
 function SPhunMartSystem:generateRandomShopOnSquare(square, direction, removeOnSuccess)
     direction = direction or "south"
-    print("===============> SPhunMartSystem:generateRandomShopOnSquare ", tostring(square), " d=", tostring(direction))
-
     local shop = PM:generateShop(square)
     if shop ~= nil then
         square:transmitRemoveItemFromSquare(removeOnSuccess)
@@ -111,6 +106,26 @@ function SPhunMartSystem:restockAll()
         end
     end
 
+end
+
+function SPhunMartSystem:resyncAll()
+    -- really for use when moving from old system to new
+
+    -- first, check for any shops that do not have lua Objects
+    local shops = PM.shops or {}
+    for k, v in pairs(shops) do
+        local obj = self:getLuaObjectAt(v.location.x, v.location.y, v.location.z)
+        if not obj then
+            self:newLuaObjectAt(v.location.x, v.location.y, v.location.z)
+        end
+    end
+
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            obj:saveData()
+        end
+    end
 end
 
 function SPhunMartSystem:newLuaObjectAt(x, y, z)
@@ -187,8 +202,6 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
 
     local lastRestocked = shop.lastRestock
 
-    print("lastRestocked ", tostring(lastRestocked))
-
     if lastRestocked == nil then
         PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
     elseif forceRestock then
@@ -239,6 +252,26 @@ function SPhunMartSystem:requestLock(location, playerObj)
         success = success,
         lockedBy = lockedBy
     })
+end
+
+function SPhunMartSystem:updatePoweredSprites()
+
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj and obj.requiresPower then
+            obj:changeSprite()
+        end
+    end
+end
+
+function SPhunMartSystem:updateSprites()
+
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            obj:changeSprite()
+        end
+    end
 end
 
 function SPhunMartSystem:releaseShop(shopId, location, playerObj)
@@ -297,11 +330,9 @@ function SPhunMartSystem:checkLocks()
         if not playerObj then
             -- player is no longer on server
             doRemove[data.shopId] = data
-            print("Player ", data.playerName, " no longer on server")
         elseif playerObj:isDead() then
             -- player is dead
             doRemove[data.shopId] = data
-            print("Player ", data.playerName, " is dead")
             sendServerCommand(playerObj, PM.name, PM.commands.closeShop, {
                 shopId = data.shopId
             })
@@ -312,7 +343,6 @@ function SPhunMartSystem:checkLocks()
             local distance = math.sqrt(dx * dx + dy * dy)
             if distance > 5 then
                 -- player is too far away
-                print("Player ", data.playerName, " is too far away from shop ", data.shopId)
                 sendServerCommand(playerObj, PM.name, PM.commands.closeShop, {
                     shopId = data.shopId
                 })
@@ -328,7 +358,6 @@ function SPhunMartSystem:checkLocks()
 end
 
 function SPhunMartSystem:removeShopIdLockData(shop)
-    print("SPhunMartSystem:removeShopIdLockData ", tostring(shop), " t= ", tostring(#self.lockedShopIds))
     for i = #self.lockedShopIds, 1, -1 do
         local data = self.lockedShopIds[i]
         if data.shopId == shop.id then
@@ -342,16 +371,12 @@ function SPhunMartSystem:removeShopIdLockData(shop)
 end
 
 function SPhunMartSystem:OnClientCommand(command, playerObj, args)
-    print("SPhunMartSystem:OnClientCommand ", tostring(command), " p= ", tostring(playerObj), " a=", tostring(args))
     if SPhunMartServerCommands[command] ~= nil then
         SPhunMartServerCommands[command](playerObj, args)
-        print("SPhunMartSystem:OnClientCommand ", tostring(command), " not found")
     end
-    -- SPhunMartServerCommands[command](playerObj, args)
 end
 
 function SPhunMartSystem:receiveCommand(playerObj, command, args)
-    print("SPhunMartSystem:receiveCommand ", tostring(playerObj), " c= ", tostring(command), " a=", tostring(args))
     SPhunMartServerCommands[command](playerObj, args)
 end
 

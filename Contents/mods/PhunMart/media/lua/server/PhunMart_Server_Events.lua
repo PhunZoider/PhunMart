@@ -10,8 +10,6 @@ local SPhunMartSystem = SPhunMartSystem
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == PhunMart.name and SPhunMartServerCommands[command] then
-        print("Command ", command, " received from ", playerObj:getUsername())
-        PhunTools:printTable(arguments)
         SPhunMartServerCommands[command](playerObj, arguments)
     end
 end)
@@ -25,13 +23,23 @@ Events.EveryOneMinute.Add(function()
 
 end)
 
+Events.EveryTenMinutes.Add(function()
+    SPhunMartSystem.instance:updatePoweredSprites()
+end)
+
 -- Events.OnInitGlobalModData.Add(loadDefs)
 Events.OnInitGlobalModData.Add(function()
     PhunMart:loadAll()
 
-    for k, _ in pairs(Events) do
-        print(k)
-    end
+    -- local p = {}
+    -- for k, _ in pairs(Events) do
+    --     table.insert(p, k)
+    -- end
+    -- table.sort(p)
+    -- print("--- EVENTS ---")
+    -- PhunTools:printTable(p)
+    -- print("--- END EVENTS ---")
+
 end)
 
 -- South

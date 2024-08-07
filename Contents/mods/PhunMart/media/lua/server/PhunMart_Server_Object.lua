@@ -6,6 +6,7 @@ require "Map/SGlobalObject"
 
 SPhunMartObject = SGlobalObject:derive("SPhunMartObject")
 local PM = PhunMart
+
 local fields = {
     id = {
         type = "string",
@@ -70,18 +71,22 @@ local fields = {
     items = {
         type = "table",
         default = {}
+    },
+    sprites = {
+        type = "table",
+        default = {
+            sheet = 1,
+            row = 1
+        }
     }
-
 }
 
 function SPhunMartObject:new(luaSystem, globalObject)
-    print("=======SPhunMartObject:new ", tostring(self))
     local o = SGlobalObject.new(self, luaSystem, globalObject)
     return o
 end
 
 function SPhunMartObject:initNew()
-    print("SPhunMartObject:initNew")
     for k, v in pairs(fields) do
         self[k] = v.default
     end
@@ -108,12 +113,10 @@ function SPhunMartObject:stateFromIsoObject(isoObject)
 end
 
 function SPhunMartObject:getObject()
-    print("SPhunMartObject:getObject")
     return self:getIsoObject()
 end
 
 function SPhunMartObject:stateToIsoObject(isoObject)
-    print("SPhunMartObject:stateToIsoObject")
     self:toModData(isoObject:getModData())
     self:changeSprite()
     isoObject:transmitModData()
@@ -123,27 +126,39 @@ function SPhunMartObject:unlock()
     self.lockedBy = false
     self:saveData()
     SPhunMartSystem.instance:removeShopIdLockData(self)
-    print("Unlocked " .. self.id)
 end
 
 function SPhunMartObject:lock(player)
-    print("SPhunMartObject:lock")
     self.lockedBy = player:getUsername()
     self:saveData()
 end
 
+function SPhunMartObject:render(x, y, z, square)
+    SGlobalObject:render(self, x, y, z, square)
+end
+
 function SPhunMartObject:changeSprite()
-    print("SPhunMartObject:changeSprite")
+
     local isoObject = self:getIsoObject()
     if not isoObject then
         return
     end
 
-    print("SPhunMartObject:changeSprite ", tostring(self.key), tostring(self.direction))
-
-    local spriteName = PM.defs.shops[self.key].sprites[self.direction]
+    local def = PM.defs.shops[self.key]
+    local hasPower = true
+    if self.requiresPower then
+        hasPower = self:getSquare():haveElectricity()
+        if not hasPower then
+            hasPower = SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() <
+                           SandboxVars.ElecShutModifier
+        end
+    end
+    local spriteName = PM:resolveSprite(def.sprites.sheet, def.sprites.row, self.direction, hasPower == false)
 
     if spriteName and (not isoObject:getSprite() or spriteName ~= isoObject:getSprite():getName()) then
+        print("SPhunMartObject:changeSprite ", tostring(self.key), tostring(self.direction), " has power=",
+            tostring(hasPower), " sprite=", tostring(spriteName))
+
         self:noise('sprite changed to ' .. spriteName .. ' at ' .. self.x .. ',' .. self.y .. ',' .. self.z)
         isoObject:setSprite(spriteName)
         isoObject:transmitUpdatedSpriteToClients()
@@ -151,12 +166,10 @@ function SPhunMartObject:changeSprite()
 end
 
 function SPhunMartObject:saveData()
-    print("SPhunMartObject:saveData")
     local isoObject = self:getIsoObject()
     if isoObject then
         self:toModData(isoObject:getModData())
         isoObject:transmitModData()
-        print("transmitted")
     end
 end
 
@@ -169,7 +182,6 @@ function SPhunMartObject:fromModData(modData)
 end
 
 function SPhunMartObject:toModData(modData)
-    print("SPhunMartObject:toModData")
     for k, v in pairs(fields) do
         modData[k] = self[k]
     end

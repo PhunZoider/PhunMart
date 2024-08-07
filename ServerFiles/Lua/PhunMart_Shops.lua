@@ -55,6 +55,8 @@ return { --[[
     },
     backgroundImage = "machine-good-phoods",
     sprites = {
+        sheet = 1,
+        row = 2,
         east = "phunmart_01_0",
         south = "phunmart_01_1"
     }
@@ -75,6 +77,8 @@ return { --[[
     },
     backgroundImage = "machine-collectors",
     sprites = {
+        sheet = 3,
+        row = 2,
         east = "phunmart_01_2",
         south = "phunmart_01_3"
     }
@@ -99,6 +103,8 @@ return { --[[
     },
     backgroundImage = "machine-collectors",
     sprites = {
+        sheet = 3,
+        row = 2,
         east = "phunmart_01_2",
         south = "phunmart_01_3"
     }
@@ -123,6 +129,8 @@ return { --[[
     },
     backgroundImage = "machine-collectors",
     sprites = {
+        sheet = 3,
+        row = 2,
         east = "phunmart_01_2",
         south = "phunmart_01_3"
     }
@@ -147,6 +155,8 @@ return { --[[
     },
     backgroundImage = "machine-collectors",
     sprites = {
+        sheet = 3,
+        row = 2,
         east = "phunmart_01_2",
         south = "phunmart_01_3"
     }
@@ -173,6 +183,8 @@ return { --[[
     },
     backgroundImage = "machine-phat-phoods",
     sprites = {
+        sheet = 1,
+        row = 3,
         east = "phunmart_01_22",
         south = "phunmart_01_23"
     }
@@ -199,6 +211,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 4,
         east = "phunmart_01_6",
         south = "phunmart_01_7"
     }
@@ -214,6 +228,8 @@ return { --[[
         tags = "perks1,perks2"
     },
     sprites = {
+        sheet = 2,
+        row = 6,
         east = "phunmart_01_32",
         south = "phunmart_01_33"
     }
@@ -232,6 +248,8 @@ return { --[[
         tags = "perks2,perks3,boosts1,boosts2"
     },
     sprites = {
+        sheet = 2,
+        row = 7,
         east = "phunmart_01_28",
         south = "phunmart_01_29"
     }
@@ -252,6 +270,8 @@ return { --[[
         tags = "perks3,perks4,boosts3,boosts4"
     },
     sprites = {
+        sheet = 2,
+        row = 8,
         east = "phunmart_01_27",
         south = "phunmart_01_28"
     }
@@ -269,6 +289,8 @@ return { --[[
         tags = "positive,negative"
     },
     sprites = {
+        sheet = 2,
+        row = 1,
         east = "phunmart_01_14",
         south = "phunmart_01_15"
     }
@@ -300,6 +322,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 6,
         east = "phunmart_01_10",
         south = "phunmart_01_11"
     }
@@ -326,6 +350,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 6,
         east = "phunmart_01_10",
         south = "phunmart_01_11"
     }
@@ -341,6 +367,8 @@ return { --[[
         tags = "autozone"
     },
     sprites = {
+        sheet = 1,
+        row = 8,
         east = "phunmart_01_12",
         south = "phunmart_01_13"
     }
@@ -355,6 +383,8 @@ return { --[[
         tags = "medical"
     },
     sprites = {
+        sheet = 2,
+        row = 2,
         east = "phunmart_01_16",
         south = "phunmart_01_17"
     }
@@ -369,6 +399,8 @@ return { --[[
         tags = "electronics"
     },
     sprites = {
+        sheet = 2,
+        row = 3,
         east = "phunmart_01_18",
         south = "phunmart_01_19"
     }
@@ -383,6 +415,8 @@ return { --[[
         tags = "gardening"
     },
     sprites = {
+        sheet = 2,
+        row = 5,
         east = "phunmart_01_24",
         south = "phunmart_01_25"
     }
@@ -397,6 +431,8 @@ return { --[[
         tags = "crafts,paint"
     },
     sprites = {
+        sheet = 1,
+        row = 7,
         east = "phunmart_01_30",
         south = "phunmart_01_31"
     }
@@ -415,6 +451,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 2,
+        row = 4,
         east = "phunmart_01_20",
         south = "phunmart_01_21"
     }
@@ -441,6 +479,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 5,
         east = "phunmart_01_8",
         south = "phunmart_01_9"
     }
@@ -468,6 +508,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 5,
         east = "phunmart_01_8",
         south = "phunmart_01_9"
     }
@@ -495,6 +537,8 @@ return { --[[
         }}
     },
     sprites = {
+        sheet = 1,
+        row = 5,
         east = "phunmart_01_8",
         south = "phunmart_01_9"
     }

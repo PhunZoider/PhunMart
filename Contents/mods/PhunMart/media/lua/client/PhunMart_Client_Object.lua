@@ -8,8 +8,13 @@ function CPhunMartObject:new(luaSystem, globalObject)
     return o
 end
 
+function CPhunMartObject:fromModData(modData)
+    for k, v in pairs(modData) do
+        self[k] = v
+    end
+end
+
 function CPhunMartObject:getObject()
-    print("CPhunMartObject:getObject")
     return self:getIsoObject()
 end
 

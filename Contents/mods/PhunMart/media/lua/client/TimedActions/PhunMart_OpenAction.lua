@@ -30,8 +30,6 @@ function PhunMart_OpenAction:stop()
 end
 
 function PhunMart_OpenAction:perform()
-    print("PhunMart_OpenAction:perform")
-    -- PhunMartShopWindow.OnOpenPanel(self.character, self.shopObj)
     ISBaseTimedAction.perform(self);
 end
 

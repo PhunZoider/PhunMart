@@ -2,7 +2,6 @@ local PM = PhunMart
 CPhunMartSystem = CGlobalObjectSystem:derive("CPhunMartSystem")
 
 function CPhunMartSystem:new()
-    print("CPhunMartSystem:new ---->")
     local o = CGlobalObjectSystem.new(self, "phunmart")
     return o
 end
@@ -12,13 +11,11 @@ function CPhunMartSystem:isValidIsoObject(isoObject)
 end
 
 function CPhunMartSystem:newLuaObject(globalObject)
-    print("CPhunMartSystem:newLuaObject")
     local o = CPhunMartObject:new(self, globalObject)
     return o
 end
 
 function CPhunMartSystem:requestLock(obj, playerObj)
-    print("CPhunMartSystem:requestLock")
     obj:updateFromIsoObject()
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestLock, {
         id = obj.id,
@@ -27,7 +24,6 @@ function CPhunMartSystem:requestLock(obj, playerObj)
 end
 
 function CPhunMartSystem:requestPurchase(obj, itemId, playerObj)
-    print("CPhunMartSystem:requestPurchase")
     self:sendCommand(playerObj, PM.commands.buy, {
         shopId = obj.id,
         itemId = itemId,
@@ -36,7 +32,6 @@ function CPhunMartSystem:requestPurchase(obj, itemId, playerObj)
 end
 
 function CPhunMartSystem:restock(shop, playerObj)
-    print("CPhunMartSystem:restock")
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.restock, {
         shopId = shop.id,
         location = shop.location
@@ -44,7 +39,6 @@ function CPhunMartSystem:restock(shop, playerObj)
 end
 
 function CPhunMartSystem:reroll(shop, target, playerObj)
-    print("CPhunMartSystem:reroll")
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShopGenerate, {
         shopId = shop.id,
         target = target,
@@ -60,13 +54,11 @@ function CPhunMartSystem:close(shop, playerObj)
 end
 
 function CPhunMartSystem:updateShop(location)
-    print("CPhunMartSystem:updateShop")
     local obj = self:getLuaObjectAt(location.x, location.y, location.z)
     obj:updateFromIsoObject()
 end
 
 function CPhunMartSystem:OnServerCommand(command, args)
-    print("CPhunMartSystem:OnServerCommand")
     if CPhunMartCommands[command] then
         CPhunMartCommands[command](args)
     end
@@ -101,7 +93,6 @@ Events.OnObjectLeftMouseButtonUp.Add(function(object, x, y)
     if _lastHighlighted then
         _lastHighlighted:setHighlighted(false, false);
     end
-    print(tostring(object), " ", object:getName())
     if object and CPhunMartSystem:isValidIsoObject(object) then
         object:setHighlighted(true, false);
         _lastHighlighted = object
