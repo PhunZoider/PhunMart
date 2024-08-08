@@ -272,6 +272,19 @@ function PhunMart:formatItem(data)
         condition.boosts = data.boosts or condition.boots or nil
     end
 
+    -- -- transform any v1 prices into v2 format
+    -- for _, v in ipairs(conditions) do
+    --     if v.price then
+    --         local price = v.price
+    --         if type(price) == "table" then
+    --             if not price[1] then
+    --                 -- assert this is old format
+    --                 v.price = {v.price}
+    --             end
+    --         end
+    --     end
+    -- end
+
     --- @type PhunMartItem
     local formatted = {
         key = key, -- unique refernce for this item

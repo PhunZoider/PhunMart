@@ -526,57 +526,69 @@ Conditions.price = function(self, playerObj, item, price, results)
     end
 
     -- aggregate price items
-    for k, v in pairs(price) do
 
-        if not self.currencies[k] then
-            local hooks = self.hooks.currencyLabels or {}
-            for _, v in ipairs(hooks) do
-                if v then
-                    local label, type = v(k)
-                    if label and type then
-                        self.currencies[k] = {
-                            type = type,
-                            label = label
-                        }
+    for k, v in pairs(price) do
+        for _, cur in ipairs(v.currencies) do
+
+            if not self.currencies[cur] then
+                local hooks = self.hooks.currencyLabels or {}
+                for _, v in ipairs(hooks) do
+                    if v then
+                        local label, type = v(cur)
+                        if label and type then
+                            self.currencies[cur] = {
+                                type = type,
+                                label = label
+                            }
+                        end
                     end
                 end
             end
-        end
 
-        --- cache information about this currency
-        if not self.currencies[k] then
+            --- cache information about this currency
 
-            local itemInstance = getScriptManager():getItem(k)
+            if not self.currencies[cur] then
 
-            if itemInstance then
-                self.currencies[k] = {
-                    type = "item",
-                    label = itemInstance:getDisplayName()
-                }
-            elseif not itemInstance then
-                -- is this a trait?
-                local trait = TraitFactory.getTrait(k)
-                if trait then
-                    self.currencies[k] = {
-                        type = "trait",
-                        label = trait:getLabel()
+                local itemInstance = getScriptManager():getItem(cur)
+
+                if itemInstance then
+                    self.currencies[cur] = {
+                        type = "item",
+                        label = itemInstance:getDisplayName()
+                    }
+                elseif not itemInstance then
+                    -- is this a trait?
+                    local trait = TraitFactory.getTrait(cur)
+                    if trait then
+                        self.currencies[cur] = {
+                            type = "trait",
+                            label = trait:getLabel()
+                        }
+                    end
+                else
+                    self.currencies[cur] = {
+                        type = "unknown",
+                        label = cur
                     }
                 end
-            else
-                self.currencies[k] = {
-                    type = "unknown",
-                    label = k
+
+            end
+
+            if not satisfied[k] then
+                satisfied[k] = {
+                    value = v.value,
+                    formattedValue = PhunTools:formatWholeNumber(v.value),
+                    currencies = {}
                 }
             end
 
-        end
+            table.insert(satisfied[k].currencies, {
+                key = cur,
+                type = self.currencies[cur].type,
+                label = self.currencies[cur].label
+            })
 
-        satisfied[k] = {
-            value = v,
-            formattedValue = PhunTools:formatWholeNumber(price[k]),
-            type = self.currencies[k].type,
-            label = self.currencies[k].label
-        }
+        end
 
     end
 
@@ -591,24 +603,38 @@ Conditions.price = function(self, playerObj, item, price, results)
 
     -- deduct items that player has in inventory
     for k, v in pairs(satisfied) do
-        if v.type == "item" and v.value > 0 then
-            local inv = playerObj:getInventory()
-            local count = inv:getItemCountRecurse(k) or 0
-            if count > v.value then
-                v.value = 0
-            else
-                v.value = v.value - count
-            end
-        elseif v.type == "trait" and v.value > 0 then
-            -- player is "paying" with a trait
-            if playerObj:HasTrait(k) then
-                v.value = v.value - 1
+        for _, cur in ipairs(v.currencies) do
+            if cur.type == "item" and v.value > 0 then
+                local inv = playerObj:getInventory()
+                local count = inv:getItemCountRecurse(cur.key) or 0
+                if count > v.value then
+                    v.value = 0
+                else
+                    v.value = v.value - count
+                end
+            elseif v.type == "trait" and v.value > 0 then
+                -- player is "paying" with a trait
+                if playerObj:HasTrait(cur.key) then
+                    v.value = v.value - 1
+                end
             end
         end
     end
 
     -- check if anll items can be satisfied
     for k, v in pairs(satisfied) do
+
+        local labels = {}
+        local l = {}
+        -- concat all the "ors" and weed out any duplicates
+        -- eg from Base.BatmanPlushie and Base.BatmanPlushie2 (which both have the name "Batman")
+        for _, cur in ipairs(v.currencies) do
+            if not l[cur.label] then
+                table.insert(labels, cur.label)
+                l[cur.label] = true
+            end
+        end
+        local label = table.concat(labels, " or ")
         if v.value > 0 then
             table.insert(results, {
                 passed = false,
@@ -618,8 +644,8 @@ Conditions.price = function(self, playerObj, item, price, results)
                 value = v.formattedValue,
                 gap = v.value,
                 text = v.text,
-                richText = RICH_PREFIX_RED .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, v.label),
-                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), v.label)
+                richText = RICH_PREFIX_RED .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, label),
+                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), label)
             })
             hasPassed = false
         else
@@ -630,7 +656,7 @@ Conditions.price = function(self, playerObj, item, price, results)
                 key = k,
                 gap = 0,
                 value = v.formattedValue,
-                richText = RICH_PREFIX .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, v.label),
+                richText = RICH_PREFIX .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, label),
                 text = v.text
             })
         end

@@ -226,23 +226,27 @@ function PhunMart:generateShopItems(shopInstance, cumulativeModel)
 
                     local p = {}
                     for kk, vv in pairs(v.price) do
+                        p[kk] = {
+                            currencies = {},
+                            value = 0
+                        }
 
-                        local priceKey = kk
-                        local value = vv
-
-                        if kk == "currency" then
-                            priceKey = shop.currency or "Base.Money"
+                        p[kk].currencies = PhunTools:splitString(kk, "/")
+                        for i, cur in ipairs(p[kk].currencies) do
+                            if cur == "currency" then
+                                p[kk].currencies[i] = shop.currency or "Base.Money"
+                            end
                         end
+
                         -- local priced = vv
                         local basePrice = pool.basePrice or shop.basePrice or 0
 
                         if type(vv) == "table" then
-                            value = (vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10)
+                            p[kk].value = basePrice + ((vv.base or 0) + ZombRand(vv.min or 1, vv.max or 10))
                         else
-                            value = vv
+                            p[kk].value = basePrice + vv
                         end
 
-                        p[priceKey] = basePrice + value
                     end
 
                     instance.conditions[i].price = p
