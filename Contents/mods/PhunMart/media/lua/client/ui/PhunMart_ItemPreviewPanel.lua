@@ -110,7 +110,7 @@ function PhunMartUIItemPreviewPanel:setItem(item, display)
             self.previewPanel.overlay = nil
         end
         if item.display.type == "VEHICLE" then
-            if self.previewPanel3d.vehicleName ~= display.label then
+            if self.previewPanel3d.vehicleName ~= item.display.label then
                 if not self.previewPanel3d.initialized then
                     self.previewPanel3d.initialized = true
                     self.previewPanel3d.javaObject:fromLua1("setDrawGrid", false)
@@ -120,7 +120,7 @@ function PhunMartUIItemPreviewPanel:setItem(item, display)
                     self.previewPanel3d.javaObject:fromLua2("dragView", 0, 30)
                     self.previewPanel3d.javaObject:fromLua1("setZoom", 6)
                 end
-                self.previewPanel3d.vehicleName = display.label
+                self.previewPanel3d.vehicleName = item.display.label
                 self.previewPanel3d.javaObject:fromLua2("setVehicleScript", "vehicle", self.previewPanel3d.vehicleName)
             end
         end

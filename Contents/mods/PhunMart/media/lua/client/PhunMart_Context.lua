@@ -8,9 +8,9 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
     local player = getSpecificPlayer(playerObj);
 
     local found = nil
-
+    local square = nil
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
-        local square = wObj:getSquare()
+        square = wObj:getSquare()
         if square then
             found = CPhunMartSystem.instance:getLuaObjectOnSquare(square)
             break
@@ -26,11 +26,17 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
         local toolTip = ISWorldObjectContextMenu.addToolTip();
         toolTip:setVisible(false);
         toolTip:setName(found.label or "View Vending Machine");
-        toolTip.description = (found.lockedBy and found.lockedBy ~= player:getUsername() and
-                                  "This vending machine is currently in use by " .. found.lockedBy) or ""
+        option.notAvailable = false
+        if found.lockedBy and found.lockedBy ~= player:getUsername() then
+            toolTip.description = (found.lockedBy and found.lockedBy ~= player:getUsername() and
+                                      "This vending machine is currently in use by " .. found.lockedBy) or ""
+            option.notAvailable = true
+        elseif found.requiresPower and not square:haveElectricity() then
+            toolTip.description = "This vending machine requires power."
+            option.notAvailable = true
+        end
 
         option.toolTip = toolTip;
-        option.notAvailable = found.lockedBy and found.lockedBy ~= player:getUsername()
 
     end
 
