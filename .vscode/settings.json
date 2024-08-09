@@ -5,7 +5,7 @@
             {
                 "match": ".*",
                 "isAsync": true,
-                "cmd": "xcopy ${workspaceFolder}\\Contents ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart\\Contents /Y /I /E /F /EXCLUDE:xclude"
+                "cmd": "xcopy ${workspaceFolder}\\Contents ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2\\Contents /Y /I /E /F /EXCLUDE:xclude"
             },
             {
                 "match": "Contents\\.*",
