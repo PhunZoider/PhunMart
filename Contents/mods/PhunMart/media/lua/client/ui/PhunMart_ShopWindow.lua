@@ -399,6 +399,10 @@ function UI:prerender()
     local selected = self.tabPanel:getSelected()
     if selected then
         local item = shop.items[selected.text]
+        if not item then
+            self.disabledBuyButton:setVisible(true)
+            return
+        end
         self.preview:setItem(item, selected.item)
         self.pricePanel:setItem(item, selected.item)
         local canBuy = self.pricePanel.canBuy.passed == true

@@ -520,6 +520,8 @@ Conditions.price = function(self, playerObj, item, price, results)
     --- @type table<string, {value: number, formattedValue: string, label: string}>
     local satisfied = {}
 
+    local allocation = {}
+
     if not self.currencies then
         --- @type table<string, {type: string, label: string, type: string}>
         self.currencies = {}
@@ -596,11 +598,12 @@ Conditions.price = function(self, playerObj, item, price, results)
     if #hooks then
         for _, v in ipairs(hooks) do
             if v then
-                v(playerObj, item, satisfied)
+                v(playerObj, item, satisfied, allocation)
             end
         end
     end
-
+    local all = allocation
+    PhunTools:printTable(allocation)
     -- deduct items that player has in inventory
     for k, v in pairs(satisfied) do
         for _, cur in ipairs(v.currencies) do
@@ -608,20 +611,35 @@ Conditions.price = function(self, playerObj, item, price, results)
                 local inv = playerObj:getInventory()
                 local count = inv:getItemCountRecurse(cur.key) or 0
                 if count > v.value then
+                    table.insert(allocation, {
+                        currency = cur.key,
+                        type = "item",
+                        value = v.value
+                    })
                     v.value = 0
                 else
+                    table.insert(allocation, {
+                        currency = cur.key,
+                        type = "item",
+                        value = v.value - count
+                    })
                     v.value = v.value - count
                 end
             elseif v.type == "trait" and v.value > 0 then
                 -- player is "paying" with a trait
                 if playerObj:HasTrait(cur.key) then
+                    table.insert(allocation, {
+                        currency = cur.key,
+                        type = "trait",
+                        value = 1
+                    })
                     v.value = v.value - 1
                 end
             end
         end
     end
 
-    -- check if anll items can be satisfied
+    -- check if all items can be satisfied
     for k, v in pairs(satisfied) do
 
         local labels = {}
@@ -645,7 +663,8 @@ Conditions.price = function(self, playerObj, item, price, results)
                 gap = v.value,
                 text = v.text,
                 richText = RICH_PREFIX_RED .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, label),
-                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), label)
+                tooltipText = getText("IGUI_PhunMart.PriceDescShortage", PhunTools:formatWholeNumber(v.value), label),
+                allocation = allocation
             })
             hasPassed = false
         else
@@ -657,7 +676,8 @@ Conditions.price = function(self, playerObj, item, price, results)
                 gap = 0,
                 value = v.formattedValue,
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.PriceDesc", v.formattedValue, label),
-                text = v.text
+                text = v.text,
+                allocation = allocation
             })
         end
     end

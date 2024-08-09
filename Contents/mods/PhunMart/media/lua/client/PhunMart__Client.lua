@@ -84,36 +84,30 @@ function PhunMart:purchaseRequest(playerObj, shopKey, item)
         for _, v in ipairs(canBuy.conditions[1]) do
 
             if v.type == "price" then
-
-                local key = v.key
-                local val = tonumber(v.value)
-
-                local hooks = self.hooks.prePurchase
-                for _, v in ipairs(hooks) do
-                    if v then
-                        -- should mutate val if handled in hook
-                        v(playerObj, key, val)
-                    end
-                end
-
-                if self.currencies[key] then
-                    if self.currencies[key].type == "trait" then
-                        -- spending a trait
-                        playerObj:getTraits():remove(key)
-                    elseif self.currencies[key].type == "item" and val > 0 then
-                        -- spending an item
-                        local item = getScriptManager():getItem(key)
+                local allocations = v.allocations or {}
+                for _, a in ipairs(allocations) do
+                    if a.type == "trait" then
+                        playerObj:getTraits():remove(a.currency)
+                    elseif a.type == "item" and a.value > 0 then
+                        local item = getScriptManager():getItem(a.currency)
                         if item then
-                            local remaining = val
+                            local remaining = a.value
                             -- asserting we have enough to consume or canBuy wouldn't have passed?
                             for i = 1, remaining do
-                                local invItem = playerObj:getInventory():getItemFromTypeRecurse(key)
+                                local invItem = playerObj:getInventory():getItemFromTypeRecurse(a.currency)
                                 if invItem then
                                     invItem:getContainer():DoRemoveItem(invItem)
-                                    val = val - 1
                                 end
                             end
-
+                        end
+                    else
+                        -- assert its a hook
+                        local hooks = self.hooks.prePurchase
+                        for _, v in ipairs(hooks) do
+                            if v then
+                                -- should mutate val if handled in hook
+                                v(playerObj, a.type, a.currency, a.value)
+                            end
                         end
                     end
                 end

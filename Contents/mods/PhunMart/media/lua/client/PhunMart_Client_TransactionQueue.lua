@@ -25,14 +25,34 @@ function PhunMart:completeTransaction(args)
 
         if playerObj then
             local hooks = self.hooks.purchase
+            local canBuy = self:canBuy(playerObj, args.item)
 
-            if hooks and #hooks > 0 then
-                if args.item.conditions[1] and args.item.conditions[1].price then
-                    for key, val in pairs(args.item.conditions[1].price) do
-                        for _, v in ipairs(hooks) do
-                            if v then
-                                -- should mutate val if handled in hook
-                                v(playerObj, key, tonumber(val))
+            for _, v in ipairs(canBuy.conditions[1]) do
+
+                if v.type == "price" then
+                    local allocations = v.allocation or {}
+                    for _, a in ipairs(allocations) do
+                        if a.type == "trait" then
+                            playerObj:getTraits():remove(a.currency)
+                        elseif a.type == "item" and a.value > 0 then
+                            local item = getScriptManager():getItem(a.currency)
+                            if item then
+                                local remaining = a.value
+                                for i = 1, remaining do
+                                    local invItem = playerObj:getInventory():getItemFromTypeRecurse(a.currency)
+                                    if invItem then
+                                        invItem:getContainer():DoRemoveItem(invItem)
+                                    end
+                                end
+                            end
+                        else
+                            -- assert its a hook
+                            local hooks = self.hooks.purchase
+                            for _, v in ipairs(hooks) do
+                                if v then
+                                    -- should mutate val if handled in hook
+                                    v(playerObj, a.type, a.currency, a.value)
+                                end
                             end
                         end
                     end
