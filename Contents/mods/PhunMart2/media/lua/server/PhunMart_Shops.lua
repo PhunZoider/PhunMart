@@ -247,7 +247,6 @@ function PhunMart:formatShop(data)
         -- minimum distance between duplicate instances
         minDistance = data.minDistance or base.minDistance,
         type = data.type or base.type or nil,
-        broken = false,
         sprites = base.sprites or {},
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
@@ -265,13 +264,6 @@ function PhunMart:formatShop(data)
         for k, v in pairs(data.zones) do
             formatted.zones[k] = v
         end
-    end
-
-    if base.broken ~= nil then
-        formatted.broken = base.broken
-    end
-    if data.broken ~= nil then
-        data.broken = data.broken
     end
 
     if formatted.reservations and #formatted.reservations > 0 then
@@ -314,7 +306,7 @@ function PhunMart:formatShop(data)
     --     end
     -- end
 
-    if not formatted.abstract and not formatted.broken then
+    if not formatted.abstract then
         populatePoolItems(formatted.pools)
     end
 

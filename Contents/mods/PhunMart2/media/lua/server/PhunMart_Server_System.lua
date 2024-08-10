@@ -1,7 +1,4 @@
--- ***********************************************************
--- **                    THE INDIE STONE                    **
--- ***********************************************************
-if isClient() then
+if not isServer() then
     return
 end
 local PM = PhunMart

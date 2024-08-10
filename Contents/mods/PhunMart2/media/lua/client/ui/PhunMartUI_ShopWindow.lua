@@ -440,7 +440,7 @@ function UI:render()
 
     if self.shopObj and self.shopObj.requiresPower then
         local text = getText("IGUI_PhunMart.isPowered")
-        if self.shopObj.isUnplugged then
+        if self.shopObj:insufficientPower() then
             text = getText("IGUI_PhunMart.isNotPowered")
         end
         local width = getTextManager():MeasureStringX(UIFont.Small, text)

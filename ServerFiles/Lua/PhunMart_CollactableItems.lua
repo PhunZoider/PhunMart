@@ -201,7 +201,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["BZMClothing.SpiffoBatman"] = 2
+        ["BZMClothing.SpiffoBatman/Base.BatmanPlushie"] = 2
     },
     mod = "MonmouthCounty_new"
 }, {

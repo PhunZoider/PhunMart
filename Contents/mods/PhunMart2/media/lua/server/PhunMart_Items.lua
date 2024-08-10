@@ -337,13 +337,21 @@ function PhunMart:loadFilesForItemQueue()
     end
     for _, v in ipairs(files or {}) do
         -- add to the queue
-        self:queueFileForItemProcessing(v)
+        local name = string.trim(v)
+        print("Adding: ", v, " to item queue")
+        if string.len(v) > 0 then
+            self:queueFileForItemProcessing(v)
+        end
     end
     triggerEvent(self.events.OnItemQueueFilesReadyToProcess)
 end
 
 -- iterate through file queued and add contents to transform queue
 function PhunMart:processFilesToItemQueue()
+
+    print("Processing files to item queue")
+    PhunTools:printTable(self.loaders.itemFiles)
+
     for _, v in ipairs(self.loaders.itemFiles) do
         v.status = "processing"
         -- load the contents of the file into queue

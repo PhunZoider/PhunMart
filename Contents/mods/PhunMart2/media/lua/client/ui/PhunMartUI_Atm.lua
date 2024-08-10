@@ -1,4 +1,4 @@
-require "ui/PhunMart_UI_Core"
+require "ui/PhunMartUI_Core"
 local pickle = PhunMartShopUI
 
 if not isClient() then

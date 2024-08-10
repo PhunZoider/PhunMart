@@ -1,3 +1,6 @@
+if not isClient() then
+    return
+end
 PhunMartAdminUI = ISPanel:derive("PhunMartAdminUI");
 PhunMartAdminUI.instance = nil;
 local PhunMart = PhunMart

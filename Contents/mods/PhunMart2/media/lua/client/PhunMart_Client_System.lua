@@ -1,3 +1,6 @@
+if not isClient() then
+    return
+end
 local PM = PhunMart
 CPhunMartSystem = CGlobalObjectSystem:derive("CPhunMartSystem")
 

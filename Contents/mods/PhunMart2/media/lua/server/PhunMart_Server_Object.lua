@@ -1,4 +1,4 @@
-if isClient() then
+if not isServer() then
     return
 end
 

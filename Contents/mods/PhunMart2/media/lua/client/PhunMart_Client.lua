@@ -1,7 +1,6 @@
 if not isClient() then
     return
 end
-require "PhunMart_UX"
 
 local PhunMart = PhunMart
 

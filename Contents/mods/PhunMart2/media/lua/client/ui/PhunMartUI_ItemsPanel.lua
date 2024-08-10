@@ -59,7 +59,7 @@ end
 
 function PhunMartUIItemsPanel:getSelected()
     local shop = self.parent and self.parent.shopObj
-    if shop and not shop.isUnplugged then
+    if shop and not shop:insufficientPower() then
         if self.tabPanel and self.tabPanel.activeView then
             return self.tabPanel.activeView.view.items[self.tabPanel.activeView.view.selected]
         end
@@ -321,7 +321,7 @@ function PhunMartUIItemsPanel:prerender()
     ISPanel.prerender(self)
 
     local shop = self.parent and self.parent.shopObj
-    self.noPower:setVisible(shop and shop.isUnplugged == true)
+    self.noPower:setVisible(shop and shop:insufficientPower())
 
 end
 

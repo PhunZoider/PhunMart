@@ -1,4 +1,3 @@
-local sandbox = SandboxVars.PhunMart
 PhunMart = {
     name = "PhunMart",
     inied = false,

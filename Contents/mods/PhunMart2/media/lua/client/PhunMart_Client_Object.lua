@@ -1,3 +1,6 @@
+if not isClient() then
+    return
+end
 require "Map/CGlobalObject"
 local PM = PhunMart
 CPhunMartObject = CGlobalObject:derive("CPhunMartObject")
@@ -29,4 +32,16 @@ end
 function CPhunMartObject:open(playerObj)
     CPhunMartSystem.instance:requestLock(self, playerObj)
     PhunMart_OpenAction:openShop(playerObj, self)
+end
+
+function CPhunMartObject:insufficientPower()
+    if self.requiresPower then
+        if not self:getSquare():haveElectricity() then
+            if SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() >
+                SandboxVars.ElecShutModifier then
+                return true
+            end
+        end
+    end
+    return false
 end

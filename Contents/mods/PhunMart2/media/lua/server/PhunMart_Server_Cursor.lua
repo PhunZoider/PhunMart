@@ -1,3 +1,6 @@
+if not isServer() then
+    return
+end
 require "BuildingObjects/ISBuildingObject"
 
 -- this class extend ISBuildingObject, it's a class to help you drag around/place an item in the world

@@ -1,3 +1,6 @@
+if not isServer() then
+    return
+end
 local PhunMart = PhunMart
 
 function PhunMart:getAllVehicles(name)

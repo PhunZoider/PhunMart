@@ -411,8 +411,7 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
             y = location.y,
             z = location.z
         },
-        tabs = {},
-        isUnplugged = chosenShopDef.requiresPower == true and sandbox.PoweredMachinesEnabled == true
+        tabs = {}
     }
 
     shopInstance.items = self:generateShopItems(shopInstance, sandbox.CumulativeItemGeneration == true)

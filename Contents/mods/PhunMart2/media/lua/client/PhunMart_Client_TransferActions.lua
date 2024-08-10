@@ -1,3 +1,6 @@
+if not isClient() then
+    return
+end
 require "TimedActions/ISInventoryTransferAction"
 -- Hook the original New Inventory Transfer Method
 local originalNewInventoryTransaferAction = ISInventoryTransferAction.new

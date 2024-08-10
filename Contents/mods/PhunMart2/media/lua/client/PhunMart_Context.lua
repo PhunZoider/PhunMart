@@ -23,17 +23,27 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
             found:open(player)
         end)
 
-        local toolTip = ISWorldObjectContextMenu.addToolTip();
+        local toolTip = ISToolTip:new();
         toolTip:setVisible(false);
         toolTip:setName(found.label or "View Vending Machine");
         option.notAvailable = false
+
         if found.lockedBy and found.lockedBy ~= player:getUsername() then
             toolTip.description = (found.lockedBy and found.lockedBy ~= player:getUsername() and
                                       "This vending machine is currently in use by " .. found.lockedBy) or ""
             option.notAvailable = true
-        elseif found.requiresPower and not square:haveElectricity() then
-            toolTip.description = "This vending machine requires power."
-            option.notAvailable = true
+        elseif found.requiresPower then
+            if not square:haveElectricity() then
+                if SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() >
+                    SandboxVars.ElecShutModifier then
+                    toolTip.description = "This vending machine requires power."
+                    option.notAvailable = true
+                end
+            end
+        end
+
+        if option.notAvailable and isAdmin() then
+            option.notAvailable = false
         end
 
         option.toolTip = toolTip;

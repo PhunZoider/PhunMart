@@ -21,19 +21,6 @@ return { --[[
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18",
               "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
 }, {
-    label = "Broken",
-    broken = true,
-    distance = 0,
-    key = "broken-shop",
-    inherits = "base-shop",
-
-    pools = {
-        items = {}
-    },
-    minDistance = 1,
-    probability = 5,
-    backgroundImage = "machine-broken"
-}, {
     label = "Good Phoods",
     key = "shop-good-foods",
     inherits = "base-shop",
