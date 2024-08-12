@@ -92,9 +92,49 @@ return {{
     }},
     mod = "MonmouthCounty_new"
 }, {
+    inherits = "base-collectors-2",
+    display = {
+        label = "MonmouthClothing.Hat_Silent_Bob",
+        overlay = "traiter-token-overlay"
+    },
+    price = {
+        ["MonmouthClothing.Hat_Silent_Bob"] = 1
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }},
+    mod = "MonmouthCounty_new"
+}, {
+    inherits = "base-collectors-2",
+    display = {
+        label = "Base.StitchesPlushie",
+        overlay = "traiter-token-overlay"
+    },
+    price = {
+        ["Base.StitchesPlushie"] = 3
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }}
+}, {
+    inherits = "base-collectors-1",
+    display = {
+        label = "Base.StitchesPlushie",
+        overlay = "traiter-token-overlay"
+    },
+    price = {
+        ["Base.StitchesPlushie"] = 3
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }}
+}, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_01",
+        label = "Tikitown.Baseball_Card_04",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -102,13 +142,13 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_01"] = 2
+        ["Tikitown.Baseball_Card_04"] = 2
     },
     mod = "tikitown"
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_06",
+        label = "Tikitown.Baseball_Card_07",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -116,13 +156,13 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_06"] = 2
+        ["Tikitown.Baseball_Card_07"] = 2
     },
     mod = "tikitown"
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_15",
+        label = "Tikitown.Baseball_Card_14",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -130,17 +170,17 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_15"] = 2
+        ["Tikitown.Baseball_Card_14"] = 2
     },
     mod = "tikitown"
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_23",
+        label = "Tikitown.Baseball_Card_19",
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["Tikitown.Baseball_Card_23"] = 2
+        ["Tikitown.Baseball_Card_19"] = 2
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -150,7 +190,7 @@ return {{
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_29",
+        label = "Tikitown.Baseball_Card_25",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -158,13 +198,13 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_29"] = 2
+        ["Tikitown.Baseball_Card_25"] = 2
     },
     mod = "tikitown"
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_34",
+        label = "Tikitown.Baseball_Card_32",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -172,7 +212,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_34"] = 2
+        ["Tikitown.Baseball_Card_32"] = 2
     },
     mod = "tikitown"
 }, {
@@ -189,6 +229,51 @@ return {{
         ["Tikitown.Sorted_Full_Baseball_Card_Box"] = 1
     },
     mod = "tikitown"
+
+}, {
+    inherits = "base-collectors-1",
+    display = {
+        label = "Tsarcraft.CassetteBananaramaVenus",
+        overlay = "traiter-token-overlay"
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }},
+    price = {
+        ["Tsarcraft.CassetteBananaramaVenus"] = 1
+    },
+    mod = "Music_Hits_And_More"
+
+}, {
+    inherits = "base-collectors-2",
+    display = {
+        label = "Tsarcraft.VinylCyndiLauperGirlsJustWannaHaveFun",
+        overlay = "traiter-token-overlay"
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }},
+    price = {
+        ["Tsarcraft.VinylCyndiLauperGirlsJustWannaHaveFun"] = 2
+    },
+    mod = "Music_Hits_And_More"
+
+}, {
+    inherits = "base-collectors-3",
+    display = {
+        label = "Tsarcraft.CassetteEddieMurphyPartyAlltheTime",
+        overlay = "traiter-token-overlay"
+    },
+    receive = {{
+        label = "PhunMart.TraiterToken",
+        type = "ITEM"
+    }},
+    price = {
+        ["Tsarcraft.CassetteEddieMurphyPartyAlltheTime"] = 3
+    },
+    mod = "Music_Hits_And_More"
 
 }, {
     inherits = "base-collectors-2",

@@ -50,6 +50,19 @@ end)
 -- 01_16
 -- 01_18
 
+local spriteMap = {
+    ["location_shop_accessories_01_29"] = "north",
+    ["location_shop_accessories_01_31"] = "north",
+    ["location_shop_accessories_01_17"] = "south",
+    ["location_shop_accessories_01_19"] = "south",
+    ["location_shop_accessories_01_16"] = "east",
+    ["location_shop_accessories_01_18"] = "east",
+    ["location_shop_accessories_01_30"] = "west",
+    ["location_shop_accessories_01_28"] = "west",
+    ["DylansRandomFurniture02_23"] = "south",
+    ["DylansRandomFurniture02_22"] = "east"
+}
+
 Events.OnFillContainer.Add(function(roomtype, containertype, container)
     -- print("OnFillContainer: " .. tostring(roomtype) .. " " .. tostring(containertype))
     if containertype and (containertype == "vendingpop" or containertype == "vendingsnack") then
@@ -59,30 +72,16 @@ Events.OnFillContainer.Add(function(roomtype, containertype, container)
             if not data or not data.PhunMart then
                 -- do we convert to machines?
 
-                local rng = ZombRand(1, 10)
+                local rng = ZombRand(1, 100)
 
-                if rng < 3 then
+                if rng < 20 then
                     data = {
                         tested = true
                     }
                 else
                     -- if containertype == "vendingpop" then
                     local spriteName = parent:getSprite():getName()
-                    local direction = nil
-
-                    if spriteName == "location_shop_accessories_01_17" then
-                        -- south facing machine
-                        direction = "south"
-                    elseif spriteName == "location_shop_accessories_01_19" then
-                        -- south facing machine
-                        direction = "south"
-                    elseif spriteName == "location_shop_accessories_01_16" then
-                        -- east facing
-                        direction = "east"
-                    elseif spriteName == "location_shop_accessories_01_18" then
-                        -- east facing
-                        direction = "east"
-                    end
+                    local direction = spriteMap[spriteName] or nil
 
                     if direction ~= nil then
                         local square = parent:getSquare()
