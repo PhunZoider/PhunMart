@@ -276,7 +276,7 @@ function PhunMart:getShopListFromKey(location)
     local totalProbability = 0
 
     for k, v in pairs(self.defs.shops) do
-        if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract then
+        if v.enabled and (v.reservations == nil or v.reservations == false) and not v.abstract and v.generate ~= false then
 
             local minDistance = (v.minDistance or 0)
             local distanceKey = v.type or v.key

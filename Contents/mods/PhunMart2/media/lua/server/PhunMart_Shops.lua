@@ -248,6 +248,7 @@ function PhunMart:formatShop(data)
         minDistance = data.minDistance or base.minDistance,
         type = data.type or base.type or nil,
         sprites = base.sprites or {},
+        generate = (data.generate or base.generate) ~= false,
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false

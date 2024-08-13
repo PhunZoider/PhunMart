@@ -150,6 +150,7 @@ return { --[[
 }, {
     key = "shop-phat-foods",
     inherits = "base-shop",
+    generate = false,
     type = "FOOD",
     label = "Phat Phoods",
     pools = {
@@ -199,6 +200,34 @@ return { --[[
     },
     sprites = {
         sheet = 1,
+        row = 4,
+        east = "phunmart_01_6",
+        south = "phunmart_01_7"
+    }
+}, {
+
+    key = "shop-books",
+    inherits = "base-shop",
+    type = "BOOKS",
+    backgroundImage = "machine-sheds-and-commoners",
+    basePrice = 45,
+    pools = {
+        items = {{
+            filters = {
+                tags = "literature,litmisc"
+            }
+        }, {
+            filters = {
+                tags = "literature,magazine"
+            }
+        }, {
+            filters = {
+                tags = "base-literature-book"
+            }
+        }}
+    },
+    sprites = {
+        sheet = 3,
         row = 4,
         east = "phunmart_01_6",
         south = "phunmart_01_7"

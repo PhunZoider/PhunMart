@@ -5,11 +5,11 @@ return {{
     tags = "literature",
     inventory = {
         min = 1,
-        max = 5
+        max = 3
     },
     price = {
         currency = {
-            base = 1,
+            base = 45,
             min = 3,
             max = 5
         }
