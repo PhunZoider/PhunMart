@@ -350,7 +350,9 @@ function SPhunMartSystem:checkLocks()
 
     for k, v in pairs(doRemove) do
         local obj = self:getLuaObjectAt(v.location.x, v.location.y, v.location.z)
-        obj:unlock()
+        if obj then
+            obj:unlock()
+        end
     end
 end
 

@@ -222,7 +222,7 @@ return { --[[
             }
         }, {
             filters = {
-                tags = "base-literature-book"
+                tags = "literature,book"
             }
         }}
     },

@@ -291,7 +291,7 @@ return {{
         }
     },
     price = {
-        currency = 600
+        currency = 400
     }
 }, {
     inherits = "base-boost:basic2",
@@ -326,7 +326,7 @@ return {{
         }
     },
     price = {
-        currency = 1800
+        currency = 900
     }
 }, {
     inherits = "base-boost:basic3",
@@ -361,7 +361,7 @@ return {{
         }
     },
     price = {
-        currency = 6000
+        currency = 3000
     }
 }, {
     inherits = "base-boost:basic4",
@@ -427,7 +427,7 @@ return {{
         }
     },
     price = {
-        currency = 600
+        currency = 400
     }
 }, {
     inherits = "base-boost:basic2",
@@ -462,7 +462,7 @@ return {{
         }
     },
     price = {
-        currency = 1800
+        currency = 900
     }
 }, {
     inherits = "base-boost:basic3",
@@ -497,7 +497,7 @@ return {{
         }
     },
     price = {
-        currency = 6000
+        currency = 3000
     }
 }, {
     inherits = "base-boost:basic4",

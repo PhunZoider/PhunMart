@@ -34,7 +34,7 @@ return {{
     },
     inventory = false,
     price = {
-        ["Base.GoldScraps"] = 75
+        ["Base.GoldScraps"] = 15
     },
     mod = "PhunStuff",
     receive = {{
@@ -53,7 +53,7 @@ return {{
     },
     inventory = false,
     price = {
-        ["Base.SilverScraps"] = 25
+        ["Base.SilverScraps"] = 5
     },
     mod = "PhunStuff",
     receive = {{

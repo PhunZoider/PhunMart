@@ -60,7 +60,23 @@ local spriteMap = {
     ["location_shop_accessories_01_30"] = "west",
     ["location_shop_accessories_01_28"] = "west",
     ["DylansRandomFurniture02_23"] = "south",
-    ["DylansRandomFurniture02_22"] = "east"
+    ["DylansRandomFurniture02_22"] = "east",
+    -- LC
+    ["LC_Random_20"] = "south",
+    ["LC_Random_23"] = "south",
+    ["LC_Random_28"] = "south",
+    ["LC_Random_32"] = "south",
+
+    ["LC_Random_21"] = "east",
+    ["LC_Random_22"] = "east",
+    ["LC_Random_29"] = "east",
+    ["LC_Random_33"] = "east",
+
+    ["LC_Random_30"] = "north",
+    ["LC_Random_34"] = "north",
+
+    ["LC_Random_31"] = "west",
+    ["LC_Random_35"] = "west"
 }
 
 Events.OnFillContainer.Add(function(roomtype, containertype, container)
