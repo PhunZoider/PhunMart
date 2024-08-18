@@ -35,6 +35,10 @@ Commands[PM.commands.requestShopDefs] = function(playerObj, args)
     })
 end
 
+Commands[PM.commands.addFromSprite] = function(playerObj, args)
+    SPhunMartSystem.instance:addFromSprite(args.location.x, args.location.y, args.location.z, args.sprite)
+end
+
 Commands[PM.commands.requestItemDefs] = function(playerObj, args)
     -- because this can be so massive, we will need to chunk it down
     local row = 0

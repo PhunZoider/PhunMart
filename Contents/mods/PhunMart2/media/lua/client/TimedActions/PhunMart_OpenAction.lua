@@ -152,9 +152,11 @@ function PhunMart_OpenAction:openShop(playerObj, shopObj)
     -- grab the first free one
     for i = 1, #squares do
         local s = getSquare(squares[i].x, squares[i].y, squares[i].z)
-        if pSquare == s or s:isFree(true) then
-            square = s
-            break
+        if s then
+            if pSquare == s or s:isFree(true) then
+                square = s
+                break
+            end
         end
     end
 

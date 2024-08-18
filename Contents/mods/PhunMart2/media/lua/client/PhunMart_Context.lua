@@ -13,7 +13,22 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
         square = wObj:getSquare()
         if square then
             found = CPhunMartSystem.instance:getLuaObjectOnSquare(square)
-            break
+            if found then
+                break
+            end
+        end
+        local name = wObj.getSprite and wObj:getSprite():getName()
+        if name and PhunTools:startsWith(name, "phunmart_") then
+            print("Orphaned vending machine found at " .. square:getX() .. ", " .. square:getY())
+            local args = {
+                location = {
+                    x = square:getX(),
+                    y = square:getY(),
+                    z = square:getZ()
+                },
+                sprite = name
+            }
+            sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
         end
     end
 
@@ -72,15 +87,18 @@ Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, context, items)
                 if modData.PhunMart and modData.PhunMart.text then
                     text = modData.PhunMart.text
                 end
-                context:addOptionOnTop(getText("IGUI_PhunMart.CallForX", text), playerObj, function()
-                    local building = playerObj:getBuilding()
-                    if building then
-                        playerObj:Say(getText("IGUI_PhunMart.CannotCallForXInside", text))
-                    else
-                        sendClientCommand(playerObj, PhunMart.name, PhunMart.commands.spawnVehicle, modData.PhunMart)
-                        playerObj:getInventory():DoRemoveItem(item)
-                    end
-                end)
+                if modData.PhunMart and modData.PhunMart.playername and modData.PhunMart.playername ==
+                    playerObj:getUsername() then
+                    context:addOptionOnTop(getText("IGUI_PhunMart.CallForX", text), playerObj, function()
+                        local building = playerObj:getBuilding()
+                        if building then
+                            playerObj:Say(getText("IGUI_PhunMart.CannotCallForXInside", text))
+                        else
+                            sendClientCommand(playerObj, PhunMart.name, PhunMart.commands.spawnVehicle, modData.PhunMart)
+                            playerObj:getInventory():DoRemoveItem(item)
+                        end
+                    end)
+                end
             end
         end
     end

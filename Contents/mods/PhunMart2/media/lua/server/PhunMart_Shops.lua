@@ -311,6 +311,19 @@ function PhunMart:formatShop(data)
     --     end
     -- end
 
+    -- map out sprites for quick id of shop type and direction
+    formatted.spriteMap = {}
+    if formatted.sprites and formatted.sprites.sheet and formatted.sprites.row then
+
+        local row = (formatted.sprites.row - 1) * 8
+        local direction = {"east", "south", "west", "north", "east", "south", "west", "north"}
+        for j = 0, 7 do
+            formatted.spriteMap["phunmart_0" .. formatted.sprites.sheet .. "_" .. (row + j)] = direction[j + 1]
+        end
+
+        PhunTools:printTable(formatted.spriteMap)
+    end
+
     if not formatted.abstract then
         populatePoolItems(formatted.pools)
     end

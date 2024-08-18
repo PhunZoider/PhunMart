@@ -32,6 +32,10 @@ local fields = {
         type = "number",
         default = 0
     },
+    nextRestock = {
+        type = "number",
+        default = 0
+    },
     backgroundImage = {
         type = "string",
         default = "machine-none.png"
@@ -177,6 +181,12 @@ function SPhunMartObject:fromModData(modData)
     for k, v in pairs(modData) do
         if fields[k] then
             self[k] = fields[k].type == "number" and tonumber(v) or v
+            -- print("SPhunMartObject:fromModData ", tostring(k), "=", tostring(v))
+            -- if type(v) == "table" then
+            --     for k2, v2 in pairs(v) do
+            --         print("  ", tostring(k2), "=", tostring(v2))
+            --     end
+            -- end
         end
     end
 end
@@ -184,6 +194,12 @@ end
 function SPhunMartObject:toModData(modData)
     for k, v in pairs(fields) do
         modData[k] = self[k]
+        -- print("SPhunMartObject:toModData ", tostring(k), "=", tostring(v))
+        -- if type(v) == "table" then
+        --     for k2, v2 in pairs(v) do
+        --         print("  ", tostring(k2), "=", tostring(v2))
+        --     end
+        -- end
     end
 end
 

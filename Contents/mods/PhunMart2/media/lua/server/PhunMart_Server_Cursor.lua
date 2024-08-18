@@ -8,10 +8,8 @@ ISPhunMartShop = ISBuildingObject:derive("ISPhunMartShop");
 -- list of our shops in the world
 
 local sprites = {
-    goodPhoods = {
-        east = "phunmart_01_0",
-        south = "phunmart_01_1"
-    }
+    east = "phunmart_01_0",
+    south = "phunmart_01_1"
 }
 
 function ISPhunMartShop:create(x, y, z, north, sprite)

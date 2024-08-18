@@ -51,7 +51,8 @@ PhunMart.applyReceipt["VEHICLE"] = function(playerObj, item)
     key:setName(getText("IGUI_PhunMart.CallForX", named))
     key:getModData().PhunMart = {
         text = named,
-        name = item.name or item.label
+        name = item.name or item.label,
+        playername = playerObj:getUsername()
     }
     playerObj:getInventory():AddItem(key)
 

@@ -426,11 +426,11 @@ function UI:render()
     if self.shopObj and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
         local hoursTillNextRestock = self.shopObj.nextRestock - GameTime:getInstance():getWorldAgeHours();
         local txt = "";
-        if hoursTillNextRestock > 22 then
+        if hoursTillNextRestock > 36 then
             txt = getText("IGUI_PhunMart.HoursTillRestock.Days", math.ceil(hoursTillNextRestock / 24))
         elseif hoursTillNextRestock >= 22 then
             txt = getText("IGUI_PhunMart.HoursTillRestock.Day")
-        elseif hoursTillNextRestock >= 12 then
+        elseif hoursTillNextRestock >= 6 then
             txt = getText("IGUI_PhunMart.HoursTillRestock.HalfADay")
         else
             txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")

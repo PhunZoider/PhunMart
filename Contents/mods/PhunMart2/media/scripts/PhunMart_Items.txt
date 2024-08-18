@@ -43,7 +43,7 @@ module PhunMart
         Type = Moveable,
         Icon			= default,
         DisplayName		= PhunMartShop,
-        WorldObjectSprite = phunmart_01_0,
+        WorldObjectSprite = phunmart_01_7,
 		Tags = PhunMartShop
     }
  

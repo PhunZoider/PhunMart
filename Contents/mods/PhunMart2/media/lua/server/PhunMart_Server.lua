@@ -356,6 +356,12 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
 
     local key = self:getKey(vendingMachineOrKey)
     local location = self:xyzFromKey(key)
+
+    PhunMart:debug({
+        key = key,
+        location = location
+    })
+
     if not key then
         print("PhunMart:Error No key found for " .. tostring(vendingMachineOrKey))
         return
@@ -390,7 +396,6 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
         chosenShopDef = self.defs.shops[forceKey]
     end
 
-    local location = self:xyzFromKey(key)
     local shopInstance = {
         id = key,
         key = chosenShopDef.key or chosenShopDef.name,
@@ -416,6 +421,7 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
 
     shopInstance.items = self:generateShopItems(shopInstance, sandbox.CumulativeItemGeneration == true)
     self.shops[key] = shopInstance
+
     return shopInstance
 end
 

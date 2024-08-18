@@ -15,8 +15,11 @@ end
 
 function SPhunMartSystem.addToWorld(square, shop, direction)
 
-    print("SPhunMartSystem.addToWorld ", tostring(square), " t= ", tostring(shop.key), " d=", tostring(direction))
     direction = direction or "south"
+    shop.id = square:getX() .. "_" .. square:getY() .. "_" .. square:getZ()
+
+    print("SPhunMartSystem.addToWorld ", tostring(square), " type= ", tostring(shop.key),
+        ", id=" .. shop.id .. ", facing ", tostring(direction))
 
     local isoObject
 
@@ -26,7 +29,6 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
     --     isoObject:createLightSource(10, 5, 5, 5, 5)
     -- end
 
-    shop.id = square:getX() .. "_" .. square:getY() .. "_" .. square:getZ()
     shop.direction = direction
 
     isoObject:setModData(shop)
@@ -37,6 +39,41 @@ function SPhunMartSystem.addToWorld(square, shop, direction)
     isoObject:transmitCompleteItemToClients()
 end
 
+function SPhunMartSystem:addFromSprite(x, y, z, sprite)
+
+    -- iterate through shops to get the associated shop
+    print("addFromSprite ", tostring(x), ", ", tostring(y), ", ", tostring(z), ", ", sprite)
+    local shop = nil
+    local dir = nil
+    for k, v in pairs(PM.defs.shops) do
+        if v.spriteMap and v.spriteMap[sprite] then
+            shop = v
+            dir = v.spriteMap[sprite]
+            break
+        end
+    end
+
+    if shop and dir then
+        local square = getCell():getGridSquare(x, y, z)
+        if square then
+            for i = 0, square:getObjects():size() - 1 do
+                local object = square:getObjects():get(i)
+                if object:getSprite():getName() == sprite then
+                    square:RemoveTileObject(object);
+                    object:transmitUpdatedSpriteToClients()
+                end
+            end
+            local s = PM:generateShop(square, shop.key)
+            print("Adding " .. shop.key .. " to " .. x .. "," .. y .. "," .. z .. " with sprite " .. sprite ..
+                      " facing " .. dir)
+            self.addToWorld(square, s, dir)
+        end
+    else
+        print("ERROR! shop not found for sprite " .. sprite)
+    end
+
+end
+
 function SPhunMartSystem:initSystem()
 
     SGlobalObjectSystem.initSystem(self)
@@ -45,8 +82,8 @@ function SPhunMartSystem:initSystem()
     self.system:setModDataKeys({})
 
     -- Specify GlobalObject fields that should be saved.
-    self.system:setObjectModDataKeys({'id', 'key', 'label', 'fills', 'lastRestock', 'location', 'tabs', 'items',
-                                      'playerName', 'direction', 'backgroundImage', 'layout', 'requiresPower',
+    self.system:setObjectModDataKeys({'id', 'key', 'label', 'fills', 'lastRestock', 'nextRestock', 'location', 'tabs',
+                                      'items', 'playerName', 'direction', 'backgroundImage', 'layout', 'requiresPower',
                                       'currency', 'basePrice', 'type', 'lockedBy', 'restocked'})
 
 end
@@ -197,20 +234,23 @@ function SPhunMartSystem:requestShop(location, playerObj, forceRestock)
         return
     end
 
-    local lastRestocked = shop.lastRestock
+    local lastRestocked = shop.lastRestock or 0
+    local frequency = PM.defs.shops[shop.key].restock or 24
+    local hoursSinceLastRestock = GameTime:getInstance():getWorldAgeHours() - lastRestocked
+    local times = math.floor(hoursSinceLastRestock / frequency)
+    local newRestock = lastRestocked + (times * frequency)
+    shop.nextRestock = newRestock + frequency
 
     if lastRestocked == nil then
         PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
+        shop.nextRestock = GameTime:getInstance():getWorldAgeHours() + frequency
     elseif forceRestock then
         PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
     else
-        local frequency = PM.defs.shops[shop.key].restock or 24
-        local hoursSinceLastRestock = GameTime:getInstance():getWorldAgeHours() - lastRestocked
         print("hoursSinceLastRestock ", tostring(hoursSinceLastRestock), " frequency", tostring(frequency))
         if hoursSinceLastRestock > frequency then
             -- shop should have been restocked by now
-            local times = math.floor(hoursSinceLastRestock / frequency)
-            local newRestock = lastRestocked + (times * frequency)
+
             -- now restock
             PM:generateShopItems(shop, sandbox.CumulativeItemGeneration == true)
             -- now overwrite the last restock time to our newRetock figure
@@ -235,6 +275,10 @@ end
 
 function SPhunMartSystem:requestLock(location, playerObj)
     local obj = self:getLuaObjectAt(location.x, location.y, location.z)
+    if obj == nil then
+        print("ERROR! shop not found for " .. location.x .. "," .. location.y .. "," .. location.z)
+        return
+    end
     local success = true
     local lockedBy = false
     if obj.lockedBy then
