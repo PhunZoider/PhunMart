@@ -157,15 +157,17 @@ function SPhunMartObject:changeSprite()
                            SandboxVars.ElecShutModifier
         end
     end
-    local spriteName = PM:resolveSprite(def.sprites.sheet, def.sprites.row, self.direction, hasPower == false)
+    if def and def.sprites then
+        local spriteName = PM:resolveSprite(def.sprites.sheet, def.sprites.row, self.direction, hasPower == false)
 
-    if spriteName and (not isoObject:getSprite() or spriteName ~= isoObject:getSprite():getName()) then
-        print("SPhunMartObject:changeSprite ", tostring(self.key), tostring(self.direction), " has power=",
-            tostring(hasPower), " sprite=", tostring(spriteName))
+        if spriteName and (not isoObject:getSprite() or spriteName ~= isoObject:getSprite():getName()) then
+            print("SPhunMartObject:changeSprite ", tostring(self.key), tostring(self.direction), " has power=",
+                tostring(hasPower), " sprite=", tostring(spriteName))
 
-        self:noise('sprite changed to ' .. spriteName .. ' at ' .. self.x .. ',' .. self.y .. ',' .. self.z)
-        isoObject:setSprite(spriteName)
-        isoObject:transmitUpdatedSpriteToClients()
+            self:noise('sprite changed to ' .. spriteName .. ' at ' .. self.x .. ',' .. self.y .. ',' .. self.z)
+            isoObject:setSprite(spriteName)
+            isoObject:transmitUpdatedSpriteToClients()
+        end
     end
 end
 

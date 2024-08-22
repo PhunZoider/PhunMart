@@ -5,12 +5,13 @@ local PhunMart = PhunMart
 
 local function setup()
     Events.EveryOneMinute.Remove(setup)
-    if FAVendingMachine and FAVendingMachine.doBuildMenu then
-        FAVendingMachine.doBuildMenu = function(player, menu, square, VendingMachine)
-        end
-        FAVendingMachine.onUseVendingMachine = function(junk, player, VendingMachine, tempSetting)
-        end
-    end
+    -- sendClientCommand(PhunMart.name, PhunMart.commands.requestShopDefs, {})
+    -- if FAVendingMachine and FAVendingMachine.doBuildMenu then
+    --     FAVendingMachine.doBuildMenu = function(player, menu, square, VendingMachine)
+    --     end
+    --     FAVendingMachine.onUseVendingMachine = function(junk, player, VendingMachine, tempSetting)
+    --     end
+    -- end
 end
 Events.EveryOneMinute.Add(setup)
 

@@ -43,6 +43,7 @@ function SPhunMartSystem:addFromSprite(x, y, z, sprite)
 
     -- iterate through shops to get the associated shop
     print("addFromSprite ", tostring(x), ", ", tostring(y), ", ", tostring(z), ", ", sprite)
+
     local shop = nil
     local dir = nil
     for k, v in pairs(PM.defs.shops) do
@@ -53,7 +54,28 @@ function SPhunMartSystem:addFromSprite(x, y, z, sprite)
         end
     end
 
+    -- is there a shop but it is orphaned from the obj?
+    local key = tostring(x) .. "_" .. tostring(y) .. "_" .. tostring(z)
+    -- if PM.shops[key] then
+
+    --     print("Discovered orphaned shop")
+    --     PhunTools:printTable(PM.shops[key])
+
+    --     self:removeLuaObjectAt(x, y, z)
+    --     print("Reconnecting orphaned vending machine found at " .. x .. ", " .. y .. " sprite: " .. sprite)
+    --     local sq = getCell():getGridSquare(x, y, z)
+    --     if not sq then
+    --         print("ERROR! square not found for " .. x .. "," .. y .. "," .. z)
+    --         return
+    --     end
+    --     self.addToWorld(sq, PM.shops[key], dir)
+    --     return
+    -- end
+
+    print("Machine was not generated, attempting to generate from sprite")
+
     if shop and dir then
+        self:removeLuaObjectAt(x, y, z)
         local square = getCell():getGridSquare(x, y, z)
         if square then
             for i = 0, square:getObjects():size() - 1 do
@@ -63,9 +85,13 @@ function SPhunMartSystem:addFromSprite(x, y, z, sprite)
                     object:transmitUpdatedSpriteToClients()
                 end
             end
+
             local s = PM:generateShop(square, shop.key)
             print("Adding " .. shop.key .. " to " .. x .. "," .. y .. "," .. z .. " with sprite " .. sprite ..
                       " facing " .. dir)
+
+            print("Recreating orphan ", key, " from sprite ", sprite, " dir=", dir)
+            PhunTools:printTable(PM.shops[key])
             self.addToWorld(square, s, dir)
         end
     else
@@ -327,14 +353,15 @@ end
 function SPhunMartSystem:closestShopTypesTo(location)
 
     local shops = {}
+    print("Getting distances of existing shops to ", location.x, location.y)
     for i = 1, self:getLuaObjectCount() do
         local obj = self:getLuaObjectByIndex(i)
         if obj then
             local dx = location.x - obj.location.x
             local dy = location.y - obj.location.y
             local distance = math.sqrt(dx * dx + dy * dy)
-
-            if shops[obj.type or obj.key] == nil or shops[obj.type or obj.key].distance < distance then
+            print(" ---- distance: ", distance, " type:", tostring(obj.type), " key:", tostring(obj.key))
+            if shops[obj.type or obj.key] == nil or distance < shops[obj.type or obj.key].distance then
                 shops[obj.type or obj.key] = {
                     distance = distance,
                     key = obj.key,

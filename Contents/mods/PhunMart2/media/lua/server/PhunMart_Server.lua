@@ -265,7 +265,7 @@ function PhunMart:getShopListFromKey(location)
 
     local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
-    print("Distances")
+    print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
     print("----------")
     PhunTools:printTable(distances)
     print("----------")

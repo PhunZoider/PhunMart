@@ -144,14 +144,6 @@ function UI.OnOpenPanel(playerObj, obj)
 
     local pNum = playerObj:getPlayerNum()
     instance:setVisible(true)
-    -- UI.instances[pNum] = instance
-    -- if pNum == 0 then
-    --     ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
-    -- end
-
-    -- local open = PM_OpenAction:new(playerObj, instance, 75)
-    -- ISTimedActionQueue.add(open)
-
     return instance
 end
 
@@ -186,56 +178,63 @@ function UI:createChildren()
     ISPanelJoypad.createChildren(self);
     -- Close button
     local layout = self.layouts.default.close
-    self.closeButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "X", self, self.close)
+    self.closeButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width, layout.height, "X",
+        self, self.close)
     self.closeButton:initialise()
     self:addChild(self.closeButton)
 
     if isAdmin() then
         layout = self.layouts.default.restock
-        self.restockButton =
-            ISButton:new(layout.x, layout.y, layout.width, layout.height, "Restock", self, self.restock)
+        self.restockButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+            layout.height * FONT_SCALE, "Restock", self, self.restock)
         self.restockButton:initialise()
         self:addChild(self.restockButton)
 
         layout = self.layouts.default.reroll
-        self.rerollButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Reroll", self, self.reroll)
+        self.rerollButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+            layout.height * FONT_SCALE, "Reroll", self, self.reroll)
         self.rerollButton:initialise()
         self:addChild(self.rerollButton)
 
         layout = self.layouts.default.admin
-        self.adminButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "Admin", self, function()
-            PhunMartUIShopAdmin.OnOpenPanel(self.player, self.data.location)
-            -- PhunMartAdminUI.OnOpenPanel()
-        end)
+        self.adminButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+            layout.height * FONT_SCALE, "Admin", self, function()
+                PhunMartUIShopAdmin.OnOpenPanel(self.player, self.data.location)
+                -- PhunMartAdminUI.OnOpenPanel()
+            end)
         self.adminButton:initialise()
         self:addChild(self.adminButton)
 
     end
 
     layout = self.layouts.default.tabs
-    self.tabPanel = PhunMartUIItemsPanel:new(layout.x, layout.y, layout.width, layout.height, {
-        viewer = self.player,
-        backgroundColor = layout.backgroundColor
-    })
+    self.tabPanel = PhunMartUIItemsPanel:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+        layout.height * FONT_SCALE, {
+            viewer = self.player,
+            backgroundColor = layout.backgroundColor
+        })
     -- self.tabPanel:setShop(self.shopObj)
     self:addChild(self.tabPanel)
 
     layout = self.layouts.default.previewPanel
-    self.preview = PhunMartUIItemPreviewPanel:new(layout.x, layout.y, layout.width, layout.height, {
-        viewer = self.player,
-        backgroundColor = layout.backgroundColor
-    })
+    self.preview = PhunMartUIItemPreviewPanel:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE,
+        layout.width * FONT_SCALE, layout.height * FONT_SCALE, {
+            viewer = self.player,
+            backgroundColor = layout.backgroundColor
+        })
     self:addChild(self.preview)
 
     layout = self.layouts.default.pricePanel
-    self.pricePanel = PunMartUIPricePanel:new(layout.x, layout.y, layout.width, layout.height, {
-        viewer = self.player,
-        backgroundColor = layout.backgroundColor
-    })
+    self.pricePanel = PunMartUIPricePanel:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+        layout.height * FONT_SCALE, {
+            viewer = self.player,
+            backgroundColor = layout.backgroundColor
+        })
     self:addChild(self.pricePanel)
 
     layout = self.layouts.default.buyButton
-    self.buyButton = ISButton:new(layout.x, layout.y, layout.width, layout.height, "BUY", self, self.onBuy)
+    self.buyButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+        layout.height * FONT_SCALE, "BUY", self, self.onBuy)
     self.buyButton.backgroundColor = {
         r = 0,
         g = 0,
@@ -246,7 +245,8 @@ function UI:createChildren()
     self.buyButton:initialise()
     self:addChild(self.buyButton)
 
-    self.disabledBuyButton = ISPanel:new(layout.x, layout.y, layout.width, layout.height)
+    self.disabledBuyButton = ISPanel:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
+        layout.height * FONT_SCALE)
     self.disabledBuyButton.backgroundColor = {
         r = 0,
         g = 0,
@@ -393,7 +393,8 @@ function UI:prerender()
             end
         end
         if self.backgroundTexture then
-            self:drawTexture(self.backgroundTexture, 0, 0, 1, 1, 1, 1)
+            -- self:drawTexture(self.backgroundTexture, 0, 0, 1, 1, 1, 1)
+            self:drawTextureScaledAspect(self.backgroundTexture, 0, 0, self.width, self.height, 1);
         end
     end
     local selected = self.tabPanel:getSelected()

@@ -47,6 +47,7 @@ function PhunMart:validateShops()
         issues = {}
     }
     for k, v in pairs(self.defs.shops) do
+
         results.total = results.total + 1
         if v.abstract == true then
             v.enabled = false
@@ -319,9 +320,9 @@ function PhunMart:formatShop(data)
         local direction = {"east", "south", "west", "north", "east", "south", "west", "north"}
         for j = 0, 7 do
             formatted.spriteMap["phunmart_0" .. formatted.sprites.sheet .. "_" .. (row + j)] = direction[j + 1]
+            self.spriteMap["phunmart_0" .. formatted.sprites.sheet .. "_" .. (row + j)] = direction[j + 1]
         end
 
-        PhunTools:printTable(formatted.spriteMap)
     end
 
     if not formatted.abstract then
@@ -353,6 +354,7 @@ end
 
 -- iterate through file queued and add contents to transform queue
 function PhunMart:processFilesToShopQueue()
+
     for _, v in ipairs(self.loaders.shopFiles) do
         v.status = "processing"
         -- load the contents of the file into queu
@@ -384,11 +386,20 @@ function PhunMart:processShopTransformQueue()
         all = {},
         files = {}
     }
+    -- local tempSpriteMap = {}
     for _, v in ipairs(self.loaders.shops or {}) do
         if v.status == "pending" then
             local f = v.data.file or "none"
             local r = self:transformToShopDef(v.data)
-
+            -- if r and r.sprites then
+            --     local tmpKey = tostring(r.sprites.sheet) .. "_" .. tostring(r.sprites.row)
+            --     if not tempSpriteMap[tmpKey] then
+            --         tempSpriteMap[tmpKey] = {
+            --             sheet = r.sprites.sheet,
+            --             row = r.sprites.row
+            --         }
+            --     end
+            -- end
             if not results.all[r.status] then
                 results.all[r.status] = 0
             end
@@ -405,6 +416,17 @@ function PhunMart:processShopTransformQueue()
             print("PhunMart: Skipping shop as it is not in pending state")
         end
     end
+
+    -- local dir = {"east", "south", "west", "north", "east", "south", "west", "north"}
+    -- for k, v in pairs(tempSpriteMap) do
+    --     for i = 0, 7 do
+    --         self.spriteMap["phunmart_0" .. v.sheet .. "_" .. (v.row + i)] = dir[i + 1]
+    --     end
+    -- end
+
+    print(" --------- SPRITE MAP --------------")
+    PhunTools:printTable(self.spriteMap)
+
     return results
 end
 

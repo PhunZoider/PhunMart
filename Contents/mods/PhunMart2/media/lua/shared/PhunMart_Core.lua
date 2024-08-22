@@ -86,10 +86,34 @@ PhunMart = {
         shopFiles = {},
         shops = {}
     },
-    shopSprites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16",
-                   "location_shop_accessories_01_28", "location_shop_accessories_01_29",
-                   "location_shop_accessories_01_19", "location_shop_accessories_01_18",
-                   "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
+    spriteMap = {
+        ["location_shop_accessories_01_29"] = "north",
+        ["location_shop_accessories_01_31"] = "north",
+        ["location_shop_accessories_01_17"] = "south",
+        ["location_shop_accessories_01_19"] = "south",
+        ["location_shop_accessories_01_16"] = "east",
+        ["location_shop_accessories_01_18"] = "east",
+        ["location_shop_accessories_01_30"] = "west",
+        ["location_shop_accessories_01_28"] = "west",
+        ["DylansRandomFurniture02_23"] = "south",
+        ["DylansRandomFurniture02_22"] = "east",
+        -- LC
+        ["LC_Random_20"] = "south",
+        ["LC_Random_23"] = "south",
+        ["LC_Random_28"] = "south",
+        ["LC_Random_32"] = "south",
+
+        ["LC_Random_21"] = "east",
+        ["LC_Random_22"] = "east",
+        ["LC_Random_29"] = "east",
+        ["LC_Random_33"] = "east",
+
+        ["LC_Random_30"] = "north",
+        ["LC_Random_34"] = "north",
+
+        ["LC_Random_31"] = "west",
+        ["LC_Random_35"] = "west"
+    }
 }
 
 -- Setup any events
@@ -300,9 +324,8 @@ function PhunMart:getMachineByLocation(playerObj, x, y, z)
 end
 
 function PhunMart:isMachine(object)
-    local name = object:getSprite():getName()
-    for _, v in ipairs(self.shopSprites) do
-        if name == v then
+    if object and object.getSprite then
+        if self.spriteMap[object:getSprite():getName()] then
             return object
         end
     end

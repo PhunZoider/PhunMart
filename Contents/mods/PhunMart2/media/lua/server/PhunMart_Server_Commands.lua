@@ -36,6 +36,8 @@ Commands[PM.commands.requestShopDefs] = function(playerObj, args)
 end
 
 Commands[PM.commands.addFromSprite] = function(playerObj, args)
+    print("Orphaned vending machine found at " .. args.location.x .. ", " .. args.location.y .. " sprite: " ..
+              args.sprite)
     SPhunMartSystem.instance:addFromSprite(args.location.x, args.location.y, args.location.z, args.sprite)
 end
 
@@ -199,6 +201,7 @@ end
 -- generates or re-generates shop and inventory
 Commands[PM.commands.requestShopGenerate] = function(playerObj, args)
     SPhunMartSystem.instance:reroll(args.location, args.target)
+    SPhunMartSystem.instance:rerollAll()
 end
 
 Commands[PM.commands.spawnVehicle] = function(playerObj, args)

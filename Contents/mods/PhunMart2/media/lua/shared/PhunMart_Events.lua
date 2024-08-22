@@ -37,12 +37,9 @@ Events.OnObjectLeftMouseButtonUp.Add(function(object, x, y)
     end
     if object then
         local sprite = object:getSprite();
-        for i, v in ipairs(PhunMart.shopSprites) do
-            if v == sprite:getName() then
-                object:setHighlighted(true, false);
-                _lastHighlighted = object
-                break
-            end
+        if PhunMart.spriteMap[sprite:getName()] then
+            object:setHighlighted(true, false);
+            _lastHighlighted = object
         end
     end
 end)
@@ -53,12 +50,9 @@ Events.OnObjectRightMouseButtonUp.Add(function(object, x, y)
     end
     if object then
         local sprite = object:getSprite();
-        for i, v in ipairs(PhunMart.shopSprites) do
-            if v == sprite:getName() then
-                object:setHighlighted(true, false);
-                _lastHighlighted = object
-                break
-            end
+        if PhunMart.spriteMap[sprite:getName()] then
+            object:setHighlighted(true, false);
+            _lastHighlighted = object
         end
     end
 end)

@@ -9,26 +9,18 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
 
     local found = nil
     local square = nil
+    local spriteName = nil
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
         square = wObj:getSquare()
         if square then
             found = CPhunMartSystem.instance:getLuaObjectOnSquare(square)
+            local sn = wObj.getSprite and wObj:getSprite():getName()
+            if PhunMart.spriteMap[sn] or PhunTools:startsWith(sn, "phunmart_") then
+                spriteName = sn
+            end
             if found then
                 break
             end
-        end
-        local name = wObj.getSprite and wObj:getSprite():getName()
-        if name and PhunTools:startsWith(name, "phunmart_") then
-            print("Orphaned vending machine found at " .. square:getX() .. ", " .. square:getY())
-            local args = {
-                location = {
-                    x = square:getX(),
-                    y = square:getY(),
-                    z = square:getZ()
-                },
-                sprite = name
-            }
-            sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
         end
     end
 
@@ -62,7 +54,93 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
         end
 
         option.toolTip = toolTip;
+    elseif found then
+        if spriteName then
+            print("Orphaned vending machine found at " .. square:getX() .. ", " .. square:getY() .. " with sprite=" ..
+                      tostring(spriteName))
+            local args = {
+                location = {
+                    x = square:getX(),
+                    y = square:getY(),
+                    z = square:getZ()
+                },
+                sprite = spriteName
+            }
+            sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
 
+        else
+            print("Found vending machine, but it is missing an id and spritename")
+        end
+    end
+
+    if isAdmin() then
+        if spriteName then
+            if found then
+                context:addOption("PhunMart: Reroll", player, function()
+                    CPhunMartSystem.instance:reroll({
+                        location = {
+                            x = square:getX(),
+                            y = square:getY(),
+                            z = square:getZ()
+                        }
+                    })
+                end)
+            else
+                -- not found, but has a sprite. So either a broken one or a virgin one
+
+                local isVirgin = not PhunTools:startsWith(spriteName, "phunmart_")
+                if isVirgin then
+                    context:addOption("PhunMart: Convert", player, function()
+
+                        -- what dir is spriteName  facing?
+                        local dir = {
+                            east = 0,
+                            south = 1,
+                            west = 2,
+                            north = 3
+                        }
+                        local s = spriteName
+                        local sm = PhunMart.spriteMap
+                        local xx = sm[s]
+                        local i = dir[xx]
+                        local args = {
+                            location = {
+                                x = square:getX(),
+                                y = square:getY(),
+                                z = square:getZ()
+                            },
+                            sprite = "phunmart_01_" .. tostring((8 + i or 0))
+                        }
+                        sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
+                    end)
+
+                else
+                    context:addOption("PhunMart: Fix", player, function()
+                        local args = {
+                            location = {
+                                x = square:getX(),
+                                y = square:getY(),
+                                z = square:getZ()
+                            },
+                            sprite = spriteName
+                        }
+                        sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
+                    end)
+                end
+
+            end
+            -- if not found then
+            --     context:addOption("PhunMart: Fix", player, function()
+            --         CPhunMartSystem.instance:reroll({
+            --             location = {
+            --                 x = square:getX(),
+            --                 y = square:getY(),
+            --                 z = square:getZ()
+            --             }
+            --         })
+            --     end)
+            -- end
+        end
     end
 
 end

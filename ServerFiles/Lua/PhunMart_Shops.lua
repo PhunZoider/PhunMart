@@ -479,6 +479,7 @@ return { --[[
     label = "Final Ammendment",
     type = "WEAPONS",
     backgroundImage = "machine-final-ammendment",
+    currency = "PhunMart.CheeseToken", -- the default currency for shops
     pools = {
         items = {{
             filters = {

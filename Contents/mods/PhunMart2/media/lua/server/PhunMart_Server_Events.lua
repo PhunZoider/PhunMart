@@ -27,60 +27,12 @@ Events.EveryTenMinutes.Add(function()
     SPhunMartSystem.instance:updatePoweredSprites()
 end)
 
--- Events.OnInitGlobalModData.Add(loadDefs)
 Events.OnInitGlobalModData.Add(function()
     PhunMart:loadAll()
-
-    -- local p = {}
-    -- for k, _ in pairs(Events) do
-    --     table.insert(p, k)
-    -- end
-    -- table.sort(p)
-    -- print("--- EVENTS ---")
-    -- PhunTools:printTable(p)
-    -- print("--- END EVENTS ---")
-
 end)
 
--- South
--- 01_19
--- 01_17
-
--- EAST
--- 01_16
--- 01_18
-
-local spriteMap = {
-    ["location_shop_accessories_01_29"] = "north",
-    ["location_shop_accessories_01_31"] = "north",
-    ["location_shop_accessories_01_17"] = "south",
-    ["location_shop_accessories_01_19"] = "south",
-    ["location_shop_accessories_01_16"] = "east",
-    ["location_shop_accessories_01_18"] = "east",
-    ["location_shop_accessories_01_30"] = "west",
-    ["location_shop_accessories_01_28"] = "west",
-    ["DylansRandomFurniture02_23"] = "south",
-    ["DylansRandomFurniture02_22"] = "east",
-    -- LC
-    ["LC_Random_20"] = "south",
-    ["LC_Random_23"] = "south",
-    ["LC_Random_28"] = "south",
-    ["LC_Random_32"] = "south",
-
-    ["LC_Random_21"] = "east",
-    ["LC_Random_22"] = "east",
-    ["LC_Random_29"] = "east",
-    ["LC_Random_33"] = "east",
-
-    ["LC_Random_30"] = "north",
-    ["LC_Random_34"] = "north",
-
-    ["LC_Random_31"] = "west",
-    ["LC_Random_35"] = "west"
-}
-
 Events.OnFillContainer.Add(function(roomtype, containertype, container)
-    -- print("OnFillContainer: " .. tostring(roomtype) .. " " .. tostring(containertype))
+
     if containertype and (containertype == "vendingpop" or containertype == "vendingsnack") then
         local parent = container:getParent()
         if parent and parent.getModData then
@@ -97,7 +49,7 @@ Events.OnFillContainer.Add(function(roomtype, containertype, container)
                 else
                     -- if containertype == "vendingpop" then
                     local spriteName = parent:getSprite():getName()
-                    local direction = spriteMap[spriteName] or nil
+                    local direction = PhunMart.spriteMap[spriteName] or nil
 
                     if direction ~= nil then
                         local square = parent:getSquare()
