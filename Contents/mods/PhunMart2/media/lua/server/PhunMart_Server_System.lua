@@ -87,6 +87,10 @@ function SPhunMartSystem:addFromSprite(x, y, z, sprite)
             end
 
             local s = PM:generateShop(square, shop.key)
+            if s == nil then
+                print("ERROR! shop not found for sprite " .. sprite)
+                return
+            end
             print("Adding " .. shop.key .. " to " .. x .. "," .. y .. "," .. z .. " with sprite " .. sprite ..
                       " facing " .. dir)
 
@@ -137,7 +141,7 @@ function SPhunMartSystem:reroll(location, target)
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
     local shop = PM:generateShop(location, target)
     shopObj:fromModData(shop)
-    shopObj:changeSprite()
+    shopObj:changeSprite(true)
     shopObj:saveData()
     sendServerCommand(PM.name, PM.commands.updateShop, {
         id = shop.id,

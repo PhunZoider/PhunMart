@@ -208,8 +208,10 @@ return { --[[
 
     key = "shop-books",
     inherits = "base-shop",
+    label = "Books",
     type = "BOOKS",
     backgroundImage = "machine-sheds-and-commoners",
+    minDistance = 1000,
     basePrice = 45,
     pools = {
         items = {{

@@ -89,6 +89,9 @@ Commands[PM.commands.updateShop] = function(playerObj, args)
     local resend = false
     if args.shop then
         local shop = PM:generateShop(args.key, args.shop)
+        if shop == nil then
+            return
+        end
         resend = true
     end
     if resend then
@@ -201,7 +204,6 @@ end
 -- generates or re-generates shop and inventory
 Commands[PM.commands.requestShopGenerate] = function(playerObj, args)
     SPhunMartSystem.instance:reroll(args.location, args.target)
-    SPhunMartSystem.instance:rerollAll()
 end
 
 Commands[PM.commands.spawnVehicle] = function(playerObj, args)

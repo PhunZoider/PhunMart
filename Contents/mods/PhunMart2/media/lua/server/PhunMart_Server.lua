@@ -297,7 +297,7 @@ function PhunMart:getShopListFromKey(location)
                         else
                             difficultyMin = v.zones.difficulty
                         end
-                        print(" - Difficulty range " .. tostring(difficultyMin) .. " to " .. tostring(difficultyMax))
+                        -- print(" - Difficulty range " .. tostring(difficultyMin) .. " to " .. tostring(difficultyMax))
                     end
 
                     local names = v.zones.keys or {}
@@ -379,6 +379,9 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
             local shopCandidates = self:getShopListFromKey(location)
             if shopCandidates == nil then
                 print("No shop candidates found for " .. key)
+                if self.shops[key] then
+                    return self.shops[key]
+                end
                 return nil
             end
             local rand = ZombRand(shopCandidates.totalProbability or 100) + 1
