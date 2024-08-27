@@ -507,6 +507,42 @@ Conditions.inventory = function(self, playerObj, item, condition, results)
     return hasPassed
 end
 
+Conditions.maxBoundCurrency = function(self, playerObj, item, condition, results)
+    local hasPassed = true
+
+    local wallet = PhunWallet:getPlayerData(playerObj).wallet or {
+        current = {},
+        bound = {}
+    }
+
+    for k, v in pairs(condition or {}) do
+        if wallet.bound[k] and wallet.bound[k] >= v then
+            local name = PhunWallet:processCurrencyLabelHook(k)
+            table.insert(results, {
+                passed = false,
+                type = "maxLimit",
+                key = k,
+                value = v,
+                richText = RICH_PREFIX_RED .. getText("IGUI_PhunMart.ConditionCategory.currencyMaxed", name),
+                tooltipText = getText("IGUI_PhunMart.ConditionCategory.currencyMaxed", name)
+            })
+            hasPassed = false
+        else
+            table.insert(results, {
+                passed = true,
+                type = "maxLimit",
+                key = k,
+                value = v,
+                text = ""
+                -- no mention in rich text or tooltip if there is no issue
+            })
+        end
+    end
+
+    return hasPassed
+
+end
+
 --- Check players inventory (and PhunWallet) for ability to pay for item
 --- mutating the results table by adding additional information for use in the UI
 --- @param playerObj IsoPlayer

@@ -52,6 +52,10 @@ return { --[[
     key = "shop-collectables",
     type = "COLLECTABLES",
     inherits = "base-shop",
+    fills = {
+        min = 2,
+        max = 3
+    },
     zones = {
         difficulty = 1
     },
@@ -75,8 +79,8 @@ return { --[[
     inherits = "base-shop",
     type = "COLLECTABLES",
     fills = {
-        min = 3,
-        max = 7
+        min = 2,
+        max = 3
     },
     zones = {
         difficulty = 2
@@ -102,7 +106,7 @@ return { --[[
     type = "COLLECTABLES",
     fills = {
         min = 2,
-        max = 4
+        max = 3
     },
     zones = {
         difficulty = 3
@@ -128,7 +132,7 @@ return { --[[
     type = "COLLECTABLES",
     fills = {
         min = 2,
-        max = 4
+        max = 3
     },
     zones = {
         difficulty = 4

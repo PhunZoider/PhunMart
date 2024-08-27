@@ -270,6 +270,7 @@ function PhunMart:formatItem(data)
         condition.minCharTime = data.minCharTime or condition.minCharTime or nil
         condition.price = data.price or condition.price or nil
         condition.boosts = data.boosts or condition.boots or nil
+        condition.maxBoundCurrency = data.maxBoundCurrency or condition.maxBoundCurrency or nil
     end
 
     -- -- transform any v1 prices into v2 format
