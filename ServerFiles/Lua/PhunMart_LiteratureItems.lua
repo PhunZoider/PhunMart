@@ -89,21 +89,21 @@ return {{
     name = "Base.BookMechanic5",
     inherits = "base-literature-book"
 }, {
-    name = "Base.BookBlacksmith5",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith2",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith1",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith4",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith3",
-    inherits = "base-literature-book"
-}, {
+    --     name = "Base.BookBlacksmith5",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith2",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith1",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith4",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith3",
+    --     inherits = "base-literature-book"
+    -- }, {
     name = "Base.BookFirstAid2",
     inherits = "base-literature-book"
 }, {
