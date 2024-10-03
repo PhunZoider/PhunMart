@@ -1,6 +1,7 @@
 require "PhunMart_Core"
 local PhunMart = PhunMart
 
+<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/shared/PhunMart_Events.lua
 -- Events.OnLoadedTileDefinitions.Add(function(manager)
 --     -- prevent snack and pop vending machines from being movable or scrappable
 
@@ -16,6 +17,21 @@ local PhunMart = PhunMart
 --         -- sprite:getProperties():Set("HasLightOnSprite", "");
 --     end
 -- end)
+=======
+Events.OnLoadedTileDefinitions.Add(function(manager)
+    -- prevent snack and pop vending machines from being movable or scrappable
+    for i, v in ipairs(PhunMart.shopSprites) do
+        local sprite = manager:getSprite(v)
+        sprite:getProperties():UnSet("IsMoveAble");
+        sprite:getProperties():UnSet("CanScrap");
+        sprite:getProperties():UnSet("container");
+        sprite:getProperties():UnSet("ContainerCapacity");
+        -- sprite:getProperties():Set("ContainerCapacity", "0");
+        sprite:getProperties():UnSet(IsoFlagType.container);
+        -- local properties = sprite:getProperties():getPropertyNames()
+    end
+end)
+>>>>>>> main:Contents/mods/PhunMart/media/lua/shared/PhunMart_Events.lua
 
 Events.OnInitGlobalModData.Add(function()
     PhunMart:ini()

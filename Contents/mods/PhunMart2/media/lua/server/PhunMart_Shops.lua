@@ -217,7 +217,7 @@ function PhunMart:formatShop(data)
     if data.inherits then
         local b = self.defs.shops[data.inherits]
         if b then
-            base = PhunTools:deepCopyTable(b)
+            base = b
         end
     end
 
@@ -240,6 +240,7 @@ function PhunMart:formatShop(data)
         file = data.file or nil,
         mod = data.mod or base.mod or nil,
         abstract = data.abstract,
+        sprites = data.sprites or base.sprites or {},
         reservations = data.reservations or base.reservations or {},
         currency = data.currency or base.currency or "Base.Money",
         basePrice = data.basePrice or base.basePrice or 0,
@@ -248,13 +249,18 @@ function PhunMart:formatShop(data)
         -- minimum distance between duplicate instances
         minDistance = data.minDistance or base.minDistance,
         type = data.type or base.type or nil,
+<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/server/PhunMart_Shops.lua
         sprites = base.sprites or {},
         generate = true,
+=======
+        broken = false,
+>>>>>>> main:Contents/mods/PhunMart/media/lua/server/PhunMart_Shops.lua
         enabled = data.enabled ~= false, -- do not inherit enabled and default to true
         requiresPower = (data.requiresPower == true or data.requiresPower == false) and data.requiresPower or
             (base.requiresPower == true or base.requiresPower == false) and base.requiresPower or false
     }
 
+<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/server/PhunMart_Shops.lua
     if data.generate == false or base.generated == false then
         formatted.generate = false
     end
@@ -270,6 +276,13 @@ function PhunMart:formatShop(data)
         for k, v in pairs(data.zones) do
             formatted.zones[k] = v
         end
+=======
+    if base.broken ~= nil then
+        formatted.broken = base.broken
+    end
+    if data.broken ~= nil then
+        data.broken = data.broken
+>>>>>>> main:Contents/mods/PhunMart/media/lua/server/PhunMart_Shops.lua
     end
 
     if formatted.reservations and #formatted.reservations > 0 then
