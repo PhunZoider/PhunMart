@@ -1,7 +1,7 @@
 version=1
-id=3270428943
-title=PhunMart
-description=Shop Smart. Shop PhunMart. Your total vending solution.
+id=3305706699
+title=PhunMart2
+description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
 description=
 description=beta testing! Currently play testing and balance tweaking on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]

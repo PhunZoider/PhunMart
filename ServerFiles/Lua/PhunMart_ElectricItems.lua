@@ -9,7 +9,7 @@ return {{
     },
     price = {
         currency = {
-            base = 1,
+            base = 10,
             min = 3,
             max = 5
         }
@@ -28,7 +28,7 @@ return {{
     inherits = "base-electronics",
     price = {
         currency = {
-            base = 100,
+            base = 200,
             min = 5,
             max = 10
         }
@@ -59,7 +59,14 @@ return {{
     inherits = "base-electronics"
 }, {
     name = "Base.Remote",
-    inherits = "base-electronics"
+    inherits = "base-electronics",
+    price = {
+        currency = {
+            base = 25,
+            min = 3,
+            max = 4
+        }
+    }
 }, {
     name = "Base.Radio",
     inherits = "base-electronics"
@@ -174,8 +181,110 @@ return {{
     inherits = "base-electronics"
 }, {
     name = "Radio.ScannerModule",
-    inherits = "base-electronics"
+    inherits = "base-electronics",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
 }, {
     name = "Radio.CDplayer",
-    inherits = "base-electronics"
+    inherits = "base-electronics",
+    price = {
+        currency = {
+            base = 45,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "Tsarcraft.TCVinylplayer",
+    inherits = "base-electronics",
+    mod = "truemusic",
+    price = {
+        currency = {
+            base = 45,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "Tsarcraft.TCBoombox",
+    inherits = "base-electronics",
+    mod = "truemusic",
+    price = {
+        currency = {
+            base = 50,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "Tsarcraft.TCWalkman",
+    inherits = "base-electronics",
+    mod = "truemusic",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "Tikitown.Drazvision_VCR",
+    inherits = "base-electronics",
+    mod = "tikitown",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "ISA.SolarFailsafe",
+    inherits = "base-electronics",
+    mod = "ISA_41",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "ISA.SolarPanelFlat",
+    inherits = "base-electronics",
+    mod = "ISA_41",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "ISA.SolarPanelWall",
+    inherits = "base-electronics",
+    mod = "ISA_41",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "ISA.SolarPanelMounted",
+    inherits = "base-electronics",
+    mod = "ISA_41",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
 }}

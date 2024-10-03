@@ -582,6 +582,11 @@ return {{
     mod = "ATA_Petyarbuilt"
 
 }, {
+    name = "ATADeLorean",
+    inherits = "base-vehicle-special",
+    mod = "ATA_DeLorean"
+
+}, {
     name = "70dodgeRT",
     inherits = "base-vehicle-car",
     mod = "70dodge"

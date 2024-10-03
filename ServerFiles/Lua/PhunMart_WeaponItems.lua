@@ -9,7 +9,7 @@ return {{
     },
     price = {
         currency = {
-            base = 1,
+            base = 10,
             min = 3,
             max = 5
         }
@@ -39,8 +39,8 @@ return {{
     inherits = "base-weapons",
     tags = "weapons,wepbulkammo",
     price = {
-        currency = {
-            base = 15,
+        ["PhunMart.SilverDollar"] = {
+            base = 20,
             min = 3,
             max = 5
         }
@@ -51,8 +51,8 @@ return {{
     inherits = "base-weapons",
     tags = "weapons,wepbulkammo",
     price = {
-        currency = {
-            base = 30,
+        ["PhunMart.SilverDollar"] = {
+            base = 80,
             min = 10,
             max = 20
         }
@@ -63,10 +63,10 @@ return {{
     inherits = "base-weapons",
     tags = "weapons,wepbulkammo",
     price = {
-        currency = {
-            base = 120,
-            min = 10,
-            max = 30
+        ["PhunMart.SilverDollar"] = {
+            base = 1200,
+            min = 100,
+            max = 300
         }
     }
 }, {
@@ -80,7 +80,14 @@ return {{
     key = "base-weapons-wepammo",
     inherits = "base-weapons",
     tab = "Ammo",
-    tags = "weapons,wepammo"
+    tags = "weapons,wepammo",
+    price = {
+        ["PhunMart.SilverDollar"] = {
+            base = 10,
+            min = 3,
+            max = 5
+        }
+    }
 }, {
     abstract = true,
     key = "base-weapons-wepaccessory",
@@ -180,7 +187,8 @@ return {{
     quantity = 10
 }, {
     name = "Base.223Bullets",
-    inherits = "base-weapons-wepammo"
+    inherits = "base-weapons-wepammo",
+    quantity = 10
 }, {
     name = "Base.9mmClip",
     inherits = "base-weapons-clips"

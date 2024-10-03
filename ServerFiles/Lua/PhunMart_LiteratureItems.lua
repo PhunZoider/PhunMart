@@ -5,11 +5,11 @@ return {{
     tags = "literature",
     inventory = {
         min = 1,
-        max = 5
+        max = 3
     },
     price = {
         currency = {
-            base = 1,
+            base = 45,
             min = 3,
             max = 5
         }
@@ -89,21 +89,21 @@ return {{
     name = "Base.BookMechanic5",
     inherits = "base-literature-book"
 }, {
-    name = "Base.BookBlacksmith5",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith2",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith1",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith4",
-    inherits = "base-literature-book"
-}, {
-    name = "Base.BookBlacksmith3",
-    inherits = "base-literature-book"
-}, {
+    --     name = "Base.BookBlacksmith5",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith2",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith1",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith4",
+    --     inherits = "base-literature-book"
+    -- }, {
+    --     name = "Base.BookBlacksmith3",
+    --     inherits = "base-literature-book"
+    -- }, {
     name = "Base.BookFirstAid2",
     inherits = "base-literature-book"
 }, {
