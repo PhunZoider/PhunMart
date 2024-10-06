@@ -112,40 +112,19 @@ local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
 local FONT_SCALE = FONT_HGT_SMALL / 14
 
-<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/client/ui/PhunMartUI_ShopWindow.lua
 function UI.OnOpenPanel(playerObj, obj)
 
     if not obj then
         return
-=======
-function UI.OnOpenPanel(playerObj, key)
-
-    local pNum = playerObj:getPlayerNum()
-    local recycle = false
-
-    if UI.instances[pNum] then
-        if UI.instances[pNum].data.key == key then
-            self:highlight()
-            triggerEvent(PhunMart.events.OnWindowOpened, UI.instances[pNum].player, key)
-            if UI.instances[pNum] and UI.instances[pNum].rebuild then
-                UI.instances[pNum]:rebuild()
-            end
-            return UI.instances[pNum]
-        else
-            return UI.instances[pNum]
-        end
->>>>>>> main:Contents/mods/PhunMart/media/lua/client/ui/PhunMart_ShopWindow.lua
     end
 
     local core = getCore()
     local FONT_SCALE = getTextManager():getFontHeight(UIFont.Small) / 14
-    local core = getCore()
     local width = UI.layouts.default.window.width * FONT_SCALE
     local height = UI.layouts.default.window.height * FONT_SCALE
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
 
-<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/client/ui/PhunMartUI_ShopWindow.lua
     local pIndex = playerObj:getPlayerNum()
     local instances = PhunMartShopWindow.instances
     if instances[pIndex] then
@@ -166,29 +145,6 @@ function UI.OnOpenPanel(playerObj, key)
     local pNum = playerObj:getPlayerNum()
     instance:setVisible(true)
     return instance
-=======
-    local instance = UI:new(x, y, width, height, playerObj);
-    instance:initialise();
-    instance:instantiate();
-    instance.data = {
-        key = key,
-        location = PhunMart:xyzFromKey(key)
-    }
-    instance.player = playerObj
-    instance:addToUIManager();
-    instance:setVisible(false);
-    if instance.rebuild then
-        instance:rebuild()
-    end
-
-    triggerEvent(PhunMart.events.OnWindowOpened, instance.player, key)
-    instance:highlight()
-    UI.instances[pNum] = instance
-    if pNum == 0 then
-        ISLayoutManager.RegisterWindow('PhunMartShopWindow', PhunMartShopWindow, UI.instances[pNum])
-    end
-    return UI.instances[pNum]
->>>>>>> main:Contents/mods/PhunMart/media/lua/client/ui/PhunMart_ShopWindow.lua
 end
 
 function UI:highlight()
@@ -428,62 +384,13 @@ function UI:restock()
     end
 end
 
-<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/client/ui/PhunMartUI_ShopWindow.lua
 local updateShopIterations = 0
-=======
-function UI:setData(data)
-
-    -- get current selected state
-    local activeView = self.tabPanel.activeView
-    local currentTab = nil
-    local currentSelection = nil
-    if activeView then
-        local selected = activeView.view.selected
-        currentTab = activeView.name
-        currentSelection = activeView.view.items[selected]
-    end
-    local doRebuild = false
-    if self.data == nil or self.data.shop == nil and data.shop then
-        doRebuild = true
-    end
-    self.data = data
-    if doRebuild then
-        self:rebuild(data.shop)
-    end
-    if currentTab and currentSelection and currentSelection.index then
-        local activeView
-        for _, view in ipairs(self.tabPanel.viewList) do
-            if view.name == currentTab then
-                activeView = view.view
-                break
-            end
-        end
-        if activeView then
-            activeView.selected = currentSelection.index
-            self.tabPanel:activateView(currentTab)
-        end
-    end
-end
-
-function UI:getShop()
-    if self.data and self.data.shop then
-        if not self.data.shop.tabs then
-            self:rebuild(self.data.shop)
-        end
-        return self.data.shop
-    end
-end
->>>>>>> main:Contents/mods/PhunMart/media/lua/client/ui/PhunMart_ShopWindow.lua
 
 function UI:prerender()
     ISPanelJoypad.prerender(self);
 
-<<<<<<< HEAD:Contents/mods/PhunMart2/media/lua/client/ui/PhunMartUI_ShopWindow.lua
     local shop = self.shopObj
 
-=======
-    local shop = self:getShop()
->>>>>>> main:Contents/mods/PhunMart/media/lua/client/ui/PhunMart_ShopWindow.lua
     if shop then
         updateShopIterations = updateShopIterations + 1
         if updateShopIterations > 10 then
