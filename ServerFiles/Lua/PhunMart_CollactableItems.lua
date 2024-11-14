@@ -141,7 +141,7 @@ return {{
 }, {
     inherits = "base-collectors-1",
     display = {
-        label = "Tikitown.Baseball_Card_03",
+        label = "pkmncards.003Venusaurcard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -149,7 +149,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_03"] = 2
+        ["pkmncards.003Venusaurcard"] = 2
     },
     mod = "tikitown"
 }, {
@@ -225,7 +225,7 @@ return {{
 }, {
     inherits = "base-collectors-1",
     display = {
-        label = "Tikitown.Baseball_Card_21",
+        label = "pkmncards.006Charizardcard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -233,14 +233,14 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_21"] = 2
+        ["pkmncards.006Charizardcard"] = 2
     },
     mod = "tikitown"
 }, {
 
     inherits = "base-collectors-1",
     display = {
-        label = "Tikitown.Baseball_Card_33",
+        label = "pkmncards.011Metapodcard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -248,7 +248,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_33"] = 2
+        ["pkmncards.011Metapodcard"] = 2
     },
     mod = "tikitown"
 }, {
@@ -444,7 +444,7 @@ return {{
 
     inherits = "base-collectors-2",
     display = {
-        label = "Tikitown.Baseball_Card_23",
+        label = "pkmncards.014Kakunacard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -452,7 +452,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_23"] = 2
+        ["pkmncards.014Kakunacard"] = 2
     },
     mod = "tikitown"
 }, {
@@ -593,7 +593,7 @@ return {{
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_14",
+        label = "pkmncards.024Arbokcard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -601,7 +601,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_14"] = 2
+        ["pkmncards.024Arbokcard"] = 2
     },
     mod = "tikitown"
 }, {
@@ -635,7 +635,7 @@ return {{
 }, {
     inherits = "base-collectors-3",
     display = {
-        label = "Tikitown.Baseball_Card_32",
+        label = "pkmncards.030Nidorinacard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -643,7 +643,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_32"] = 2
+        ["pkmncards.030Nidorinacard"] = 2
     },
     mod = "tikitown"
 }, {
@@ -860,7 +860,7 @@ return {{
 }, {
     inherits = "base-collectors-4",
     display = {
-        label = "Tikitown.Baseball_Card_09",
+        label = "pkmncards.148Dragonaircard",
         overlay = "traiter-token-overlay"
     },
     receive = {{
@@ -868,7 +868,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_09"] = 2
+        ["pkmncards.148Dragonaircard"] = 2
     },
     mod = "tikitown"
 }, {

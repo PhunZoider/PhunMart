@@ -137,11 +137,8 @@ function PhunMart:itemGenerationChanceModel(shop, poolIndex)
         rolls = poolItemCount
     end
 
-    print("Rolls: " .. rolls .. " for " .. shop.key .. " " .. poolIndex .. " containing " .. #itemsKeys .. " items")
+    -- print("Rolls: " .. rolls .. " for " .. shop.key .. " " .. poolIndex .. " containing " .. #itemsKeys .. " items")
     for sanity = 1, 50 do
-        if sanity > 1 then
-            print("Sanity check " .. sanity .. " for " .. shop.key .. " " .. poolIndex)
-        end
         for _, v in ipairs(itemsKeys) do
             if ZombRand(100) <= (self.defs.items[v].probability or defaultProbaility) then
                 table.insert(results, v)
@@ -265,10 +262,10 @@ function PhunMart:getShopListFromKey(location)
 
     local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
-    print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
-    print("----------")
-    PhunTools:printTable(distances)
-    print("----------")
+    -- print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
+    -- print("----------")
+    -- PhunTools:printTable(distances)
+    -- print("----------")
 
     local zoneInfo = self:getZoneInfo(location)
 
@@ -282,8 +279,8 @@ function PhunMart:getShopListFromKey(location)
             local distanceKey = v.type or v.key
             local distance = distances[distanceKey] and distances[distanceKey].distance or 0
 
-            print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
-                      tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
+            -- print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
+            --           tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
 
             if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey].distance) then
                 if v.zones and type(v.zones) == "table" then
@@ -317,15 +314,15 @@ function PhunMart:getShopListFromKey(location)
                             })
                             totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                         else
-                            if not difficultyOk then
-                                print(" - Skipping " .. v.key .. " because difficulty is out of range")
-                            end
-                            if not nameOk then
-                                print(" - Skipping " .. v.key .. " because zone " .. zoneInfo.key .. " is not allowed")
-                            end
+                            -- if not difficultyOk then
+                            --     print(" - Skipping " .. v.key .. " because difficulty is out of range")
+                            -- end
+                            -- if not nameOk then
+                            --     print(" - Skipping " .. v.key .. " because zone " .. zoneInfo.key .. " is not allowed")
+                            -- end
                         end
                     else
-                        print(" - Skipping " .. v.key .. " because no zone info")
+                        -- print(" - Skipping " .. v.key .. " because no zone info")
                     end
                 else
                     table.insert(shops, {
@@ -335,7 +332,7 @@ function PhunMart:getShopListFromKey(location)
                     totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                 end
             else
-                print(" - Skipping " .. v.key .. " because there is another too close")
+                -- print(" - Skipping " .. v.key .. " because there is another too close")
             end
         end
     end

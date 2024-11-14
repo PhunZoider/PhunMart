@@ -1,7 +1,7 @@
 if isClient() then
     return
 end
-require "PhunMart_SShopSystem"
+require "PhunMart_Server_System"
 
 local PM = PhunMart
 local sandbox = SandboxVars.PhunMart

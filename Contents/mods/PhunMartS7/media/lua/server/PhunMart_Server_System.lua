@@ -91,11 +91,10 @@ function SPhunMartSystem:addFromSprite(x, y, z, sprite)
                 print("ERROR! shop not found for sprite " .. sprite)
                 return
             end
-            print("Adding " .. shop.key .. " to " .. x .. "," .. y .. "," .. z .. " with sprite " .. sprite ..
-                      " facing " .. dir)
+            -- print("Adding " .. shop.key .. " to " .. x .. "," .. y .. "," .. z .. " with sprite " .. sprite ..
+            --           " facing " .. dir)
 
-            print("Recreating orphan ", key, " from sprite ", sprite, " dir=", dir)
-            PhunTools:printTable(PM.shops[key])
+            -- print("Recreating orphan ", key, " from sprite ", sprite, " dir=", dir)
             self.addToWorld(square, s, dir)
         end
     else

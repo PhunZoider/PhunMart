@@ -639,7 +639,6 @@ Conditions.price = function(self, playerObj, item, price, results)
         end
     end
     local all = allocation
-    PhunTools:printTable(allocation)
     -- deduct items that player has in inventory
     for k, v in pairs(satisfied) do
         for _, cur in ipairs(v.currencies) do
