@@ -54,23 +54,20 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
         end
 
         option.toolTip = toolTip;
-    elseif found then
-        if spriteName then
-            print("Orphaned vending machine found at " .. square:getX() .. ", " .. square:getY() .. " with sprite=" ..
-                      tostring(spriteName))
-            local args = {
-                location = {
-                    x = square:getX(),
-                    y = square:getY(),
-                    z = square:getZ()
-                },
-                sprite = spriteName
-            }
-            sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
+    elseif spriteName then
+        player:Say("It is jammed, let me try that again.")
+        print("Orphaned vending machine found at " .. square:getX() .. ", " .. square:getY() .. " with sprite=" ..
+                  tostring(spriteName))
+        local args = {
+            location = {
+                x = square:getX(),
+                y = square:getY(),
+                z = square:getZ()
+            },
+            sprite = spriteName
+        }
+        sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
 
-        else
-            print("Found vending machine, but it is missing an id and spritename")
-        end
     end
 
     if isAdmin() then
