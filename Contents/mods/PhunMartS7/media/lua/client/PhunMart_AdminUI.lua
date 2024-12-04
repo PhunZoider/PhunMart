@@ -68,13 +68,13 @@ end
 
 function PhunMartAdminUI:createChildren()
     ISPanel.createChildren(self);
-    local FONT_HGT = getTextManager():getFontHeight(UIFont.Medium);
+    local FONT_HGT = getTextManager():getFontHeight(UIFont.Small);
 
     local x = 10
     local y = 10
     local h = 20;
     local w = self.width - 20;
-    self.title = ISLabel:new(x, y, FONT_HGT, "Tools", 1, 1, 1, 1, UIFont.Medium, true);
+    self.title = ISLabel:new(x, y, FONT_HGT, "Tools", 1, 1, 1, 1, UIFont.Small, true);
     self.title:initialise();
     self.title:instantiate();
     self:addChild(self.title);

@@ -37,32 +37,28 @@ Events.OnFillContainer.Add(function(roomtype, containertype, container)
         local parent = container:getParent()
         if parent and parent.getModData then
             local data = parent:getModData()
-            if not data or not data.PhunMart then
+            local key = SandboxVars.PhunMart.PhunMartVanillaTestKey or "PhunMartTested"
+            if not data or not data[key] then
+                print("PhunMart: Testing for conversion=false ", key)
                 -- do we convert to machines?
+                data[key] = true
 
                 local rng = ZombRand(1, 100)
-
-                if rng < 20 then
-                    data = {
-                        tested = true
-                    }
-                else
-                    -- if containertype == "vendingpop" then
+                -- print(tostring(rng), " vs ", tostring(SandboxVars.PhunMart.PhunMartVanillaChance))
+                if rng < (SandboxVars.PhunMart.PhunMartVanillaChance or 80) then
+                    -- print("PhunMart: Converting to machine")
                     local spriteName = parent:getSprite():getName()
                     local direction = PhunMart.spriteMap[spriteName] or nil
 
                     if direction ~= nil then
                         local square = parent:getSquare()
                         local isoObject = SPhunMartSystem.instance:generateRandomShopOnSquare(square, direction, parent)
-                    else
-                        data = {
-                            -- PhunMart = {
-                            --     tested = true
-                            -- }
-                        }
                     end
-
+                    -- else
+                    --     print("PhunMart: Not converting to machine")
                 end
+            else
+                print("PhunMart: Testing for conversion=true ", key)
             end
         end
     end

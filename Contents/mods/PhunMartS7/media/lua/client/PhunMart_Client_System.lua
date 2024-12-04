@@ -91,7 +91,8 @@ function CPhunMartSystem:reroll(shop, target, playerObj)
     self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShopGenerate, {
         shopId = shop.id,
         target = target,
-        location = shop.location
+        location = shop.location,
+        ignoreDistance = shop.ignoreDistance == true
     })
 end
 
@@ -134,7 +135,7 @@ local function DoSpecialTooltip(tooltip, square)
     DoSpecialTooltip1(tooltip, square)
 end
 
---Events.DoSpecialTooltip.Add(DoSpecialTooltip)
+-- Events.DoSpecialTooltip.Add(DoSpecialTooltip)
 
 local _lastHighlighted = nil
 

@@ -135,10 +135,10 @@ function SPhunMartSystem:generateRandomShopOnSquare(square, direction, removeOnS
 
 end
 
-function SPhunMartSystem:reroll(location, target)
+function SPhunMartSystem:reroll(location, target, ignoreDistance)
 
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
-    local shop = PM:generateShop(location, target)
+    local shop = PM:generateShop(location, target, ignoreDistance == true)
     shopObj:fromModData(shop)
     shopObj:changeSprite(true)
     shopObj:saveData()
@@ -363,7 +363,10 @@ function SPhunMartSystem:closestShopTypesTo(location)
             local dx = location.x - obj.location.x
             local dy = location.y - obj.location.y
             local distance = math.sqrt(dx * dx + dy * dy)
-            print(" ---- distance: ", distance, " type:", tostring(obj.type), " key:", tostring(obj.key))
+            if shops[obj.type or obj.key] ~= nil then
+                print(" ---- distance: ", distance, " type:", tostring(obj.type), " key:", tostring(obj.key), " t=",
+                    tostring(shops[obj.type or obj.key].distance))
+            end
             if shops[obj.type or obj.key] == nil or distance < shops[obj.type or obj.key].distance then
                 shops[obj.type or obj.key] = {
                     distance = distance,

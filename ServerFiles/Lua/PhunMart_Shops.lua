@@ -16,7 +16,7 @@ return { --[[
     maxRestock = 1000,
     currency = "PhunMart.SilverDollar", -- the default currency for shops
     backgroundImage = "machine-none",
-    minDistance = 500,
+    minDistance = 200,
     spites = {"location_shop_accessories_01_17", "location_shop_accessories_01_16", "location_shop_accessories_01_28",
               "location_shop_accessories_01_29", "location_shop_accessories_01_19", "location_shop_accessories_01_18",
               "location_shop_accessories_01_31", "location_shop_accessories_01_30"}
@@ -303,7 +303,7 @@ return { --[[
     inherits = "base-shop",
     label = "TraiterJoe",
     type = "TRAITS",
-    minDistance = 5000,
+    minDistance = 1000,
     currency = "PhunMart.TraiterToken", -- change default currency to traiter tokens
     requiresPower = true,
     backgroundImage = "machine-traiter-joes",

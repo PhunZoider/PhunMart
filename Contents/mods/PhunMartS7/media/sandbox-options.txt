@@ -59,3 +59,21 @@ option PhunMart.PhunMartShowNextRestockDate
     page = PhunMart, 
     translation = PhunMartShowNextRestockDate
 }
+
+option PhunMart.PhunMartVanillaTestKey
+{ 
+    type = string,
+    default = PhunMartTest, 
+    page = PhunMart, 
+    translation = PhunMartVanillaTestKey
+}
+
+option PhunMart.PhunMartVanillaChance
+{ 
+    type = integer, 
+    default = 80, 
+    min = 1,
+    max = 100,
+    page = PhunMart, 
+    translation = PhunMartVanillaChance
+}

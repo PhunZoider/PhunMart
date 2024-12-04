@@ -1,7 +1,7 @@
 if not isClient() then
     return
 end
-
+require "P4HasBeenRead"
 local PhunMart = PhunMart
 
 function PhunMart:getDisplayValues(item)
@@ -10,6 +10,7 @@ function PhunMart:getDisplayValues(item)
     display.textureVal = display.textureVal or PhunMart:getTextureFromItem(item.display or {})
     display.labelVal = display.labelVal or PhunMart:getLabelFromItem(item.display or {}) or item.key
     display.overlayVal = display.overlayVal or PhunMart:getOverlayFromItem(item.display or {})
+    display.hasBeenReadVal = PhunMart:hasBeenRead(item.display)
     display.descriptionVal = display.descriptionVal or PhunMart:getDescriptionFromItem(item.display or {})
     return display
 end

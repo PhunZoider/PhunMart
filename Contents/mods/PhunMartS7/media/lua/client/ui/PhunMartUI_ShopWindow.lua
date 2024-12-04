@@ -12,14 +12,14 @@ UI.DrawType = {}
 UI.layouts = {
     default = {
         window = {
-            width = 537,
-            height = 728
+            width = 369, -- 537,
+            height = 500 -- 728
         },
         tabs = {
-            x = 45,
-            y = 145,
-            width = 299,
-            height = 476,
+            x = 31, -- 45,
+            y = 100, -- 145,
+            width = 206, -- 299,
+            height = 326, -- 476,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -28,10 +28,10 @@ UI.layouts = {
             }
         },
         previewPanel = {
-            x = 378,
-            y = 145,
-            width = 150,
-            height = 150,
+            x = 261, -- 378,
+            y = 100, -- 145,
+            width = 104, -- 150,
+            height = 100, -- 150,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -40,10 +40,10 @@ UI.layouts = {
             }
         },
         pricePanel = {
-            x = 378,
-            y = 305,
-            width = 150,
-            height = 316,
+            x = 261, -- 378,
+            y = 210, -- 305,
+            width = 104, -- 150,
+            height = 218, -- 316,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -52,10 +52,10 @@ UI.layouts = {
             }
         },
         detailsPanel = {
-            x = 378,
-            y = 305,
-            width = 150,
-            height = 316,
+            x = 261, -- 378,
+            y = 210, -- 305,
+            width = 104, -- 150,
+            height = 218, -- 316,
             backgroundColor = {
                 r = 0,
                 g = 0,
@@ -64,33 +64,33 @@ UI.layouts = {
             }
         },
         buyButton = {
-            x = 30,
-            y = 645,
-            width = 315,
-            height = 62
+            x = 21, -- 30,
+            y = 445, -- 645,
+            width = 217, -- 315,
+            height = 43 -- 62
         },
         close = {
-            x = 505,
-            y = 10,
+            x = 348, -- 505,
+            y = 5,
             width = 25,
             height = 25
         },
         restock = {
-            x = 378,
-            y = 643,
-            width = 70,
+            x = 261, -- 378,
+            y = 444, -- 643,
+            width = 48, -- 70,
             height = 25
         },
         reroll = {
-            x = 458,
-            y = 643,
-            width = 70,
+            x = 316, -- 458,
+            y = 444, -- 643,
+            width = 48, -- 70,
             height = 25
         },
         admin = {
-            x = 378,
-            y = 678,
-            width = 150,
+            x = 261, -- 378,
+            y = 468, -- 678,
+            width = 104, -- 150,
             height = 25
         }
     }
@@ -448,7 +448,7 @@ function UI:render()
         else
             txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
         end
-        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 12, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     end
 
     if self.shopObj and self.shopObj.requiresPower then

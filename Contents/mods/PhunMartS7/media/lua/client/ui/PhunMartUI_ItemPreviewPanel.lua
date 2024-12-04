@@ -36,7 +36,7 @@ function PhunMartUIItemPreviewPanel:new(x, y, width, height, options)
         b = 0.7,
         a = 0.5
     };
-    o.tabFont = opts.tabFont or UIFont.Medium
+    o.tabFont = opts.tabFont or UIFont.Small
     o.selectedItem = {}
     PhunMartUIItemPreviewPanel.instance = o;
     return o;
@@ -65,6 +65,20 @@ function PhunMartUIItemPreviewPanel:createChildren()
         end
         if self.overlay then
             self:drawTextureScaledAspect(self.overlay, 0, 0, self:getWidth(), self:getHeight(), 1)
+        end
+        if self.hasBeenReadVal then
+            local th = self:getWidth() * .5
+            if self.hasBeenReadVal.status then
+                local textured =
+                    self:drawTextureScaledAspect2(self.hasBeenReadVal.statu, 0, th - 10, th, th, 1, 1, 1, 1)
+            end
+            if self.hasBeenReadVal.marking then
+                local textured = self:drawTextureScaledAspect2(self.hasBeenReadVal.marking, 0 + 20, th - 10, th, th, 1,
+                    1, 1, 1)
+            end
+            if self.hasBeenReadVal.current then
+                local textured = self:drawTextureScaledAspect2(self.hasBeenReadVal.current, 0, 0, th, th, 1, 1, 1, 1)
+            end
         end
     end
     self.panel:addChild(self.previewPanel)
@@ -99,6 +113,11 @@ function PhunMartUIItemPreviewPanel:setItem(item, display)
     if item then
         self.previewPanel3d:setVisible(item.display.type == "VEHICLE")
         self.previewPanel:setVisible(item.display.type ~= "VEHICLE")
+        if display.hasBeenReadVal then
+            self.previewPanel.hasBeenReadVal = display.hasBeenReadVal
+        else
+            self.previewPanel.hasBeenReadVal = nil
+        end
         if display.textureVal then
             self.previewPanel.texture = display.textureVal
         else

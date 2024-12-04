@@ -9,6 +9,10 @@ local descriptionCache = {}
 local overlayCache = {}
 local carKeyTexture = getTexture("Item_CarKey")
 
+local p4 = nil
+local p4Textures = {}
+local p4Options = {}
+
 -- returns the display.label on client side for an item
 function PhunMart:getTextureFromItem(item)
 
@@ -84,10 +88,11 @@ function PhunMart:getLabelFromItem(item)
     if not labelCache[typeName] then
         labelCache[typeName] = {}
     end
+    local itemInstance = nil
     if labelCache[typeName][labelName] == nil then
 
         if typeName == "ITEM" then
-            local itemInstance = getScriptManager():getItem(labelName)
+            itemInstance = getScriptManager():getItem(labelName)
             if itemInstance and itemInstance.getDisplayName then
                 labelCache[typeName][labelName] = itemInstance:getDisplayName() or false
             else
@@ -133,7 +138,162 @@ function PhunMart:getLabelFromItem(item)
     if labelCache[typeName][labelName] == false then
         return nil
     end
+
     return labelCache[typeName][labelName]
+end
+
+function PhunMart:hasBeenRead(item)
+
+    if not item or not item.type == "ITEM" or not item.label then
+        return nil
+    end
+
+    local typeName = item.type
+    local labelName = item.label
+    local result = {
+        status = nil,
+        marking = nil,
+        current = nil
+    }
+    local itemInstance = getScriptManager():getItem(labelName)
+
+    if p4 == nil then
+        p4 = false
+        local p4data = ModData.get("P4HasBeenRead")
+        if p4data then
+            local pdata = getPlayer():getModData()
+            if not pdata.P4HasBeenRead then
+                pdata.P4HasBeenRead = {}
+                pdata.P4HasBeenRead.markedMap = {}
+            end
+            p4 = pdata.P4HasBeenRead.markedMap
+            p4Textures.textureBookNR = getTexture("media/ui/P4HasBeenRead_Book_NR.png")
+            p4Textures.textureBookNC = getTexture("media/ui/P4HasBeenRead_Book_NC.png")
+            p4Textures.textureBookAR = getTexture("media/ui/P4HasBeenRead_Book_AR.png")
+            p4Textures.textureBookSM = getTexture("media/ui/P4HasBeenRead_Book_SM.png")
+            p4Textures.textureBookCT = getTexture("media/ui/P4HasBeenRead_Book_CT.png")
+
+            p4Textures.notReadTexture = p4Textures.textureBookNR
+            p4Textures.notCompletedTexture = p4Textures.textureBookNC
+            p4Textures.alreadyReadTexture = nil
+            p4Textures.selfMarkingTexture = p4Textures.textureBookSM
+            p4Textures.currentTargetTexture = p4Textures.textureBookCT
+
+            p4Options = {
+                showNR = true,
+                showNC = true,
+                showAR = false,
+                showNCasNR = false,
+                showSM = true,
+                showCT = true,
+                enableMap = true,
+                enableCD = true,
+                enableVHS = true,
+                enableHVHS = true,
+                autoMark = false,
+                reverseMarkDisplay = false
+            }
+        end
+    end
+
+    if itemInstance and p4 then
+        local category = itemInstance:getDisplayCategory()
+        local statusTexture = nil
+        local selfMarkingTexture = nil
+        local currentTargetTexture = nil
+        if category == "SkillBook" then
+            local p = p4
+
+            local player = getPlayer()
+            local skillBook = SkillBook[itemInstance:getSkillTrained()]
+            if skillBook then
+                local perkLevel = player:getPerkLevel(skillBook.perk)
+                local trained = itemInstance:getSkillTrained()
+                local skillBook = SkillBook[trained]
+                if not skillBook then
+                    statusTexture = p4Textures.notReadTexture
+                else
+                    statusTexture = p4Textures.alreadyReadTexture
+                end
+
+                -- local minLevel = itemInstance:getLvlSkillTrained()
+                -- local maxLevel = itemInstance:getMaxLevelTrained()
+                -- if (minLevel <= perkLevel + 1) and (perkLevel + 1 <= maxLevel) then
+                --     currentTargetTexture = p4Textures.currentTargetTexture
+                -- end
+                -- local readPages = player:getAlreadyReadPages(itemInstance:getFullType())
+                -- if readPages >= itemInstance:getNumberOfPages() then
+                --     statusTexture = p4Textures.alreadyReadTexture
+                -- elseif perkLevel >= maxLevel then
+                --     statusTexture = p4Textures.alreadyReadTexture
+                -- elseif readPages > 0 then
+                --     statusTexture = p4Textures.notCompletedTexture
+                -- else
+                --     statusTexture = p4Textures.notReadTexture
+                -- end
+            elseif itemInstance:getTeachedRecipes() and not itemInstance:getTeachedRecipes():isEmpty() then
+                if player:getKnownRecipes():containsAll(itemInstance:getTeachedRecipes()) then
+                    statusTexture = p4Textures.alreadyReadTexture
+                else
+                    statusTexture = p4Textures.notReadTexture
+                end
+            end
+
+            if p4[labelName] then
+                if not p4Options.reverseMarkDisplay then
+                    selfMarkingTexture = p4Textures.selfMarkingTexture
+                end
+            else
+                if p4Options.reverseMarkDisplay then
+                    selfMarkingTexture = p4Textures.selfMarkingTexture
+                end
+            end
+
+            result.marked = p[labelName] ~= nil
+            -- local player = getPlayer()
+            -- if itemInstance.getTeachedRecipes and itemInstance:getTeachedRecipes() and
+            --     not itemInstance:getTeachedRecipes():isEmpty() then
+
+            --     local recs = player:getKnownRecipes()
+            --     local itemRecs = itemInstance:getTeachedRecipes()
+            --     if recs:contains(itemRecs) then
+            --         result.read = true
+            --     else
+            --         result.unread = true
+            --     end
+            -- else
+            --     local trained = itemInstance:getSkillTrained()
+            --     local skillBook = SkillBook[trained]
+
+            --     if skillBook then
+            --         local perkLevel = player:getPerkLevel(skillBook.perk)
+            --         local minLevel = item:getLvlSkillTrained()
+            --         local maxLevel = item:getMaxLevelTrained()
+            --         if (minLevel <= perkLevel + 1) and (perkLevel + 1 <= maxLevel) then
+            --             currentTargetTexture = p4Textures.currentTargetTexture
+            --         end
+            --         local readPages = player:getAlreadyReadPages(item:getFullType())
+            --         if readPages >= item:getNumberOfPages() then
+            --             statusTexture = p4Textures.alreadyReadTexture
+            --         elseif perkLevel >= maxLevel then
+            --             statusTexture = p4Textures.alreadyReadTexture
+            --         elseif readPages > 0 then
+            --             statusTexture = p4Textures.notCompletedTexture
+            --         else
+            --             statusTexture = p4Textures.notReadTexture
+            --         end
+            --     end
+            --     result.read = p[labelName] ~= nil
+
+            --     result.unread = not trained and skillBook[trained]
+            -- end
+
+        end
+        result.status = statusTexture
+        result.marking = selfMarkingTexture
+        result.current = currentTargetTexture
+    end
+    return result
 end
 
 function PhunMart:getDescriptionFromItem(item)

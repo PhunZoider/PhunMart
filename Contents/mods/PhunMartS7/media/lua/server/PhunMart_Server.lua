@@ -258,14 +258,14 @@ function PhunMart:generateShopItems(shopInstance, cumulativeModel)
     return items
 end
 
-function PhunMart:getShopListFromKey(location)
+function PhunMart:getShopListFromKey(location, ignoreDistance)
 
     local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
-    -- print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
-    -- print("----------")
-    -- PhunTools:printTable(distances)
-    -- print("----------")
+    print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
+    print("----------")
+    PhunTools:printTable(distances)
+    print("----------")
 
     local zoneInfo = self:getZoneInfo(location)
 
@@ -282,7 +282,8 @@ function PhunMart:getShopListFromKey(location)
             -- print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
             --           tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
 
-            if minDistance == 0 or not distances[distanceKey] or (minDistance < distances[distanceKey].distance) then
+            if ignoreDistance == true or minDistance == 0 or not distances[distanceKey] or
+                (minDistance < distances[distanceKey].distance) then
                 if v.zones and type(v.zones) == "table" then
 
                     local difficultyMin = 0
@@ -349,7 +350,7 @@ function PhunMart:getShopListFromKey(location)
 
 end
 
-function PhunMart:generateShop(vendingMachineOrKey, forceKey)
+function PhunMart:generateShop(vendingMachineOrKey, forceKey, ignoreDistance)
 
     local key = self:getKey(vendingMachineOrKey)
     local location = self:xyzFromKey(key)
@@ -373,7 +374,7 @@ function PhunMart:generateShop(vendingMachineOrKey, forceKey)
         if resKey and self.defs.shops[resKey] and self.defs.shops[resKey].enabled then
             chosenShopDef = self.defs.shops[resKey]
         else
-            local shopCandidates = self:getShopListFromKey(location)
+            local shopCandidates = self:getShopListFromKey(location, ignoreDistance)
             if shopCandidates == nil then
                 print("No shop candidates found for " .. key)
                 if self.shops[key] then

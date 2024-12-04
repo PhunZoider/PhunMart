@@ -37,7 +37,7 @@ function PunMartUIPricePanel:new(x, y, width, height, options)
         b = 0.7,
         a = 0.5
     };
-    o.tabFont = opts.tabFont or UIFont.Medium
+    o.tabFont = opts.tabFont or UIFont.Small
     o.selectedItem = {}
     o.cachedItem = {}
     o.canBuy = {}

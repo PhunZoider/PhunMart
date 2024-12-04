@@ -203,7 +203,7 @@ end
 
 -- generates or re-generates shop and inventory
 Commands[PM.commands.requestShopGenerate] = function(playerObj, args)
-    SPhunMartSystem.instance:reroll(args.location, args.target)
+    SPhunMartSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
 end
 
 Commands[PM.commands.spawnVehicle] = function(playerObj, args)

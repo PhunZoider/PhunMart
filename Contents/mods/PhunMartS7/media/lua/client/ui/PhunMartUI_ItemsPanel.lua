@@ -50,9 +50,9 @@ function PhunMartUIItemsPanel:new(x, y, width, height, options)
         a = 0.5
     };
     o.viewer = opts.viewer or getPlayer()
-    o.tabFont = opts.tabFont or UIFont.Medium
+    o.tabFont = opts.tabFont or UIFont.Small
     o.selections = {}
-    o.tabHeight = opts.tabHeight or FONT_HGT_MEDIUM + 6
+    o.tabHeight = opts.tabHeight or FONT_HGT_SMALL + 6
     PhunMartUIItemsPanel.instance = o;
     return o;
 end
@@ -90,7 +90,7 @@ function PhunMartUIItemsPanel:rebuildTabs(reset)
             self.tabPanel.height - self.tabPanel.tabHeight)
 
         scrollingList.itemPadY = 10 * FONT_SCALE
-        scrollingList.itemheight = FONT_HGT_LARGE + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
+        scrollingList.itemheight = FONT_HGT_MEDIUM + scrollingList.itemPadY * 2 + 1 * FONT_SCALE + FONT_HGT_SMALL
         scrollingList.textureHeight = scrollingList.itemheight - scrollingList.itemPadY * 2
         scrollingList.mouseoverselected = -1
         scrollingList.background = false
@@ -301,13 +301,30 @@ function PhunMartUIItemsPanel:doDrawItem(y, row, alt)
             self.textureHeight, itemAlpha, 1, 1, 1)
 
     end
+
+    if display.hasBeenReadVal then
+        local th = self.textureHeight * .5
+        if display.hasBeenReadVal.status then
+            local textured = self:drawTextureScaledAspect2(display.hasBeenReadVal.status, x,
+                y + self.textureHeight - 10, th, th, itemAlpha, 1, 1, 1)
+        end
+        if display.hasBeenReadVal.marking then
+            local textured = self:drawTextureScaledAspect2(display.hasBeenReadVal.marking, x + 20,
+                y + self.textureHeight - 10, th, th, itemAlpha, 1, 1, 1)
+        end
+        if display.hasBeenReadVal.current then
+            local textured = self:drawTextureScaledAspect2(display.hasBeenReadVal.current, x, y + 10,
+                self.textureHeight, self.textureHeight, itemAlpha, 1, 1, 1)
+        end
+    end
+
     x = x + self.itemPadY + self.textureHeight
     x2 = x
 
     local txt = nil
 
     txt = getText("IGUI_PhunMartInventoryAmount", inventoryVal)
-    self:drawText(txt, x, (y + FONT_HGT_LARGE + 3 * FONT_SCALE) + 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+    self:drawText(txt, x, (y + FONT_HGT_MEDIUM + 3 * FONT_SCALE) + 10, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     x = x + getTextManager():MeasureStringX(UIFont.Small, txt)
 
     x = x2

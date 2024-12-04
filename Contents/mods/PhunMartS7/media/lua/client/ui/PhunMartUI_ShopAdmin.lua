@@ -80,9 +80,9 @@ function PhunMartUIShopAdmin:createChildren()
 
     local x = 10
     local y = 10
-    local h = FONT_HGT_MEDIUM;
+    local h = FONT_HGT_SMALL;
     local w = self.width - 20;
-    self.title = ISLabel:new(x, y, h, "Tools", 1, 1, 1, 1, UIFont.Medium, true);
+    self.title = ISLabel:new(x, y, h, "Tools", 1, 1, 1, 1, UIFont.Small, true);
     self.title:initialise();
     self.title:instantiate();
     self:addChild(self.title);
@@ -113,8 +113,8 @@ function PhunMartUIShopAdmin:createChildren()
 
     self.tabPanel = ISTabPanel:new(x, y, self.width - x - x, self.height - y - 45)
     self.tabPanel:initialise()
-    self.tabPanel.tabFont = UIFont.Medium
-    self.tabPanel.tabHeight = FONT_HGT_MEDIUM + 6
+    self.tabPanel.tabFont = UIFont.Small
+    self.tabPanel.tabHeight = FONT_HGT_SMALL + 6
     self.tabPanel.activateView = function(self, viewname)
         ISTabPanel.activateView(self, viewname)
         self.parent:setSelected(viewname, self.activeView.view.selected)

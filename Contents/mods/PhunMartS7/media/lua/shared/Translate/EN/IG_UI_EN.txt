@@ -92,7 +92,7 @@ IGUI_EN = {
     IGUI_PhunMart.CallForX = "Call for %1"
     IGUI_PhunMart.CannotCallForXInside = "I cannot call for a %1 from inside a building"
 
-    IGUI_PhunMart.YouWillReceive = "You will receive"
+    IGUI_PhunMart.YouWillReceive = "Receive"
     IGUI_PhunMart.Receives.traitRemoved = "removal of %1 trait"
     IGUI_PhunMart.Receives.traitAdded = "%1 trait"
 
