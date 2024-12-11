@@ -37,7 +37,8 @@ PhunMart = {
         closeAllShops = "closeAllShops",
         closeShop = "closeShop",
         requestLock = "requestLock",
-        addFromSprite = "addFromSprite"
+        addFromSprite = "addFromSprite",
+        requestLocations = "PhunMartRequestLocations"
 
     },
     events = {
@@ -51,7 +52,8 @@ PhunMart = {
         OnShopQueueFilesReadyToProcess = "OnPhunMartShopQueueFilesReadyToProcess",
         OnShopQueueProcessed = "OnPhunMartShopQueueProcessed",
         OnShopDefsReloaded = "OnPhunMartShopDefsReloaded",
-        OnShopItemDefsReloaded = "OnPhunMartOnShopItemDefsReloaded"
+        OnShopItemDefsReloaded = "OnPhunMartOnShopItemDefsReloaded",
+        OnShopLocationsReceived = "OnPhunMartShopLocationsReceived"
     },
     hooks = {
         currencyLabel = {},
@@ -288,12 +290,7 @@ end
 function PhunMart:getZoneInfo(location)
 
     if self.maps == nil then
-        local mods = getActivatedMods()
-        if mods:contains("PhunZones") then
-            self.maps = PhunZones
-        else
-            self.maps = false
-        end
+        self.maps = PhunZones or false
     end
 
     if self.maps == false or self.maps == nil then

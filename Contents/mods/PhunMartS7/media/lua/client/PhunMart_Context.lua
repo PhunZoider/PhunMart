@@ -76,9 +76,17 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
     end
 
     if isAdmin() then
+
+        local adminOption = context:addOption("PhunVend", worldobjects, nil)
+        local adminSubMenu = ISContextMenu:getNew(context)
+
+        adminSubMenu:addOption("Locations", player, function()
+            PhunMartUIAdminShops.OnOpenPanel(player)
+        end)
+
         if spriteName then
             if found then
-                context:addOption("PhunMart: Reroll", player, function()
+                adminSubMenu:addOption("PhunMart: Reroll", player, function()
                     CPhunMartSystem.instance:reroll({
                         ignoreDistance = true,
                         location = {
@@ -91,7 +99,7 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
             end
 
         elseif isVanillaMachine then
-            context:addOption("PhunMart: Convert", player, function()
+            adminSubMenu:addOption("PhunMart: Convert", player, function()
                 local args = {
                     location = {
                         x = square:getX(),
@@ -103,6 +111,7 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
                 sendClientCommand(player, PhunMart.name, PhunMart.commands.addFromSprite, args)
             end)
         end
+        context:addSubMenu(adminOption, adminSubMenu)
     end
 
 end

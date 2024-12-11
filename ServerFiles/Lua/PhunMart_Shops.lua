@@ -48,6 +48,48 @@ return { --[[
         south = "phunmart_01_1"
     }
 }, {
+    label = "HardWare",
+    key = "shop-clothing",
+    type = "CLOTHING",
+    inherits = "base-shop",
+    fills = {
+        min = 5,
+        max = 7
+    },
+    zones = {
+        difficulty = 1
+    },
+    pools = {
+        items = {{
+            filters = {
+                tags = "clothing,clothaccessories,clothspecial"
+            }
+        }, {
+            filters = {
+                tags = "clothing,clothhat,clothunderwear"
+            }
+        }, {
+            filters = {
+                tags = "clothing,clothshirt,clothgloves,clothdress"
+            }
+        }, {
+            filters = {
+                tags = "clothing,clothcoat,clothbag"
+            }
+        }, {
+            filters = {
+                tags = "clothing,clothshoes,clothpants"
+            }
+        }}
+    },
+    backgroundImage = "machine-collectors",
+    sprites = {
+        sheet = 3,
+        row = 1,
+        east = "phunmart_01_0",
+        south = "phunmart_01_1"
+    }
+}, {
     label = "Collectors",
     key = "shop-collectables",
     type = "COLLECTABLES",
@@ -185,6 +227,7 @@ return { --[[
     key = "shop-tools",
     inherits = "base-shop",
     type = "TOOLS",
+    label = "Pity The Tool",
     backgroundImage = "machine-pity-the-tool",
     basePrice = 4,
     pools = {

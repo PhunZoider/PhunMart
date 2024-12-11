@@ -201,4 +201,16 @@ return {{
     name = "Base.Perfume",
     inherits = "base-medical-medpills",
     mod = "EssentialCrafting"
+}, {
+    name = "RadiatedZones.Iodine",
+    inherits = "base-medical-medpills",
+    mod = "RadiatedZones"
+}, {
+    name = "RadiatedZones.CivGeigerTeller",
+    inherits = "base-medical-medtools",
+    mod = "RadiatedZones"
+}, {
+    name = "RadiatedZones.GeigerTeller",
+    inherits = "base-medical-medtools",
+    mod = "RadiatedZones"
 }}

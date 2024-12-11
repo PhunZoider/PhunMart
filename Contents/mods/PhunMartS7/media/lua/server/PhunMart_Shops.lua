@@ -5,6 +5,24 @@ require "PhunMart_Core"
 local PhunMart = PhunMart
 local PhunTools = PhunTools
 
+local shopExample = {}
+
+local itemGroupExample = {
+    id = "group-1",
+    tab = "tab-1",
+    inventory = {
+        min = 1, -- defaults to 1
+        max = 10 -- defaults to min
+    }, -- or 1 (default)
+    price = {
+        default = {
+            min = 10, -- defaults to 1
+            max = 15 -- defaults to min
+        }
+    }, -- or 10 (default)
+    recieve = {}
+}
+
 function PhunMart:validateShopDef(shop)
     local issues = {}
     if not shop.abstract and shop.enabled then
@@ -53,6 +71,8 @@ function PhunMart:validateShops()
             v.enabled = false
             results.abstract = results.abstract + 1
         elseif not v.enabled then
+            print("Shop " .. v.key .. " is disabled")
+            PhunTools:printTable(v)
             results.disabled = results.disabled + 1
         else
             local issues = self:validateShopDef(v)

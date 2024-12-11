@@ -289,6 +289,7 @@ function PhunMart:formatItem(data)
     --- @type PhunMartItem
     local formatted = {
         key = key, -- unique refernce for this item
+        inherits = data.inherits or base.key or nil,
         probability = data.probability or base.probability or nil,
         tab = data.tab or base.tab or nil,
         mod = data.mod or base.mod or nil,

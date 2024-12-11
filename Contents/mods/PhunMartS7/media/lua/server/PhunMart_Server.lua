@@ -262,10 +262,10 @@ function PhunMart:getShopListFromKey(location, ignoreDistance)
 
     local distances = SPhunMartSystem.instance:closestShopTypesTo(location)
 
-    print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
-    print("----------")
-    PhunTools:printTable(distances)
-    print("----------")
+    -- print("Distances from " .. tostring(location.x) .. "," .. tostring(location.y))
+    -- print("----------")
+    -- PhunTools:printTable(distances)
+    -- print("----------")
 
     local zoneInfo = self:getZoneInfo(location)
 
@@ -279,8 +279,8 @@ function PhunMart:getShopListFromKey(location, ignoreDistance)
             local distanceKey = v.type or v.key
             local distance = distances[distanceKey] and distances[distanceKey].distance or 0
 
-            -- print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
-            --           tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
+            print("Min distance for " .. tostring(v.key) .. " is " .. tostring(minDistance) .. " and distance is " ..
+                      tostring(distance) .. " using distanceKey " .. tostring(distanceKey))
 
             if ignoreDistance == true or minDistance == 0 or not distances[distanceKey] or
                 (minDistance < distances[distanceKey].distance) then
@@ -295,7 +295,7 @@ function PhunMart:getShopListFromKey(location, ignoreDistance)
                         else
                             difficultyMin = v.zones.difficulty
                         end
-                        -- print(" - Difficulty range " .. tostring(difficultyMin) .. " to " .. tostring(difficultyMax))
+                        print(" - Difficulty range " .. tostring(difficultyMin) .. " to " .. tostring(difficultyMax))
                     end
 
                     local names = v.zones.keys or {}
@@ -315,15 +315,15 @@ function PhunMart:getShopListFromKey(location, ignoreDistance)
                             })
                             totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                         else
-                            -- if not difficultyOk then
-                            --     print(" - Skipping " .. v.key .. " because difficulty is out of range")
-                            -- end
-                            -- if not nameOk then
-                            --     print(" - Skipping " .. v.key .. " because zone " .. zoneInfo.key .. " is not allowed")
-                            -- end
+                            if not difficultyOk then
+                                print(" - Skipping " .. v.key .. " because difficulty is out of range")
+                            end
+                            if not nameOk then
+                                print(" - Skipping " .. v.key .. " because zone " .. zoneInfo.key .. " is not allowed")
+                            end
                         end
                     else
-                        -- print(" - Skipping " .. v.key .. " because no zone info")
+                        print(" - Skipping " .. v.key .. " because no zone info")
                     end
                 else
                     table.insert(shops, {
@@ -333,8 +333,10 @@ function PhunMart:getShopListFromKey(location, ignoreDistance)
                     totalProbability = totalProbability + (v.probability or sandbox.DefaultItemProbability or 1)
                 end
             else
-                -- print(" - Skipping " .. v.key .. " because there is another too close")
+                print(" - Skipping " .. v.key .. " because there is another too close")
             end
+        else
+            print(" - Skipping " .. v.key .. " because it is disabled or reserved")
         end
     end
 

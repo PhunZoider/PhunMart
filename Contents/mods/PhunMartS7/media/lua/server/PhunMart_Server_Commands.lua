@@ -36,8 +36,8 @@ Commands[PM.commands.requestShopDefs] = function(playerObj, args)
 end
 
 Commands[PM.commands.addFromSprite] = function(playerObj, args)
-    print("Orphaned vending machine found at " .. args.location.x .. ", " .. args.location.y .. " sprite: " ..
-              args.sprite)
+    print("Orphaned vending machine found at " .. tostring(args.location.x) .. ", " .. tostring(args.location.y) ..
+              " sprite: " .. tostring(args.sprite))
     SPhunMartSystem.instance:addFromSprite(args.location.x, args.location.y, args.location.z, args.sprite)
 end
 
@@ -217,6 +217,14 @@ Commands[PM.commands.spawnVehicle] = function(playerObj, args)
     vehicle:repair()
     playerObj:sendObjectChange("addItem", {
         item = vehicle:createVehicleKey()
+    })
+end
+
+Commands[PM.commands.requestLocations] = function(playerObj, args)
+    local locations = SPhunMartSystem.instance:getShopLocations(args.key)
+    sendServerCommand(playerObj, PM.name, PM.commands.requestLocations, {
+        playerIndex = playerObj:getPlayerNum(),
+        locations = locations
     })
 end
 

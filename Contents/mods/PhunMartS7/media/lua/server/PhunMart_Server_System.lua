@@ -353,6 +353,19 @@ function SPhunMartSystem:restock(shop, playerObj)
     self:requestShop(shop.id, playerObj, true)
 end
 
+function SPhunMartSystem:getShopLocations(key)
+    local instances = {}
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            if obj.key == key then
+                table.insert(instances, obj.location)
+            end
+        end
+    end
+    return instances
+end
+
 function SPhunMartSystem:closestShopTypesTo(location)
 
     local shops = {}
@@ -364,8 +377,8 @@ function SPhunMartSystem:closestShopTypesTo(location)
             local dy = location.y - obj.location.y
             local distance = math.sqrt(dx * dx + dy * dy)
             if shops[obj.type or obj.key] ~= nil then
-                print(" ---- distance: ", distance, " type:", tostring(obj.type), " key:", tostring(obj.key), " t=",
-                    tostring(shops[obj.type or obj.key].distance))
+                -- print(" ---- distance: ", distance, " type:", tostring(obj.type), " key:", tostring(obj.key), " t=",
+                --     tostring(shops[obj.type or obj.key].distance))
             end
             if shops[obj.type or obj.key] == nil or distance < shops[obj.type or obj.key].distance then
                 shops[obj.type or obj.key] = {

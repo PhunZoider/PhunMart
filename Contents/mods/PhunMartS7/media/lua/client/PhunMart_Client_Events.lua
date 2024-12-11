@@ -39,3 +39,25 @@ Events.OnGameStart.Add(function()
     Events.EveryOneMinute.Add(requestHistory)
 
 end)
+
+Events[PhunMart.events.OnShopDefsReloaded].Add(function(shops)
+    if PhunMartUIAdminShops then
+        for _, instance in pairs(PhunMartUIAdminShops.instances) do
+            instance:refreshShops(shops or {})
+        end
+    end
+end)
+Events[PhunMart.events.OnShopLocationsReceived].Add(function(locations)
+    if PhunMartUIAdminShops then
+        for _, instance in pairs(PhunMartUIAdminShops.instances) do
+            instance:refreshLocations(locations or {})
+        end
+    end
+end)
+Events[PhunMart.events.OnShopItemDefsReloaded].Add(function(items)
+    if PhunMartUIAdminShops then
+        for _, instance in pairs(PhunMartUIAdminShops.instances) do
+            instance:refreshItems(items or {})
+        end
+    end
+end)

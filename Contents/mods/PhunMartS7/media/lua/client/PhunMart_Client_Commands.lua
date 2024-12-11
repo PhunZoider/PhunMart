@@ -104,6 +104,10 @@ Commands[PhunMart.commands.requestItemDefs] = function(arguments)
     end
 end
 
+Commands[PhunMart.commands.requestLocations] = function(args)
+    triggerEvent(PhunMart.events.OnShopLocationsReceived, args.locations)
+end
+
 CPhunMartCommands = Commands
 
 -- Listen for commands from the server

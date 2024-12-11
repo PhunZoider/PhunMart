@@ -119,7 +119,7 @@ return {{
     inherits = "base-tools"
 }, {
     name = "Base.BlowTorch",
-    inherits = "base-tools"
+    inherits = "base-tools-toolwelding"
 }, {
     name = "Base.GardenSaw",
     inherits = "base-tools"
@@ -146,6 +146,13 @@ return {{
 }, {
     name = "camping.SteelAndFlint",
     inherits = "base-tools-toolcamping"
+}, {
+    name = "PhunSpawn.Escape Vent",
+    inherits = "base-tools-toolcamping",
+    mod = "PhunSpawn",
+    price = {
+        currency = 80
+    }
 }, {
     name = "Base.WeldingMask",
     inherits = "base-tools-toolwelding"

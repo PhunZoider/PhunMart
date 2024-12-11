@@ -321,10 +321,14 @@ end
 
 local Commands = {}
 
-Events[PhunMart.events.OnShopDefsReloaded] = function(shops)
-    PhunMartUIShopAdmin.instance:refreshData()
-end
+Events[PhunMart.events.OnShopDefsReloaded].Add(function(shops)
+    if PhunMartUIShopAdmin.instance then
+        PhunMartUIShopAdmin.instance:refreshData()
+    end
+end)
 
-Events[PhunMart.events.OnShopItemDefsReloaded] = function(items)
-    PhunMartUIShopAdmin.instance:refreshData()
-end
+Events[PhunMart.events.OnShopItemDefsReloaded].Add(function(items)
+    if PhunMartUIShopAdmin.instance then
+        PhunMartUIShopAdmin.instance:refreshItems(items)
+    end
+end)
