@@ -1,9 +1,9 @@
 version=1
-id=3362307173
+id=3393346404
 title=PhunMart
 description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
 description=
 description=beta testing! Currently play testing and balance tweaking on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 tags=Build 41
-visibility=public
+visibility=unlisted

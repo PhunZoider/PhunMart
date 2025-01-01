@@ -1080,7 +1080,8 @@ return {{
 }, {
     name = "Base.762Bullets",
     inherits = "base-weapons-wepammo",
-    mod = "VFExpansion1"
+    mod = "VFExpansion1",
+    quantity = 10
 }, {
     name = "Base.22Bullets",
     inherits = "base-weapons-wepammo",
