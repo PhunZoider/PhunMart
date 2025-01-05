@@ -233,6 +233,17 @@ return {{
         }
     }
 }, {
+    name = "PhunRad.GeigerCounter",
+    inherits = "base-electronics",
+    mod = "phunrad",
+    price = {
+        currency = {
+            base = 95,
+            min = 3,
+            max = 13
+        }
+    }
+}, {
     name = "Tikitown.Drazvision_VCR",
     inherits = "base-electronics",
     mod = "tikitown",

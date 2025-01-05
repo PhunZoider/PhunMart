@@ -99,6 +99,9 @@ return {{
     name = "Base.PillsSleepingTablets",
     inherits = "base-medical-medpills"
 }, {
+    name = "PhunRad.Iodine",
+    inherits = "base-medical-medpills"
+}, {
     name = "Base.Antibiotics",
     inherits = "base-medical-medpills"
 }, {
