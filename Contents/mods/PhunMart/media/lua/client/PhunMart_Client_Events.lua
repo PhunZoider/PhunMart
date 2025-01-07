@@ -17,11 +17,10 @@ Events.EveryOneMinute.Add(setup)
 
 -- Request each local players purchase history
 local function requestHistory()
-    for i = 0, getOnlinePlayers():size() - 1 do
-        local p = getOnlinePlayers():get(i)
-        if p:isLocalPlayer() then
-            sendClientCommand(p, PhunMart.name, PhunMart.commands.updateHistory, {})
-        end
+    local players = PhunMart:onlinePlayers()
+    for i = 0, players:size() - 1 do
+        local p = players:get(i)
+        sendClientCommand(p, PhunMart.name, PhunMart.commands.updateHistory, {})
     end
     -- wtf is this?
     Events.EveryOneMinute.Remove(requestHistory)

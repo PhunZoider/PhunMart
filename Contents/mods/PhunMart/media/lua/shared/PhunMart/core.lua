@@ -190,6 +190,30 @@ function Core:ini()
     triggerEvent(self.events.onInitialized, self)
 end
 
+function Core:onlinePlayers(all)
+
+    local onlinePlayers;
+
+    if not isClient() and not isServer() and not isCoopHost() then
+        onlinePlayers = ArrayList.new();
+        local p = getPlayer()
+        onlinePlayers:add(p);
+    elseif all then
+        onlinePlayers = getOnlinePlayers();
+
+    else
+        onlinePlayers = ArrayList.new();
+        for i = 0, getOnlinePlayers():size() - 1 do
+            local player = getOnlinePlayers():get(i);
+            if player:isLocalPlayer() then
+                onlinePlayers:add(player);
+            end
+        end
+    end
+
+    return onlinePlayers;
+end
+
 function Core:isTargetSprite(obj)
     local sprite = obj and obj.getSprite and obj:getSprite():getName();
     local match = self.targetSprites[sprite]

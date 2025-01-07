@@ -402,8 +402,9 @@ function SPhunMartSystem:checkLocks()
 
     -- get lookup of online player names
     local players = {}
-    for i = 1, getOnlinePlayers():size() do
-        local playerObj = getOnlinePlayers():get(i - 1)
+    local online = PhunMart:onlinePlayers(true)
+    for i = 1, online:size() do
+        local playerObj = online:get(i - 1)
         if playerObj then
             players[playerObj:getUsername()] = playerObj
         end
