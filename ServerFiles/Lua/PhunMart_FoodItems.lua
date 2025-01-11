@@ -3480,7 +3480,8 @@ return {{
 }, {
     name = "SapphCooking.Macaron_Purple-foodjunk",
     inherits = "base-food-foodjunk",
-    mod = "sapphcooking"
+    mod = "sapphcooking",
+    enabled = false
 }, {
     name = "SapphCooking.Macaron_Red",
     inherits = "base-food-foodjunk",
@@ -4225,4 +4226,200 @@ return {{
     name = "SpoonEssentialCrafting.SpoonMassGraveEmpty",
     inherits = "base-food-foodutensil",
     mod = "EssentialCrafting"
+}, {
+    name = "SapphCooking.PaodeQueijo",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.CoxinhaPrep",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Arancini",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.BeefWellington",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Bowl_Paella",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.NaN_Pill",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.FeijoadaPrep",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.PastelPrep",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.CrabRangoon",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.WildBeets",
+    inherits = "base-food",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.SaucepanwithStroganoff",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Skewer_TornadoPotato",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.BagofWontonWrappers",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Tray_Rice",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Tray_Soup",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.BagofFlourTortillas",
+    inherits = "base-food-foodbaking",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.MugMetal_Milkshake",
+    inherits = "base-food-fooddairy",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.WoodenSkewers_Butter",
+    inherits = "base-food-fooddairy",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Bowl_MacCheese",
+    inherits = "base-food-fooddairy",
+    mod = "sapphcooking"
+}, {
+    name = "AuthenticZClothing.Pop",
+    inherits = "base-food-fooddrink",
+    mod = "Authentic Z - Current"
+}, {
+    name = "MCH.Cup of Coffee",
+    inherits = "base-food-fooddrink",
+    mod = "Machines15"
+}, {
+    name = "SapphCooking.HotDrink_Metal",
+    inherits = "base-food-fooddrink",
+    mod = "sapphcooking"
+}, {
+    name = "AuthenticZClothing.BigLollipop",
+    inherits = "base-food-fooddrink",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Pop3",
+    inherits = "base-food-fooddrink",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Pop2",
+    inherits = "base-food-fooddrink",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PopBottle",
+    inherits = "base-food-fooddrink",
+    mod = "Authentic Z - Current"
+}, {
+    name = "MCH.OrangeVitamins",
+    inherits = "base-food-foodfruit",
+    mod = "Machines15"
+}, {
+    name = "MCH.BananaVitamins",
+    inherits = "base-food-foodfruit",
+    mod = "Machines15"
+}, {
+    name = "MCH.StrewberrieVitamins",
+    inherits = "base-food-foodfruit",
+    mod = "Machines15"
+}, {
+    name = "MCH.CottonCandy",
+    inherits = "base-food-foodjunk",
+    mod = "Machines15"
+}, {
+    name = "SapphCooking.SapphSmore",
+    inherits = "base-food-foodjunk",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Sandwich_CheesesteakPrep",
+    inherits = "base-food-foodmeat",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Tray_Pasta",
+    inherits = "base-food-foodpasta",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Focaccia_Piece",
+    inherits = "base-food-foodpie",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Pierogi",
+    inherits = "base-food-foodpie",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.FunnelCake",
+    inherits = "base-food-foodpie",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Tray_FruitSalad",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Focaccia_Sandwich",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.CalzoneRecipe",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Takeout_FruitSalad",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.PastelFried",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Saucepan_MacandCheese",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.CoxinhaFried",
+    inherits = "base-food-foodready",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.MugCoffee_Metal",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Roastingpan_FocacciaPrep",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.SaucepanStew",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Mug_Metal",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.WaterMug_Metal",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
+}, {
+    name = "SapphCooking.Saucepan_Paella",
+    inherits = "base-food-foodutensil",
+    mod = "sapphcooking"
 }}

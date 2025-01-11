@@ -817,4 +817,100 @@ return {{
     name = "TrueMusicJukebox.InstructionManual",
     inherits = "base-literature-magazine",
     mod = "TrueMusicJukebox"
+}, {
+    name = "dtitems.DTAngerBook5",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTAngerBook4",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTAngerBook1",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTBoredomBook2",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTAngerBook3",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTBoredomBook1",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTAngerBook2",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTBoredomBook4",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTBoredomBook3",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTBoredomBook5",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTStressBook2",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTUnhappynessBook5",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTStressBook1",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTStressBook4",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTUnhappynessBook3",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTStressBook3",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTUnhappynessBook4",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTUnhappynessBook1",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTUnhappynessBook2",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "dtitems.DTStressBook5",
+    inherits = "base-literature-book",
+    mod = "DynamicTraits"
+}, {
+    name = "NUC_Items.NUC_Mag2",
+    inherits = "base-literature-magazine",
+    mod = "PhunRadNUC"
+}, {
+    name = "FunctionalAppliances.FASodaJerkMagazine",
+    inherits = "base-literature-magazine",
+    mod = "FunctionalAppliances2"
+}, {
+    name = "NUC_Items.NUC_Mag1",
+    inherits = "base-literature-magazine",
+    mod = "PhunRadNUC"
+}, {
+    name = "NUC_Items.NUC_Mag3",
+    inherits = "base-literature-magazine",
+    mod = "PhunRadNUC"
 }}

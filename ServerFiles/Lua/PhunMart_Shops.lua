@@ -239,10 +239,6 @@ return { --[[
             filters = {
                 tags = "tools"
             }
-        }, {
-            filters = {
-                tags = "toolcamping"
-            }
         }}
     },
     sprites = {
@@ -263,15 +259,15 @@ return { --[[
     pools = {
         items = {{
             filters = {
-                tags = "literature,litmisc"
+                tags = "literature,litmisc,maps"
             }
         }, {
             filters = {
-                tags = "literature,magazine"
+                tags = "literature,magazine,maps"
             }
         }, {
             filters = {
-                tags = "literature,book"
+                tags = "literature,book,maps"
             }
         }}
     },

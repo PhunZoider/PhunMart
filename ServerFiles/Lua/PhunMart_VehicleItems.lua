@@ -227,31 +227,38 @@ return {{
 }, {
     name = "69camaroSS",
     inherits = "base-vehicle-car",
-    mod = "69camaro"
+    mod = "69camaro",
+    enabled = false
 }, {
     name = "69camaroSS",
     inherits = "base-vehicle-car",
-    mod = "69camaro"
+    mod = "69camaro",
+    enabled = false
 }, {
     name = "84mercLWB2",
     inherits = "base-vehicle-car",
-    mod = "84merc"
+    mod = "84merc",
+    enabled = false
 }, {
     name = "84mercLWB4",
     inherits = "base-vehicle-car",
-    mod = "84merc"
+    mod = "84merc",
+    enabled = false
 }, {
     name = "84mercSWB",
     inherits = "base-vehicle-car",
-    mod = "84merc"
+    mod = "84merc",
+    enabled = false
 }, {
     name = "93townCar",
     inherits = "base-vehicle-car",
-    mod = "93townCar"
+    mod = "93townCar",
+    enabled = false
 }, {
     name = "93townCarLimo",
     inherits = "base-vehicle-car",
-    mod = "93townCar"
+    mod = "93townCar",
+    enabled = false
 }, {
     name = "CytU1550L",
     inherits = "base-vehicle-truck",
@@ -276,11 +283,13 @@ return {{
 }, {
     name = "ATASamaraPolice",
     inherits = "base-vehicle-car",
-    mod = "ATA_Samara"
+    mod = "ATA_Samara",
+    enabled = false
 }, {
     name = "ATASamaraClassic",
     inherits = "base-vehicle-car",
-    mod = "ATA_Samara"
+    mod = "ATA_Samara",
+    enabled = false
 }, {
     name = "92amgeneralM998Reskin",
     inherits = "base-vehicle-truck",
@@ -300,11 +309,13 @@ return {{
 }, {
     name = "59meteor",
     inherits = "base-vehicle-car",
-    mod = "59meteor"
+    mod = "59meteor",
+    enabled = false
 }, {
     name = "59ambulance",
     inherits = "base-vehicle-car",
-    mod = "59meteor"
+    mod = "59meteor",
+    enabled = false
 }, {
     name = "ECTO1",
     inherits = "base-vehicle-other",
@@ -330,7 +341,8 @@ return {{
 }, {
     name = "CytMCF1",
     inherits = "base-vehicle-car",
-    mod = "CytMCF1"
+    mod = "CytMCF1",
+    enabled = false
 
 }, {
     name = "88chevyS10",
@@ -362,41 +374,50 @@ return {{
 }, {
     name = "88golf2doorMk2",
     inherits = "base-vehicle-car",
-    mod = "88golfMk2"
+    mod = "88golfMk2",
+    enabled = false
 }, {
     name = "88golf4doorMk2",
     inherits = "base-vehicle-car",
-    mod = "88golfMk2"
+    mod = "88golfMk2",
+    enabled = false
 
 }, {
     name = "93mustangSSP",
     inherits = "base-vehicle-car",
-    mod = "93mustangSSP"
+    mod = "93mustangSSP",
+    enabled = false
 }, {
     name = "93mustangSSPpd",
     inherits = "base-vehicle-car",
-    mod = "93mustangSSP"
+    mod = "93mustangSSP",
+    enabled = false
 }, {
     name = "93mustangSSPksp",
     inherits = "base-vehicle-car",
-    mod = "93mustangSSP"
+    mod = "93mustangSSP",
+    enabled = false
 }, {
     name = "93mustangSSPunmarked",
     inherits = "base-vehicle-car",
-    mod = "93mustangSSP"
+    mod = "93mustangSSP",
+    enabled = false
 
 }, {
     name = "63beetle",
     inherits = "base-vehicle-car",
-    mod = "63beetle"
+    mod = "63beetle",
+    enabled = false
 }, {
     name = "63beetleBuggy",
     inherits = "base-vehicle-car",
-    mod = "63beetle"
+    mod = "63beetle",
+    enabled = false
 }, {
     name = "63beetleHP",
     inherits = "base-vehicle-car",
-    mod = "63beetle"
+    mod = "63beetle",
+    enabled = false
 
 }, {
     name = "63Type2Van",
@@ -418,22 +439,26 @@ return {{
 }, {
     name = "en79450SL",
     inherits = "base-vehicle-car",
-    mod = "en79450SL"
+    mod = "en79450SL",
+    enabled = false
 
 }, {
     name = "89porshce911turbo",
     inherits = "base-vehicle-car",
-    mod = "1989Porsche911Turbo"
+    mod = "1989Porsche911Turbo",
+    enabled = false
 
 }, {
     name = "SupraMkIVfhq",
     inherits = "base-vehicle-car",
-    mod = "SupraMkIVfhq"
+    mod = "SupraMkIVfhq",
+    enabled = false
 
 }, {
     name = "ATATuningDatsun240z",
     inherits = "base-vehicle-car",
-    mod = "ATA_Datsun_240z"
+    mod = "ATA_Datsun_240z",
+    enabled = false
 
 }, {
     name = "en21_Bronco",
@@ -443,31 +468,37 @@ return {{
 }, {
     name = "67gt500",
     inherits = "base-vehicle-car",
-    mod = "67gt500"
+    mod = "67gt500",
+    enabled = false
 
 }, {
     name = "67gt500e",
     inherits = "base-vehicle-car",
-    mod = "67gt500"
+    mod = "67gt500",
+    enabled = false
 
 }, {
     name = "ATABMWe36",
     inherits = "base-vehicle-car",
-    mod = "ATA_BMW_E36"
+    mod = "ATA_BMW_E36",
+    enabled = false
 
 }, {
     name = "ATABMWe36M3",
     inherits = "base-vehicle-car",
-    mod = "ATA_BMW_E36"
+    mod = "ATA_BMW_E36",
+    enabled = false
 
 }, {
     name = "ATA_Dadge",
     inherits = "base-vehicle-car",
-    mod = "ATA_Dadge"
+    mod = "ATA_Dadge",
+    enabled = false
 }, {
     name = "71chevyc10offroad",
     inherits = "base-vehicle-special",
-    mod = "SpecialEmergencyVehiclesFRsm"
+    mod = "SpecialEmergencyVehiclesFRsm",
+    enabled = false
 }, {
     name = "80f350ambulanceFEMAas",
     inherits = "base-vehicle-special",
@@ -567,7 +598,8 @@ return {{
 }, {
     name = "ATA_Bus",
     inherits = "base-vehicle-special",
-    mod = "ATA_Petyarbuilt"
+    mod = "ATA_Petyarbuilt",
+    enabled = false
 }, {
     name = "ATAPetyarbuiltSleeper",
     inherits = "base-vehicle-special",
@@ -601,28 +633,34 @@ return {{
 }, {
     name = "ATA_Jeep",
     inherits = "base-vehicle-car",
-    mod = "ATA_Jeep"
+    mod = "ATA_Jeep",
+    enabled = false
 
 }, {
     name = "92fordCVPI",
     inherits = "base-vehicle-car",
-    mod = "92fordCVPI"
+    mod = "92fordCVPI",
+    enabled = false
 }, {
     name = "92fordCVPIunmarked",
     inherits = "base-vehicle-car",
-    mod = "92fordCVPI"
+    mod = "92fordCVPI",
+    enabled = false
 }, {
     name = "92fordCVPI2",
     inherits = "base-vehicle-car",
-    mod = "92fordCVPI"
+    mod = "92fordCVPI",
+    enabled = false
 }, {
     name = "92fordCVPI2ksp",
     inherits = "base-vehicle-car",
-    mod = "92fordCVPI"
+    mod = "92fordCVPI",
+    enabled = false
 }, {
     name = "92fordCVPItaxi",
     inherits = "base-vehicle-car",
-    mod = "92fordCVPI"
+    mod = "92fordCVPI",
+    enabled = false
 
 }, {
     name = "82oshkoshM911",
@@ -635,7 +673,8 @@ return {{
 }, {
     name = "TrailerM127stake",
     inherits = "base-vehicle-othspecialer",
-    mod = "82oshkoshM911"
+    mod = "82oshkoshM911",
+    enabled = false
 }, {
     name = "TrailerM128van",
     inherits = "base-vehicle-special",
@@ -664,5 +703,6 @@ return {{
 }, {
     name = "ATA_Mustang",
     inherits = "base-vehicle-car",
-    mod = "ATA_Mustang"
+    mod = "ATA_Mustang",
+    enabled = false
 }}

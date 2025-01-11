@@ -15,7 +15,7 @@ local function requestShopDefs()
 end
 
 function PhunMartUIShopAdmin.OnOpenPanel(playerObj, key)
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         if PhunMartUIShopAdmin.instance == nil then
             PhunMartUIShopAdmin.instance = PhunMartUIShopAdmin:new(100, 100, 400, 400, playerObj, key);
             PhunMartUIShopAdmin.instance:initialise();

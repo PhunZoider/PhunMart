@@ -298,4 +298,301 @@ return {{
             max = 4
         }
     }
+}, {
+    name = "Base.TsarEarthing",
+    inherits = "base-electronics",
+    mod = "autotsartrailers"
+}, {
+    name = "Radio.TvMonster",
+    inherits = "base-electronics",
+    mod = "BuildingMenuPertsPartyTilesAddon"
+}, {
+    name = "AuthenticZClothing.Authentic_HeadphonesNeck3",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_HeadphonesNeck2",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_HeadphonesNeck4",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_HeadphonesNeck",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_Headphones",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_Headphones3",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_Headphones4",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_Headphones2",
+    inherits = "base-electronics",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Lifestyle.LS_Discoball",
+    inherits = "base-electronics",
+    mod = "NorthKillian"
+}, {
+    name = "ISA.PowerBank",
+    inherits = "base-electronics",
+    mod = "ISA_41",
+    price = {
+        currency = {
+            base = 100,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSRainSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSTemperatureSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSLightSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSRoomSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSPowerSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSZombieSensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "LightSensors.LSProxySensor",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "SensorsTraps.LSTrapBrokenGlass",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "SensorsTraps.LSTrapShock",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "SensorsTraps.LSTrapNails",
+    inherits = "base-electronics",
+    mod = "LightSensor",
+    price = {
+        currency = {
+            base = 35,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_ReprocessingMainboard",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_PumpMotorClose",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_CoreMainboard",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_CommunicationMainboard",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_RDDBasic",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_FuseA",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_CoreMainboard_V15",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_FuseB",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_DiagnosticSystemMainboard",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_PumpMotorOpen",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "NUC_Items.NUC_AdministrationMainboard",
+    inherits = "base-electronics",
+    mod = "PhunRadNUC",
+    price = {
+        currency = {
+            base = 150,
+            min = 3,
+            max = 4
+        }
+    }
+}, {
+    name = "PhunRad.BrokenGeigerCounter",
+    inherits = "base-electronics",
+    mod = "phunrad",
+    price = {
+        currency = {
+            base = 25,
+            min = 3,
+            max = 4
+        }
+    }
 }}

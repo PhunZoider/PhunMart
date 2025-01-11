@@ -75,7 +75,7 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
 
     end
 
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
 
         local adminOption = context:addOption("PhunVend", worldobjects, nil)
         local adminSubMenu = ISContextMenu:getNew(context)

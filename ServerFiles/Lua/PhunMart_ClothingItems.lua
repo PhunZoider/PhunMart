@@ -4587,4 +4587,4256 @@ return {{
     name = "MonmouthClothing.Underwear_Kinky_Kelly",
     inherits = "base-clothing-clothunderwear",
     mod = "MonmouthCounty_new"
+}, {
+    name = "AuthenticZClothing.CameraDisposableAZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody03_ObeseBod_Shockmaster",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Sport_Top",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CrutchLEFT",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBowTINT",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_Coveralls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.InflatableTube_AZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.ClownNoseTINT",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs9",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs7",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs8",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs5",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs6",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Coveralls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs3",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs4",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_KCChiefs0",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CameraAZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBow_SideLeft",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Clown_Coveralls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hairstyle_Pennywise",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody02_Cheese",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody01",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hairstyle_HairCurlers",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots0",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots8",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots9",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots6",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots7",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots4",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots5",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_NEPatriots3",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CameraDSLR",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Beard_Long_Santa",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_RedSkull",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CatEarsAZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_M_Stubble",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tattoo_LeftArm1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tattoo_RightArm1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.ClownNose",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBowTINT_SideRight",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BlueZskin_M1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BlueZskin_M2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BlackLeggings_Bottoms",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.ClownTopWhite",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody03_ObeseFemale",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CultistSign",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.SkinnyBody_M",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody02_BurgerLover",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Sweater_Freddy",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_M",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Samurai_WarBanner",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_BlueStar",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_W",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBowTINT_SideLeft",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Coveralls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Tan_Zed_M",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AuthenticHairHeadband",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CameraExpensiveAZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Tan_Zed_W",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_Overalls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_Winslow",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Coveralls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBowsTINT_UP",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.SkeletonBody",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBow_SideRight",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.ClownTop",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CrutchRIGHT",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_M2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody03_ObeseBod_Clown",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Jeans",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody01_MiddleAged",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Charcoal_Zed_M",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_M_TattooArms",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CigarAZ",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Overalls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Mime_Overalls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody02_PlusSize",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Charcoal_Zed_W",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_Hand_R",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_Hand_L",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BlueZskin_F1",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BlueZskin_F2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_Forearm_R",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_Forearm_L",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Rose_Dimitrescu",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AlienBody",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HawaiianLei",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle19",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle18",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle15",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle14",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle17",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle16",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle11",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle10",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle13",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle12",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBow",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle08",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Leg_SamuraiShinGuards",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle07",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle09",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle04",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle03",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle06",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle05",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle02",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle01",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Overalls",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairBows_UP",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle33",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle32",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle34",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle31",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle30",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_UpperArm_R",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hairstyle_Afro_Pick2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle29",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle26",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle25",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle28",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle27",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle22",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle21",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle24",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle23",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bone_Skin_UpperArm_L",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_HairStyle20",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AuthenticFreeHugsSign",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody03_ObeseBod",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Dimitrescu",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Samurai_ZokWarBanner",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FatBody01_DadBod",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.GreeneZ_F",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Cigarette",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hairstyle_Afro_Pick",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_White_Zed_W2",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle04",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle03",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle02",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle01",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle08",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle07",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle06",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle05",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.ClownTopBlue",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle09",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Black_Zed_M",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AZ_BeardStyle10",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skin_Black_Zed_W",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tattoo_Wally",
+    inherits = "base-clothing",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Boilersuit_BlueRedTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.MakeUp_BillMurray",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BEvangelo_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BEvangelo_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Necklace_NeckProtector",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BEvangelo_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_Vegan",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_MimeBlack",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Full_Red",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Glasses_AviatorsSunset",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairDyeDarkerBrown",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagNBH_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHolly_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHolly_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHolly_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Full_Brad",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagNBH_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_UrbanCamo_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_UrbanCamo_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagNBH_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairDyeDarkBrown",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Glasses_Cheese",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_JokerColor",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AmmoStrap_Bullets1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AmmoStrap_Bullets2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_ClownFace1Color",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Army_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Army_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Army_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.RaveMask",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_BowTieWorn_Red",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Necklace_GoldCrucifix",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Scarf_Black",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_MedicalBag_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_MedicalBag_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_MedicalBag_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BMom_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BMom_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BMom_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Boilersuit_PrisonerKhakiTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieTied_Black",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_RoadsideDuffel_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_RoadsideDuffel_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_RoadsideDuffel_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Plain_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Necklace_B",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Plain_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Plain_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_RedPlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHoffman_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHoffman_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHoffman_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Hoodie_WhiteTINTTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.MakeUp_Joker",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_TurquoisePlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BWalker_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_BowTieWorn_Blue",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BWalker_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BWalker_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Full_GMan",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_CropTopTINT",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Boilersuit_PrisonerTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.BoilersuitTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieTied_Checkered",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Boilersuit_YellowTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Bag_ARVN_Rucksack_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_ShotgunFace",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Full_White",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDARed_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_OrangePlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AmmoStrap_Shells1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.AmmoStrap_Shells2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDARed_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDARed_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_Pennywise",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ARVN_Rucksack_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ARVN_Rucksack_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairDyeBlonde2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlue_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Mask_Samurai",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Belt_AZ",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Festive_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlue_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Festive_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlue_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Festive_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagGrey_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagGrey_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagGrey_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CultistMask",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Glasses_ReadingBlack",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_Freddy",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Festive_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Festive_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Festive_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Boilersuit_FlyingTIED",
+    inherits = "base-clothing-clothaccessories",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieTied_PurplePlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_YellowPlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_Insane",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Scarf_DarkGreen",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Full_BlueSpy",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Military_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_GreyPlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagTINT_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_BigHikingBag_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_BigHikingBag_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_BowTieWorn_Green",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_BigHikingBag_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Military_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Military_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagTINT_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_BluePlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Mask_Oni",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_BowTieWorn_Purple",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_AmmoStrap",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBagTINT_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_NormalHikingBag_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_NormalHikingBag_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_NormalHikingBag_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HairDyePurple",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_Buzzers",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Glasses_Popeyes",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_Bengal",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDA_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_UrbanCamo_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_AmmoStrap",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDA_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDA_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_ClownFace2Color",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_GreenPlaid",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.MakeUp_MimeRed",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Rim_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Rim_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Rim_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_WhiteTINT",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlack_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlack_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Spiffo2_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Spiffo2_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_Big_Long",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Tier_2",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tie_BowTieWorn_Yellow",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Spiffo2_Tier_1",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieTied_CropTopRave",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlack_Tier_3",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_AmmoStrap",
+    inherits = "base-clothing-clothaccessories",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHoffman",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker1",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDA",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDARed",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_MilitaryWebbing_AZ",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_UtilityBeltDesert",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BEvangelo",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker0",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_UrbanCamo",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Schoolbag_Spiffo2",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker3",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker4",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BWalker",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker7",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ALICEpack_Festive",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker6",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlack",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_UtilityBeltFront_Loose",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_JerryCanBack",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_UtilityBeltFront",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagNBH",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BHolly",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_DuffelBag_Festive",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker2",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_SchoolBagCEDABlue",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Satchel",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_L4DeadMedkit",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_B4BMom",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Rim",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker9",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_RoadsideDuffel",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker8",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jersey_GreenBayPacker5",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_MilitaryWebbingTightened_AZ",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_ProtonPack_Back",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_UtilityBeltDesert_Loose",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bag_Packsport_Plain",
+    inherits = "base-clothing-clothbag",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_BlackOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.JacketLong_SantaBluePattern",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_LeatherIronRodentROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Suit_JacketNick",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoUrbanForestDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.JacketLong_RandomOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_LoganCarter",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Mom",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_RedPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_Black",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Zoey",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_PinkOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_SantaOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_Bengal",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Suit_JacketJoker",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_TurquoisePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_CropTopTINT",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_PonchoDown",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Soldier_Yankee",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_PonchoUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Jacket",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_PaddedEvangeloDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoCamoForestDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoUrbanForest",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_VarsityOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_Doctor2",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Doctor3",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Soldier_Rebel",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_JacketLong",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Francis",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Hunter",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_ChuckGreene",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_ATFblclosed",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpecialEmergencyVehiclesFRsm"
+}, {
+    name = "Base.Jacket_LeatherWildRacoonsROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Thin01_HoodieDown",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoWhiteTINT",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_LeatherIronRodentOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat02_HoodieDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_PonchoDown",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.JacketLong_DoctorROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.PonchoCamoDesert",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Thriller",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_YellowPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_BluePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_Vegan",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoOrangePunchDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Suit_JacketROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat02_PonchoUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_NavyBlueOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.JacketLong_SantaWhite",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_JacketLeather",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_NavyBlueROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_PoliceOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_Shellsuit_TealROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_Varsity_AZ",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_Vegan",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Suit_JacketTINTOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieUP_CropTopTINT",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_JacketLong",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.WeddingJacketOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_FiremanNMRIH",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_BlueOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_RandomROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieUP_Bengal",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_GreyPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_WhiteTINT",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_RangerROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_SantaROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoat2",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Base.Jacket_CoatArmyROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_PoliceROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_DoctorOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat03_PonchoDown",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_HoodieUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Jacket",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Reporter_3N",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_StraightJacket",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_TealOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_GreyPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_HoodieUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_WhiteTINT",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Bub",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_PurplePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.WeddingJacketROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_CropTopRave",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_GreenOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_Shellsuit_PinkROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_Bill",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoCamoForest2DOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_JacketLeather",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_JacketVarsity",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_OrangePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoOrangePunch",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_TINTROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_BluePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Jacket",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Suit_JacketTINTROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_ArmyCamoGreenOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat03_JacketLeather",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_Shellsuit_BlackROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_Shellsuit_TINTOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_LeatherBarrelDogsROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_Shellsuit_GreenROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieUP_YellowPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_HoodieDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoBlackDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_FiremanOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_WhiteTINTOPEN",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Suit_JacketBlue",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Suit_JacketSamB",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_CoatArmyOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_GreenPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_BlackOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_CoatNavy",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_CropTopRave",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_ArmyCamoDesertROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_TurquoisePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_PaddedEvangelo",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_HoodieDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_GreenPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_JacketLong_Santa",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoCamoDesertDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoCamoForest2",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_Checkered",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Varsity_Thriller",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_ChefROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_ArmyCamoDesertOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_VarsityROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_FiremanROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_SantaGreenOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.PonchoOliveDrabDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Grimes",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_RangerOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat02_JacketLong",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_WhiteTINTROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Suit_JacketOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.JacketLong_SantaGreenROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_Clementine",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_Buzzers",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_BlackROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.HoodieUP_Black",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Reporter_Radio",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_ArmyCamoGreenROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_PostalDude",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_ArmyOliveDrab",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_ArmyCamoUrban",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_WhiteTINTOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jacket_FiremanNMRIHOpen",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Bateman",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Trenchcoat",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_LeatherBarrelDogsOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat03_HoodieUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoBlack",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Scandroid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_HoodieUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_Buzzers",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_PonchoUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_ArmyOliveDrab2",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_ChefOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Suit_JacketJessie",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_PonchoUP",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoCamoForest",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jacket_LeatherWildRacoonsOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_NavyBlueOPEN",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "Base.Jacket_Shellsuit_BlueROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Fat02_PonchoDown",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_Checkered",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoWhiteTINTDOWN",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_Reporter_LBMW",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Suit_JacketGMan",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_JimmyGibbs",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_RedPlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.PonchoOliveDrab",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_OrangePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jacket_FrankWest",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_PurplePlaid",
+    inherits = "base-clothing-clothcoat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Spongie.Jacket_BomberROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoat2ROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_Ribbed",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_FlightROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_DenimOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_BomberOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_RibbedOPEN",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_DenimROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_Tweed",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_TweedOPEN",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_QuiltedROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_QuiltedOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoatOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoat2OPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_RibbedROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_SheepWoolROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_FieldOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_TweedOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_TweedROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_SheepWoolOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_FieldROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoat2OPEN",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_PeaCoatROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_RibbedOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "Spongie.Jacket_FlightOPENROLL",
+    inherits = "base-clothing-clothcoat",
+    mod = "SpnCloth"
+}, {
+    name = "AuthenticZClothing.Fat02_Skirt_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Flower_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_SmallStrapless",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Maid",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Skirt_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Flower",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Kansas",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Relaxed",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_SmallStrapless",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_SmallStraps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Skirt_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_NormalBlue",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.WeddingDressPink",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_DressKnees_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortBlack",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Knees_Black",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Frilly",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Dimitrescu",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_LongPink",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Pattern",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Polkadot_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortPlaid",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Prairie",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_SmallStrapless",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieUP_BearHeaddress",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Elegant",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_NormalPink",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Plaid",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Skirt_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Polkadot",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_LVCheerleader",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Skirt_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_SmallStraps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Short2",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortCheerleader",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_LongBlue",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Skirt_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Striped",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_LongSleevedButtoned",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_SatinNegligee",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_Long",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_LongPolkadot",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_long_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Skirt_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_long_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_LongFlower",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_DressKnees_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_SmallStraps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Nurse",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_LongBlack",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortXian",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Lavish",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_SatinNegligee",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HoodieDOWN_BearHeaddress",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Simple",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_DimitrescuALT",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_Purna",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Cute",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortJessie",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Skirt_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Dress_long_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Skirt_ShortRedPlaid",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Skirt_Short",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.WeddingDressBlue",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_DressKnees_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Skirt_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_SatinNegligee",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_Casual",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Dress_Straps",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Skirt_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Dress_Normal",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Skirt_Knees",
+    inherits = "base-clothing-clothdress",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_White",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_LeatherWalker",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_FingerlessGlovesRed",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_LeatherGlovesWhite",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_Black",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_FingerlessGlovesWHITE",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_FreddyKreuger",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_SamaraiArmor_Gauntlets",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_LeatherGauntlets",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_FingerlessGlovesBlue",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_White_Reflective",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_LongWomenGlovesWhite",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_OvenMitts",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_WhitePatriots",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Gloves_LeatherGlovesBlackFull",
+    inherits = "base-clothing-clothgloves",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaDesert",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapJohnMorgan_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapSmileyFace",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapPrinceBelAir_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalOptimus",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Antlers_AZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_JasonSack",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapWhite",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Bonnet_Tied",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WinslowHelmet",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_RuneDuel_Back",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Red",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Cowboy_Freddy",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapHunter_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeil_Front",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_UncleSam",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Soldier_Yankee",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_GasMask",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapJohnMorgan",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_ClownConeHead",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeil_AZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeilBlue",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SantaHatWhite",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapPrinceBelAir",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BeretMime",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaTiedDesert",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_DRLegoHead",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapSeaHorse_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SweatbandBlue",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapClementine_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapDayZ_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapEllis",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_EarMuffs_Neck",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BeanyGrey",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Blue",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_HockeyMaskJason",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaTiedRed",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalShark",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLTINT",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalEvelKnievel",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Hat_BaseballCapATFBL_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "SpecialEmergencyVehiclesFRsm"
+}, {
+    name = "AuthenticZClothing.Hat_Maid",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Soldier_Rebel",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_PyromancerSkull",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Hat_BaseballCapATFBL",
+    inherits = "base-clothing-clothhat",
+    mod = "SpecialEmergencyVehiclesFRsm"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapWhite_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Small",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_ChickenHeadJacket",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BeretBlack",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Bonnet_UnTied",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Gibus",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Dimitrescu_Back",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FurryEarsAZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapBuzzers",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FurryEars_Zoey",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SantaHatBluePattern",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeilPink",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_TopHat_AZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapDayZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeilPink_Front",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_CheeseHat",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Nurse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SummerWhite",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_StormtrooperHelmetSparklesAZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_KillaHelmet",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Gibus2",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalGreenDragon",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SweatbandPink",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaMaskDesert",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Yellow",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_EarMuff_Protectors_Neck",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapWalker",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalPowerRangerRed",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FootballHelmet_BlueStar",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_StovePipe",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapBuzzers_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Witchy_2",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapHolly",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BalaclavaSpyBlue",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_EarMuff_Protectors_AZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapBossTagilla",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FootballHelmet_RedSkull",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Grimes",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapSmileyFace_Sideways",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_TagillaMask",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Dimitrescu",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapRedDI",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_DeerSkull",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmet",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_StormtrooperHelmetAZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaRed",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapWalker_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalSnowLeopard",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_EarMuffs_AZ",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SamuraiHelmet",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Hat_BaseballCapFBILGbl_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "SpecialEmergencyVehiclesFRsm"
+}, {
+    name = "AuthenticZClothing.Hat_TagillaMask2",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalSimple",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_MichaelMyers",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SweatbandRBW",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalKiss",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BandanaMaskRed",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_HardHat_Miner2",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_CaptainSkipper",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_VikingHelmet",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FedoraWhite",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SweatbandOGP",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Witchy_2_Back",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapHolly_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FootballHelmet_Chiefs",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapBossTagilla_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapHunter",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Hat_BaseballCapFBILGbl",
+    inherits = "base-clothing-clothhat",
+    mod = "SpecialEmergencyVehiclesFRsm"
+}, {
+    name = "AuthenticZClothing.Hat_WeddingVeilBlue_Front",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_RuneDuel",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapSeaHorse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SummerWhite_Back",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_GhostFace",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Graduation_Cap",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FootballHelmet_Packers",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapRedDI_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BalaclavaSpyRed",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Green",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FastFood_Donut",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WrinklesMask",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Boater_Purple",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLRacing",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapClementine",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalBobaFett",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_SweatbandPurple",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_TrueEyeCult",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CultistHat",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapEllis_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_BaseballCapSmileyFace_Reverse",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_WoolyHatWaldo",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_FootballHelmet_Patriots",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_AuthenticCrashHelmetFULLDecalVenom",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_LeatherFace",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_JackoLantern",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Hat_Court_Jester",
+    inherits = "base-clothing-clothhat",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.SnowGhillie_Trousers",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Soldier_Rebel",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SantaBluePattern",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_UncleSam",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_SportShorts",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportBluePurple",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitBrown",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportWatermelon",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BarbershopGreen",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportNeon",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat_03_Trousers_Santa",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BarbershopYellow",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_JeanDark",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_OliveDrab",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_SuitPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.TrousersMesh_Rave",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_DefaultJeans",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_ShellPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SportRed",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SportKilla",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportPurple",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_ShortSport_Neon",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_ShortSport_PinkBlackBlue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSport_Blue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportChiefs",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BelAir",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.DungareesWhite",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BarbershopRed",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_ShellPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_ShellPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportGold",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongDenimWhite",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportGolden",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Tagilla",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitBrad",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SportGreen",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_SportShorts",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitVeryRed",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_SportShorts",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Flyboy",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Soldier_Yankee",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_ShortSport_Sunset",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportPinkBlackBlue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SportYellow",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitBlack",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_SportShorts",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_OliveDrab2",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportPopcicle",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BarbershopBlue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_JohnMorgan",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_FormalPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SantaWhite",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Sport",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitJoker",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_Grimes",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.TrousersMesh_Bill",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_FiremanNMRIH",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SportBlue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitNick",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_ShellPants",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportLightBlue",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_DesignerTINT",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.TrousersMesh_Bub",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shorts_ShortSport_Popcicle",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_BarbershopPurple",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Spongie.Trousers_TweedTUCK",
+    inherits = "base-clothing-clothpants",
+    mod = "SpnCloth"
+}, {
+    name = "AuthenticZClothing.TrousersMesh_JimmyGibbs",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Trousers_SuitGMan",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Spongie.Trousers_Tweed",
+    inherits = "base-clothing-clothpants",
+    mod = "SpnCloth"
+}, {
+    name = "AuthenticZClothing.Shorts_LongSportPatriots",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.DungareesDOWN",
+    inherits = "base-clothing-clothpants",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Trousers_Coach",
+    inherits = "base-clothing-clothpants",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Mime",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportBluePurple",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportWatermelon",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Icon",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletTV110_BulletVest_Radio",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportWhite",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportPurple",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportGrey",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Rochelle",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_TShirtCoach",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_Buzzers",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jumper_PoloNeckROLL",
+    inherits = "base-clothing-clothshirt",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Shirt_Cheerleader",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Vest_TankTop",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Jumper_DiamondBillMurray",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_Bill_Murray",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletTagilla",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_LumberJackShortRed",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportPinkBlackBlue",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_VotePedro",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalJoker",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportNeon",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_LegoHead",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Barbershop_Blue",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletTV110_Bag",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalBateman",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportGold",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_TShirt",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Vest_TankTop",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_MimeBlack",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SpiffoNEW",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Portal_Tanktop",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalRed_ShortSleeve",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Rim_Duke",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_TShirtLongBlart",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_TShirt",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_MimeRed",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Barbershop_Purple",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletKilla",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_TShirt",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportLightBlue",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_Walker",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalDayZ",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_UndershirtFancy",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_IconNumbers",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Vest_BlackOpen",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jumper_RoundNeckROLL",
+    inherits = "base-clothing-clothshirt",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Barbershop_Red",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletRPD",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Barbershop_Yellow",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_WhiteStriped",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_LoganCarter",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.TShirt_BrickBuster",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Rock2",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Hunting_Beige",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_HighViz_Press",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_CheeseRoyale2",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.TShirt_RedStriped",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_LumberjackTheyLive",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_TShirtCheese",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Ellis",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportKillaLong",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jumper_DiamondPatternTINTROLL",
+    inherits = "base-clothing-clothshirt",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalBlack_ShortSleeve",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Vest_HighViz",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_Bub",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Coach",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_SamuraiBreastPlate",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalBlue_ShortSleeve",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_PrinceBelAir",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Barbershop_Green",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Base.Jumper_VNeckROLL",
+    inherits = "base-clothing-clothshirt",
+    mod = "SpnOpenCloth"
+}, {
+    name = "AuthenticZClothing.Jumper_PoloNeckCheeseRoyale",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_CheeseRoyale",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Rim_TINT",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportSunset",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalNick",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_JohnMorgan",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Waistcoat_Joker_Orange",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_TShirt",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_DenimBlack",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Wichammer",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Vest_HighViz",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportPopcicle",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Badass",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_Holly",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_MimeRed2",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Vest_HighViz",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalBrad",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_PostalDude",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_LogoTest",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Tshirt_SportKilla",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletTV110_Bag_Radio",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletBlack",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "Spongie.Jumper_MilitaryROLL",
+    inherits = "base-clothing-clothshirt",
+    mod = "SpnCloth"
+}, {
+    name = "AuthenticZClothing.Shirt_FormalAsh",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shirt_LumberJackShort",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_BulletTV110_BulletVest",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_Vest_HighViz",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Vest_TankTop",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Vest_Hunting_Wally",
+    inherits = "base-clothing-clothshirt",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlueNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_LegWarmersNeonBlue",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_ArmyBootsOrange",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_Maid",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainersAZ",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerRedandBlack",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitRedNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_ClownPolka",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Shoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_BlueStripedWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Shoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_BrownBoots",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerBlackandWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_LegWarmersNeonPink",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlackNoMaskNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_Clown",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_Nurse",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Boots",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerWhitePlain",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlueNoMaskNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_Charcoal",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuit2NoMaskNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitRedNoMaskNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Rainboots_Yellow",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_LegWarmersPurple",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_JimmyGibbs",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_MimeLeggings",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_StockingsBlack",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_Shoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_White",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Shoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_MaidStockings",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerPinkandWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_BillMurray",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_ClownStriped",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_NurseThigh",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_RedStriped01",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_RedStriped02",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_RedStriped03",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuit2NoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlackNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_LegWarmers",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerBlack",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_PurpleStripedWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerGreenandWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Socks_Long_DarkGreen",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_SlippersBlack",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_BlackPinkTrainers",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerWhite",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuitCEDANoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_Pale",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Shoes_TrainerBlackMamba",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuitCEDANoMaskNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.NBHHazmatSuitNoShoes",
+    inherits = "base-clothing-clothshoes",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_PrairieApron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_GhostbustersVenkman",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_BlackMamba",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.NBHHazmatSuit",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Apron_DonutAZ",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuit",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlack",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.InvisibleSuit",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_BigDaddy",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitRedNoMask",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlue",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_GhostbustersZeddemore",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Apron_GreenSeaHorse",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Apron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_GhostbustersSpengler",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlueNoMask",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_PatternApron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_PlaidApron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_Halloween",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat03_Apron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuit2NoMask",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitBlackNoMask",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_GhostbustersStantz",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat01_Apron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.SnowGhillie_Top",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Apron_Short",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_Pennywise",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_Apron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_Wrinkles",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_StripedApron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuit2",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.HazmatSuitCEDANoMask",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_ClownSuit",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BunnyTail",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Dress_BallroomDress_LongSleevedButtonedApron",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Apron_Yellow",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CEDAHazmatSuitRed",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_PrisonerClassic",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.BunnyEars",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Boilersuit_CrossingGuard",
+    inherits = "base-clothing-clothspecial",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bikini_Pattern03",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Fat02_Boxers",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.CultistRobe",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bikini_Pattern02",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Thin01_LongJohns",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Bikini_Pattern04",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Red_LongJohns",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Blue_LongJohns",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Corset_Jill",
+    inherits = "base-clothing-clothunderwear",
+    mod = "Authentic Z - Current"
 }}

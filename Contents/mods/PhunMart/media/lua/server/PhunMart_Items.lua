@@ -86,9 +86,11 @@ function PhunMart:validateItemDef(item)
                     table.insert(issues, "Invalid VEHICLE display.label: " .. item.display.label)
                 end
             elseif item.display.type == "PERK" or item.display.type == "BOOST" then
-                local instance = PerkFactory.getPerkFromName(item.display.label)
-                if not instance then
-                    table.insert(issues, "Invalid " .. item.display.type .. " display.label: " .. item.display.label)
+                if item.display.label ~= "Engineering" then
+                    local instance = PerkFactory.getPerkFromName(item.display.label)
+                    if not instance then
+                        table.insert(issues, "Invalid " .. item.display.type .. " display.label: " .. item.display.label)
+                    end
                 end
             elseif item.display.type == "TRAIT" then
                 local instance = TraitFactory.getTrait(item.display.label)

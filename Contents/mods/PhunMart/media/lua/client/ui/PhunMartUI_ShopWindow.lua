@@ -195,7 +195,7 @@ function UI:createChildren()
     self.closeButton:initialise()
     self:addChild(self.closeButton)
 
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         layout = self.layouts.default.restock
         self.restockButton = ISButton:new(layout.x * FONT_SCALE, layout.y * FONT_SCALE, layout.width * FONT_SCALE,
             layout.height * FONT_SCALE, "Restock", self, self.restock)
@@ -373,13 +373,13 @@ function UI:rebuild()
 end
 
 function UI:reroll()
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         self.shopObj:reroll()
     end
 end
 
 function UI:restock()
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         self.shopObj:restock()
     end
 end
@@ -436,7 +436,7 @@ function UI:render()
 
     local sb = sandbox
 
-    if self.shopObj and (isAdmin() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
+    if self.shopObj and (isAdmin() or isDebugEnabled() or sandbox.PhunMart.PhunMartShowNextRestockDate) then
         local hoursTillNextRestock = self.shopObj.nextRestock - GameTime:getInstance():getWorldAgeHours();
         local txt = "";
         if hoursTillNextRestock > 36 then
@@ -448,7 +448,7 @@ function UI:render()
         else
             txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
         end
-        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 12, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 8, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     end
 
     if self.shopObj and self.shopObj.requiresPower then

@@ -161,13 +161,18 @@ return {{
     name = "Base.Hat_SurgicalCap_Green",
     inherits = "base-medical-medtools"
 }, {
+    name = "Base.CoughSyrup",
+    inherits = "base-medical",
+    mod = "phunstuff"
+}, {
     name = "Base.AdrenalineSyringe",
     inherits = "base-medical-medtools",
     mod = "BB_FirstAidOverhaul_Alt"
 }, {
     name = "CanteensAndBottles.MedicinalCanteenRedWhiteMedicine-medpills",
     inherits = "base-medical",
-    mod = "CanteensAndBottles"
+    mod = "CanteensAndBottles",
+    enabled = false
 }, {
     name = "Base.Syringe1",
     inherits = "base-medical-medtools",
@@ -179,15 +184,18 @@ return {{
 }, {
     name = "CanteensAndBottles.MedicinalCanteenGreenWhiteSerum-medpills",
     inherits = "base-medical",
-    mod = "CanteensAndBottles"
+    mod = "CanteensAndBottles",
+    enabled = false
 }, {
     name = "CanteensAndBottles.MedicinalCanteenWhiteRedMedicine-medpills",
     inherits = "base-medical",
-    mod = "CanteensAndBottles"
+    mod = "CanteensAndBottles",
+    enabled = false
 }, {
     name = "CanteensAndBottles.MedicinalCanteenWhiteGreenSerum-medpills",
     inherits = "base-medical",
-    mod = "CanteensAndBottles"
+    mod = "CanteensAndBottles",
+    enabled = false
 }, {
     name = "Base.AlcoholBandage2Dirty",
     inherits = "base-medical-medbandage",
@@ -216,4 +224,28 @@ return {{
     name = "RadiatedZones.GeigerTeller",
     inherits = "base-medical-medtools",
     mod = "RadiatedZones"
+}, {
+    name = "AuthenticZClothing.Authentic_Bandages",
+    inherits = "base-medical-medbandage",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Authentic_Pills",
+    inherits = "base-medical-medpills",
+    mod = "Authentic Z - Current"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenGreenWhiteSerum",
+    inherits = "base-medical-medpills",
+    mod = "CanteensAndBottles"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenWhiteRedMedicine",
+    inherits = "base-medical-medpills",
+    mod = "CanteensAndBottles"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenWhiteGreenSerum",
+    inherits = "base-medical-medpills",
+    mod = "CanteensAndBottles"
+}, {
+    name = "CanteensAndBottles.MedicinalCanteenRedWhiteMedicine",
+    inherits = "base-medical-medpills",
+    mod = "CanteensAndBottles"
 }}

@@ -1456,4 +1456,144 @@ return {{
     name = "Base.M2400_Shotgun",
     inherits = "base-weapons-wepshotgun",
     mod = "VFExpansion1"
+}, {
+    name = "Base.MAK90",
+    inherits = "base-weapons",
+    mod = "VFExpansion1"
+}, {
+    name = "AuthenticZClothing.Flare12GaugeShot",
+    inherits = "base-weapons",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.FlareGun",
+    inherits = "base-weapons",
+    mod = "Authentic Z - Current"
+}, {
+    name = "GWP.ColtPython38",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Glock21",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Wakizashi",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.MiniUzi",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.M60",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Marlin1894Custom38",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.ColtPeacemaker",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.ColtPython357",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Mac10SD",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.DeLisleCarbine",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.ThompsonM1A1",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Model44",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.M1carbine9mm",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Winchester1894",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.R870Police",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.NorincoMak90",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.PSG1",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Marlin1894Custom357",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.BigBoy45ACP",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.HKG3",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Winchester1887",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Mini30",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.RugerMarkII",
+    inherits = "base-weapons",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.357Bullets",
+    inherits = "base-weapons-wepammo",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.357Box",
+    inherits = "base-weapons-wepbulkammo",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "AuthenticZClothing.MandoSpear",
+    inherits = "base-weapons-wepmelee",
+    mod = "Authentic Z - Current"
+}, {
+    name = "AuthenticZClothing.Stake2",
+    inherits = "base-weapons-wepmelee",
+    mod = "Authentic Z - Current"
+}, {
+    name = "GWP.MoraKnife",
+    inherits = "base-weapons-wepmelee",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "MCH.Chainsaw",
+    inherits = "base-weapons-wepmelee",
+    mod = "Machines15"
+}, {
+    name = "GWP.VikingAxe",
+    inherits = "base-weapons-wepmelee",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.KatanaGoldRed",
+    inherits = "base-weapons-wepmelee",
+    mod = "GunrunnersWeaponPack"
+}, {
+    name = "GWP.Heritage22Revolver",
+    inherits = "base-weapons-weppistol",
+    mod = "GunrunnersWeaponPack"
 }}

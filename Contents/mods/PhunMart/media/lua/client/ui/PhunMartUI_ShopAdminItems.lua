@@ -57,7 +57,7 @@ function PhunMartUIShopAdminItems:new(x, y, width, height, viewer, key)
 end
 
 function PhunMartUIShopAdminItems:GridDoubleClick(item)
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         PhunInfoAdminPlayersUI.OnOpenPanel(item)
     end
 end

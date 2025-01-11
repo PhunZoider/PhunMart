@@ -22,12 +22,6 @@ return {{
     tags = "tools,toolwelding"
 }, {
     abstract = true,
-    key = "base-tools-toolcamping",
-    inherits = "base-tools",
-    tab = "Camping",
-    tags = "tools,toolcamping"
-}, {
-    abstract = true,
     key = "base-tools-toolmecanics",
     inherits = "base-tools",
     tab = "Mechanics",
@@ -145,11 +139,11 @@ return {{
     mod = "sapphcooking"
 }, {
     name = "camping.SteelAndFlint",
-    inherits = "base-tools-toolcamping"
+    inherits = "base-tools"
 }, {
     name = "PhunSpawn.Escape Vent",
-    inherits = "base-tools-toolcamping",
-    mod = "PhunSpawn",
+    inherits = "base-tools",
+    mod = "phunspawn",
     price = {
         currency = 80
     }
@@ -270,6 +264,6 @@ return {{
     mod = "SimpleOverhaulMeleeWeapons"
 }, {
     name = "SOMW.CampingHatchet",
-    inherits = "base-tools-toolcamping",
+    inherits = "base-tools",
     mod = "SimpleOverhaulMeleeWeapons"
 }}

@@ -2837,4 +2837,112 @@ return {{
     name = "Base.63beetleWindshieldRear1",
     inherits = "base-autozone-carwindows",
     mod = "63beetle"
+}, {
+    name = "Base.M1082Mudflaps2",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AFenderRight3_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ASpareMount2_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AFenderRight2_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AFenderLeft2_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AFenderLeft1_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ASpareMount1_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AFenderRight1_Item",
+    inherits = "base-autozone",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.ModernLargeRoofrack3",
+    inherits = "base-autozone-caraccessories",
+    mod = "damnlib"
+}, {
+    name = "Base.P19ABumperRear0",
+    inherits = "base-autozone-caraccessories",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ABumperFront0",
+    inherits = "base-autozone-caraccessories",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.93fordF350Roofrack2",
+    inherits = "base-autozone-caraccessories",
+    mod = "damnlib"
+}, {
+    name = "Base.P19ARoofrack1_Item",
+    inherits = "base-autozone-caraccessories",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AWindshieldArmor1_Item",
+    inherits = "base-autozone-cararmor",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AEngineDoor2",
+    inherits = "base-autozone-cardoors",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ACarFrontDoorArmor1_Item",
+    inherits = "base-autozone-cardoors",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ACarFrontDoor2",
+    inherits = "base-autozone-cardoors",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ACarSeat2",
+    inherits = "base-autozone-carseats",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.M1082TrunkDoor2",
+    inherits = "base-autozone-carstorage",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19ATrunkDoor2",
+    inherits = "base-autozone-carstorage",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.90chevyCKseriesTire1",
+    inherits = "base-autozone-cartires",
+    mod = "damnlib"
+}, {
+    name = "Base.80chevyCKseriesTire2",
+    inherits = "base-autozone-cartires",
+    mod = "damnlib"
+}, {
+    name = "Base.76chevyKseriesTire2",
+    inherits = "base-autozone-cartires",
+    mod = "damnlib"
+}, {
+    name = "Base.80chevyCKseriesTire1",
+    inherits = "base-autozone-cartires",
+    mod = "damnlib"
+}, {
+    name = "Base.90chevyCKseriesTire2",
+    inherits = "base-autozone-cartires",
+    mod = "damnlib"
+}, {
+    name = "Base.P19ASideWindow2",
+    inherits = "base-autozone-carwindows",
+    mod = "86oshkoshP19A"
+}, {
+    name = "Base.P19AWindshield2",
+    inherits = "base-autozone-carwindows",
+    mod = "86oshkoshP19A"
 }}

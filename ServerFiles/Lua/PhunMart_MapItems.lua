@@ -92,4 +92,36 @@ return {{
     name = "Base.BedfordMap",
     inherits = "base-maps",
     mod = "BedfordFalls"
+}, {
+    name = "Base.AbandonedSurvivorBaseMap",
+    inherits = "base-maps",
+    mod = "AbandonedSurvivorBase"
+}, {
+    name = "Base.ShortrestCityMap",
+    inherits = "base-maps",
+    mod = "Shortrest_City"
+}, {
+    name = "Base.PinevilleMap",
+    inherits = "base-maps",
+    mod = "pineville"
+}, {
+    name = "Base.NUCMap1",
+    inherits = "base-maps",
+    mod = "PhunRadNUC"
+}, {
+    name = "Base.NewAlbanyMap",
+    inherits = "base-maps",
+    mod = "NewAlbany"
+}, {
+    name = "Base.BunkerMap",
+    inherits = "base-maps",
+    mod = "NewAlbany"
+}, {
+    name = "Base.ConstownMap",
+    inherits = "base-maps",
+    mod = "constownwithRCandFR"
+}, {
+    name = "Base.HartburgMap",
+    inherits = "base-maps",
+    mod = "hartburg"
 }}

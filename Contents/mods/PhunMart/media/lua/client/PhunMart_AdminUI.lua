@@ -7,7 +7,7 @@ local PhunMart = PhunMart
 local PhunTools = PhunTools
 
 function PhunMartAdminUI.OnOpenPanel()
-    if isAdmin() then
+    if isAdmin() or isDebugEnabled() then
         if PhunMartAdminUI.instance == nil then
             PhunMartAdminUI.instance = PhunMartAdminUI:new(100, 100, 200, 400, getPlayer());
             PhunMartAdminUI.instance:initialise();

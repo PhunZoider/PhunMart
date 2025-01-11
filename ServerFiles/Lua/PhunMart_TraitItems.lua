@@ -1825,4 +1825,674 @@ return {{
         WeakStomach = false,
         IronGut = false
     }
+}, {
+    inherits = "base-trait:positive",
+    display = {
+        label = "AmateurElectrician",
+        type = "TRAIT",
+        name = "AmateurElectrician"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AmateurElectrician = false,
+        AmateurElectrician2 = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Pluviophile",
+        type = "TRAIT",
+        name = "Pluviophile"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        Pluviophile = false,
+        Pluviophobia = false,
+        WeatherSensitive = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Sneaky",
+        type = "TRAIT",
+        name = "Sneaky"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        Sneaky = false,
+        Conspicuous = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Lightfooted",
+        type = "TRAIT",
+        name = "Lightfooted"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        Lightfooted = false,
+        Clumsy = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Nimble",
+        type = "TRAIT",
+        name = "Nimble"
+    },
+    price = {
+        currency = 3
+    },
+    type = "TRAIT",
+    traits = {
+        Nimble = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "MarathonRunner",
+        type = "TRAIT",
+        name = "MarathonRunner"
+    },
+    price = {
+        currency = 5
+    },
+    type = "TRAIT",
+    traits = {
+        MarathonRunner = false,
+        Slack = false,
+        Unfit = false,
+        Obese = false,
+        SoreLegsTrait = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "StrongNimble",
+        type = "TRAIT",
+        name = "StrongNimble"
+    },
+    price = {
+        currency = 7
+    },
+    type = "TRAIT",
+    traits = {
+        StrongNimble = false,
+        Slack = false,
+        Weak = false,
+        ["Very Underweight"] = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Taut",
+        type = "TRAIT",
+        name = "Taut"
+    },
+    price = {
+        currency = 6
+    },
+    type = "TRAIT",
+    traits = {
+        Taut = false,
+        Slack = false,
+        Unfit = false,
+        Weak = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "NinjaWay",
+        type = "TRAIT",
+        name = "NinjaWay"
+    },
+    price = {
+        currency = 5
+    },
+    type = "TRAIT",
+    traits = {
+        NinjaWay = false,
+        Conspicuous = false,
+        Clumsy = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMForager",
+        type = "TRAIT",
+        name = "AMForager"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AMForager = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMTrapper",
+        type = "TRAIT",
+        name = "AMTrapper"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AMTrapper = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Mushroomer",
+        type = "TRAIT",
+        name = "Mushroomer"
+    },
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        Mushroomer = false,
+        Herbalist = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMCook",
+        type = "TRAIT",
+        name = "AMCook"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AMCook = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMElectrician",
+        type = "TRAIT",
+        name = "AMElectrician"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AMElectrician = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMMechanic",
+        type = "TRAIT",
+        name = "AMMechanic"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        AMMechanic = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMCarpenter",
+        type = "TRAIT",
+        name = "AMCarpenter"
+    },
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        AMCarpenter = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AMMetalworker",
+        type = "TRAIT",
+        name = "AMMetalworker"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        AMMetalworker = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Durabile",
+        type = "TRAIT",
+        name = "Durabile"
+    },
+    price = {
+        currency = 3
+    },
+    type = "TRAIT",
+    traits = {
+        Durabile = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Shortbladefan",
+        type = "TRAIT",
+        name = "Shortbladefan"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        Shortbladefan = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Shortbluntfan",
+        type = "TRAIT",
+        name = "Shortbluntfan"
+    },
+    price = {
+        currency = 3
+    },
+    type = "TRAIT",
+    traits = {
+        Shortbluntfan = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Cutter",
+        type = "TRAIT",
+        name = "Cutter"
+    },
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        Cutter = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Spearman",
+        type = "TRAIT",
+        name = "Spearman"
+    },
+    price = {
+        currency = 5
+    },
+    type = "TRAIT",
+    traits = {
+        Spearman = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Swordsman",
+        type = "TRAIT",
+        name = "Swordsman"
+    },
+    price = {
+        currency = 5
+    },
+    type = "TRAIT",
+    traits = {
+        Swordsman = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Cruelty",
+        type = "TRAIT",
+        name = "Cruelty"
+    },
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        Cruelty = false,
+        Pacifist = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Gunfan",
+        type = "TRAIT",
+        name = "Gunfan"
+    },
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        Gunfan = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Sharpshooter",
+        type = "TRAIT",
+        name = "Sharpshooter"
+    },
+    price = {
+        currency = 6
+    },
+    type = "TRAIT",
+    traits = {
+        Sharpshooter = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "AccMetabolism",
+        type = "TRAIT",
+        name = "AccMetabolism"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        AccMetabolism = false,
+        Prodigy = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "MSTOptimist",
+        type = "TRAIT",
+        name = "MSTOptimist"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        MSTOptimist = false,
+        MSTDepressive = false
+    }
+}, {
+    inherits = "base-trait:positive",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "LessSweaty",
+        type = "TRAIT",
+        name = "LessSweaty"
+    },
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        LessSweaty = false,
+        HighSweaty = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Slack",
+        type = "TRAIT",
+        name = "Slack"
+    },
+    receive = {{
+        type = "trait",
+        name = "Slack",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 6
+    },
+    type = "TRAIT",
+    traits = {
+        Slack = true,
+        MarathonRunner = false,
+        StrongNimble = false,
+        Athletic = false,
+        Strong = false,
+        Taut = false,
+        Unfit = false,
+        Weak = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "WeatherSensitive",
+        type = "TRAIT",
+        name = "WeatherSensitive"
+    },
+    receive = {{
+        type = "trait",
+        name = "WeatherSensitive",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        WeatherSensitive = true,
+        Pluviophile = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "SoreLegsTrait",
+        type = "TRAIT",
+        name = "SoreLegsTrait"
+    },
+    receive = {{
+        type = "trait",
+        name = "SoreLegsTrait",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 8
+    },
+    type = "TRAIT",
+    traits = {
+        SoreLegsTrait = true,
+        MarathonRunner = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "SensitiveStomach",
+        type = "TRAIT",
+        name = "SensitiveStomach"
+    },
+    receive = {{
+        type = "trait",
+        name = "SensitiveStomach",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        SensitiveStomach = true
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "PanicAttacks",
+        type = "TRAIT",
+        name = "PanicAttacks"
+    },
+    receive = {{
+        type = "trait",
+        name = "PanicAttacks",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        PanicAttacks = true
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "MSTAllergic",
+        type = "TRAIT",
+        name = "MSTAllergic"
+    },
+    receive = {{
+        type = "trait",
+        name = "MSTAllergic",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 3
+    },
+    type = "TRAIT",
+    traits = {
+        MSTAllergic = true
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "FearoftheDark",
+        type = "TRAIT",
+        name = "FearoftheDark"
+    },
+    receive = {{
+        type = "trait",
+        name = "FearoftheDark",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 1
+    },
+    type = "TRAIT",
+    traits = {
+        FearoftheDark = true,
+        NightVision = false,
+        Desensitized = false,
+        Brave = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "Snorer",
+        type = "TRAIT",
+        name = "Snorer"
+    },
+    receive = {{
+        type = "trait",
+        name = "Snorer",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 2
+    },
+    type = "TRAIT",
+    traits = {
+        Snorer = true
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "HighSweaty",
+        type = "TRAIT",
+        name = "HighSweaty"
+    },
+    receive = {{
+        type = "trait",
+        name = "HighSweaty",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 3
+    },
+    type = "TRAIT",
+    traits = {
+        HighSweaty = true,
+        LessSweaty = false
+    }
+}, {
+    inherits = "base-trait:negative",
+    mod = "MoreSimpleTraits",
+    display = {
+        label = "MSTDepressive",
+        type = "TRAIT",
+        name = "MSTDepressive"
+    },
+    receive = {{
+        type = "trait",
+        name = "MSTDepressive",
+        tag = "REMOVE"
+    }},
+    price = {
+        currency = 4
+    },
+    type = "TRAIT",
+    traits = {
+        MSTDepressive = true,
+        MSTOptimist = false
+    }
 }}

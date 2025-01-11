@@ -113,6 +113,142 @@ return {{
 }, {
     inherits = "base-perk:basic1",
     display = {
+        label = "Engineering"
+    },
+    quantity = 75,
+    skills = {
+        Engineering = {
+            max = 2
+        }
+    },
+    price = {
+        currency = 7
+    }
+}, {
+    inherits = "base-boost:basic1",
+    display = {
+        label = "Engineering"
+    },
+    quantity = 3,
+    skills = {
+        Engineering = {
+            max = 2
+        }
+    },
+    price = {
+        currency = 7
+    },
+    boosts = {
+        Engineering = false
+    }
+}, {
+    inherits = "base-perk:basic2",
+    display = {
+        label = "Engineering",
+        labelExt = "II"
+    },
+    quantity = 300,
+    skills = {
+        Engineering = {
+            min = 3,
+            max = 5
+        }
+    },
+    price = {
+        currency = 30
+    }
+}, {
+    inherits = "base-boost:basic2",
+    display = {
+        label = "Engineering",
+        labelExt = "II"
+    },
+    quantity = 3,
+    skills = {
+        Engineering = {
+            min = 3,
+            max = 5
+        }
+    },
+    price = {
+        currency = 30
+    },
+    boosts = {
+        Engineering = false
+    }
+}, {
+    inherits = "base-perk:basic3",
+    display = {
+        label = "Engineering",
+        labelExt = "III"
+    },
+    quantity = 1500,
+    skills = {
+        Engineering = {
+            min = 6,
+            max = 8
+        }
+    },
+    price = {
+        currency = 150
+    }
+}, {
+    inherits = "base-boost:basic3",
+    display = {
+        label = "Engineering",
+        labelExt = "III"
+    },
+    quantity = 3,
+    skills = {
+        Engineering = {
+            min = 6,
+            max = 8
+        }
+    },
+    price = {
+        currency = 150
+    },
+    boosts = {
+        Engineering = false
+    }
+}, {
+    inherits = "base-perk:basic4",
+    display = {
+        label = "Engineering",
+        labelExt = "IV"
+    },
+    quantity = 4500,
+    skills = {
+        Engineering = {
+            min = 9,
+            max = 10
+        }
+    },
+    price = {
+        currency = 450
+    }
+}, {
+    inherits = "base-boost:basic4",
+    display = {
+        label = "Engineering",
+        labelExt = "IV"
+    },
+    quantity = 3,
+    skills = {
+        Engineering = {
+            min = 9,
+            max = 10
+        }
+    },
+    price = {
+        currency = 450
+    },
+    boosts = {
+        Engineering = false
+    }
+}, {
+    inherits = "base-perk:basic1",
+    display = {
         label = "Cooking"
     },
     quantity = 75,
