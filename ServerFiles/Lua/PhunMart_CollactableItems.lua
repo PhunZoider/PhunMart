@@ -106,7 +106,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.CassetteBananaramaVenus"] = 1
+        ["Tsarcraft.CassetteBananaramaVenus"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -117,7 +120,10 @@ return {{
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["AuthenticZClothing.ToyBear"] = 1
+        ["AuthenticZClothing.ToyBear"] = {
+            min = 1,
+            max = 2
+        }
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -131,7 +137,10 @@ return {{
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["RoundPlushies.Plushie_Cat1/RoundPlushies.Plushie_Cat2/RoundPlushies.Plushie_Cat3"] = 1
+        ["RoundPlushies.Plushie_Cat1/RoundPlushies.Plushie_Cat2/RoundPlushies.Plushie_Cat3"] = {
+            min = 1,
+            max = 2
+        }
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -149,7 +158,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.003Venusaurcard"] = 2
+        ["pkmncards.003Venusaurcard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -205,7 +217,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["UndeadSurvivor.BountyPhoto01"] = 2
+        ["UndeadSurvivor.BountyPhoto01"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "UndeadSuvivor"
 }, {
@@ -219,7 +234,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["UndeadSurvivor.BountyPhoto09"] = 2
+        ["UndeadSurvivor.BountyPhoto09"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "UndeadSuvivor"
 }, {
@@ -233,7 +251,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.006Charizardcard"] = 2
+        ["pkmncards.006Charizardcard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -248,7 +269,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.011Metapodcard"] = 2
+        ["pkmncards.011Metapodcard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -262,7 +286,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["JTG.DannyNews"] = 2
+        ["JTG.DannyNews"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "NorthKillian"
 
@@ -277,7 +304,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylDoctorWhoThemeSong(1963)"] = 2
+        ["Tsarcraft.VinylDoctorWhoThemeSong(1963)"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -293,7 +323,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylEddyGrantElectricAvenue"] = 2
+        ["Tsarcraft.VinylEddyGrantElectricAvenue"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -308,7 +341,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylNoDoubtJustAGirl"] = 2
+        ["Tsarcraft.VinylNoDoubtJustAGirl"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -319,7 +355,10 @@ return {{
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["MonmouthClothing.Hat_Silent_Bob"] = 1
+        ["MonmouthClothing.Hat_Silent_Bob"] = {
+            min = 1,
+            max = 2
+        }
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -350,7 +389,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["UndeadSurvivor.BountyPhoto03"] = 2
+        ["UndeadSurvivor.BountyPhoto03"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "UndeadSuvivor"
 }, {
@@ -364,7 +406,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["UndeadSurvivor.BountyPhoto06"] = 2
+        ["UndeadSurvivor.BountyPhoto06"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "UndeadSuvivor"
 }, {
@@ -378,7 +423,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylCyndiLauperGirlsJustWannaHaveFun"] = 2
+        ["Tsarcraft.VinylCyndiLauperGirlsJustWannaHaveFun"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -393,7 +441,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["BZMClothing.SpiffoBatman/Base.BatmanPlushie"] = 2
+        ["BZMClothing.SpiffoBatman/Base.BatmanPlushie"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "MonmouthCounty_new"
 }, {
@@ -404,7 +455,10 @@ return {{
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["RoundPlushies.Plushie_Chicken1/RoundPlushies.Plushie_Chicken2/RoundPlushies.Plushie_Chicken3"] = 1
+        ["RoundPlushies.Plushie_Chicken1/RoundPlushies.Plushie_Chicken2/RoundPlushies.Plushie_Chicken3"] = {
+            min = 1,
+            max = 2
+        }
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -423,7 +477,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["AuthenticZClothing.SpiffoHeart"] = 2
+        ["AuthenticZClothing.SpiffoHeart"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Authentic Z - Current"
 }, {
@@ -437,7 +494,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_29"] = 2
+        ["Tikitown.Baseball_Card_29"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -452,7 +512,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.014Kakunacard"] = 2
+        ["pkmncards.014Kakunacard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -467,7 +530,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylLennyKravitzAreYouGonnaGoMyWay"] = 2
+        ["Tsarcraft.VinylLennyKravitzAreYouGonnaGoMyWay"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -482,7 +548,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Base.SpoonPic11"] = 1
+        ["Base.SpoonPic11"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "PictureThis"
 
@@ -498,7 +567,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Base.SpoonPic10"] = 1
+        ["Base.SpoonPic10"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "PictureThis"
 
@@ -514,7 +586,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylPrince1999"] = 2
+        ["Tsarcraft.VinylPrince1999"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -529,7 +604,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["JTG.CMNews"] = 2
+        ["JTG.CMNews"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "NorthKillian"
 
@@ -544,7 +622,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylRobertPalmerAddictedToLove"] = 2
+        ["Tsarcraft.VinylRobertPalmerAddictedToLove"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -573,7 +654,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_04"] = 2
+        ["Tikitown.Baseball_Card_04"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -587,7 +671,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_07"] = 2
+        ["Tikitown.Baseball_Card_07"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -601,7 +688,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.024Arbokcard"] = 2
+        ["pkmncards.024Arbokcard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -611,7 +701,10 @@ return {{
         overlay = "traiter-token-overlay"
     },
     price = {
-        ["Tikitown.Baseball_Card_19"] = 2
+        ["Tikitown.Baseball_Card_19"] = {
+            min = 1,
+            max = 2
+        }
     },
     receive = {{
         label = "PhunMart.TraiterToken",
@@ -629,7 +722,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_25"] = 2
+        ["Tikitown.Baseball_Card_25"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -643,7 +739,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.030Nidorinacard"] = 2
+        ["pkmncards.030Nidorinacard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -657,7 +756,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Sorted_Full_Baseball_Card_Box"] = 1
+        ["Tikitown.Sorted_Full_Baseball_Card_Box"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 
@@ -703,7 +805,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["RoundPlushies.Plushie_Dog1/RoundPlushies.Plushie_Dog2/RoundPlushies.Plushie_Dog3"] = 2
+        ["RoundPlushies.Plushie_Dog1/RoundPlushies.Plushie_Dog2/RoundPlushies.Plushie_Dog3"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "RoundPlushies"
 }, {
@@ -732,7 +837,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["BZMClothing.SpiffoDredd"] = 1
+        ["BZMClothing.SpiffoDredd"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "MonmouthCounty_new"
 
@@ -748,7 +856,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tikitown.Baseball_Card_19"] = 2
+        ["Tikitown.Baseball_Card_19"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {
@@ -762,7 +873,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Base.SpoonPic2"] = 1
+        ["Base.SpoonPic2"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "PictureThis"
 }, {
@@ -776,7 +890,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Base.ChrisPic"] = 1
+        ["Base.ChrisPic"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "PictureThis"
 }, {
@@ -791,7 +908,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["JTG.AlexNews"] = 2
+        ["JTG.AlexNews"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "NorthKillian"
 
@@ -806,7 +926,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylWhitneyHoustonHowWillIKnow"] = 2
+        ["Tsarcraft.VinylWhitneyHoustonHowWillIKnow"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -822,7 +945,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylWilsonPhillipsHoldOn"] = 2
+        ["Tsarcraft.VinylWilsonPhillipsHoldOn"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -838,7 +964,7 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylTheSpinnersWorkingmywaybacktoyou"] = 2
+        ["Tsarcraft.VinylTheSpinnersWorkingmywaybacktoyou"] = 1
     },
     mod = "Music_Hits_And_More"
 
@@ -853,7 +979,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["Tsarcraft.VinylStoneTemplePilotsPlush"] = 2
+        ["Tsarcraft.VinylStoneTemplePilotsPlush"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "Music_Hits_And_More"
 
@@ -868,7 +997,10 @@ return {{
         type = "ITEM"
     }},
     price = {
-        ["pkmncards.148Dragonaircard"] = 2
+        ["pkmncards.148Dragonaircard"] = {
+            min = 1,
+            max = 2
+        }
     },
     mod = "tikitown"
 }, {

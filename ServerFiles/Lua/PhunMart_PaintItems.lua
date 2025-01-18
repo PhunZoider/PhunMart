@@ -60,7 +60,7 @@ return {{
     name = "Base.PaintGrey",
     inherits = "base-paint"
 }, {
-    name = "PhunSafePaint.RepellentPaint",
+    name = "Base.HousePaint",
     inherits = "base-paint",
     price = {
         ["PhunMart.CheeseToken"] = 10

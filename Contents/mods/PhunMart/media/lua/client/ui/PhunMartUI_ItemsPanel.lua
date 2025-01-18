@@ -381,6 +381,8 @@ function PhunMartUIItemsPanel:doOnMouseMove(dx, dy)
                             tooltip:setItem(instance)
                             tooltip:setOwner(self)
                         end
+                    elseif item.display.type == "TRAIT" then
+                        tooltip.description = PhunMart:getDescriptionFromItem(item.display) or item.display.label
                     else
                         tooltip.description = item.display.label
                     end

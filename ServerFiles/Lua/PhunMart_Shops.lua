@@ -82,7 +82,7 @@ return { --[[
             }
         }}
     },
-    backgroundImage = "machine-collectors",
+    backgroundImage = "machine-hard-wear",
     sprites = {
         sheet = 3,
         row = 1,
