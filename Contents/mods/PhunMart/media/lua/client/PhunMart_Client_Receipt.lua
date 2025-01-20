@@ -41,7 +41,22 @@ PhunMart.applyReceipt["TRAIT"] = function(playerObj, item)
         playerObj:getTraits():remove(trait:getType())
     else
         playerObj:getTraits():add(trait:getType())
+        local boosts = transformIntoKahluaTable(trait:getXPBoostMap())
+        local factory = PerkFactory
+        local list = factory.PerkList
+        for p, level in pairs(boosts or {}) do
+            local perk = PerkFactory.getPerkFromName(tostring(p))
+            -- playerObj:getXp():setTraitBoost(perk, level)
+            local currentXPBoost = playerObj:getXp():getPerkBoost(perk);
+            local newBoost = currentXPBoost + tonumber(tostring(level));
+            if newBoost > 3 then
+                playerObj:getXp():setPerkBoost(perk, 3);
+            else
+                playerObj:getXp():setPerkBoost(perk, newBoost);
+            end
+        end
     end
+    SyncXp(playerObj)
 
 end
 

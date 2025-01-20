@@ -65,5 +65,5 @@ return {{
     price = {
         ["PhunMart.CheeseToken"] = 10
     },
-    mod = "PhunSafePaint"
+    mod = "phunhouse"
 }}

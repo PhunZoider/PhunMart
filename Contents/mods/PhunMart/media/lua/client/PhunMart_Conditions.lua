@@ -50,7 +50,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
             end
 
         elseif v.min and v.max then
-            if skills[k] >= v.min and skills[k] <= v.max then
+            if skills[k] and (skills[k] >= v.min and skills[k] <= v.max) then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredBetweenDesc", k, v.min, v.max)
             else
@@ -59,7 +59,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
                 tooltip = getText("IGUI_PhunMart.SkillRequiredBetweenDesc", k, v.min, v.max)
             end
         elseif v.min then
-            if skills[k] >= v.min then
+            if skills[k] and skills[k] >= v.min then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredDesc", k, v.min)
             else
@@ -68,7 +68,7 @@ Conditions.skills = function(self, playerObj, item, condition, results)
                 tooltip = getText("IGUI_PhunMart.SkillRequiredDesc", k, v.min)
             end
         elseif v.max then
-            if skills[k] <= v.max then
+            if skills[k] and skills[k] <= v.max then
                 isPassed = true
                 richText = RICH_PREFIX .. getText("IGUI_PhunMart.SkillRequiredLessThanDesc", k, v.max)
             else

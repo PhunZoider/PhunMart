@@ -112,6 +112,7 @@ return {{
     tags = "boosts4"
 }, {
     inherits = "base-perk:basic1",
+    enabled = false,
     display = {
         label = "Engineering"
     },
@@ -126,6 +127,7 @@ return {{
     }
 }, {
     inherits = "base-boost:basic1",
+    enabled = false,
     display = {
         label = "Engineering"
     },
@@ -143,6 +145,7 @@ return {{
     }
 }, {
     inherits = "base-perk:basic2",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "II"
@@ -159,6 +162,7 @@ return {{
     }
 }, {
     inherits = "base-boost:basic2",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "II"
@@ -178,6 +182,7 @@ return {{
     }
 }, {
     inherits = "base-perk:basic3",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "III"
@@ -194,6 +199,7 @@ return {{
     }
 }, {
     inherits = "base-boost:basic3",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "III"
@@ -213,6 +219,7 @@ return {{
     }
 }, {
     inherits = "base-perk:basic4",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "IV"
@@ -229,6 +236,7 @@ return {{
     }
 }, {
     inherits = "base-boost:basic4",
+    enabled = false,
     display = {
         label = "Engineering",
         labelExt = "IV"

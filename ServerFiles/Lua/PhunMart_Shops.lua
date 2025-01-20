@@ -53,8 +53,8 @@ return { --[[
     type = "CLOTHING",
     inherits = "base-shop",
     fills = {
-        min = 5,
-        max = 7
+        min = 12,
+        max = 20
     },
     zones = {
         difficulty = 1
@@ -424,6 +424,10 @@ return { --[[
     type = "CARPARTS",
     backgroundImage = "machine-car-a-part",
     basePrice = 25,
+    fills = {
+        min = 12,
+        max = 20
+    },
     filters = {
         tags = "autozone"
     },
