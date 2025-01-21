@@ -119,6 +119,7 @@ return {{
         label = "AuthenticZClothing.ToyBear",
         overlay = "traiter-token-overlay"
     },
+    enabled = false,
     price = {
         ["AuthenticZClothing.ToyBear"] = {
             min = 1,
