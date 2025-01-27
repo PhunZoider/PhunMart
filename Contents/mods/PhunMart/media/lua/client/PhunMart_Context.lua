@@ -47,7 +47,7 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
         elseif found.requiresPower then
             if not square:haveElectricity() then
                 if SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() >
-                    SandboxVars.ElecShutModifier then
+                    getSandboxOptions():getOptionByName("ElecShutModifier"):getValue() then
                     toolTip.description = "This vending machine requires power."
                     option.notAvailable = true
                 end

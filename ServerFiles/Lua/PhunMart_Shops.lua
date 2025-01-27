@@ -56,9 +56,6 @@ return { --[[
         min = 12,
         max = 20
     },
-    zones = {
-        difficulty = 1
-    },
     pools = {
         items = {{
             filters = {
@@ -494,6 +491,10 @@ return { --[[
     backgroundImage = "machine-michelles",
     filters = {
         tags = "crafts,paint"
+    },
+    fills = {
+        min = 8,
+        max = 12
     },
     sprites = {
         sheet = 1,

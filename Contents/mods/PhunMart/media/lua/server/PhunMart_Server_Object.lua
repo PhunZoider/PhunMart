@@ -154,7 +154,7 @@ function SPhunMartObject:changeSprite(force)
         hasPower = self:getSquare():haveElectricity()
         if not hasPower then
             hasPower = SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() <
-                           SandboxVars.ElecShutModifier
+                           getSandboxOptions():getOptionByName("ElecShutModifier"):getValue()
         end
     end
     if def and def.sprites then

@@ -35,13 +35,9 @@ function CPhunMartObject:open(playerObj)
 end
 
 function CPhunMartObject:insufficientPower()
-    if self.requiresPower then
-        if not self:getSquare():haveElectricity() then
-            if SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() >
-                SandboxVars.ElecShutModifier then
-                return true
-            end
-        end
+    if self.requiresPower and SandboxVars.ElecShutModifier > -1 then
+        return self:getSquare():haveElectricity() or GameTime:getInstance():getNightsSurvived() >
+                   getSandboxOptions():getOptionByName("ElecShutModifier"):getValue()
     end
     return false
 end
