@@ -448,16 +448,24 @@ function UI:render()
         else
             txt = getText("IGUI_PhunMart.HoursTillRestock.Soon")
         end
-        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 8, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
+        self:drawText(txt, self.layouts.default.buyButton.x, self.height - 20, 0.7, 0.7, 0.7, 1.0, UIFont.Small)
     end
 
     if self.shopObj and self.shopObj.requiresPower then
         local text = getText("IGUI_PhunMart.isPowered")
         if self.shopObj:insufficientPower() then
             text = getText("IGUI_PhunMart.isNotPowered")
+            self.preview:setVisible(false)
+            self.pricePanel:setVisible(false)
+        else
+            self.preview:setVisible(true)
+            self.pricePanel:setVisible(true)
         end
         local width = getTextManager():MeasureStringX(UIFont.Small, text)
         self:drawText(text, self.width - width - 10, self.height - 20, 0.7, 0.7, 0.7, 1, UIFont.Small)
+    else
+        self.preview:setVisible(true)
+        self.pricePanel:setVisible(true)
     end
 end
 

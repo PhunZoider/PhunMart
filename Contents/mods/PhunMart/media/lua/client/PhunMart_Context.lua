@@ -45,9 +45,11 @@ local vendingContextMenu = function(playerObj, context, worldobjects, test)
                                       "This vending machine is currently in use by " .. found.lockedBy) or ""
             option.notAvailable = true
         elseif found.requiresPower then
+
             if not square:haveElectricity() then
-                if SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() >
-                    getSandboxOptions():getOptionByName("ElecShutModifier"):getValue() then
+                local nightsSurvived = GameTime:getInstance():getNightsSurvived()
+                local elecShutModifier = getSandboxOptions():getOptionByName("ElecShutModifier"):getValue()
+                if nightsSurvived > elecShutModifier then
                     toolTip.description = "This vending machine requires power."
                     option.notAvailable = true
                 end

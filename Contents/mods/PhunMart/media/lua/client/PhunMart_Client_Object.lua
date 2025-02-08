@@ -36,8 +36,11 @@ end
 
 function CPhunMartObject:insufficientPower()
     if self.requiresPower and SandboxVars.ElecShutModifier > -1 then
-        return self:getSquare():haveElectricity() or GameTime:getInstance():getNightsSurvived() >
-                   getSandboxOptions():getOptionByName("ElecShutModifier"):getValue()
+        local square = self:getSquare()
+        local hasElectricity = square:haveElectricity()
+        local nightsSurvived = GameTime:getInstance():getNightsSurvived()
+        local elecShutModifier = getSandboxOptions():getOptionByName("ElecShutModifier"):getValue()
+        return not (hasElectricity or nightsSurvived < elecShutModifier)
     end
     return false
 end
