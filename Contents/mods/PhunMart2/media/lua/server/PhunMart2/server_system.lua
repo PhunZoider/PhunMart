@@ -335,42 +335,51 @@ function ServerSystem:loadGridsquare(square)
     for i = 0, objects:size() - 1 do
         local obj = objects:get(i)
         -- is this sprite a shop
-        local customName = obj:getSprite():getProperties():Val("CustomName")
+        local sprite = obj:getSprite()
+        if sprite and sprite.getProperties then
+            local properties = sprite:getProperties()
+            if properties and properties.Val then
 
-        if customName and Core.shops[customName] then
-            -- registered already, but check if it is valid?
-            if not self:isValidIsoObject(obj) then
-                -- not valid, remove it
-                local facing = obj:getSprite():getProperties():Val("Facing")
-                square:transmitRemoveItemFromSquare(obj)
-                self.addToWorld(square, customName, facing)
+                local customName = properties:Val("CustomName")
+                print("Checking object on square for shop: " .. tostring(customName))
+                if customName and Core.shops[customName] then
+                    -- registered already, but check if it is valid?
+                    if not self:isValidIsoObject(obj) then
+                        -- not valid, remove it
+                        local facing = obj:getSprite():getProperties():Val("Facing")
+                        square:transmitRemoveItemFromSquare(obj)
+                        self.addToWorld(square, customName, facing)
 
-            end
-        elseif customName == "Machine" then
-            -- this could be a vendinng machine we want to convert?
-            local type = obj:getSprite():getProperties():Val("container")
-            if type == "vendingpop" or type == "vendingsnack" then
-                -- has it already been tested?
-                local modData = obj:getModData()
-                if not modData.PhunMart then
-                    modData.PhunMart = {}
-                end
-                if modData.PhunMart.replacementKey ~= Core.settings.ReplacementKey then
-                    modData.PhunMart.replacementKey = Core.settings.ReplacementKey
-                    if Core.settings.ChanceToConvertVanillaMachines > 0 then
-                        local chance = ZombRand(100)
-                        if chance <= Core.settings.ChanceToConvertVanillaMachines then
-                            local shopname = self:getRandomShop(square:getX(), square:getY())
-                            if shopname then
-                                local facing = obj:getSprite():getProperties():Val("Facing")
-                                square:transmitRemoveItemFromSquare(obj)
-                                self.addToWorld(square, shopname, facing)
+                    end
+                elseif customName == "Machine" then
+                    -- this could be a vendinng machine we want to convert?
+                    local type = obj:getSprite():getProperties():Val("container")
+                    if type == "vendingpop" or type == "vendingsnack" then
+                        -- has it already been tested?
+                        local modData = obj:getModData()
+                        if not modData.PhunMart then
+                            modData.PhunMart = {}
+                        end
+                        if modData.PhunMart.replacementKey ~= Core.settings.ReplacementKey then
+                            modData.PhunMart.replacementKey = Core.settings.ReplacementKey
+                            if Core.settings.ChanceToConvertVanillaMachines > 0 then
+                                local chance = ZombRand(100)
+                                if chance <= Core.settings.ChanceToConvertVanillaMachines then
+                                    local shopname = self:getRandomShop(square:getX(), square:getY())
+                                    if shopname then
+                                        local facing = sprite:getProperties():Val("Facing")
+                                        square:transmitRemoveItemFromSquare(obj)
+                                        self.addToWorld(square, shopname, facing)
+                                    end
+                                end
                             end
                         end
                     end
                 end
             end
+
         end
+
     end
 end
 
@@ -382,6 +391,11 @@ end
 
 function ServerSystem:receiveCommand(playerObj, command, args)
     Commands[command](playerObj, args)
+end
+
+function ServerSystem:recompileShops()
+    Core:compile()
+    print("Recompiled shop definitions")
 end
 
 SGlobalObjectSystem.RegisterSystemClass(ServerSystem)

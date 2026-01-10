@@ -5,6 +5,12 @@ end
 local Core = PhunMart
 local Commands = {}
 
+Commands[Core.commands.compile] = function(playerObj, args)
+
+    Core.ServerSystem.instance:recompileShops()
+
+end
+
 Commands[Core.commands.getBlacklist] = function(playerObj, args)
     local list = Core.getBlacklist()
     sendServerCommand(Core.name, Core.commands.getBlackList, {

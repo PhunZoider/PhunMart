@@ -34,7 +34,8 @@ PhunMart = {
         openError = "PhunMartOpenError",
         unlockShop = "PhunMartUnlockShop",
         upsertShopDefinition = "PhunMartUpsertShopDefinition",
-        getShopDefinition = "PhunMartGetShopDefinition"
+        getShopDefinition = "PhunMartGetShopDefinition",
+        compile = "PhunMartCompileShops"
 
     },
     events = {
@@ -92,8 +93,29 @@ for _, event in pairs(PhunMart.events) do
     end
 end
 
+function Core.getOption(name, default)
+    local n = Core.name .. "." .. name
+    local val = getSandboxOptions():getOptionByName(n) and getSandboxOptions():getOptionByName(n):getValue()
+    if val == nil then
+        return default
+    end
+    return val
+end
+
+function Core.debugLn(str)
+    if Core.settings.Debug then
+        print("[" .. Core.name .. "] " .. str)
+    end
+end
+
+function Core.debug(...)
+    if Core.consts.debug then
+        print("[PhunMart2][ServerSystem]", ...)
+    end
+end
+
 function Core:reloadShopDefinitions()
-    local file = PL.file.loadTable(self.consts.shopsLuaFile, false)
+    local file = nil -- PL.file.loadTable(self.consts.shopsLuaFile, false)
     if file then
         self.shops = file
     else

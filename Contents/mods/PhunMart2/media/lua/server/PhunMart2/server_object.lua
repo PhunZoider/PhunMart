@@ -207,7 +207,8 @@ function ServerObject:validate()
 end
 
 function ServerObject:requiresPower()
-    local shops = Core.shops
+    local c = Core
+    local shops = c.shops
     local def = shops[self.type]
     if def.powered == true then
         return not self:getSquare():haveElectricity() and SandboxVars.ElecShutModifier > -1 and

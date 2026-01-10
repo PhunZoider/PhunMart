@@ -7,35 +7,57 @@
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 2>nul"
             },
+
+            // del dest PhunWallet2
+            {
+                "match": ".*",
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2 2>nul"
+            },
+
             // copy src to dest
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods ${env.USERPROFILE}\\Zomboid\\mods /Y /I /E /F /EXCLUDE:xclude"
             },
-            // copy src/media/* from dest to dest/42
+            // copy src/media/* from dest to dest/42.0.0
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42\\media /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\media /Y /I /E /F"
             },
+
+            // copy src/media/* from dest to dest/42.0.0
+            {
+                "match": ".*",
+                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\media /Y /I /E /F"
+            },  
+
             // copy src/common to dest/common
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\common /Y /I /E /F"
             },
-            // copy src/mod.info to dest/42/mod.info
+
+            // copy src/common to dest/common
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\42\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42\\mod.info /Y"
+                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\common /Y /I /E /F"
+            },  
+
+
+            // copy src/mod.info to dest/42.0.0/mod.info
+            {
+                "match": ".*",
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\42.0.0\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\mod.info /Y"
             },
-            // copy src/poster to dest/42/poster
+            // copy src/poster to dest/42.0.0/poster
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42\\poster.png /Y"
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\poster.png /Y"
             },
-            // copy src/icon to dest/42/icon
+            // copy src/icon to dest/42.0.0/icon
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42\\icon.png /Y"
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\icon.png /Y"
             },
             // remove workshop/*
             {
@@ -64,40 +86,21 @@
             },
 
 
-            // del dest
+
+            // copy src/mod.info to dest/42.0.0/mod.info
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2 2>nul"
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\42.0.0\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\mod.info /Y"
             },
-            // copy src to dest
-            // {
-            //     "match": ".*",
-            //     "cmd": "xcopy ${workspaceFolder}\\Contents\\mods ${env.USERPROFILE}\\Zomboid\\mods /Y /I /E /F /EXCLUDE:xclude"
-            // },
-            // copy src/media/* from dest to dest/42
+            // copy src/poster to dest/42.0.0/poster
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42\\media /Y /I /E /F"
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\poster.png /Y"
             },
-            // copy src/common to dest/common
+            // copy src/icon to dest/42.0.0/icon
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\common /Y /I /E /F"
-            },
-            // copy src/mod.info to dest/42/mod.info
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\42\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42\\mod.info /Y"
-            },
-            // copy src/poster to dest/42/poster
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42\\poster.png /Y"
-            },
-            // copy src/icon to dest/42/icon
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42\\icon.png /Y"
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\icon.png /Y"
             },
             // remove workshop/*
             {

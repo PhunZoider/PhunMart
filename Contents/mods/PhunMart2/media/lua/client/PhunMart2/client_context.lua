@@ -49,6 +49,10 @@ Core.contexts.open = function(player, context, worldobjects, test)
         local adminOption = context:addOption("PhunMart", worldobjects, nil)
         local adminSubMenu = ISContextMenu:getNew(context)
 
+        adminSubMenu:addOption("Compile", player, function()
+            sendClientCommand(Core.name, Core.commands.compile, {})
+        end)
+
         adminSubMenu:addOption("Shops", player, function()
             Core.ClientSystem.instance:prepareShopList(playerObj)
         end)

@@ -165,7 +165,6 @@ local function getModifications()
     local data = {}
     if not isClient() then
         -- this is a server or local game
-        -- load the modified data from ./lua/PhunZones.lua
         local data = PL.file.loadTable(Core.consts.shopsLuaFile)
         if not data then
             print("PhunMart: missing ./lua/" .. Core.consts.shopsLuaFile ..

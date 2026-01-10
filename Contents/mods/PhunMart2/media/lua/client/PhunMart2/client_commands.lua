@@ -6,6 +6,12 @@ local Core = PhunMart
 local PL = PhunLib
 local Commands = {}
 
+local PS = PhunServer
+
+PS.cmds["compile"] = function(args)
+    sendClientCommand(Core.name, Core.commands.compile, {})
+end
+
 Commands[Core.commands.openError] = function(args)
     local player = getSpecificPlayer(args.playerIndex)
     local w = 300

@@ -3,8 +3,28 @@ if isClient() then
 end
 local Core = PhunMart
 local PL = PhunLib
-
+local fileTools = PL.file
+local tableTools = PL.table
 Core.instances = {}
+
+function Core.compile()
+
+    local ctx = {
+        prices = fileTools.loadTable("PhunMart2_Prices.lua"),
+        rewards = fileTools.loadTable("PhunMart2_Rewards.lua"),
+        conditionsDefs = fileTools.loadTable("PhunMart2_Conditions.lua"),
+        items = fileTools.loadTable("PhunMart2_Items.lua"),
+        groups = fileTools.loadTable("PhunMart2_Groups.lua"),
+        pools = fileTools.loadTable("PhunMart2_Pools.lua"),
+        shops = fileTools.loadTable("PhunMart2_Shops.lua")
+    }
+
+    local runtime, log = Core.compiler.compileAll(ctx)
+    -- print summary
+    PL.debug("Warn", log.warnings, "Errors", log.errors)
+    return runtime, log
+
+end
 
 function Core:addInstance(instance)
     self.instances[instance.key] = instance
@@ -138,5 +158,6 @@ function Core:ini()
     self.instances = ModData.getOrCreate(self.name)
     self.lastStart = getTimestamp()
     Core.ServerSystem.instance:removeInvalidInstanceData()
+    Core.debug("Server System initialized", self:getShops())
     triggerEvent(self.events.OnReady, self)
 end

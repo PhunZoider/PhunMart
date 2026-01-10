@@ -7,7 +7,8 @@ module PhunWallet
 	item DroppedWallet
     {
         type = Normal,
-        DisplayName = Wallet
+        DisplayName = Wallet,
+        ItemType = phunwallet2:wallet,
         Weight = 1,
         Icon = DroppedWallet,
 		IsHidden = true,
@@ -19,6 +20,7 @@ module PhunWallet
     {
         Weight = 0.01,
         Type = Normal,
+        ItemType = phunwallet2:currency,
 	    DisplayName = Quarter,
 	    Icon = QuarterCoin,
         DisplayCategory = Currency,
@@ -29,6 +31,7 @@ module PhunWallet
     {
         Weight = 0.01,
         Type = Normal,
+        ItemType = phunwallet2:currency,
 	    DisplayName = Silver Dollar,
 	    Icon = SilverDollar,
         scale = 0.4,
@@ -39,6 +42,7 @@ module PhunWallet
     {
         Weight = 0.01,
         Type = Normal,
+        ItemType = phunwallet2:currency,
 	    DisplayName = Traiter Joe Token,
 	    Icon = TraiterToken,
         DisplayCategory = Currency, 

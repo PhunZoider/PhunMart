@@ -6,15 +6,14 @@ module PhunMart
     }
     item VehicleKeySpawner
     {
-        Type            =   Normal,
-        DisplayName     =   KeySpawner,
+        ItemType        =   phunmart2:vehiclespawner,
         Weight          =   1,
         Icon            =   CarKey
     }
     item TraiterToken
     {
         Weight = 0.01,
-        Type = Normal,
+        ItemType = phunmart2:currency,
 	    DisplayName = Traiter Joe Token,
 	    Icon = TraiterToken,
         DisplayCategory = Currency, 
@@ -23,6 +22,7 @@ module PhunMart
     item GoodPhoods
     {
 		DisplayCategory   = Furniture,
+		ItemType		  = phunmart2:vendingmachine,
 		Type              = Moveable,
 		Icon              = VendingMachine,
 		Weight            = 250,
@@ -35,6 +35,7 @@ module PhunMart
     item PhatPhoods
     {
 		DisplayCategory   = Furniture,
+		ItemType		  = phunmart2:vendingmachine,
 		Type              = Moveable,
 		Icon              = VendingMachine,
 		Weight            = 250,
@@ -46,6 +47,7 @@ module PhunMart
     item PittyTheTool
     {
 		DisplayCategory   = Furniture,
+		ItemType		  = phunmart2:vendingmachine,
 		Type              = Moveable,
 		Icon              = VendingMachine,
 		Weight            = 250,
@@ -57,6 +59,7 @@ module PhunMart
     item FinalAmmendment
     {
 		DisplayCategory   = Furniture,
+		ItemType		  = phunmart2:vendingmachine,
 		Type              = Moveable,
 		Icon              = VendingMachine,
 		Weight            = 250,
@@ -69,6 +72,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Wrent A Wreck Vending Machine,
@@ -80,6 +84,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Michelle Crafts Vending Machine,
@@ -91,6 +96,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Car-A-Part Vending Machine,
@@ -102,6 +108,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Traiter Joes Vending Machine,
@@ -113,6 +120,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = CSV Pharmacy Vending Machine,
@@ -124,6 +132,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Radio Hacks Vending Machine,
@@ -135,6 +144,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Phish4U Vending Machine,
@@ -146,6 +156,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = HoesNMoes Vending Machine,
@@ -157,6 +168,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = BudgetXp Vending Machine,
@@ -168,6 +180,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = GiftedXp Vending Machine,
@@ -179,6 +192,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = LuxuryXp Vending Machine,
@@ -190,6 +204,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       =HardWear Vending Machine,
@@ -201,6 +216,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Collectors Vending Machine,
@@ -212,6 +228,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Travel Vending Machine,
@@ -223,6 +240,7 @@ module PhunMart
     {
 		DisplayCategory   = Furniture,
 		Type              = Moveable,
+		ItemType		  = phunmart2:vendingmachine,
 		Icon              = VendingMachine,
 		Weight            = 250,
 		DisplayName       = Books Vending Machine,

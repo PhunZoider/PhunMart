@@ -1,5 +1,14 @@
 VERSION = 1,
 
+option PhunMart.Debug
+{
+    type = boolean,
+    default = true,
+    page = PhunMartSettings,
+    translation=PhunMart_Debug,
+}
+
+
 option PhunMart.ChanceToConvertVanillaMachines
 {
     type = integer,
