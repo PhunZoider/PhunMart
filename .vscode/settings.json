@@ -2,131 +2,83 @@
     "emeraldwalk.runonsave": {
         "autoClearConsole": true,
         "commands": [
-            // del dest
+            // Delete old local mod folder
             {
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 2>nul"
             },
-
-            // del dest PhunWallet2
-            {
-                "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2 2>nul"
-            },
-
-            // copy src to dest
+            // Copy mod files to local mod folder
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods ${env.USERPROFILE}\\Zomboid\\mods /Y /I /E /F /EXCLUDE:xclude"
             },
-            // copy src/media/* from dest to dest/42.0.0
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\media /Y /I /E /F"
-            },
-
-            // copy src/media/* from dest to dest/42.0.0
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\media /Y /I /E /F"
-            },  
-
-            // copy src/common to dest/common
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\common /Y /I /E /F"
-            },
-
-            // copy src/common to dest/common
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\common /Y /I /E /F"
-            },  
-
-
-            // copy src/mod.info to dest/42.0.0/mod.info
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\42.0.0\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\mod.info /Y"
-            },
-            // copy src/poster to dest/42.0.0/poster
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\poster.png /Y"
-            },
-            // copy src/icon to dest/42.0.0/icon
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2\\42.0.0\\icon.png /Y"
-            },
-            // remove workshop/*
+			// Delete old local workshop folder
             {
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2 2>nul"
             },
-            // copy src to workshop
+			// Copy contents to local workshop folder
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2 /Y /I /E /F /EXCLUDE:xclude"
             },
-            // copy dest to workshop
+            // del Tests folder from local workshop
             {
                 "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2\\Contents\\mods\\PhunMart2 /Y /I /E /F"
-            },
-            // del pz41
-            {
-                "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\pz41\\mods\\PhunMart2 2>nul"
-            },
-            // copy dest to pz41
-            {
-                "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 ${env.USERPROFILE}\\pz41\\mods\\PhunMart2 /Y /I /E /F /EXCLUDE:xclude"
-            },
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2\\Tests 2>nul"
+            },              
 
 
+            // TESTING VERSION
 
-            // copy src/mod.info to dest/42.0.0/mod.info
+            // del TEST local mod
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\42.0.0\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\mod.info /Y"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test 2>nul"
             },
-            // copy src/poster to dest/42.0.0/poster
+
+            // copy TEST from live
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\poster.png /Y"
-            },
-            // copy src/icon to dest/42.0.0/icon
+                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test /Y /I /E /F /EXCLUDE:xclude"
+            },            
+
+            // copy TEST overrides
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunWallet2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2\\42.0.0\\icon.png /Y"
-            },
-            // remove workshop/*
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test /Y /I /E /F /EXCLUDE:xclude"
+            }, 
+
+            // remove TEST workshop
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunWallet2 2>nul"
-            },
-            // copy src to workshop
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test 2>nul"
+            },            
+            // copy src to TEST workshop
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunWallet2 /Y /I /E /F /EXCLUDE:xclude"
+                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test /Y /I /E /F /EXCLUDE:xclude"
             },
-            // copy dest to workshop
+            // del Tests folder from deployment
             {
                 "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2 ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunWallet2\\Contents\\mods\\PhunWallet2 /Y /I /E /F"
-            },
-            // del pz41
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\Tests 2>nul"
+            },            
+            // copy TEST mod root overrides (mod.info, icon, poster) into workshop mod subfolder
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\pz41\\mods\\PhunWallet2 2>nul"
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\Contents\\mods\\PhunMart2 /Y /I /E /F"
             },
-            // copy dest to pz41
+            // copy TEST preview file to workshop version
             {
                 "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunWallet2 ${env.USERPROFILE}\\pz41\\mods\\PhunWallet2 /Y /I /E /F /EXCLUDE:xclude"
-            },
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\preview.png ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\preview.png /Y /I /E /F"
+            }, 
+            // Copy TEST workshop file to workshop version
+            {
+                "match": ".*",
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\workshop.txt ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\workshop.txt /Y /I /E /F"
+            }, 
 
         ]
     },
