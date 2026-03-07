@@ -146,6 +146,23 @@ function ServerSystem:reroll(location, ignoreDistance)
 
 end
 
+function ServerSystem:changeTo(shopName, location)
+
+    local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
+    local square = shopObj:getIsoObject():getSquare()
+    local facing = IsoDirections.N
+    if shopObj.facing == "E" or shopObj.facing == IsoDirections.E then
+        facing = IsoDirections.E
+    elseif shopObj.facing == "S" or shopObj.facing == IsoDirections.S then
+        facing = IsoDirections.S
+    elseif shopObj.facing == "W" or shopObj.facing == IsoDirections.W then
+        facing = IsoDirections.W
+    end
+    square:transmitRemoveItemFromSquare(shopObj:getIsoObject())
+    self.addToWorld(square, shopName, facing)
+
+end
+
 function ServerSystem:rerollAll()
     for i = 1, self:getLuaObjectCount() do
         local obj = self:getLuaObjectByIndex(i)
@@ -208,8 +225,11 @@ function ServerSystem:openShop(player, args, forceRestock)
     local inventoryData = self:getInventoryForShop(shop)
 
     if Core.isLocal then
-        Core:updateInstanceInventory(inventoryData.key, inventoryData.data)
-        Core.ui.client.shop.open(getSpecificPlayer(0), inventoryData)
+        -- In singleplayer the server and client share the same Lua state, so
+        -- we can write directly into the slot the open_shop action polls.
+        Core.pendingShopData = Core.pendingShopData or {}
+        Core.pendingShopData[inventoryData.key] = inventoryData
+
     else
         sendServerCommand(player, Core.name, Core.commands.requestShop, {
             playerIndex = player:getPlayerNum(),
@@ -257,7 +277,8 @@ function ServerSystem:getInventoryForShop(shop)
 
     return {
         key = key,
-        offers = offers
+        offers = offers,
+        conditionsDefs = Core.runtime.conditionsDefs
     }
 end
 
@@ -411,56 +432,21 @@ function ServerSystem:loadGridsquare(square)
                 end
                 -- end
             end
-
-            -- local properties = sprite:getProperties()
-            -- Core.debug(properties)
-            -- if properties and properties.Val then
-
-            --     local customName = properties:Val("CustomName")
-            --     print("Checking object on square for shop: " .. tostring(customName))
-            --     if customName and Core.shops[customName] then
-            --         -- registered already, but check if it is valid?
-            --         if not self:isValidIsoObject(obj) then
-            --             -- not valid, remove it
-            --             local facing = obj:getSprite():getProperties():Val("Facing")
-            --             square:transmitRemoveItemFromSquare(obj)
-            --             self.addToWorld(square, customName, facing)
-
-            --         end
-            --     elseif customName == "Machine" then
-            --         -- this could be a vendinng machine we want to convert?
-            --         local type = obj:getSprite():getProperties():Val("container")
-            --         if type == "vendingpop" or type == "vendingsnack" then
-            --             -- has it already been tested?
-            --             local modData = obj:getModData()
-            --             if not modData.PhunMart then
-            --                 modData.PhunMart = {}
-            --             end
-            --             if modData.PhunMart.replacementKey ~= Core.settings.ReplacementKey then
-            --                 modData.PhunMart.replacementKey = Core.settings.ReplacementKey
-            --                 if Core.settings.ChanceToConvertVanillaMachines > 0 then
-            --                     local chance = ZombRand(100)
-            --                     if chance <= Core.settings.ChanceToConvertVanillaMachines then
-            --                         local shopname = self:getRandomShop(square:getX(), square:getY())
-            --                         if shopname then
-            --                             local facing = sprite:getProperties():Val("Facing")
-            --                             square:transmitRemoveItemFromSquare(obj)
-            --                             self.addToWorld(square, shopname, facing)
-            --                         end
-            --                     end
-            --                 end
-            --             end
-            --         end
-            --     end
-            -- end
-
         end
 
     end
 end
 
 function ServerSystem:OnClientCommand(command, playerObj, args)
-    if Commands[command] ~= nil then
+
+    local instance = Core.ServerSystem.instance
+
+    if command == Core.commands.changeTo then
+        instance:changeTo(args.to, args.location)
+    elseif command == Core.commands.restock then
+        local obj = instance:getLuaObjectAt(args.x, args.y, args.z)
+        obj:restock()
+    elseif Commands[command] ~= nil then
         Commands[command](playerObj, args)
     end
 end

@@ -2,229 +2,406 @@ if isServer() then
     return
 end
 
-require "ISUI/ISCollapsableWindowJoypad"
+require "ISUI/ISPanel"
+require "ISUI/ISButton"
 local Core = PhunMart
 local tools = require "PhunMart2/ux/tools"
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PhunMart shop window
+--
+-- Layout (% of window, matched to machine-hard-wear.png proportions):
+--
+--   ┌─────────────────────────────────────────┐
+--   │  [X]                                    │  ← close btn overlay
+--   │  ┌──────────────────┐  ┌─────────────┐  │
+--   │  │                  │  │  PREVIEW     │  │  yellow
+--   │  │   ITEM GRID      │  ├─────────────┤  │
+--   │  │   (5 col icon)   │  │  DETAILS     │  │  purple
+--   │  │                  │  │  price/desc  │  │
+--   │  │                  │  └─────────────┘  │
+--   │  ├──────────────────┤  ┌─────────────┐  │
+--   │  │  FEEDBACK        │  │    BUY       │  │  orange / green
+--   │  └──────────────────┘  └─────────────┘  │
+--   └─────────────────────────────────────────┘
+-- ─────────────────────────────────────────────────────────────────────────────
+
 local profileName = "PhunMartUIShop"
-Core.ui.client.shop = ISCollapsableWindowJoypad:derive(profileName);
+Core.ui.client.shop = ISPanel:derive(profileName)
 local UI = Core.ui.client.shop
 local instances = {}
 
-UI.layouts = {
-    default = {
-        window = {
-            width = 369, -- 537,
-            height = 500 -- 728
-        },
-        tabs = {
-            x = 31, -- 45,
-            y = 100, -- 145,
-            width = 206, -- 299,
-            height = 326, -- 476,
-            backgroundColor = {
-                r = 0,
-                g = 0,
-                b = 0,
-                a = 0.7
-            }
-        },
-        previewPanel = {
-            x = 261, -- 378,
-            y = 100, -- 145,
-            width = 104, -- 150,
-            height = 100, -- 150,
-            backgroundColor = {
-                r = 0,
-                g = 0,
-                b = 0,
-                a = 0.7
-            }
-        },
-        pricePanel = {
-            x = 261, -- 378,
-            y = 210, -- 305,
-            width = 104, -- 150,
-            height = 218, -- 316,
-            backgroundColor = {
-                r = 0,
-                g = 0,
-                b = 0,
-                a = 0.7
-            }
-        },
-        detailsPanel = {
-            x = 261, -- 378,
-            y = 210, -- 305,
-            width = 104, -- 150,
-            height = 218, -- 316,
-            backgroundColor = {
-                r = 0,
-                g = 0,
-                b = 0,
-                a = 0.7
-            }
-        },
-        buyButton = {
-            x = 21, -- 30,
-            y = 445, -- 645,
-            width = 217, -- 315,
-            height = 43 -- 62
-        },
-        close = {
-            x = 348, -- 505,
-            y = 5,
-            width = 25,
-            height = 25
-        },
-        restock = {
-            x = 261, -- 378,
-            y = 444, -- 643,
-            width = 48, -- 70,
-            height = 25
-        },
-        reroll = {
-            x = 316, -- 458,
-            y = 444, -- 643,
-            width = 48, -- 70,
-            height = 25
-        },
-        admin = {
-            x = 261, -- 378,
-            y = 468, -- 678,
-            width = 104, -- 150,
-            height = 25
-        }
-    }
+require "PhunMart2/conditions"
+require "PhunMart2/playerAdapter"
+
+local FS = tools.FONT_SCALE
+local FONT_SM = tools.FONT_HGT_SMALL
+local FONT_MD = tools.FONT_HGT_MEDIUM
+
+-- Base window size before font scaling (portrait, matches machine image ratio ~0.73)
+local BASE_W = 480
+local BASE_H = 660
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Layout: all positions in BASE pixel coordinates (window = 480 × 660).
+-- Measured against machine-hard-wear.png stretched to fill that canvas.
+-- Every value is multiplied by FS at runtime → px().
+-- Tune these numbers to realign zones with any background image.
+-- ─────────────────────────────────────────────────────────────────────────────
+local L = {
+    bannerH = 135, -- bottom of the top Hard-Wear banner
+
+    -- Left column: items grid (glass door area)
+    glassX = 40,
+    glassW = 270,
+    glassH = 410, -- from bannerH down to top of tray, minus a small gap
+
+    -- Right column: control panel
+    panelX = 335,
+    panelW = 140,
+
+    -- Right column rows
+    screenY = 130,
+    screenH = 140, -- display screen  (preview)
+    keypadY = 278,
+    keypadH = 210, -- keypad area     (details)
+    -- 478 → 571: lower machine section deliberately left un-overlaid
+
+    -- Bottom strip: dispenser tray (feedback left, buy right)
+    trayY = 580,
+    trayH = 71,
+
+    -- Close button sits inside the banner, top-right corner
+    closeX = 448,
+    closeY = 5,
+    closeSize = 24
 }
 
--- obj = Core.ClientSystem.instance:getLuaObjectOnSquare
-function UI.open(player, data)
+-- ─────────────────────────────────────────────────────────────────────────────
+-- text helpers
+-- ─────────────────────────────────────────────────────────────────────────────
 
-    local playerIndex = player:getPlayerNum()
-    local instance = instances[playerIndex]
+-- Returns a table of lines fitting within maxWidth.  Splits on spaces.
+local function wrapText(text, maxWidth, font)
+    local lines = {}
+    local current = ""
+    for word in text:gmatch("%S+") do
+        local test = current == "" and word or (current .. " " .. word)
+        if getTextManager():MeasureStringX(font, test) <= maxWidth then
+            current = test
+        else
+            if current ~= "" then
+                table.insert(lines, current)
+            end
+            current = word
+        end
+    end
+    if current ~= "" then
+        table.insert(lines, current)
+    end
+    return lines
+end
+
+-- Truncates text with "…" if it exceeds maxWidth.
+local function truncate(text, maxWidth, font)
+    if getTextManager():MeasureStringX(font, text) <= maxWidth then
+        return text
+    end
+    local t = text
+    while #t > 0 and getTextManager():MeasureStringX(font, t .. "...") > maxWidth do
+        t = t:sub(1, -2)
+    end
+    return t .. "..."
+end
+
+-- Human-readable label for a condition key, using the compiled def when available.
+local function conditionLabel(condKey, conditionsDefs)
+    if type(condKey) ~= "string" then
+        return tostring(condKey)
+    end
+    local def = conditionsDefs and conditionsDefs[condKey]
+    if not def then
+        return condKey
+    end
+    local t = def.test
+    local a = def.args or {}
+    if t == "worldAgeHoursBetween" then
+        local min = a.min or 0
+        local max = a.max
+        return "World age: " .. min .. "h" .. (max and (" - " .. max .. "h") or "+")
+    elseif t == "perkLevelBetween" then
+        return "Perk: " .. (a.perk or "?") .. " lv." .. (a.min or 0) .. "+"
+    elseif t == "perkBoostBetween" then
+        return "Trait boost: " .. (a.perk or "?")
+    elseif t == "purchaseCountMax" then
+        return "Purchase limit: " .. (a.max or "?")
+    elseif t == "professionIn" then
+        local profs = a.professions or {}
+        return "Profession: " .. (type(profs) == "table" and table.concat(profs, "/") or tostring(profs))
+    elseif t == "hasItems" then
+        return "Requires items"
+    else
+        return condKey
+    end
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- open / lifecycle
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI.open(player, data)
+    local idx = player:getPlayerNum()
+    local instance = instances[idx]
 
     if instance and instance.player ~= player then
-        instance:close()
+        instance:removeFromUIManager()
         instance = nil
     end
 
     if not instance then
+        local w = math.floor(BASE_W * FS)
+        local h = math.floor(BASE_H * FS)
         local core = getCore()
-        local width = 450 * tools.FONT_SCALE
-        local height = 590 * tools.FONT_SCALE
+        local x = math.floor((core:getScreenWidth() - w) / 2)
+        local y = math.floor((core:getScreenHeight() - h) / 2)
 
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-
-        instances[playerIndex] = UI:new(x, y, width, height, player, playerIndex, data);
-        instance = instances[playerIndex]
-        instance:initialise();
-
-        ISLayoutManager.RegisterWindow(profileName, UI, instance)
+        instance = UI:new(x, y, w, h, player, idx)
+        instance:initialise()
+        instance:addToUIManager()
+        instances[idx] = instance
     end
 
-    instance:addToUIManager();
-    instance:setVisible(true);
-    instance:ensureVisible()
-    instance.controls.items:setData(data)
-
-    return instance;
-
+    instance:setVisible(true)
+    instance:bringToTop()
+    instance:setData(data)
 end
 
-function UI:new(x, y, width, height, player, playerIndex, data)
-    local o = {};
-    o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
-    setmetatable(o, self);
-    self.__index = self;
+-- ─────────────────────────────────────────────────────────────────────────────
+-- constructor
+-- ─────────────────────────────────────────────────────────────────────────────
 
-    o.variableColor = {
-        r = 0.9,
-        g = 0.55,
-        b = 0.1,
-        a = 1
-    };
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    };
-    o.buttonBorderColor = {
-        r = 0.7,
-        g = 0.7,
-        b = 0.7,
-        a = 1
-    };
-    o.data = data or nil
-    o.items = {}
-    o.moveWithMouse = false;
-    o.anchorRight = true
-    o.anchorBottom = true
+function UI:new(x, y, w, h, player, playerIndex)
+    local o = ISPanel:new(x, y, w, h)
+    setmetatable(o, self)
+    self.__index = self
+
     o.player = player
     o.playerIndex = playerIndex
-    o.zOffsetLargeFont = 25;
-    o.zOffsetMediumFont = 20;
-    o.zOffsetSmallFont = 6;
+    o.moveWithMouse = true
+    o.noBackground = true
+
+    o.bgTexture = nil
+    o.selectedId = nil
+    o.selectedOffer = nil
+    o.feedbackText = nil
+    o.feedbackColor = {
+        r = 1,
+        g = 1,
+        b = 1,
+        a = 1
+    }
+    o.feedbackTimer = 0
+
     o:setWantKeyEvents(true)
-    o:setTitle("PhunMart")
-    return o;
+    return o
 end
 
-function UI:RestoreLayout(name, layout)
-
-    ISLayoutManager.DefaultRestoreWindow(self, layout)
-    if name == profileName then
-        ISLayoutManager.DefaultRestoreWindow(self, layout)
-        self.userPosition = layout.userPosition == 'true'
-    end
-    self:recalcSize();
-end
-
-function UI:SaveLayout(name, layout)
-    ISLayoutManager.DefaultSaveWindow(self, layout)
-    if self.userPosition then
-        layout.userPosition = 'true'
-    else
-        layout.userPosition = 'false'
-    end
-end
-
-function UI:close()
-    if not self.locked then
-        ISCollapsableWindowJoypad.close(self);
-    end
-end
-
-function UI:setSelected(item)
-    self.controls.list.selected = item
-end
+-- ─────────────────────────────────────────────────────────────────────────────
+-- createChildren
+-- ─────────────────────────────────────────────────────────────────────────────
 
 function UI:createChildren()
+    ISPanel.createChildren(self)
 
-    ISCollapsableWindowJoypad.createChildren(self);
+    -- Scale a base-pixel value to the actual (font-scaled) window size.
+    local function px(n)
+        return math.floor(n * FS)
+    end
 
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
+    local gridX = px(L.glassX)
+    local gridY = px(L.bannerH)
+    local gridW = px(L.glassW)
+    local gridH = px(L.glassH)
 
-    local padding = 10
-    local x = padding
-    local y = th + padding
-    local w = self.width - padding * 2
-    local h = self.height - y - rh - padding
+    local rightX = px(L.panelX)
+    local rightW = px(L.panelW)
 
+    local previewY = px(L.screenY)
+    local previewH = px(L.screenH)
+    local detailY = px(L.keypadY)
+    local detailH = px(L.keypadH)
+
+    local trayY = px(L.trayY)
+    local trayH = px(L.trayH)
+
+    -- ── item grid ────────────────────────────────────────────────────────────
     self.controls = {}
+    self.controls.grid = Core.ui.client.shopItemsList:new(gridX, gridY, gridW, gridH, {
+        player = self.player,
+        onSelect = function(id, offer)
+            self:onOfferSelected(id, offer)
+        end
+    })
+    self.controls.grid:initialise()
+    self:addChild(self.controls.grid)
 
-    local layout = self.layouts.default.tabs
-    self.controls.items = Core.ui.client.shopItemsList:new(layout.x * tools.FONT_SCALE, layout.y * tools.FONT_SCALE,
-        layout.width * tools.FONT_SCALE, layout.height * tools.FONT_SCALE, {
-            viewer = self.player,
-            backgroundColor = layout.backgroundColor
-        })
+    -- ── buy button (green zone, bottom-right) ────────────────────────────────
+    self.controls.buyBtn = ISButton:new(rightX, trayY, rightW, trayH, "BUY", self, UI.onBuy)
+    self.controls.buyBtn:initialise()
+    self.controls.buyBtn:instantiate()
+    self.controls.buyBtn:setEnable(false)
+    self.controls.buyBtn.font = UIFont.Medium
+    self.controls.buyBtn.backgroundColor = {
+        r = 0.04,
+        g = 0.22,
+        b = 0.04,
+        a = 0.90
+    }
+    self.controls.buyBtn.backgroundColorMouseOver = {
+        r = 0.08,
+        g = 0.42,
+        b = 0.08,
+        a = 0.95
+    }
+    self.controls.buyBtn.borderColor = {
+        r = 0.15,
+        g = 0.70,
+        b = 0.15,
+        a = 1.00
+    }
+    self:addChild(self.controls.buyBtn)
 
-    self:addChild(self.controls.items)
+    -- ── close button ─────────────────────────────────────────────────────────
+    local closeSize = px(L.closeSize)
+    self.controls.closeBtn = ISButton:new(px(L.closeX), px(L.closeY), closeSize, closeSize, "X", self, UI.close)
+    self.controls.closeBtn:initialise()
+    self.controls.closeBtn:instantiate()
+    self.controls.closeBtn.backgroundColor = {
+        r = 0.28,
+        g = 0.04,
+        b = 0.04,
+        a = 0.85
+    }
+    self.controls.closeBtn.backgroundColorMouseOver = {
+        r = 0.60,
+        g = 0.08,
+        b = 0.08,
+        a = 0.95
+    }
+    self.controls.closeBtn.borderColor = {
+        r = 0.50,
+        g = 0.15,
+        b = 0.15,
+        a = 1.00
+    }
+    self:addChild(self.controls.closeBtn)
 
+    -- ── zone rects stored for prerender + render ──────────────────────────────
+    self.zones = {
+        preview = {
+            x = rightX,
+            y = previewY,
+            w = rightW,
+            h = previewH
+        },
+        details = {
+            x = rightX,
+            y = detailY,
+            w = rightW,
+            h = detailH
+        },
+        feedback = {
+            x = px(L.glassX),
+            y = trayY,
+            w = px(L.glassW),
+            h = trayH
+        }
+    }
+
+    self.bgTexture = getTexture("media/textures/machine-hard-wear.png")
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- data
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:setData(data)
+    self.data = data or {}
+    self.selectedId = nil
+    self.selectedOffer = nil
+    self.feedbackText = nil
+
+    local bg = data and data.background
+    if bg then
+        local tex = getTexture("media/textures/" .. bg .. ".png")
+        if tex then
+            self.bgTexture = tex
+        end
+    end
+
+    self.controls.grid:setData(data)
+    self.controls.buyBtn:setEnable(false)
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- selection / buy
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:canPurchase(offer)
+    if not offer then return false end
+    local condDefs = self.data and self.data.conditionsDefs
+    local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
+    local R = Core.conditionsRuntime
+
+    -- conditions
+    if R and adapter and condDefs and offer.conditions then
+        local result = R.evaluate(offer.conditions, condDefs, adapter, nil, nil)
+        if not result.ok then return false end
+    end
+
+    -- price affordability
+    local price = offer.price
+    if adapter and price and price.items then
+        for _, pi in ipairs(price.items) do
+            local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+            if (adapter:countItem(pi.item) or 0) < need then return false end
+        end
+    end
+
+    return true
+end
+
+function UI:onOfferSelected(id, offer)
+    self.selectedId = id
+    self.selectedOffer = offer
+    self.controls.buyBtn:setEnable(self:canPurchase(offer))
+end
+
+function UI:onBuy()
+    if not self.selectedId then
+        return
+    end
+    -- TODO: sendClientCommand("PhunMart2", "purchase", { offerId = self.selectedId })
+    self:showFeedback("Purchasing...", 0.9, 0.9, 0.3)
+end
+
+function UI:showFeedback(msg, r, g, b)
+    self.feedbackText = msg
+    self.feedbackColor = {
+        r = r or 1,
+        g = g or 1,
+        b = b or 1,
+        a = 1
+    }
+    self.feedbackTimer = 180
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- input
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:close()
+    self:setVisible(false)
 end
 
 function UI:isKeyConsumed(key)
@@ -237,27 +414,183 @@ function UI:onKeyRelease(key)
     end
 end
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- rendering
+-- ─────────────────────────────────────────────────────────────────────────────
+
 function UI:prerender()
+    ISPanel.prerender(self)
 
-    ISCollapsableWindowJoypad.prerender(self);
+    -- 1. machine background image (fully opaque)
+    if self.bgTexture then
+        self:drawTextureScaled(self.bgTexture, 0, 0, self.width, self.height, 1)
+    else
+        self:drawRect(0, 0, self.width, self.height, 1, 0.08, 0.08, 0.10)
+    end
 
-    local shop = self.shopObj
+    -- 2. dark wash to increase overall contrast
+    self:drawRect(0, 0, self.width, self.height, 0.30, 0, 0, 0)
 
-    if shop then
-        updateShopIterations = updateShopIterations + 1
-        if updateShopIterations > 10 then
-            updateShopIterations = 0
-            shop:updateFromIsoObject()
+    -- 3. opaque panel backgrounds for the right-column zones
+    --    drawn here so they sit behind both children and the render() overlays
+    local pz = self.zones and self.zones.preview
+    local dz = self.zones and self.zones.details
+    local fz = self.zones and self.zones.feedback
+    if pz then
+        self:drawRect(pz.x, pz.y, pz.w, pz.h, 0.82, 0.04, 0.04, 0.06)
+        self:drawRectBorder(pz.x, pz.y, pz.w, pz.h, 0.50, 0.30, 0.30, 0.35)
+    end
+    if dz then
+        self:drawRect(dz.x, dz.y, dz.w, dz.h, 0.82, 0.04, 0.04, 0.06)
+        self:drawRectBorder(dz.x, dz.y, dz.w, dz.h, 0.50, 0.30, 0.30, 0.35)
+    end
+    if fz then
+        -- feedback tray: always visible as a recessed slot
+        self:drawRect(fz.x, fz.y, fz.w, fz.h, 0.70, 0.03, 0.03, 0.04)
+        self:drawRectBorder(fz.x, fz.y, fz.w, fz.h, 0.40, 0.25, 0.25, 0.28)
+    end
+end
+
+function UI:render()
+    ISPanel.render(self)
+
+    local pz = self.zones.preview
+    local dz = self.zones.details
+    local fz = self.zones.feedback
+
+    -- ── preview zone ─────────────────────────────────────────────────────────
+    if self.selectedOffer then
+        local scriptItem = getScriptManager():getItem(self.selectedOffer.item)
+        local tex = scriptItem and scriptItem:getNormalTexture()
+        if tex then
+            local iconSize = math.floor(math.min(pz.w, pz.h) * 0.78)
+            local ix = pz.x + (pz.w - iconSize) / 2
+            local iy = pz.y + (pz.h - iconSize) / 2
+            self:drawTextureScaledAspect(tex, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
         end
-        if not self.backgroundTexture or self.backgroundTexture ~= shop.backgroundImage then
-            if shop.backgroundImage then
-                self.backgroundTexture = getTexture("media/textures/" .. shop.backgroundImage .. ".png")
-            else
-                self.backgroundTexture = getTexture("media/textures/machine-none.png")
+        self:renderDetails(dz)
+    else
+        local hint = "Select an item"
+        local tw = getTextManager():MeasureStringX(UIFont.Small, hint)
+        self:drawText(hint, math.floor(pz.x + (pz.w - tw) / 2), math.floor(pz.y + (pz.h - FONT_SM) / 2), 0.38, 0.38,
+            0.38, 1, UIFont.Small)
+    end
+
+    -- ── feedback zone ─────────────────────────────────────────────────────────
+    if self.feedbackText then
+        if self.feedbackTimer > 0 then
+            self.feedbackTimer = self.feedbackTimer - 1
+        else
+            self.feedbackText = nil
+        end
+    end
+    if self.feedbackText then
+        local fc = self.feedbackColor
+        local txt = truncate(self.feedbackText, fz.w - 12, UIFont.Small)
+        local tw = getTextManager():MeasureStringX(UIFont.Small, txt)
+        self:drawText(txt, math.floor(fz.x + (fz.w - tw) / 2), math.floor(fz.y + (fz.h - FONT_SM) / 2), fc.r, fc.g,
+            fc.b, fc.a, UIFont.Small)
+    end
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- details panel content
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:renderDetails(z)
+    local offer = self.selectedOffer
+    if not offer then
+        return
+    end
+
+    local pad = 8
+    local x = z.x + pad
+    local maxW = z.w - pad * 2
+    local y = z.y + pad
+    local lh = FONT_SM + 3
+    local maxY = z.y + z.h - lh - 4
+    local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
+
+    -- item name (word-wrapped, max 2 lines)
+    local scriptItem = getScriptManager():getItem(offer.item)
+    local name = scriptItem and scriptItem:getDisplayName() or offer.item
+    local nameLines = wrapText(name, maxW, UIFont.Small)
+    for i = 1, math.min(2, #nameLines) do
+        local line = (i == 2 and #nameLines > 2) and truncate(nameLines[i], maxW, UIFont.Small) or nameLines[i]
+        self:drawText(line, x, y, 1.0, 0.88, 0.45, 1, UIFont.Small)
+        y = y + lh
+    end
+    y = y + 2
+
+    -- divider
+    self:drawRect(x, y, maxW, 1, 0.40, 0.45, 0.45, 0.50)
+    y = y + 5
+
+    -- price
+    local price = offer.price
+    local priceText
+    if not price then
+        priceText = "Price: ?"
+    elseif price.kind == "free" then
+        priceText = "Price: FREE"
+    elseif price.items and price.items[1] then
+        local pi = price.items[1]
+        local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
+        priceText = "Price: " .. amt .. "x " .. (pi.item or "?")
+    else
+        priceText = "Price: ?"
+    end
+    local pr, pg, pb = 0.72, 0.88, 0.28  -- green: affordable
+    if adapter and price and price.items then
+        for _, pi in ipairs(price.items) do
+            local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+            if (adapter:countItem(pi.item) or 0) < need then
+                pr, pg, pb = 0.90, 0.30, 0.30; break  -- red: can't afford
             end
         end
-        if self.backgroundTexture then
-            self:drawTextureScaledAspect(self.backgroundTexture, 0, 0, self.width, self.height, 1);
+    end
+    self:drawText(truncate(priceText, maxW, UIFont.Small), x, y, pr, pg, pb, 1, UIFont.Small)
+    y = y + lh + 4
+
+    -- conditions
+    if not offer.conditions then
+        return
+    end
+
+    -- conditions.all / any are arrays of string keys referencing named condition defs.
+    local condList = offer.conditions.all or offer.conditions.any or
+                         (type(offer.conditions) == "table" and offer.conditions)
+    if not condList then
+        return
+    end
+
+    self:drawText("Requirements:", x, y, 0.50, 0.50, 0.55, 1, UIFont.Small)
+    y = y + lh
+
+    local condDefs = self.data and self.data.conditionsDefs
+    local R = Core.conditionsRuntime
+
+    for _, condKey in ipairs(condList) do
+        if y > maxY then
+            self:drawText("...", x + 4, y, 0.35, 0.35, 0.35, 1, UIFont.Small)
+            break
         end
+
+        -- evaluate this single condition to get pass/fail colour
+        local cr, cg, cb = 0.52, 0.52, 0.58 -- default: grey (unknown)
+        if R and adapter and condDefs then
+            local result = R.evaluate({
+                all = {condKey}
+            }, condDefs, adapter, nil, nil)
+            if result.ok then
+                cr, cg, cb = 0.30, 0.90, 0.30 -- green: passes
+            else
+                cr, cg, cb = 0.90, 0.30, 0.30 -- red: fails
+            end
+        end
+
+        local label = truncate("- " .. conditionLabel(condKey, condDefs), maxW - 4, UIFont.Small)
+        self:drawText(label, x + 4, y, cr, cg, cb, 1, UIFont.Small)
+        y = y + lh
     end
 end

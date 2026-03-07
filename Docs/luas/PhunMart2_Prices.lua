@@ -7,6 +7,17 @@ return {
         }}
     },
 
+    very_low = {
+        kind = "items",
+        items = {{
+            item = "Base.Silver",
+            amount = {
+                min = 2,
+                max = 5
+            }
+        }}
+    },
+
     low = {
         kind = "items",
         items = {{
@@ -14,6 +25,50 @@ return {
             amount = {
                 min = 8,
                 max = 12
+            }
+        }}
+    },
+
+    med = {
+        kind = "items",
+        items = {{
+            item = "Base.Silver",
+            amount = {
+                min = 10,
+                max = 22
+            }
+        }}
+    },
+
+    high = {
+        kind = "items",
+        items = {{
+            item = "Base.Silver",
+            amount = {
+                min = 20,
+                max = 50
+            }
+        }}
+    },
+
+    low_gold = {
+        kind = "items",
+        items = {{
+            item = "Base.Gold",
+            amount = {
+                min = 1,
+                max = 10
+            }
+        }}
+    },
+
+    med_gold = {
+        kind = "items",
+        items = {{
+            item = "Base.Gold",
+            amount = {
+                min = 9,
+                max = 25
             }
         }}
     },

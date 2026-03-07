@@ -37,7 +37,9 @@ PhunMart = {
         getShopDefinition = "PhunMartGetShopDefinition",
         compile = "PhunMartCompileShops",
         reroll = "PhunMartReroll",
-        rerollAllShops = "PhunMartRerollAllShops"
+        rerollAllShops = "PhunMartRerollAllShops",
+        changeTo = "PhunMartChangeShopType",
+        restock = "PhunMartRestockShop"
 
     },
     events = {

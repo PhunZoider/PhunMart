@@ -28,6 +28,11 @@ local fields = {
         type = "string",
         default = "E"
     },
+    lastRestock = {
+        -- what hour this shop was last restocked
+        type = "numberToTens",
+        default = 0
+    },
     x = {
         -- x position of the shop
         type = "number",

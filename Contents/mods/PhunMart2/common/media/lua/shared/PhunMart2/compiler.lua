@@ -639,7 +639,8 @@ function Compiler.compileAll(ctx)
     -- Compile pools -> offers
     local runtime = {
         shops = {},
-        pools = {}
+        pools = {},
+        conditionsDefs = resolved.conditionsDefs
     }
 
     for poolKey, poolDef in pairs(resolved.pools) do

@@ -43,5 +43,17 @@ return {
         blacklist = {
             -- "Base.AluminumBat"
         }
+    },
+    books_1 = {
+        defaults = {
+            price = "very_low",
+            offer = {
+                qty = 1,
+                weight = 0.5
+            }
+        },
+        include = {
+            categories = {"Base.BookCooking1", "Base.BookCarpentry1", "Base.BookFirstAid1"}
+        }
     }
 }

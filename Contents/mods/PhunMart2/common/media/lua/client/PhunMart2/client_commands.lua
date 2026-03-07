@@ -101,11 +101,11 @@ Commands[Core.commands.modifyTraits] = function(arguments)
 end
 
 Commands[Core.commands.requestShop] = function(arguments)
-    Core:updateInstanceInventory(arguments.key, arguments.data)
-    local player = getSpecificPlayer(arguments.playerIndex or 0)
-    if player then
-        Core.ui.client.shop.open(player, arguments.data)
-    end
+    -- Store data for the open_shop timed action to pick up.
+    -- The action polls Core.pendingShopData[key] in its update() loop and
+    -- opens the UI once both the animation has finished and this data exists.
+    Core.pendingShopData = Core.pendingShopData or {}
+    Core.pendingShopData[arguments.key] = arguments.data
 end
 
 Commands[Core.commands.getShopList] = function(args)

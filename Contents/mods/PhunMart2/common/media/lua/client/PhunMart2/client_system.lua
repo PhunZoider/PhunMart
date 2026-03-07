@@ -88,14 +88,28 @@ function ClientSystem:requestPurchase(obj, itemId, playerObj)
 end
 
 function ClientSystem:restock(shop, playerObj)
-    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.restock, {
+    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.restock, {
+        x = shop.x,
+        y = shop.y,
+        z = shop.z
+    })
+end
+
+function ClientSystem:changeTo(shop, playerObj, to)
+    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.changeTo, {
         shopId = shop.id,
-        location = shop.location
+        type = shop.type,
+        location = {
+            x = shop.x,
+            y = shop.y,
+            z = shop.z
+        },
+        to = to
     })
 end
 
 function ClientSystem:reroll(shop, target, playerObj)
-    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.requestShopGenerate, {
+    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.requestShopGenerate, {
         shopId = shop.id,
         target = target,
         location = shop.location,
@@ -104,7 +118,7 @@ function ClientSystem:reroll(shop, target, playerObj)
 end
 
 function ClientSystem:close(shop, playerObj)
-    self:sendCommand(playerObj or getSpecificPlayer(0), PM.commands.closeShop, {
+    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.closeShop, {
         shopId = shop.id,
         location = shop.location
     })

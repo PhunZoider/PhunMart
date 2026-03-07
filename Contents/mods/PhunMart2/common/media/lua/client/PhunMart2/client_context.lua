@@ -8,10 +8,13 @@ Core.contexts.open = function(player, context, worldobjects, test)
     local obj
     local playerObj = getSpecificPlayer(player)
     local isShop = false
+    local wsq = nil
+
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
         obj = Core.ClientSystem.instance:getLuaObjectOnSquare(wObj:getSquare())
         if obj then
             isShop = true
+            wsq = wObj:getSquare()
             local text = getText("IGUI_PhunMart_Open_X", getText("IGUI_PhunMart_Shop_" .. obj.type))
             local desc = getText("IGUI_PhunMart_Shop_" .. obj.type .. "_tooltip")
             local disabled = false
@@ -51,7 +54,20 @@ Core.contexts.open = function(player, context, worldobjects, test)
         local adminSubMenu = ISContextMenu:getNew(context)
 
         if isShop then
-            adminSubMenu:addOption("Reroll", player, function()
+
+            local c = Core
+            local o = Core.ClientSystem.instance:getLuaObjectOnSquare(wsq)
+
+            adminSubMenu:addOption("Restock", player, function()
+                Core.ClientSystem.instance:restock(o, playerObj)
+            end)
+
+            local changeToOption = adminSubMenu:addOption("Change To", player, nil)
+            local changeTo = ISContextMenu:getNew(context)
+            adminSubMenu:addSubMenu(changeToOption, changeTo)
+
+            changeTo:addOption("Reroll", player, function()
+
                 sendClientCommand(Core.name, Core.commands.reroll, {
                     location = {
                         x = obj.x,
@@ -60,6 +76,13 @@ Core.contexts.open = function(player, context, worldobjects, test)
                     }
                 })
             end)
+
+            for shopType, _ in pairs(Core.runtime.shops) do
+                changeTo:addOption(shopType, player, function()
+                    Core.ClientSystem.instance:changeTo(o, playerObj, shopType)
+                end)
+            end
+
         end
 
         adminSubMenu:addOption("Compile", player, function()
