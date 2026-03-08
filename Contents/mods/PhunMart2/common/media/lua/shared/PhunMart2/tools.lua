@@ -1,5 +1,6 @@
 local luautils = luautils
-local loadstring = loadstring
+-- loadstring was removed in Lua 5.2+; PZ B42 may only have load()
+local loadstring = loadstring or load
 local tools = {}
 
 tools.isLocal = not isClient() and not isServer() and not isCoopHost()
@@ -390,7 +391,8 @@ local function tableOfStringsToTable(lines)
         return nil, "invalid input: empty or non-table"
     end
 
-    local startsWithReturn = luautils.stringStarts(lines[1], "return")
+    local firstLine = lines[1] or ""
+    local startsWithReturn = firstLine:match("^%s*return") ~= nil
     local src
     if startsWithReturn then
         src = table.concat(lines, "\n")

@@ -136,6 +136,7 @@ function ServerObject:buildOffers()
         self.offers = offers
         return
     end
+    local c = Core
     local shopDef = Core.runtime.shops and Core.runtime.shops[self.type]
     if not shopDef then
         print("[PhunMart2] buildOffers: no runtime shop def for type '" .. tostring(self.type) .. "'")
@@ -260,7 +261,10 @@ function ServerObject:stateFromIsoObject(isoObject)
     -- build offers if not persisted (new machine or first load after upgrade)
     local hasOffers = false
     if type(self.offers) == "table" then
-        for _ in pairs(self.offers) do hasOffers = true; break end
+        for _ in pairs(self.offers) do
+            hasOffers = true;
+            break
+        end
     end
     if not hasOffers then
         self:buildOffers()

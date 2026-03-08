@@ -111,10 +111,19 @@ Commands[Core.commands.reroll] = function(playerObj, args)
     local oldKey = oldObj and oldObj:getKey()
     Core.ServerSystem.instance:reroll(loc, args.ignoreDistance == true)
     if oldKey then
+        local newObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+        local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
+        local payload = newObj and {
+            key = newObj:getKey(),
+            location = { x = newObj.x, y = newObj.y, z = newObj.z },
+            offers = newObj.offers or {},
+            conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+            background = shopDef and shopDef.background,
+        }
         if Core.isLocal then
-            triggerEvent(Core.events.OnShopChange, oldKey, nil, true)
+            triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
         else
-            sendServerCommand(Core.name, Core.commands.onShopChange, { key = oldKey, replaced = true })
+            sendServerCommand(Core.name, Core.commands.onShopChange, { key = oldKey, data = payload, replaced = true })
         end
     end
 end

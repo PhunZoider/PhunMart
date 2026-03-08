@@ -477,15 +477,10 @@ function UI:onShopChange(key, data, replaced)
     if key ~= self.shopKey then
         return
     end
+    self:setData(data)
     if replaced then
-        -- The machine has been swapped out entirely; clear the UI and tell the player.
-        self.controls.grid:setData(nil)
-        self.controls.buyBtn:setEnable(false)
-        self.selectedId = nil
-        self.selectedOffer = nil
-        self:showFeedback("Shop changed - reopen to browse", 0.9, 0.6, 0.2)
+        self:showFeedback("Rerolled", 0.3, 0.5, 0.9)
     else
-        self:setData(data)
         self:showFeedback("Restocked", 0.4, 0.9, 0.4)
     end
 end
@@ -513,6 +508,7 @@ function UI:onAdminRestock()
 end
 
 function UI:onAdminReroll()
+    local c = Core
     local obj = self:getClientObject()
     if not obj then
         self:showFeedback("No location data", 0.9, 0.3, 0.3)

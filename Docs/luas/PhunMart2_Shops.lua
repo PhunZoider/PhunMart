@@ -1,6 +1,3 @@
--- PhunMart2 Default Shops
--- poolSets: array of sets; the server picks one set per visit based on zone/day gating.
--- Multiple sets in poolSets allow the same machine to serve different pools by location.
 return {
 
     GoodPhoods = {

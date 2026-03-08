@@ -109,11 +109,12 @@ function ClientSystem:changeTo(shop, playerObj, to)
 end
 
 function ClientSystem:reroll(shop, target, playerObj)
-    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.requestShopGenerate, {
-        shopId = shop.id,
-        target = target,
-        location = shop.location,
-        ignoreDistance = shop.ignoreDistance == true
+    self:sendCommand(playerObj or getSpecificPlayer(0), Core.commands.reroll, {
+        location = {
+            x = shop.x,
+            y = shop.y,
+            z = shop.z
+        }
     })
 end
 
