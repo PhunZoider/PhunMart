@@ -74,7 +74,12 @@ local L = {
     -- Close button sits inside the banner, top-right corner
     closeX = 448,
     closeY = 5,
-    closeSize = 24
+    closeSize = 24,
+
+    -- Admin buttons: stacked in the un-overlaid band (right col, 488-575)
+    adminY1 = 495, -- Restock
+    adminY2 = 536, -- Reroll
+    adminBtnH = 34
 }
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -174,6 +179,14 @@ function UI.open(player, data)
     instance:setVisible(true)
     instance:bringToTop()
     instance:setData(data)
+
+    if not instance._shopChangeBound then
+        instance._shopChangeFn = function(key, d, replaced)
+            instance:onShopChange(key, d, replaced)
+        end
+        Events[Core.events.OnShopChange].Add(instance._shopChangeFn)
+        instance._shopChangeBound = true
+    end
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -296,6 +309,59 @@ function UI:createChildren()
     }
     self:addChild(self.controls.closeBtn)
 
+    -- ── admin buttons (only for privileged players) ───────────────────────────
+    if Core.tools.isAdmin(self.player) then
+        self.controls.restockBtn = ISButton:new(rightX, px(L.adminY1), rightW, px(L.adminBtnH), "RESTOCK", self,
+            UI.onAdminRestock)
+        self.controls.restockBtn:initialise()
+        self.controls.restockBtn:instantiate()
+        self.controls.restockBtn.font = UIFont.Small
+        self.controls.restockBtn.backgroundColor = {
+            r = 0.15,
+            g = 0.09,
+            b = 0.02,
+            a = 0.90
+        }
+        self.controls.restockBtn.backgroundColorMouseOver = {
+            r = 0.30,
+            g = 0.18,
+            b = 0.03,
+            a = 0.95
+        }
+        self.controls.restockBtn.borderColor = {
+            r = 0.70,
+            g = 0.45,
+            b = 0.10,
+            a = 1.00
+        }
+        self:addChild(self.controls.restockBtn)
+
+        self.controls.rerollBtn = ISButton:new(rightX, px(L.adminY2), rightW, px(L.adminBtnH), "REROLL", self,
+            UI.onAdminReroll)
+        self.controls.rerollBtn:initialise()
+        self.controls.rerollBtn:instantiate()
+        self.controls.rerollBtn.font = UIFont.Small
+        self.controls.rerollBtn.backgroundColor = {
+            r = 0.02,
+            g = 0.05,
+            b = 0.15,
+            a = 0.90
+        }
+        self.controls.rerollBtn.backgroundColorMouseOver = {
+            r = 0.04,
+            g = 0.10,
+            b = 0.30,
+            a = 0.95
+        }
+        self.controls.rerollBtn.borderColor = {
+            r = 0.20,
+            g = 0.35,
+            b = 0.70,
+            a = 1.00
+        }
+        self:addChild(self.controls.rerollBtn)
+    end
+
     -- ── zone rects stored for prerender + render ──────────────────────────────
     self.zones = {
         preview = {
@@ -318,7 +384,7 @@ function UI:createChildren()
         }
     }
 
-    self.bgTexture = getTexture("media/textures/machine-hard-wear.png")
+    self.bgTexture = getTexture("media/textures/machine-none.png")
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -327,13 +393,14 @@ end
 
 function UI:setData(data)
     self.data = data or {}
+    self.shopKey = data and data.key
     self.selectedId = nil
     self.selectedOffer = nil
     self.feedbackText = nil
 
     local bg = data and data.background
     if bg then
-        local tex = getTexture("media/textures/" .. bg .. ".png")
+        local tex = getTexture("media/textures/" .. bg)
         if tex then
             self.bgTexture = tex
         end
@@ -348,7 +415,9 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 function UI:canPurchase(offer)
-    if not offer then return false end
+    if not offer then
+        return false
+    end
     local condDefs = self.data and self.data.conditionsDefs
     local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
     local R = Core.conditionsRuntime
@@ -356,7 +425,9 @@ function UI:canPurchase(offer)
     -- conditions
     if R and adapter and condDefs and offer.conditions then
         local result = R.evaluate(offer.conditions, condDefs, adapter, nil, nil)
-        if not result.ok then return false end
+        if not result.ok then
+            return false
+        end
     end
 
     -- price affordability
@@ -364,7 +435,9 @@ function UI:canPurchase(offer)
     if adapter and price and price.items then
         for _, pi in ipairs(price.items) do
             local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-            if (adapter:countItem(pi.item) or 0) < need then return false end
+            if (adapter:countItem(pi.item) or 0) < need then
+                return false
+            end
         end
     end
 
@@ -374,7 +447,7 @@ end
 function UI:onOfferSelected(id, offer)
     self.selectedId = id
     self.selectedOffer = offer
-    self.controls.buyBtn:setEnable(self:canPurchase(offer))
+    self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer))
 end
 
 function UI:onBuy()
@@ -397,10 +470,68 @@ function UI:showFeedback(msg, r, g, b)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- shop change event
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:onShopChange(key, data, replaced)
+    if key ~= self.shopKey then
+        return
+    end
+    if replaced then
+        -- The machine has been swapped out entirely; clear the UI and tell the player.
+        self.controls.grid:setData(nil)
+        self.controls.buyBtn:setEnable(false)
+        self.selectedId = nil
+        self.selectedOffer = nil
+        self:showFeedback("Shop changed - reopen to browse", 0.9, 0.6, 0.2)
+    else
+        self:setData(data)
+        self:showFeedback("Restocked", 0.4, 0.9, 0.4)
+    end
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- admin actions
+-- ─────────────────────────────────────────────────────────────────────────────
+
+function UI:getClientObject()
+    local loc = self.data and self.data.location
+    if not loc then
+        return nil
+    end
+    return Core.ClientSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+end
+
+function UI:onAdminRestock()
+    local obj = self:getClientObject()
+    if not obj then
+        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        return
+    end
+    obj:restock(self.player)
+    self:showFeedback("Restocking...", 0.9, 0.6, 0.2)
+end
+
+function UI:onAdminReroll()
+    local obj = self:getClientObject()
+    if not obj then
+        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        return
+    end
+    obj:reroll()
+    self:showFeedback("Rerolling shop...", 0.3, 0.5, 0.9)
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- input
 -- ─────────────────────────────────────────────────────────────────────────────
 
 function UI:close()
+    if self._shopChangeBound then
+        Events[Core.events.OnShopChange].Remove(self._shopChangeFn)
+        self._shopChangeBound = false
+        self._shopChangeFn = nil
+    end
     self:setVisible(false)
 end
 
@@ -540,12 +671,13 @@ function UI:renderDetails(z)
     else
         priceText = "Price: ?"
     end
-    local pr, pg, pb = 0.72, 0.88, 0.28  -- green: affordable
+    local pr, pg, pb = 0.72, 0.88, 0.28 -- green: affordable
     if adapter and price and price.items then
         for _, pi in ipairs(price.items) do
             local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
             if (adapter:countItem(pi.item) or 0) < need then
-                pr, pg, pb = 0.90, 0.30, 0.30; break  -- red: can't afford
+                pr, pg, pb = 0.90, 0.30, 0.30;
+                break -- red: can't afford
             end
         end
     end

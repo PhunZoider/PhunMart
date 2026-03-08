@@ -27,16 +27,31 @@ Commands[Core.commands.openShop] = function(playerObj, args)
     Core.ServerSystem.instance:openShop(playerObj, args)
 end
 
-Commands[Core.commands.requestShop] = function(playerObj, args)
-    Core.ServerSystem.instance:requestShop(playerObj, args.location)
-end
-
 Commands[Core.commands.buy] = function(playerObj, args)
     Core.ServerSystem.instance:purchase(playerObj, args.location, args.itemId, args.qty or 1)
 end
 
 Commands[Core.commands.restock] = function(playerObj, args)
-    Core.ServerSystem.instance:requestShop(playerObj, args.location, true)
+    local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)
+    if not obj then return end
+    obj:restock()
+    local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[obj.type]
+    local payload = {
+        key = obj:getKey(),
+        location = { x = obj.x, y = obj.y, z = obj.z },
+        offers = obj.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        background = shopDef and shopDef.background,
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
+    else
+        sendServerCommand(Core.name, Core.commands.onShopChange, { key = payload.key, data = payload })
+    end
+end
+
+Commands[Core.commands.changeTo] = function(playerObj, args)
+    Core.ServerSystem.instance:changeTo(args.to, args.location)
 end
 
 Commands[Core.commands.closeShop] = function(playerObj, args)
@@ -91,7 +106,17 @@ Commands[Core.commands.requestItemDefs] = function(playerObj, args)
 end
 
 Commands[Core.commands.reroll] = function(playerObj, args)
-    Core.ServerSystem.instance:reroll(args.location, args.ignoreDistance == true)
+    local loc = args.location
+    local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+    local oldKey = oldObj and oldObj:getKey()
+    Core.ServerSystem.instance:reroll(loc, args.ignoreDistance == true)
+    if oldKey then
+        if Core.isLocal then
+            triggerEvent(Core.events.OnShopChange, oldKey, nil, true)
+        else
+            sendServerCommand(Core.name, Core.commands.onShopChange, { key = oldKey, replaced = true })
+        end
+    end
 end
 
 Commands[Core.commands.rerollAllShops] = function(playerObj, args)

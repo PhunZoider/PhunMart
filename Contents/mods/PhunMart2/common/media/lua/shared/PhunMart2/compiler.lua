@@ -493,6 +493,32 @@ local function itemExists(itemType)
     return false
 end
 
+-- Builds a map of displayCategory -> set of fullItemName, cached for the compile run.
+-- Only called if any group uses include.categories.
+local itemCategoryCache = nil
+local function getItemCategoryCache()
+    if itemCategoryCache then return itemCategoryCache end
+    itemCategoryCache = {}
+    if not getScriptManager then return itemCategoryCache end
+    local sm = getScriptManager()
+    if not sm then return itemCategoryCache end
+    local items = sm:getAllItems()
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item then
+            local ok, _ = pcall(function()
+                local cat = tostring(item:getDisplayCategory() or "None")
+                local id  = tostring(item:getFullName())
+                if not itemCategoryCache[cat] then
+                    itemCategoryCache[cat] = {}
+                end
+                itemCategoryCache[cat][id] = true
+            end)
+        end
+    end
+    return itemCategoryCache
+end
+
 local function expandGroupItems(groupDef, logger)
     local outSet = {}
     local include = groupDef.include or {}
@@ -504,15 +530,38 @@ local function expandGroupItems(groupDef, logger)
         end
     end
 
-    -- categories/tags discovery is optional; you can implement later.
-    -- Placeholders so schema is ready:
-    -- include.categories = {...}
-    -- include.tags = {...}
+    -- category-based discovery: include all game items whose displayCategory matches
+    if type(include.categories) == "table" and #include.categories > 0 then
+        local catCache = getItemCategoryCache()
+        for _, cat in ipairs(include.categories) do
+            local catItems = catCache[cat]
+            if catItems then
+                for id, _ in pairs(catItems) do
+                    outSet[id] = true
+                end
+            else
+                logger:warn("Group include.categories: no items found for category '" .. tostring(cat) .. "'")
+            end
+        end
+    end
 
-    -- blacklist
+    -- blacklist (items)
     if type(groupDef.blacklist) == "table" then
         for _, itemType in ipairs(groupDef.blacklist) do
             outSet[itemType] = nil
+        end
+    end
+
+    -- blacklist.categories: remove all items of these display categories
+    if type(groupDef.blacklistCategories) == "table" and #groupDef.blacklistCategories > 0 then
+        local catCache = getItemCategoryCache()
+        for _, cat in ipairs(groupDef.blacklistCategories) do
+            local catItems = catCache[cat]
+            if catItems then
+                for id, _ in pairs(catItems) do
+                    outSet[id] = nil
+                end
+            end
         end
     end
 
@@ -577,6 +626,49 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     local rewardResolved = resolveReward(ctx.rewards, merged.reward, itemType, merged.offer.qty, logger)
 
     local offerId = buildOfferId(poolKey, itemType)
+    local offerConditions = normalizeConditions(merged.conditions)
+
+    -- For grantTrait reward actions: filter out disabledInMultiplayer offers on MP server,
+    -- and auto-inject a canGrantTrait condition for mutex/already-has checks at runtime.
+    if rewardResolved and type(rewardResolved.actions) == "table" then
+        local isMP = isServer and isServer() and isClient and not isClient()
+        for _, action in ipairs(rewardResolved.actions) do
+            if action.type == "addTrait" and type(action.trait) == "string" then
+                -- Filter disabledInMultiplayer at compile time on dedicated MP server
+                if isMP and CharacterTraitDefinition then
+                    local traits = CharacterTraitDefinition.getTraits()
+                    for i = 0, traits:size() - 1 do
+                        local t = traits:get(i)
+                        if t and tostring(t:getType()) == action.trait then
+                            local disabled = false
+                            pcall(function() disabled = t:isRemoveInMP() end)
+                            if disabled then
+                                logger:warn("Offer '" .. offerId .. "' grants trait '" .. action.trait ..
+                                    "' which is disabled in multiplayer. Offer skipped.")
+                                return offerId, nil  -- signal caller to skip
+                            end
+                            break
+                        end
+                    end
+                end
+
+                -- Auto-inject canGrantTrait condition (handles mutex + already-has at runtime)
+                local condKey = "__trait:" .. action.trait
+                ctx.autoCondsDefs = ctx.autoCondsDefs or {}
+                ctx.autoCondsDefs[condKey] = { test = "canGrantTrait", args = { trait = action.trait } }
+
+                offerConditions = offerConditions or { all = {} }
+                offerConditions.all = offerConditions.all or {}
+                local found = false
+                for _, k in ipairs(offerConditions.all) do
+                    if k == condKey then found = true; break end
+                end
+                if not found then
+                    table.insert(offerConditions.all, condKey)
+                end
+            end
+        end
+    end
 
     return offerId, {
         id = offerId,
@@ -584,7 +676,7 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         price = priceResolved,
         reward = rewardResolved,
         offer = merged.offer,
-        conditions = normalizeConditions(merged.conditions),
+        conditions = offerConditions,
         meta = {
             sourceGroup = groupDef and groupDef.__key or nil
         }
@@ -597,6 +689,9 @@ end
 --  ctx.prices, ctx.rewards, ctx.conditionsDefs, ctx.items, ctx.groups, ctx.pools, ctx.shops
 -- -----------------------------
 function Compiler.compileAll(ctx)
+    -- Reset the item category cache so each compile run reflects current game state
+    itemCategoryCache = nil
+
     local logger = newLogger()
     local activeMods = getActiveModsSet()
 
@@ -637,6 +732,7 @@ function Compiler.compileAll(ctx)
     end
 
     -- Compile pools -> offers
+    local autoCondsDefs = {}  -- accumulates auto-generated canGrantTrait defs
     local runtime = {
         shops = {},
         pools = {},
@@ -648,6 +744,7 @@ function Compiler.compileAll(ctx)
             local poolRuntime = {
                 key = poolKey,
                 gate = poolDef.gate,
+                roll = poolDef.roll,
                 offers = {}
             }
 
@@ -689,6 +786,27 @@ function Compiler.compileAll(ctx)
                 end
             end
 
+            -- category-based items: include all non-template items whose resolved
+            -- reward has a matching category (inherited from reward templates).
+            if type(sources.categories) == "table" then
+                local catSet = {}
+                for _, cat in ipairs(sources.categories) do
+                    catSet[cat] = true
+                end
+
+                for itemKey, itemDef in pairs(resolved.items) do
+                    if itemDef.template ~= true and not itemsSet[itemKey] then
+                        local rewardKey = itemDef.reward
+                        if type(rewardKey) == "string" then
+                            local rewardDef = resolved.rewards[rewardKey]
+                            if rewardDef and catSet[rewardDef.category] then
+                                itemsSet[itemKey] = { fromGroup = nil }
+                            end
+                        end
+                    end
+                end
+            end
+
             -- build offers
             for itemType, meta in pairs(itemsSet) do
                 local itemDef = resolved.items[itemType]
@@ -701,22 +819,27 @@ function Compiler.compileAll(ctx)
                         -- silent skip or warn; I prefer warn
                         logger:warn("Item '" .. itemType .. "' is disabled/gated; skipping in pool '" .. poolKey .. "'.")
                     else
-                        -- validate item exists (optional warning)
-                        if not itemExists(itemType) then
+                        -- validate item exists for game items only.
+                        -- Non-item offers (trait, skill, boost, vehicle) use arbitrary
+                        -- string keys without a module prefix (no "."), so skip them.
+                        if itemType:find("%.") and not itemExists(itemType) then
                             logger:warn("Unknown item type '" .. itemType .. "' (pool '" .. poolKey ..
                                             "'). It may be from a mod or typo.")
                         end
 
                         local offerId, offer = compileOfferForItem({
                             prices = resolved.prices,
-                            rewards = resolved.rewards
+                            rewards = resolved.rewards,
+                            autoCondsDefs = autoCondsDefs
                         }, poolKey, poolDef, meta.fromGroup and (function()
                             local g = meta.fromGroup
                             g.__key = g.__key or nil
                             return g
                         end)() or nil, itemType, itemDef, logger)
 
-                        if offer and offer.price and offer.reward then
+                        if offer == nil then
+                            -- skipped (e.g. disabledInMultiplayer)
+                        elseif offer.price and offer.reward then
                             poolRuntime.offers[offerId] = offer
                         elseif not offer.price then
                             logger:error("Offer '" .. offerId .. "' has no price (use price='free' if intended)")
@@ -732,6 +855,11 @@ function Compiler.compileAll(ctx)
         end
     end
 
+    -- Merge auto-generated condition defs (canGrantTrait etc.) into runtime
+    for k, v in pairs(autoCondsDefs) do
+        runtime.conditionsDefs[k] = v
+    end
+
     -- Compile shops (mostly pass-through + gating)
     for shopKey, shopDef in pairs(resolved.shops) do
         if not gatedOut(shopDef) and shopDef.template ~= true then
@@ -741,7 +869,8 @@ function Compiler.compileAll(ctx)
                 sprites = shopDef.sprites,
                 unpoweredSprites = shopDef.unpoweredSprites,
                 poolSets = shopDef.poolSets,
-                throttle = shopDef.throttle
+                throttle = shopDef.throttle,
+                background = shopDef.background
             }
         end
     end

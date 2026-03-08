@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Steam/steamapps/common/ProjectZomboid/media/**)",
+      "Bash(grep -B5 -A10 \"item.*Generator\" /d/Steam/steamapps/common/ProjectZomboid/media/scripts/generated/items/*.txt)",
+      "Bash(grep -B5 -A20 \"^\\\\s*item Generator$\" /d/Steam/steamapps/common/ProjectZomboid/media/scripts/generated/items/normal.txt)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(grep -n \"item Generator$\" /d/Steam/steamapps/common/ProjectZomboid/media/scripts/generated/items/normal.txt)",
+      "Bash(grep \"ItemType = base:\" /d/Steam/steamapps/common/ProjectZomboid/media/scripts/generated/items/*.txt)",
+      "Bash(xargs grep -l \"item type.*Tv\\\\|item type.*TV\")",
+      "Bash(xargs grep -l \"radio.*=.*{\")",
+      "Bash(xargs grep -l \"getTexture\\\\|Perks\\\\|PerkFactory\\\\|skill\")",
+      "WebFetch(domain:projectzomboid.com)",
+      "Bash(grep 'category = \"\"Food\"\"' \"d:/pz-dev/code/PhunMart2/Docs/dumps/PhunMart2_dump_items.lua\")",
+      "Bash(grep -E 'category = \"\"\\(Material|Paint|RecipeResource|Cooking\\)\"\"' \"d:/pz-dev/code/PhunMart2/Docs/dumps/PhunMart2_dump_items.lua\")",
+      "Read(//tmp/**)",
+      "Bash(\"d:/pz-dev/code/PhunMart2/Docs/luas/PhunMart2_Groups.lua\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}

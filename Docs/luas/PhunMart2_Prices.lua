@@ -1,94 +1,45 @@
+-- PhunMart2 Default Prices
+-- Currency: Base.Silver coins (common, looted everywhere)
+--           Base.Gold coins  (rare, for premium offers)
+--           PhunMart.TraitToken (character-bound, for trait shop - implement later)
 return {
-    low10 = {
-        kind = "items", -- future-proof: "items" | "vehicle" | "trait" | etc
-        items = {{
-            item = "Base.Silver",
-            amount = 10
-        }}
-    },
 
-    very_low = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 2,
-                max = 5
-            }
-        }}
-    },
+    -- ── Free ─────────────────────────────────────────────────────────────────
+    free = { kind = "free" },
 
-    low = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 8,
-                max = 12
-            }
-        }}
-    },
+    -- ── Silver coins ─────────────────────────────────────────────────────────
+    coin_1   = { kind = "items", items = {{ item = "Base.Silver", amount = 1  }} },
+    coin_5   = { kind = "items", items = {{ item = "Base.Silver", amount = 5  }} },
+    coin_10  = { kind = "items", items = {{ item = "Base.Silver", amount = 10 }} },
+    coin_15  = { kind = "items", items = {{ item = "Base.Silver", amount = 15 }} },
+    coin_25  = { kind = "items", items = {{ item = "Base.Silver", amount = 25 }} },
+    coin_40  = { kind = "items", items = {{ item = "Base.Silver", amount = 40 }} },
+    coin_50  = { kind = "items", items = {{ item = "Base.Silver", amount = 50 }} },
+    coin_75  = { kind = "items", items = {{ item = "Base.Silver", amount = 75 }} },
+    coin_100 = { kind = "items", items = {{ item = "Base.Silver", amount = 100 }} },
 
-    med = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 10,
-                max = 22
-            }
-        }}
-    },
+    -- Range variants (for shops that feel more organic)
+    coin_low    = { kind = "items", items = {{ item = "Base.Silver", amount = { min = 5,  max = 15 } }} },
+    coin_mid    = { kind = "items", items = {{ item = "Base.Silver", amount = { min = 20, max = 40 } }} },
+    coin_high   = { kind = "items", items = {{ item = "Base.Silver", amount = { min = 50, max = 80 } }} },
+    coin_vhigh  = { kind = "items", items = {{ item = "Base.Silver", amount = { min = 80, max = 120 } }} },
 
-    high = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 20,
-                max = 50
-            }
-        }}
-    },
+    -- ── Gold coins ───────────────────────────────────────────────────────────
+    gold_1  = { kind = "items", items = {{ item = "Base.Gold", amount = 1  }} },
+    gold_5  = { kind = "items", items = {{ item = "Base.Gold", amount = 5  }} },
+    gold_10 = { kind = "items", items = {{ item = "Base.Gold", amount = 10 }} },
+    gold_25 = { kind = "items", items = {{ item = "Base.Gold", amount = 25 }} },
 
-    low_gold = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = {
-                min = 1,
-                max = 10
-            }
-        }}
-    },
+    -- XP boosts (slightly more expensive than same-tier XP to reflect duration benefit)
+    coin_boost  = { kind = "items", items = {{ item = "Base.Silver", amount = 20 }} },
 
-    med_gold = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = {
-                min = 9,
-                max = 25
-            }
-        }}
-    },
+    -- ── Trait token (placeholder - replace item key when implemented) ─────────
+    -- token_trait = { kind = "items", items = {{ item = "PhunMart.TraitToken", amount = 1 }} },
 
-    bear = {
-        kind = "items",
-        items = {{
-            item = {"Base.ToyBear", "Base.ToyBear_Crafted_Cotton"}
-        } -- defaults to 1
-        }
-    },
+    -- ── Vehicle (separate kind, not items) ───────────────────────────────────
+    -- Vehicles use gold coins as premium currency
+    vehicle_common  = { kind = "items", items = {{ item = "Base.Gold", amount = { min = 5,  max = 10 } }} },
+    vehicle_uncommon= { kind = "items", items = {{ item = "Base.Gold", amount = { min = 10, max = 20 } }} },
+    vehicle_rare    = { kind = "items", items = {{ item = "Base.Gold", amount = { min = 20, max = 40 } }} },
 
-    trade_bat_for_nails = {
-        kind = "items",
-        items = {{
-            item = "Base.BaseballBat",
-            amount = 1
-        }, {
-            item = "Base.Nails",
-            amount = 50
-        }}
-    }
 }

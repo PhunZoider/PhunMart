@@ -100,6 +100,10 @@ Commands[Core.commands.modifyTraits] = function(arguments)
     end
 end
 
+Commands[Core.commands.onShopChange] = function(args)
+    triggerEvent(Core.events.OnShopChange, args.key, args.data, args.replaced == true)
+end
+
 Commands[Core.commands.requestShop] = function(arguments)
     -- Store data for the open_shop timed action to pick up.
     -- The action polls Core.pendingShopData[key] in its update() loop and

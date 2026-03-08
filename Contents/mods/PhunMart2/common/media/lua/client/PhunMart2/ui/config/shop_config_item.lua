@@ -647,7 +647,9 @@ function UI:onSave()
     end
 
     -- if there are no properties set, return nil
-    if next(data) == nil then
+    local dataEmpty = true
+    for _ in pairs(data) do dataEmpty = false; break end
+    if dataEmpty then
         self.cb(nil)
     else
         self.cb(data)

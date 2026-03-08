@@ -24,8 +24,8 @@ function ClientObject:getObject()
     return self:getIsoObject()
 end
 
-function ClientObject:restock()
-    ClientSystem.instance:restock(self)
+function ClientObject:restock(playerObj)
+    ClientSystem.instance:restock(self, playerObj or getSpecificPlayer(0))
 end
 
 function ClientObject:reroll(target)
@@ -57,3 +57,16 @@ function ClientObject:getFrontSquare()
 
 end
 
+-- Called by the PZ engine when this object's modData is synced from the server.
+-- Keeps the client object in step with server state (offers, lastRestock, etc.)
+function ClientObject:stateFromIsoObject(isoObject)
+    self:fromModData(isoObject:getModData())
+end
+
+-- Manual sync — call when you know the underlying IsoObject's modData may have changed.
+function ClientObject:updateFromIsoObject()
+    local iso = self:getIsoObject()
+    if iso then
+        self:stateFromIsoObject(iso)
+    end
+end

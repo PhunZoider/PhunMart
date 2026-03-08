@@ -78,6 +78,17 @@ Events.OnPreFillWorldObjectContextMenu.Add(function(playerObj, context, worldobj
     Core:reloadShopDefinitions()
 end)
 
+Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobjects, test)
+    if isAdmin() or isDebugEnabled() then return end
+    for _, obj in ipairs(worldobjects) do
+        if Core.ClientSystem:isValidIsoObject(obj) then
+            context:removeOptionByName("Pick Up")
+            context:removeOptionByName("Dismantle")
+            break
+        end
+    end
+end)
+
 local function setup()
     Events.OnTick.Remove(setup)
     Core:ini()

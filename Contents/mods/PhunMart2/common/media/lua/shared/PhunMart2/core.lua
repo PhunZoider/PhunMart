@@ -39,12 +39,14 @@ PhunMart = {
         reroll = "PhunMartReroll",
         rerollAllShops = "PhunMartRerollAllShops",
         changeTo = "PhunMartChangeShopType",
-        restock = "PhunMartRestockShop"
+        restock = "PhunMartRestockShop",
+        onShopChange = "PhunMartOnShopChange"
 
     },
     events = {
         OnReady = "OnPhunMartOnReady",
-        recievedInventory = "OnPhunMartRecievedInventory"
+        recievedInventory = "OnPhunMartRecievedInventory",
+        OnShopChange = "OnPhunMartShopChange"
     },
     tools = require "PhunMart2/tools",
     settings = {},
@@ -115,7 +117,7 @@ end
 
 function Core.debug(...)
     if Core.consts.debug then
-        print("[PhunMart2][ServerSystem]", ...)
+        print("[PhunMart2]", ...)
     end
 end
 

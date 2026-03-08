@@ -11,6 +11,76 @@ local ServerObject = Core.ServerObject
 local GameTime = GameTime
 local SandboxVars = SandboxVars
 
+-- -----------------------------
+-- buildOffers helpers
+-- -----------------------------
+
+-- Return a copy of a compiled price with any {min,max} amounts resolved to concrete numbers.
+local function bakePrice(price)
+    if not price then
+        return nil
+    end
+    if price.kind == "free" then
+        return {
+            kind = "free"
+        }
+    end
+    local baked = {
+        kind = price.kind,
+        items = {}
+    }
+    for _, line in ipairs(price.items or {}) do
+        local bl = {
+            item = line.item,
+            itemAny = line.itemAny
+        }
+        local amt = line.amount
+        if type(amt) == "table" then
+            bl.amount = ZombRand(amt.min or 1, amt.max or amt.min or 1)
+        else
+            bl.amount = amt or 1
+        end
+        table.insert(baked.items, bl)
+    end
+    return baked
+end
+
+-- Weighted random pick without replacement. Returns array of {id, offer} pairs.
+-- candidates: array of {offerId, offerDef}
+local function weightedPickN(candidates, count)
+    local pool = {}
+    for _, pair in ipairs(candidates) do
+        table.insert(pool, {
+            id = pair[1],
+            offer = pair[2]
+        })
+    end
+    local picked = {}
+    count = math.min(count, #pool)
+    for _ = 1, count do
+        if #pool == 0 then
+            break
+        end
+        local total = 0
+        for _, entry in ipairs(pool) do
+            total = total + (entry.offer.offer and entry.offer.offer.weight or 1.0)
+        end
+        local r = total > 0 and (ZombRand(math.max(1, math.floor(total * 10000))) / 10000.0) or 0
+        local chosenIdx = #pool -- fallback to last
+        local cumulative = 0
+        for idx, entry in ipairs(pool) do
+            cumulative = cumulative + (entry.offer.offer and entry.offer.offer.weight or 1.0)
+            if r < cumulative then
+                chosenIdx = idx
+                break
+            end
+        end
+        table.insert(picked, pool[chosenIdx])
+        table.remove(pool, chosenIdx)
+    end
+    return picked
+end
+
 -- all valid property and default values
 local fields = {
     type = {
@@ -47,9 +117,111 @@ local fields = {
         -- z position of the shop
         type = "number",
         default = 0
+    },
+    offers = {
+        -- compiled offer table for this instance, built from Core.runtime on restock
+        type = "array",
+        default = {}
     }
 
 }
+
+-- Build self.offers from Core.runtime for this shop's type.
+-- Called on first load (if offers absent) and on every restock.
+-- Each restock bakes concrete price amounts and stock quantities from their configured ranges.
+function ServerObject:buildOffers()
+    local offers = {}
+    if not Core.runtime then
+        print("[PhunMart2] buildOffers: no compiled runtime, call Core.compile() first")
+        self.offers = offers
+        return
+    end
+    local shopDef = Core.runtime.shops and Core.runtime.shops[self.type]
+    if not shopDef then
+        print("[PhunMart2] buildOffers: no runtime shop def for type '" .. tostring(self.type) .. "'")
+        self.offers = offers
+        return
+    end
+
+    for _, poolSet in ipairs(shopDef.poolSets or {}) do
+        for _, poolRef in ipairs(poolSet.keys or {}) do
+            local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
+            local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
+            if not pool then
+                print("[PhunMart2] buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
+            else
+                local roll = pool.roll or {}
+                local mode = roll.mode or "weighted"
+
+                -- flatten pool offers into a candidate list
+                local candidates = {}
+                for offerId, offer in pairs(pool.offers or {}) do
+                    table.insert(candidates, {offerId, offer})
+                end
+
+                -- resolve count: number | {min,max} | nil → default 5
+                local function resolveCount(countCfg, fallback)
+                    if type(countCfg) == "table" and countCfg.min then
+                        return ZombRand(countCfg.min, countCfg.max or countCfg.min)
+                    elseif type(countCfg) == "number" then
+                        return countCfg
+                    end
+                    return fallback
+                end
+
+                -- select which offers appear this restock cycle
+                local selected
+                if mode == "all" then
+                    selected = {}
+                    for _, pair in ipairs(candidates) do
+                        table.insert(selected, {
+                            id = pair[1],
+                            offer = pair[2]
+                        })
+                    end
+                else -- "weighted" (default): pick N via weighted random without replacement
+                    local count = resolveCount(roll.count, 5)
+                    -- cap to pool size so we never spin forever
+                    count = math.min(count, #candidates)
+                    selected = weightedPickN(candidates, count)
+                end
+
+                -- bake each selected offer: resolve price ranges and stock quantities
+                for _, sel in ipairs(selected) do
+                    local offerId = sel.id or sel[1]
+                    local offerDef = sel.offer or sel[2]
+                    local srcOffer = offerDef.offer or {}
+
+                    -- resolve stock: {min,max} → concrete qty; absent = unlimited (-1)
+                    local stockQty, restockHours
+                    local stock = srcOffer.stock
+                    if stock then
+                        stockQty = ZombRand(stock.min or 1, stock.max or stock.min or 1)
+                        restockHours = stock.restockHours
+                    else
+                        stockQty = -1
+                    end
+
+                    offers[offerId] = {
+                        id = offerDef.id,
+                        item = offerDef.item,
+                        price = bakePrice(offerDef.price), -- price amounts resolved from ranges
+                        reward = offerDef.reward,
+                        offer = {
+                            qty = srcOffer.qty or 1, -- items given per purchase
+                            weight = srcOffer.weight or 1.0,
+                            stockQty = stockQty, -- purchase slots this cycle (-1 = unlimited)
+                            restockHours = restockHours
+                        },
+                        conditions = offerDef.conditions,
+                        meta = offerDef.meta
+                    }
+                end
+            end
+        end
+    end
+    self.offers = offers
+end
 
 function ServerObject:new(luaSystem, globalObject)
     local o = SGlobalObject.new(self, luaSystem, globalObject)
@@ -85,12 +257,22 @@ function ServerObject:stateFromIsoObject(isoObject)
     data.z = isoObject:getZ()
     self:fromModData(data) -- populate with this objects modData
 
+    -- build offers if not persisted (new machine or first load after upgrade)
+    local hasOffers = false
+    if type(self.offers) == "table" then
+        for _ in pairs(self.offers) do hasOffers = true; break end
+    end
+    if not hasOffers then
+        self:buildOffers()
+        self:toModData(data) -- write offers back into modData before transmit
+    end
+
     Core:addInstance(data)
 
     -- update sprite if needed
     self:updateSprite()
 
-    -- send data to clients 
+    -- send data to clients (includes offers)
     isoObject:transmitModData()
 end
 
@@ -180,30 +362,21 @@ end
 
 function ServerObject:requiresRestock()
     local shop = Core.shops[self.type]
-
-    local lastRestocked = self.lastRestock or 0
-    local frequency = shop.restock or 24
+    local frequency = (shop and shop.restock) or 24
     local now = GameTime:getInstance():getWorldAgeHours()
-    local hoursSinceLastRestock = now - lastRestocked
-    local times = math.floor(hoursSinceLastRestock / frequency)
-    local newRestock = lastRestocked + (times * frequency)
-    if now > (lastRestocked * frequency) then
-        return false
-    end
-    return true
+    return now >= (self.lastRestock or 0) + frequency
 end
 
--- regenerate inventory
+-- regenerate inventory and persist
 function ServerObject:restock()
-
-    local lastRestocked = self.lastRestock or 0
-    local frequency = self.restock or 24
+    local shop = Core.shops[self.type]
+    local frequency = (shop and shop.restock) or 24
     local now = GameTime:getInstance():getWorldAgeHours()
-    local hoursSinceLastRestock = now - lastRestocked
-    local times = math.floor(hoursSinceLastRestock / frequency)
-    local newRestock = lastRestocked + (times * frequency)
-    self.lastRestocked = newRestock
-    self:saveData()
+    local lastRestock = self.lastRestock or 0
+    local times = math.floor((now - lastRestock) / frequency)
+    self.lastRestock = lastRestock + (times * frequency)
+    self:buildOffers()
+    self:saveData() -- toModData + transmitModData → engine syncs offers to all clients
 end
 
 -- check to ensure we are setup correctly and restock if needed

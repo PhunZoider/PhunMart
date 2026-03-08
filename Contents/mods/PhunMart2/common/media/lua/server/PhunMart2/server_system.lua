@@ -63,7 +63,8 @@ function ServerSystem.addToWorld(square, shop, direction)
     elseif direction == IsoDirections.W then
         index = 3
     end
-    local sprite = Core.shops[shop].sprites[index]
+    local c = Core
+    local sprite = c.shops[shop].sprites[index]
     local isoObject = IsoThumpable.new(square:getCell(), square, sprite, false, {})
     ServerSystem.initializeShopObject(isoObject)
     square:AddSpecialObject(isoObject, -1)
@@ -99,7 +100,7 @@ function ServerSystem:initSystem()
     -- Specify GlobalObject fields that should be saved.
     -- ids = array of all shop ids that have been generated
     -- chunks = array of all chunk coordinates that have shops?
-    self.system:setObjectModDataKeys({'type', 'facing', 'created', 'x', 'y', 'z'})
+    self.system:setObjectModDataKeys({'type', 'facing', 'created', 'x', 'y', 'z', 'lastRestock', 'offers'})
 end
 
 function ServerSystem:isValidIsoObject(isoObject)
@@ -218,18 +219,30 @@ function ServerSystem:openShop(player, args, forceRestock)
     end
 
     if shop:requiresRestock() or forceRestock then
-        -- restock before sending
+        -- restock builds offers, saves, and transmits modData to all clients
         shop:restock()
     end
 
-    local inventoryData = self:getInventoryForShop(shop)
+    -- offers live on the shop object (synced via modData); send them alongside
+    -- conditionsDefs (shared runtime data, not stored per-object)
+    local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shop.type]
+    local inventoryData = {
+        key = shop:getKey(),
+        location = {
+            x = shop.x,
+            y = shop.y,
+            z = shop.z
+        },
+        offers = shop.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        background = shopDef and shopDef.background
+    }
 
     if Core.isLocal then
         -- In singleplayer the server and client share the same Lua state, so
         -- we can write directly into the slot the open_shop action polls.
         Core.pendingShopData = Core.pendingShopData or {}
         Core.pendingShopData[inventoryData.key] = inventoryData
-
     else
         sendServerCommand(player, Core.name, Core.commands.requestShop, {
             playerIndex = player:getPlayerNum(),
@@ -238,48 +251,6 @@ function ServerSystem:openShop(player, args, forceRestock)
         })
     end
 
-end
-
-function ServerSystem:getInventoryForShop(shop)
-    local key = shop:getKey()
-
-    if not Core.runtime then
-        print("[PhunMart2] getInventoryForShop: no compiled runtime, call Core.compile() first")
-        return {
-            key = key,
-            offers = {}
-        }
-    end
-
-    local shopDef = Core.runtime.shops and Core.runtime.shops[shop.type]
-    if not shopDef then
-        print("[PhunMart2] getInventoryForShop: no runtime shop def for type '" .. tostring(shop.type) .. "'")
-        return {
-            key = key,
-            offers = {}
-        }
-    end
-
-    local offers = {}
-    for _, poolSet in ipairs(shopDef.poolSets or {}) do
-        for _, poolRef in ipairs(poolSet.keys or {}) do
-            local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
-            local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
-            if pool then
-                for offerId, offer in pairs(pool.offers or {}) do
-                    offers[offerId] = offer
-                end
-            else
-                print("[PhunMart2] getInventoryForShop: pool '" .. tostring(poolKey) .. "' not in runtime")
-            end
-        end
-    end
-
-    return {
-        key = key,
-        offers = offers,
-        conditionsDefs = Core.runtime.conditionsDefs
-    }
 end
 
 function ServerSystem:getLoadedObjects()
@@ -438,21 +409,9 @@ function ServerSystem:loadGridsquare(square)
 end
 
 function ServerSystem:OnClientCommand(command, playerObj, args)
-
-    local instance = Core.ServerSystem.instance
-
-    if command == Core.commands.changeTo then
-        instance:changeTo(args.to, args.location)
-    elseif command == Core.commands.restock then
-        local obj = instance:getLuaObjectAt(args.x, args.y, args.z)
-        obj:restock()
-    elseif Commands[command] ~= nil then
+    if Commands[command] ~= nil then
         Commands[command](playerObj, args)
     end
-end
-
-function ServerSystem:receiveCommand(playerObj, command, args)
-    Commands[command](playerObj, args)
 end
 
 function ServerSystem:recompileShops()

@@ -47,6 +47,44 @@ end
 -- (You can keep your existing table layout; wrap it with these functions.)
 
 -- =========================================================
+-- Trait definition cache (lazy, built on first use)
+-- Keyed by trait type string e.g. "base:slowlearner"
+-- =========================================================
+local traitDefCache = nil
+
+local function getTraitDefCache()
+    if traitDefCache then return traitDefCache end
+    traitDefCache = {}
+    if not CharacterTraitDefinition then return traitDefCache end
+    local ok, err = pcall(function()
+        local traits = CharacterTraitDefinition.getTraits()
+        for i = 0, traits:size() - 1 do
+            local t = traits:get(i)
+            if t then
+                local key = tostring(t:getType())
+                local mutex = {}
+                local disabledMP = false
+                pcall(function()
+                    local mlist = t:getMutuallyExclusiveTraits()
+                    if mlist then
+                        for j = 0, mlist:size() - 1 do
+                            local m = mlist:get(j)
+                            if m then mutex[#mutex+1] = tostring(m) end
+                        end
+                    end
+                    disabledMP = t:isRemoveInMP()
+                end)
+                traitDefCache[key] = { mutex = mutex, disabledMP = disabledMP }
+            end
+        end
+    end)
+    if not ok then
+        print("[PhunMart2] traitDefCache build error: " .. tostring(err))
+    end
+    return traitDefCache
+end
+
+-- =========================================================
 -- Test implementations
 -- Each returns: ok:boolean, failTextKey:string|nil, failArgs:table|nil
 -- =========================================================
@@ -136,6 +174,34 @@ R.tests.purchaseCountMax = function(args, adapter, purchases, context)
     return true
 end
 
+
+-- Auto-injected by compiler for grantTrait reward actions.
+-- Checks: player doesn't already have the trait, no mutex conflict, not disabled in MP.
+R.tests.canGrantTrait = function(args, adapter)
+    local traitKey = args.trait
+    if not traitKey then
+        return false, "IGUI_PhunMart_Cond_TraitKeyMissing", {}
+    end
+
+    if adapter:hasTrait(traitKey) then
+        return false, "IGUI_PhunMart_Cond_AlreadyHasTrait", { traitKey }
+    end
+
+    local cache = getTraitDefCache()
+    local def = cache[traitKey]
+    if def then
+        if def.disabledMP and isClient and isClient() then
+            return false, "IGUI_PhunMart_Cond_TraitDisabledMP", { traitKey }
+        end
+        for _, mutexKey in ipairs(def.mutex) do
+            if adapter:hasTrait(mutexKey) then
+                return false, "IGUI_PhunMart_Cond_TraitMutex", { traitKey, mutexKey }
+            end
+        end
+    end
+
+    return true
+end
 
 function R.evaluate(conditionsBlock, conditionsDefs, adapter, purchases, context)
     local out = { ok = true, failures = {} }
