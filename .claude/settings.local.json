@@ -15,7 +15,8 @@
       "Bash(grep 'category = \"\"Food\"\"' \"d:/pz-dev/code/PhunMart2/Docs/dumps/PhunMart2_dump_items.lua\")",
       "Bash(grep -E 'category = \"\"\\(Material|Paint|RecipeResource|Cooking\\)\"\"' \"d:/pz-dev/code/PhunMart2/Docs/dumps/PhunMart2_dump_items.lua\")",
       "Read(//tmp/**)",
-      "Bash(\"d:/pz-dev/code/PhunMart2/Docs/luas/PhunMart2_Groups.lua\")"
+      "Bash(\"d:/pz-dev/code/PhunMart2/Docs/luas/PhunMart2_Groups.lua\")",
+      "WebSearch"
     ],
     "additionalDirectories": [
       "\\tmp"

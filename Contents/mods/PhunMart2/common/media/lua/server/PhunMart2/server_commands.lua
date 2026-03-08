@@ -33,20 +33,30 @@ end
 
 Commands[Core.commands.restock] = function(playerObj, args)
     local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)
-    if not obj then return end
+    if not obj then
+        return
+    end
     obj:restock()
     local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[obj.type]
     local payload = {
         key = obj:getKey(),
-        location = { x = obj.x, y = obj.y, z = obj.z },
+        location = {
+            x = obj.x,
+            y = obj.y,
+            z = obj.z
+        },
         offers = obj.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
         background = shopDef and shopDef.background,
+        defaultView = shopDef and shopDef.defaultView
     }
     if Core.isLocal then
         triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
     else
-        sendServerCommand(Core.name, Core.commands.onShopChange, { key = payload.key, data = payload })
+        sendServerCommand(Core.name, Core.commands.onShopChange, {
+            key = payload.key,
+            data = payload
+        })
     end
 end
 
@@ -115,15 +125,24 @@ Commands[Core.commands.reroll] = function(playerObj, args)
         local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
         local payload = newObj and {
             key = newObj:getKey(),
-            location = { x = newObj.x, y = newObj.y, z = newObj.z },
+            location = {
+                x = newObj.x,
+                y = newObj.y,
+                z = newObj.z
+            },
             offers = newObj.offers or {},
             conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
             background = shopDef and shopDef.background,
+            defaultView = shopDef and shopDef.defaultView
         }
         if Core.isLocal then
             triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
         else
-            sendServerCommand(Core.name, Core.commands.onShopChange, { key = oldKey, data = payload, replaced = true })
+            sendServerCommand(Core.name, Core.commands.onShopChange, {
+                key = oldKey,
+                data = payload,
+                replaced = true
+            })
         end
     end
 end

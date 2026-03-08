@@ -131,10 +131,79 @@ function UI:createChildren()
     if self.listType == Core.consts.itemType.vehicles then
         self.data.categories = Core.getAllVehicleCategories()
         self.data.items = Core.getAllVehicles()
-        self.tooltip = ISToolTip:new();
-        self.previewPanel3d = ISUI3DScene:new(0, 0, self.width, self.height)
-        self.previewPanel3d:initialise()
-        self.tooltip:addChild(self.previewPanel3d)
+        self.tooltip = nil
+
+        -- Split layout: list takes left 55%, preview takes right 45%
+        local listW = math.floor(self.width * 0.55)
+        list:setWidth(listW)
+
+        local previewX = listW + 4
+        local previewW = self.width - previewX
+        local preview = ISUI3DScene:new(previewX, 0, previewW, filtersPanel.y)
+        preview:initialise()
+        preview.rotX = 22
+        preview.rotY = 45
+        preview.initialized = false
+        preview.vehicleName = nil
+
+        -- Left drag: rotate
+        preview.onMouseDown = function(p, mx, my)
+            p._dragX = mx;
+            p._dragY = my
+            p._rotX0 = p.rotX;
+            p._rotY0 = p.rotY
+        end
+        preview.onMouseUp = function(p, mx, my)
+            p._dragX = nil
+        end
+        preview.onMouseMove = function(p, dx, dy)
+            if not p._dragX then
+                return
+            end
+            local mx, my = p:getMouseX(), p:getMouseY()
+            p.rotY = p._rotY0 + (mx - p._dragX) * 0.5
+            p.rotX = p._rotX0 - (my - p._dragY) * 0.5
+            p.javaObject:fromLua3("setViewRotation", p.rotX, p.rotY, 0)
+        end
+        -- Release drag state when cursor leaves the panel
+        preview.onMouseMoveOutside = function(p, dx, dy)
+            p._dragX = nil
+        end
+
+        self.previewPanel3d = preview
+        self:addChild(preview)
+
+        -- Wire list hover to update the 3D preview (capture panel ref in closure)
+        local panel = self
+        list.doOnMouseMove = function(lself, ddx, ddy)
+            local p = panel.previewPanel3d
+            if not p then
+                return
+            end
+            local row = lself:rowAt(lself:getMouseX(), lself:getMouseY())
+            if not (row and row > 0 and lself.items[row]) then
+                return
+            end
+            local item = lself.items[row].item
+            if not item or item.type == p.vehicleName then
+                return
+            end
+            if not p.initialized then
+                p.initialized = true
+                p.javaObject:fromLua1("setDrawGrid", false)
+                p.javaObject:fromLua1("createVehicle", "vehicle")
+            end
+            -- Reset view on every new vehicle
+            p.rotX = 22;
+            p.rotY = 45
+            p._dragX = nil
+            p.javaObject:fromLua3("setViewRotation", p.rotX, p.rotY, 0)
+            p.javaObject:fromLua1("setView", "UserDefined")
+            p.javaObject:fromLua1("setZoom", 3)
+            p.vehicleName = item.type
+            p.javaObject:fromLua2("setVehicleScript", "vehicle", item.type)
+        end
+
     elseif self.listType == Core.consts.itemType.traits then
         self.data.categories = Core.getAllTraitCategories()
         self.data.items = Core.getAllTraits()
@@ -203,6 +272,16 @@ function UI:prerender()
     local list = self.controls.list
     list:setHeight(filterPanel.y - list.y)
 
+    -- For vehicles, keep list at 55% and preview at 45%
+    if self.previewPanel3d then
+        local listW = math.floor(self.width * 0.55)
+        list:setWidth(listW)
+        local p = self.previewPanel3d
+        p:setX(listW + 4)
+        p:setWidth(self.width - listW - 4)
+        p:setHeight(filterPanel.y)
+    end
+
     if #list.columns > 1 and list.width < list.columns[#list.columns].size then
         for i = 2, #list.columns do
             list.columns[i].size = list.width / #list.columns
@@ -258,64 +337,6 @@ function UI:drawDatas(y, item, alt)
     return self.itemsHeight;
 end
 
-function UI:doOnMouseMoveOutside(dx, dy)
-    local tooltip = self.parent.tooltip
-    tooltip:setVisible(false)
-    tooltip:removeFromUIManager()
-end
-
-function UI:doOnMouseMove(dx, dy)
-
-    local showInvTooltipForItem = nil
-    local item = nil
-    local tooltip = nil
-
-    if not self.dragging and self.rowAt then
-        if self:isMouseOver() then
-            local row = self:rowAt(self:getMouseX(), self:getMouseY())
-            if row ~= nil and row > 0 and self.items[row] then
-                item = self.items[row].item
-                if item then
-                    tooltip = self.parent.tooltip
-                    if self.parent.listType == "TRAITS" or self.parent.listType == "XP" or self.parent.listType ==
-                        "BOOSTS" then
-                        tooltip:setName(item.label)
-                        local desc = {}
-                        tooltip.description = item.tooltip and item.tooltip.description or ""
-                    elseif self.parent.listType == "VEHICLES" then
-                        if self.parent.previewPanel3d.vehicleName ~= item.type then
-                            if self.parent.previewPanel3d.initialized ~= true then
-                                self.parent.previewPanel3d.initialized = true
-                                self.parent.previewPanel3d.javaObject:fromLua1("setDrawGrid", false)
-                                self.parent.previewPanel3d.javaObject:fromLua1("createVehicle", "vehicle")
-                            end
-                            self.parent.previewPanel3d.javaObject:fromLua3("setViewRotation", 45 / 2, 45, 0)
-                            self.parent.previewPanel3d.javaObject:fromLua1("setView", "UserDefined")
-                            self.parent.previewPanel3d.javaObject:fromLua1("setZoom", 3)
-                        end
-                        self.parent.previewPanel3d.vehicleName = item.type or "?"
-                        self.parent.previewPanel3d.javaObject:fromLua2("setVehicleScript", "vehicle",
-                            self.parent.previewPanel3d.vehicleName)
-                    else
-                        tooltip:setItem(instanceItem(item.type))
-                    end
-
-                    if not tooltip:isVisible() then
-
-                        tooltip:addToUIManager();
-                        tooltip:setVisible(true)
-                    end
-                    tooltip:bringToTop()
-                elseif self.parent.tooltip:isVisible() then
-                    self.parent.tooltip:setVisible(false)
-                    self.parent.tooltip:removeFromUIManager()
-                end
-            end
-        end
-    end
-
-end
-
 function UI:doTooltip()
 
 end
@@ -331,9 +352,10 @@ function UI:setData(data)
 end
 
 function UI:doOnMouseMoveOutside(dx, dy)
-    local tooltip = self.parent.tooltip
-    tooltip:setVisible(false)
-    tooltip:removeFromUIManager()
+    if self.tooltip then
+        self.tooltip:setVisible(false)
+        self.tooltip:removeFromUIManager()
+    end
 end
 
 function UI:refreshData()

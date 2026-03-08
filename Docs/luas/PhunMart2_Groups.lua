@@ -390,6 +390,132 @@ return {
             items = {"Base.Scissors", "Base.NeedleThread", "Base.Needle", "Base.Thread", "Base.SpoolOfThread",
                      "Base.DenimStrips", "Base.LeatherStrips", "Base.SewingPattern"}
         }
+    },
+
+    -- =========================================================
+    -- WrentAWreck  (vehicles - clean only, no smashed/burnt/trailers)
+    -- =========================================================
+
+    -- Budget tier: small cars (gold 5-10)
+    vehicles_small = {
+        label = "Small Cars",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_common",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = {"SmallCar", "SmallCar02", "CarNormal", "CarTaxi", "CarTaxi2", "CarStationWagon", "CarStationWagon2"}
+        }
+    },
+
+    -- Budget tier: panel vans, step vans, pickup vans (gold 5-10)
+    vehicles_vans = {
+        label = "Vans & Pickups",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_common",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = { -- Generic vans
+            "Van", "VanSeats", "VanMail", "VanMechanic", "VanBuilder", "VanUtility", "VanRadio", "VanAmbulance",
+            "VanSpiffo", -- Branded transit/work vans
+            "Van_Transit", "Van_Leather", "Van_CraftSupplies", "Van_VoltMojo", "Van_BugWipers", "Van_Masonry",
+            "Van_Glass", "Van_MassGenFac", "Van_LectroMax", "Van_Locksmith", "Van_KnoxDisti", "Van_Perfick_Potato",
+            "Van_HeritageTailors", "Van_Blacksmith", -- Branded company vans
+            "VanKnoxCom", "VanMooreMechanics", "VanMetalworker", "VanMeltingPointMetal", "VanMetalheads",
+            "VanKorshunovs", "VanJonesFabrication", "VanDeerValley", "VanPluggedInElectrics", "VanOldMill",
+            "VanPennSHam", "VanMicheles", "VanGreenes", "VanGardenGods", "VanCarpenter", "VanGardener",
+            "VanRiversideFabrication", "VanOvoFarm", "VanLouisvilleLandscaping", "VanCoastToCoast",
+            "VanSchwabSheetMetal", "VanUncloggers", "VanTreyBaines", "VanPlattAuto", "VanMobileMechanics",
+            "VanBrewsterHarbin", "VanBeckmans", "VanMccoy", "VanJohnMcCoy", "VanKnobCreekGas", "VanFossoil",
+            "VanKerrHomes", "VanWPCarpentry", "VanRosewoodworking", -- Van seats variants
+            "VanSeats_Trippy", "VanSeats_Space", "VanSeats_Mural", "VanSeats_Creature", "VanSeats_LadyDelighter",
+            "VanSeats_Valkyrie", "VanSeats_Prison", "VanSeatsAirportShuttle", "VanRadio_3N",
+            -- Step vans (large cargo vans)
+            "StepVan", "StepVanMail", "StepVanAirportCatering", "StepVan_Citr8", "StepVan_CompleteRepairShop",
+            "StepVan_LouisvilleSWAT", "StepVan_LouisvilleMotorShop", "StepVan_SmartKut", "StepVan_HuangsLaundry",
+            "StepVan_Blacksmith", "StepVan_Glass", "StepVan_MarineBites", "StepVan_SouthEasternHosp", "StepVan_Propane",
+            "StepVan_Zippee", "StepVan_Genuine_Beer", "StepVan_Heralds", "StepVan_SouthEasternPaint",
+            "StepVan_MobileLibrary", "StepVan_Jorgensen", "StepVan_Plonkies", "StepVan_Florist", "StepVan_Butchers",
+            "StepVan_Mechanic", "StepVan_Masonry", "StepVan_Cereal", "StepVan_RandisPlants", "StepVan_Scarlet",
+            "StepVan_USL", -- Pickup vans (light cargo)
+            "PickUpVan", "PickUpVanMccoy", "PickUpVanYingsWood", "PickUpVanMarchRidgeConstruction", "PickUpVanBuilder",
+            "PickUpVanWeldingbyCamille", "PickUpVanKimbleKonstruction", "PickUpVanMetalworker",
+            "PickUpVanHeltonMetalWorking", "PickUpVanBrickingIt", "PickUpVanCallowayLandscaping", "PickUpVan_Camo",
+            "PickUpVanLightsRanger", "PickUpVanLightsPolice", "PickUpVanLightsStatePolice", "PickUpVanLightsFire",
+            "PickUpVanLightsFossoil", "PickUpVanLightsCarpenter", "PickUpVanLightsLouisvilleCounty",
+            "PickUpVanLightsKentuckyLumber"}
+        }
+    },
+
+    -- Standard tier: modern/mid-range cars (gold 10-20)
+    vehicles_normal = {
+        label = "Cars & Sedans",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_uncommon",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = {"ModernCar", "ModernCar02", "ModernCar_Martin", "CarLightsKST", "CarLightsLouisvilleCounty",
+                     "CarLightsRanger", "CarLightsPolice", "CarLightsBulletinSheriff", "CarLightsMuldraughPolice",
+                     "ModernCarLightsCityLouisvillePD", "ModernCarLightsMeadeSheriff", "ModernCarLightsWestPoint"}
+        }
+    },
+
+    -- Standard tier: pickup trucks (gold 10-20)
+    vehicles_trucks = {
+        label = "Pickup Trucks",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_uncommon",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = {"PickUpTruck", "PickUpTruck_Camo", "PickUpTruckMccoy", "PickUpTruckLightsFossoil",
+                     "PickUpTruckLightsRanger", "PickUpTruckLightsAirportSecurity", "PickUpTruckLightsAirport",
+                     "PickUpTruckJPLandscaping", "PickUpTruckLightsFire"}
+        }
+    },
+
+    -- Standard tier: off-road / SUV (gold 10-20)
+    vehicles_4x4 = {
+        label = "Off-Road & SUVs",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_uncommon",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = {"OffRoad", "SUV"}
+        }
+    },
+
+    -- Premium tier: luxury, sports, race cars (gold 20-40)
+    vehicles_luxury = {
+        label = "Luxury & Sports Cars",
+        fallbackTexture = "Item_CarKey",
+        defaults = {
+            price = "vehicle_rare",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            items = {"CarLuxury", "SportsCar", "SportsCar_ez", "RaceCar12", "RaceCar34", "RaceCar58"}
+        }
     }
 
 }

@@ -4,8 +4,10 @@ end
 
 require "ISUI/ISPanel"
 local Core = PhunMart
+local Traits = require "PhunMart2/traits"
 
 local FONT_SM = getTextManager():getFontHeight(UIFont.Small)
+local FONT_TINY = getTextManager():getFontHeight(UIFont.Tiny)
 local FONT_SCALE = FONT_SM / 14
 
 local COLS = 5
@@ -19,6 +21,8 @@ local VIEW_GRID = "grid"
 local VIEW_LIST = "list"
 local LIST_ROW_H = FONT_SM + 8
 local LIST_ICON = FONT_SM + 4
+local LIST_ROW_H_COMP = FONT_TINY + 6
+local LIST_ICON_COMP = FONT_TINY + 2
 
 PhunMartUIShopItemsList = ISPanel:derive("PhunMartUIShopItemsList")
 local UI = PhunMartUIShopItemsList
@@ -47,8 +51,25 @@ function UI:new(x, y, w, h, opts)
     o.toggleHov = false
     o.scrollY = 0
     o.viewMode = VIEW_GRID
+    o.compactList = false
     o.noBackground = true
     return o
+end
+
+function UI:listRowH()
+    return self.compactList and LIST_ROW_H_COMP or LIST_ROW_H
+end
+
+function UI:listIconH()
+    return self.compactList and LIST_ICON_COMP or LIST_ICON
+end
+
+function UI:listFont()
+    return self.compactList and UIFont.Tiny or UIFont.Small
+end
+
+function UI:listFontH()
+    return self.compactList and FONT_TINY or FONT_SM
 end
 
 function UI:setData(data)
@@ -64,9 +85,30 @@ function UI:setData(data)
     local order = {}
     for id, offer in pairs(data.offers) do
         local scriptItem = getScriptManager():getItem(offer.item)
-        local displayName = scriptItem and scriptItem:getDisplayName() or offer.item
-        local texture = scriptItem and scriptItem:getNormalTexture()
-        local cat = (scriptItem and scriptItem:getDisplayCategory()) or "Other"
+        local displayName
+        local texture
+        -- Resolve display name and texture from reward trait action if present
+        local traitKey = Traits.getOfferTraitKey(offer)
+        if traitKey then
+            displayName = Traits.getLabel(traitKey)
+            texture = Traits.getTexture(traitKey)
+        end
+        if not displayName then
+            if scriptItem then
+                displayName = scriptItem:getDisplayName()
+            elseif Core.getVehicleLabel and Core.getVehicleLabel(offer.item) ~= offer.item then
+                displayName = Core.getVehicleLabel(offer.item)
+            else
+                displayName = Traits.getLabel(offer.item)
+            end
+        end
+        if not texture then
+            texture = scriptItem and scriptItem:getNormalTexture()
+        end
+        if not texture and offer.meta and offer.meta.fallbackTexture then
+            texture = getTexture(offer.meta.fallbackTexture)
+        end
+        local cat = (offer.meta and offer.meta.category) or (scriptItem and scriptItem:getDisplayCategory()) or "Other"
         if cat == "" then
             cat = "Other"
         end
@@ -107,6 +149,12 @@ function UI:setData(data)
             items = items
         })
     end
+
+    -- apply shop's default view; compact list mode uses tiny font + no icon column
+    if data.defaultView then
+        self.viewMode = data.defaultView == "list" and VIEW_LIST or VIEW_GRID
+    end
+    self.compactList = (self.viewMode == VIEW_LIST)
 end
 
 -- ── layout helpers ────────────────────────────────────────────────────────────
@@ -142,10 +190,11 @@ end
 
 -- List layout.
 function UI:listGroupLayout()
+    local rowH = self:listRowH()
     local layout = {}
     local y = TOGGLE_H + PAD_EDGE
     for gi, g in ipairs(self.groups) do
-        local itemsH = #g.items * (LIST_ROW_H + PAD_GAP) - PAD_GAP
+        local itemsH = #g.items * (rowH + PAD_GAP) - PAD_GAP
         table.insert(layout, {
             y = y,
             name = g.name,
@@ -213,15 +262,16 @@ function UI:gridIndexAt(mx, my)
 end
 
 function UI:listIndexAt(mx, my)
+    local rowH = self:listRowH()
     local layout = self:listGroupLayout()
     local absY = my + self.scrollY
     for gi, gl in ipairs(layout) do
         local itemsY = gl.y + HEADER_H + PAD_GAP
         if absY >= itemsY and absY < itemsY + gl.itemsH then
             local localY = absY - itemsY
-            local row = math.floor(localY / (LIST_ROW_H + PAD_GAP))
-            local ry = localY - row * (LIST_ROW_H + PAD_GAP)
-            if ry > LIST_ROW_H then
+            local row = math.floor(localY / (rowH + PAD_GAP))
+            local ry = localY - row * (rowH + PAD_GAP)
+            if ry > rowH then
                 return nil, nil
             end
             local idx = row + 1
@@ -302,7 +352,7 @@ end
 function UI:onMouseWheel(del)
     local viewH = self.height - TOGGLE_H
     local maxScroll = math.max(0, self:totalContentH() - viewH)
-    local step = self.viewMode == VIEW_GRID and (self:cellSize() + PAD_GAP) or (LIST_ROW_H + PAD_GAP)
+    local step = self.viewMode == VIEW_GRID and (self:cellSize() + PAD_GAP) or (self:listRowH() + PAD_GAP)
     self.scrollY = math.max(0, math.min(maxScroll, self.scrollY - del * step))
     return true
 end
@@ -382,6 +432,10 @@ function UI:renderGrid()
 end
 
 function UI:renderList()
+    local rowH = self:listRowH()
+    local iconH = self:listIconH()
+    local font = self:listFont()
+    local fontH = self:listFontH()
     local layout = self:listGroupLayout()
     local rowW = self.width - PAD_EDGE * 2
 
@@ -394,8 +448,8 @@ function UI:renderList()
 
         local itemsY = gl.y + HEADER_H + PAD_GAP
         for i, e in ipairs(gl.items) do
-            local ry = itemsY + (i - 1) * (LIST_ROW_H + PAD_GAP) - self.scrollY
-            if ry + LIST_ROW_H > TOGGLE_H and ry < self.height then
+            local ry = itemsY + (i - 1) * (rowH + PAD_GAP) - self.scrollY
+            if ry + rowH > TOGGLE_H and ry < self.height then
                 local isSel = self.selected and self.selected[1] == gi and self.selected[2] == i
                 local isHov = self.hovered and self.hovered[1] == gi and self.hovered[2] == i
 
@@ -407,21 +461,22 @@ function UI:renderList()
                 else
                     bg_a, bg_r, bg_g, bg_b = 0.60, 0.04, 0.04, 0.06
                 end
-                self:drawRect(PAD_EDGE, ry, rowW, LIST_ROW_H, bg_a, bg_r, bg_g, bg_b)
+                self:drawRect(PAD_EDGE, ry, rowW, rowH, bg_a, bg_r, bg_g, bg_b)
 
                 if isSel then
-                    self:drawRectBorder(PAD_EDGE, ry, rowW, LIST_ROW_H, 1.0, 0.35, 0.80, 0.35)
+                    self:drawRectBorder(PAD_EDGE, ry, rowW, rowH, 1.0, 0.35, 0.80, 0.35)
                 elseif isHov then
-                    self:drawRectBorder(PAD_EDGE, ry, rowW, LIST_ROW_H, 0.6, 0.30, 0.30, 0.45)
+                    self:drawRectBorder(PAD_EDGE, ry, rowW, rowH, 0.6, 0.30, 0.30, 0.45)
                 else
-                    self:drawRectBorder(PAD_EDGE, ry, rowW, LIST_ROW_H, 0.35, 0.20, 0.20, 0.25)
+                    self:drawRectBorder(PAD_EDGE, ry, rowW, rowH, 0.35, 0.20, 0.20, 0.25)
                 end
 
-                -- icon
-                local iconX = PAD_EDGE + 2
-                local iconY = ry + math.floor((LIST_ROW_H - LIST_ICON) / 2)
+                -- icon (shown when texture available, including fallback textures)
+                local nameX = PAD_EDGE + 2
                 if e.texture then
-                    self:drawTextureScaledAspect(e.texture, iconX, iconY, LIST_ICON, LIST_ICON, 1, 1, 1, 1)
+                    local iconY = ry + math.floor((rowH - iconH) / 2)
+                    self:drawTextureScaledAspect(e.texture, nameX, iconY, iconH, iconH, 1, 1, 1, 1)
+                    nameX = nameX + iconH + 4
                 end
 
                 -- stock badge (compute width first so name can avoid it)
@@ -429,22 +484,21 @@ function UI:renderList()
                 local badge, badgeW
                 if stockQty and stockQty ~= -1 then
                     badge = tostring(stockQty) .. "x"
-                    badgeW = getTextManager():MeasureStringX(UIFont.Small, badge) + PAD_EDGE
+                    badgeW = getTextManager():MeasureStringX(font, badge) + PAD_EDGE
                 else
                     badgeW = 0
                 end
 
                 -- name (truncated to avoid badge)
-                local nameX = iconX + LIST_ICON + 4
                 local availW = (PAD_EDGE + rowW) - nameX - badgeW - PAD_EDGE
-                local nameStr = truncate(e.displayName, availW, UIFont.Small)
+                local nameStr = truncate(e.displayName, availW, font)
                 local nr, ng, nb = isSel and 1.0 or 0.85, isSel and 1.0 or 0.85, isSel and 1.0 or 0.85
-                self:drawText(nameStr, nameX, ry + math.floor((LIST_ROW_H - FONT_SM) / 2), nr, ng, nb, 1, UIFont.Small)
+                self:drawText(nameStr, nameX, ry + math.floor((rowH - fontH) / 2), nr, ng, nb, 1, font)
 
                 if badge then
                     local bx = PAD_EDGE + rowW - badgeW + 2
-                    local by = ry + math.floor((LIST_ROW_H - FONT_SM) / 2)
-                    self:drawText(badge, bx, by, 0.65, 0.85, 0.35, 1, UIFont.Small)
+                    local by = ry + math.floor((rowH - fontH) / 2)
+                    self:drawText(badge, bx, by, 0.65, 0.85, 0.35, 1, font)
                 end
             end
         end

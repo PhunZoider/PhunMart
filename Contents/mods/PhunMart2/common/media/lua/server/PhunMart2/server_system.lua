@@ -235,7 +235,8 @@ function ServerSystem:openShop(player, args, forceRestock)
         },
         offers = shop.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-        background = shopDef and shopDef.background
+        background = shopDef and shopDef.background,
+        defaultView = shopDef and shopDef.defaultView
     }
 
     if Core.isLocal then

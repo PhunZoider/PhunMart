@@ -1,6 +1,7 @@
 -- PhunMart2/conditions_runtime.lua
 require("PhunMart2/core")
 local Core = PhunMart
+local Traits = require "PhunMart2/traits"
 
 Core.playerAdapters = {}
 
@@ -31,7 +32,7 @@ local function getAdapter(player)
     end
 
     PA.hasTrait = function(self, traitName)
-        return self.player:HasTrait(traitName)
+        return Traits.playerHas(self.player, traitName)
     end
 
     PA.getProfession = function(self)

@@ -497,18 +497,24 @@ end
 -- Only called if any group uses include.categories.
 local itemCategoryCache = nil
 local function getItemCategoryCache()
-    if itemCategoryCache then return itemCategoryCache end
+    if itemCategoryCache then
+        return itemCategoryCache
+    end
     itemCategoryCache = {}
-    if not getScriptManager then return itemCategoryCache end
+    if not getScriptManager then
+        return itemCategoryCache
+    end
     local sm = getScriptManager()
-    if not sm then return itemCategoryCache end
+    if not sm then
+        return itemCategoryCache
+    end
     local items = sm:getAllItems()
     for i = 0, items:size() - 1 do
         local item = items:get(i)
         if item then
             local ok, _ = pcall(function()
                 local cat = tostring(item:getDisplayCategory() or "None")
-                local id  = tostring(item:getFullName())
+                local id = tostring(item:getFullName())
                 if not itemCategoryCache[cat] then
                     itemCategoryCache[cat] = {}
                 end
@@ -641,11 +647,13 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                         local t = traits:get(i)
                         if t and tostring(t:getType()) == action.trait then
                             local disabled = false
-                            pcall(function() disabled = t:isRemoveInMP() end)
+                            pcall(function()
+                                disabled = t:isRemoveInMP()
+                            end)
                             if disabled then
                                 logger:warn("Offer '" .. offerId .. "' grants trait '" .. action.trait ..
-                                    "' which is disabled in multiplayer. Offer skipped.")
-                                return offerId, nil  -- signal caller to skip
+                                                "' which is disabled in multiplayer. Offer skipped.")
+                                return offerId, nil -- signal caller to skip
                             end
                             break
                         end
@@ -655,13 +663,23 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                 -- Auto-inject canGrantTrait condition (handles mutex + already-has at runtime)
                 local condKey = "__trait:" .. action.trait
                 ctx.autoCondsDefs = ctx.autoCondsDefs or {}
-                ctx.autoCondsDefs[condKey] = { test = "canGrantTrait", args = { trait = action.trait } }
+                ctx.autoCondsDefs[condKey] = {
+                    test = "canGrantTrait",
+                    args = {
+                        trait = action.trait
+                    }
+                }
 
-                offerConditions = offerConditions or { all = {} }
+                offerConditions = offerConditions or {
+                    all = {}
+                }
                 offerConditions.all = offerConditions.all or {}
                 local found = false
                 for _, k in ipairs(offerConditions.all) do
-                    if k == condKey then found = true; break end
+                    if k == condKey then
+                        found = true;
+                        break
+                    end
                 end
                 if not found then
                     table.insert(offerConditions.all, condKey)
@@ -678,7 +696,9 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         offer = merged.offer,
         conditions = offerConditions,
         meta = {
-            sourceGroup = groupDef and groupDef.__key or nil
+            sourceGroup = groupDef and groupDef.__key or nil,
+            category = (groupDef and groupDef.label) or poolDef.fallbackCategory or nil,
+            fallbackTexture = (groupDef and groupDef.fallbackTexture) or poolDef.fallbackTexture or nil
         }
     }
 end
@@ -732,7 +752,7 @@ function Compiler.compileAll(ctx)
     end
 
     -- Compile pools -> offers
-    local autoCondsDefs = {}  -- accumulates auto-generated canGrantTrait defs
+    local autoCondsDefs = {} -- accumulates auto-generated canGrantTrait defs
     local runtime = {
         shops = {},
         pools = {},
@@ -800,7 +820,9 @@ function Compiler.compileAll(ctx)
                         if type(rewardKey) == "string" then
                             local rewardDef = resolved.rewards[rewardKey]
                             if rewardDef and catSet[rewardDef.category] then
-                                itemsSet[itemKey] = { fromGroup = nil }
+                                itemsSet[itemKey] = {
+                                    fromGroup = nil
+                                }
                             end
                         end
                     end
@@ -870,7 +892,8 @@ function Compiler.compileAll(ctx)
                 unpoweredSprites = shopDef.unpoweredSprites,
                 poolSets = shopDef.poolSets,
                 throttle = shopDef.throttle,
-                background = shopDef.background
+                background = shopDef.background,
+                defaultView = shopDef.defaultView
             }
         end
     end

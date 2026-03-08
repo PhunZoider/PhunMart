@@ -62,6 +62,7 @@ return {
     -- Gate by zone in each poolSet's `gate` block once gating is implemented.
     WrentAWreck = {
         category = "Vehicle",
+        defaultView = "list",
         background = "machine-wrent-a-wreck.png",
         sprites = {"phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43"},
         unpoweredSprites = {"phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47"},
@@ -182,6 +183,7 @@ return {
 
     BudgetXPerience = {
         category = "XP",
+        defaultView = "list",
         background = "machine-budget-xp.png",
         sprites = {"phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"},
         unpoweredSprites = {"phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"},
@@ -198,6 +200,7 @@ return {
 
     GiftedXPerience = {
         category = "XP",
+        defaultView = "list",
         background = "machine-gifted-xp.png",
         sprites = {"phunmart_02_48", "phunmart_02_49", "phunmart_02_50", "phunmart_02_51"},
         unpoweredSprites = {"phunmart_02_52", "phunmart_02_53", "phunmart_02_54", "phunmart_02_55"},
@@ -214,6 +217,7 @@ return {
 
     LuxuryXPerience = {
         category = "XP",
+        defaultView = "list",
         background = "machine-luxury-xp.png",
         sprites = {"phunmart_02_56", "phunmart_02_57", "phunmart_02_58", "phunmart_02_59"},
         unpoweredSprites = {"phunmart_02_60", "phunmart_02_61", "phunmart_02_62", "phunmart_02_63"},

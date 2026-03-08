@@ -114,7 +114,11 @@ return {
             groups = {"vehicles_small", "vehicles_vans"}
         },
         roll = {
-            mode = "all"
+            mode = "weighted",
+            count = {
+                min = 5,
+                max = 8
+            }
         }
     },
     pool_vehicles_standard = {
@@ -122,7 +126,11 @@ return {
             groups = {"vehicles_normal", "vehicles_trucks", "vehicles_4x4"}
         },
         roll = {
-            mode = "all"
+            mode = "weighted",
+            count = {
+                min = 5,
+                max = 8
+            }
         }
     },
     pool_vehicles_premium = {
@@ -130,7 +138,11 @@ return {
             groups = {"vehicles_luxury"}
         },
         roll = {
-            mode = "all"
+            mode = "weighted",
+            count = {
+                min = 5,
+                max = 8
+            }
         }
     },
 
@@ -177,6 +189,8 @@ return {
     -- Sources use reward `category` field, not game item groups.
     -- =========================================================
     pool_traiter_good = {
+        fallbackTexture = "Item_Notebook",
+        fallbackCategory = "Positive Traits",
         sources = {
             categories = {"trait_add"}
         },
@@ -189,6 +203,8 @@ return {
         }
     },
     pool_traiter_bad_removal = {
+        fallbackTexture = "Item_Notebook",
+        fallbackCategory = "Remove Negative Traits",
         sources = {
             categories = {"trait_remove"}
         },
@@ -282,6 +298,8 @@ return {
     -- Defined in PhunMart2_XP_Items.lua and PhunMart2_XP_Conditions.lua
     -- =========================================================
     pool_xp_budget = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Skills",
         sources = {
             categories = {"xp_t1"}
         },
@@ -294,6 +312,8 @@ return {
         }
     },
     pool_xp_gifted = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Skills",
         sources = {
             categories = {"xp_t2"}
         },
@@ -306,6 +326,8 @@ return {
         }
     },
     pool_xp_luxury = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Skills",
         sources = {
             categories = {"xp_t3"}
         },
@@ -318,6 +340,8 @@ return {
         }
     },
     pool_boost_budget = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Boosts",
         sources = {
             categories = {"boost_t1"}
         },
@@ -330,6 +354,8 @@ return {
         }
     },
     pool_boost_gifted = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Boosts",
         sources = {
             categories = {"boost_t2"}
         },
@@ -342,6 +368,8 @@ return {
         }
     },
     pool_boost_luxury = {
+        fallbackTexture = "Item_Book",
+        fallbackCategory = "Boosts",
         sources = {
             categories = {"boost_t3"}
         },

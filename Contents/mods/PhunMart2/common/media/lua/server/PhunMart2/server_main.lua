@@ -4,13 +4,31 @@ end
 local Core = PhunMart
 Core.instances = {}
 
+local function mergeInto(base, extra)
+    if type(extra) ~= "table" then
+        return
+    end
+    for k, v in pairs(extra) do
+        base[k] = v
+    end
+end
+
 function Core.compile()
+
+    local items = Core.tools.loadTable("PhunMart2_Items.lua") or {}
+    mergeInto(items, Core.tools.loadTable("PhunMart2_XP_Items.lua"))
+
+    local rewards = Core.tools.loadTable("PhunMart2_Rewards.lua") or {}
+    mergeInto(rewards, Core.tools.loadTable("PhunMart2_XP_Rewards.lua"))
+
+    local conditionsDefs = Core.tools.loadTable("PhunMart2_Conditions.lua") or {}
+    mergeInto(conditionsDefs, Core.tools.loadTable("PhunMart2_XP_Conditions.lua"))
 
     local ctx = {
         prices = Core.tools.loadTable("PhunMart2_Prices.lua"),
-        rewards = Core.tools.loadTable("PhunMart2_Rewards.lua"),
-        conditionsDefs = Core.tools.loadTable("PhunMart2_Conditions.lua"),
-        items = Core.tools.loadTable("PhunMart2_Items.lua"),
+        rewards = rewards,
+        conditionsDefs = conditionsDefs,
+        items = items,
         groups = Core.tools.loadTable("PhunMart2_Groups.lua"),
         pools = Core.tools.loadTable("PhunMart2_Pools.lua"),
         shops = Core.tools.loadTable("PhunMart2_Shops.lua")

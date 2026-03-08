@@ -33,6 +33,7 @@ local instances = {}
 
 require "PhunMart2/conditions"
 require "PhunMart2/playerAdapter"
+local Traits = require "PhunMart2/traits"
 
 local FS = tools.FONT_SCALE
 local FONT_SM = tools.FONT_HGT_SMALL
@@ -145,6 +146,8 @@ local function conditionLabel(condKey, conditionsDefs)
         return "Profession: " .. (type(profs) == "table" and table.concat(profs, "/") or tostring(profs))
     elseif t == "hasItems" then
         return "Requires items"
+    elseif t == "canGrantTrait" then
+        return "Already owned: " .. Traits.getLabel(a.trait or "?")
     else
         return condKey
     end
@@ -362,6 +365,42 @@ function UI:createChildren()
         self:addChild(self.controls.rerollBtn)
     end
 
+    -- ── 3D vehicle preview (fills the preview zone; hidden until a vehicle offer is selected) ──
+    local p3d = ISUI3DScene:new(rightX, previewY, rightW, previewH)
+    p3d:initialise()
+    p3d.rotX = 22
+    p3d.rotY = 45
+    p3d.initialized = false
+    p3d.vehicleName = nil
+    p3d:setVisible(false)
+
+    -- Left drag: rotate
+    p3d.onMouseDown = function(p, mx, my)
+        p._dragX = mx;
+        p._dragY = my
+        p._rotX0 = p.rotX;
+        p._rotY0 = p.rotY
+    end
+    p3d.onMouseUp = function(p, mx, my)
+        p._dragX = nil
+    end
+    p3d.onMouseMove = function(p, dx, dy)
+        if not p._dragX then
+            return
+        end
+        local mx, my = p:getMouseX(), p:getMouseY()
+        p.rotY = p._rotY0 + (mx - p._dragX) * 0.5
+        p.rotX = p._rotX0 - (my - p._dragY) * 0.5
+        p.javaObject:fromLua3("setViewRotation", p.rotX, p.rotY, 0)
+    end
+    -- Release drag state when cursor leaves the panel
+    p3d.onMouseMoveOutside = function(p, dx, dy)
+        p._dragX = nil
+    end
+
+    self.controls.preview3d = p3d
+    self:addChild(p3d)
+
     -- ── zone rects stored for prerender + render ──────────────────────────────
     self.zones = {
         preview = {
@@ -406,6 +445,16 @@ function UI:setData(data)
         end
     end
 
+    -- Reset 3D preview so it doesn't show a stale vehicle on reopen
+    local p3d = self.controls.preview3d
+    if p3d then
+        p3d.vehicleName = nil
+        p3d.rotX = 22;
+        p3d.rotY = 45
+        p3d._dragX = nil
+        p3d:setVisible(false)
+    end
+
     self.controls.grid:setData(data)
     self.controls.buyBtn:setEnable(false)
 end
@@ -448,6 +497,34 @@ function UI:onOfferSelected(id, offer)
     self.selectedId = id
     self.selectedOffer = offer
     self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer))
+
+    -- Show 3D vehicle preview when the offer item has no game-item entry (vehicles have no ".").
+    local p3d = self.controls.preview3d
+    if p3d then
+        local isVehicle =
+            offer and offer.item and not offer.item:find("%.") and getScriptManager():getItem(offer.item) == nil and
+                Traits.getOfferTraitKey(offer) == nil
+        if isVehicle then
+            if not p3d.initialized then
+                p3d.initialized = true
+                p3d.javaObject:fromLua1("setDrawGrid", false)
+                p3d.javaObject:fromLua1("createVehicle", "vehicle")
+            end
+            -- Always reset rotation, pan and drag state on new selection
+            p3d.rotX = 22;
+            p3d.rotY = 45
+            p3d._dragX = nil
+            p3d.javaObject:fromLua3("setViewRotation", p3d.rotX, p3d.rotY, 0)
+            p3d.javaObject:fromLua1("setView", "UserDefined")
+            p3d.javaObject:fromLua1("setZoom", 3)
+            p3d.vehicleName = offer.item
+            p3d.javaObject:fromLua2("setVehicleScript", "vehicle", offer.item)
+            p3d:setVisible(true)
+        else
+            p3d.vehicleName = nil
+            p3d:setVisible(false)
+        end
+    end
 end
 
 function UI:onBuy()
@@ -587,13 +664,23 @@ function UI:render()
 
     -- ── preview zone ─────────────────────────────────────────────────────────
     if self.selectedOffer then
-        local scriptItem = getScriptManager():getItem(self.selectedOffer.item)
-        local tex = scriptItem and scriptItem:getNormalTexture()
-        if tex then
-            local iconSize = math.floor(math.min(pz.w, pz.h) * 0.78)
-            local ix = pz.x + (pz.w - iconSize) / 2
-            local iy = pz.y + (pz.h - iconSize) / 2
-            self:drawTextureScaledAspect(tex, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
+        local p3d = self.controls.preview3d
+        if not (p3d and p3d:isVisible()) then
+            -- 2D icon for normal items; 3D scene handles its own rendering for vehicles
+            local scriptItem = getScriptManager():getItem(self.selectedOffer.item)
+            local tex = scriptItem and scriptItem:getNormalTexture()
+            if not tex then
+                local tk = Traits.getOfferTraitKey(self.selectedOffer)
+                if tk then
+                    tex = Traits.getTexture(tk)
+                end
+            end
+            if tex then
+                local iconSize = math.floor(math.min(pz.w, pz.h) * 0.78)
+                local ix = pz.x + (pz.w - iconSize) / 2
+                local iy = pz.y + (pz.h - iconSize) / 2
+                self:drawTextureScaledAspect(tex, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
+            end
         end
         self:renderDetails(dz)
     else
@@ -640,7 +727,17 @@ function UI:renderDetails(z)
 
     -- item name (word-wrapped, max 2 lines)
     local scriptItem = getScriptManager():getItem(offer.item)
-    local name = scriptItem and scriptItem:getDisplayName() or offer.item
+    local name
+    local traitKey = Traits.getOfferTraitKey(offer)
+    if traitKey then
+        name = Traits.getLabel(traitKey)
+    elseif scriptItem then
+        name = scriptItem:getDisplayName()
+    elseif Core.getVehicleLabel then
+        name = Core.getVehicleLabel(offer.item)
+    else
+        name = offer.item
+    end
     local nameLines = wrapText(name, maxW, UIFont.Small)
     for i = 1, math.min(2, #nameLines) do
         local line = (i == 2 and #nameLines > 2) and truncate(nameLines[i], maxW, UIFont.Small) or nameLines[i]
@@ -692,11 +789,11 @@ function UI:renderDetails(z)
         return
     end
 
-    self:drawText("Requirements:", x, y, 0.50, 0.50, 0.55, 1, UIFont.Small)
-    y = y + lh
-
     local condDefs = self.data and self.data.conditionsDefs
     local R = Core.conditionsRuntime
+    local headerY = y -- reserve space; header drawn on first visible condition
+    local headerDrawn = false
+    y = y + lh
 
     for _, condKey in ipairs(condList) do
         if y > maxY then
@@ -706,19 +803,31 @@ function UI:renderDetails(z)
 
         -- evaluate this single condition to get pass/fail colour
         local cr, cg, cb = 0.52, 0.52, 0.58 -- default: grey (unknown)
+        local passed = false
         if R and adapter and condDefs then
             local result = R.evaluate({
                 all = {condKey}
             }, condDefs, adapter, nil, nil)
             if result.ok then
                 cr, cg, cb = 0.30, 0.90, 0.30 -- green: passes
+                passed = true
             else
                 cr, cg, cb = 0.90, 0.30, 0.30 -- red: fails
             end
         end
 
-        local label = truncate("- " .. conditionLabel(condKey, condDefs), maxW - 4, UIFont.Small)
-        self:drawText(label, x + 4, y, cr, cg, cb, 1, UIFont.Small)
-        y = y + lh
+        -- Skip internal (__) conditions when they pass — only show them when blocking a purchase
+        if not (passed and condKey:sub(1, 2) == "__") then
+            if not headerDrawn then
+                self:drawText("Requirements:", x, headerY, 0.50, 0.50, 0.55, 1, UIFont.Small)
+                headerDrawn = true
+            end
+            local label = truncate("- " .. conditionLabel(condKey, condDefs), maxW - 4, UIFont.Small)
+            self:drawText(label, x + 4, y, cr, cg, cb, 1, UIFont.Small)
+            y = y + lh
+        end
+    end
+    if not headerDrawn then
+        y = headerY -- reclaim the reserved line if nothing was shown
     end
 end

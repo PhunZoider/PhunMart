@@ -352,31 +352,45 @@ function Core.getAllVehicles(refresh)
     end
     Core.vehiclesAll = {}
     Core.vehicleCategories = {}
+    Core.vehicleLabelCache = {}
     local catMap = {}
 
     local itemList = getScriptManager():getAllVehicleScripts()
     for i = 0, itemList:size() - 1 do
-        local item = itemList:get(i)
-
         local script = itemList:get(i)
         local name = script:getName()
-        local fname = script:getFileName()
         local fullName = script:getFullName()
-        local text = "IGUI_VehicleName" .. name
-        local label = getText(text)
-        local cat = "Other"
-        if string.contains(name, "Van") then
-            cat = "Van"
-        elseif string.contains(name, "Truck") then
-            cat = "Truck"
-        elseif string.contains(name, "Burnt") then
-            cat = "Burnt"
-        elseif string.contains(name, "Smashed") then
+        local vehicleObj = getScriptManager():getVehicle(fullName)
+        local label
+        if vehicleObj and vehicleObj.getName then
+            local key = "IGUI_VehicleName" .. vehicleObj:getName()
+            local translated = getText(key)
+            -- getText returns the key itself when no translation exists
+            label = (translated ~= key) and translated or name
+        else
+            label = name
+        end
+        Core.vehicleLabelCache[fullName] = label
+
+        local cat
+        if string.find(name, "Smashed") then
             cat = "Smashed"
-        elseif string.contains(name, "Trailer") then
+        elseif string.find(name, "Burnt") then
+            cat = "Burnt"
+        elseif string.find(name, "Trailer") then
             cat = "Trailer"
-        elseif string.contains(name, "Car") then
+        elseif string.find(name, "Van") then
+            cat = "Van"
+        elseif string.find(name, "Truck") then
+            cat = "Truck"
+        elseif string.find(name, "SUV") then
+            cat = "SUV"
+        elseif string.find(name, "OffRoad") then
+            cat = "Off-Road"
+        elseif string.find(name, "Car") then
             cat = "Car"
+        else
+            cat = "Other"
         end
 
         if cat ~= "" and catMap[cat] == nil then
@@ -402,6 +416,27 @@ function Core.getAllVehicles(refresh)
     end)
 
     return Core.vehiclesAll
+end
+
+-- Returns a human-readable label for a vehicle full type (e.g. "Base.CarNormal").
+-- Populates the cache via getAllVehicles() on first call.
+-- Falls back to the bare script name if no translation exists.
+function Core.getVehicleLabel(fullType)
+    if Core.vehicleLabelCache == nil then
+        Core.getAllVehicles()
+    end
+    if Core.vehicleLabelCache[fullType] then
+        return Core.vehicleLabelCache[fullType]
+    end
+    -- Direct lookup for types not yet in cache (e.g. called before getAllVehicles ran)
+    local vehicleObj = getScriptManager():getVehicle(fullType)
+    if vehicleObj and vehicleObj.getName then
+        local key = "IGUI_VehicleName" .. vehicleObj:getName()
+        local translated = getText(key)
+        return (translated ~= key) and translated or vehicleObj:getName()
+    end
+    -- Last resort: strip the module prefix from the full type
+    return fullType:match("%.(.+)$") or fullType
 end
 
 function Core.getAllTraitCategories()
