@@ -16,7 +16,16 @@
       "Bash(grep -E 'category = \"\"\\(Material|Paint|RecipeResource|Cooking\\)\"\"' \"d:/pz-dev/code/PhunMart2/Docs/dumps/PhunMart2_dump_items.lua\")",
       "Read(//tmp/**)",
       "Bash(\"d:/pz-dev/code/PhunMart2/Docs/luas/PhunMart2_Groups.lua\")",
-      "WebSearch"
+      "WebSearch",
+      "Bash(xargs grep -l \"ItemType\\\\|item.*type\\\\|ModID\")",
+      "Bash(grep -rn \"phunmart\\\\\\\\\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2)",
+      "Bash(grep -rn '[a-zA-Z0-9_]\\\\\\\\\\\\[a-zA-Z0-9_]' /d/pz-dev/code/PhunMart2/Contents/mods --include=\"*.lua\" --include=\"*.txt\")",
+      "Bash(xargs grep -n \"\\\\\\\\[A-Z]\")",
+      "Bash(grep -n \"\\\\\\\\[A-Za-z]\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/data/*.lua)",
+      "Bash(grep -rn \"\\\\\\\\[A-Za-z_]\" /d/pz-dev/code/PhunMart2/Docs/luas/)",
+      "Bash(xargs -0 grep -E '[\\\\\"\"\\\\047][A-Za-z0-9_]+\\\\\\\\\\\\\\\\[A-Za-z0-9_:]')",
+      "Bash(xargs -0 grep -E '\\(Base|phunmart|farmer|sanph\\)[\"\"\\\\047]?\\\\\\\\[^\"\"]')",
+      "Bash(grep -r \"\\\\\\\\Base\\\\|\\\\\\\\phunmart\\\\|\\\\\\\\farming\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2)"
     ],
     "additionalDirectories": [
       "\\tmp"
