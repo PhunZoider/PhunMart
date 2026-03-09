@@ -142,8 +142,7 @@ function UI:createChildren()
     elseif self.listType == Core.consts.itemType.boosts then
         self.data.categories = Core.getAllBoostCategories()
     else
-        -- assert Core.consts.itemType.items
-        self.data.categories = Core.getAllItemCategories()
+        self.data.categories = Core.tools.getAllItemCategories()
     end
 
 end

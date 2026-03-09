@@ -5,1062 +5,483 @@ end
 require "ISUI/ISCollapsableWindowJoypad"
 local tools = require "PhunMart2/ux/tools"
 local Core = PhunMart
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
+
+local FONT_HGT_SMALL  = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
-local BUTTON_HGT = FONT_HGT_SMALL + 6
-local FONT_SCALE = FONT_HGT_SMALL / 14
-local HEADER_HGT = FONT_HGT_MEDIUM + 2 * 2
+local BUTTON_HGT      = FONT_HGT_SMALL + 6
+local FONT_SCALE      = FONT_HGT_SMALL / 14
+local HEADER_HGT      = FONT_HGT_MEDIUM + 2 * 2
 
 local profileName = "PhunMartUIConfigItem"
-Core.ui.shop_config_item = ISCollapsableWindowJoypad:derive(profileName);
+Core.ui.shop_config_item = ISCollapsableWindowJoypad:derive(profileName)
 local UI = Core.ui.shop_config_item
-local instances = {}
 
-local itemProperties = {
-    probability = {
-        type = "int",
-        label = "Probability",
-        tooltip = "The probability that this item will be picked when restocking. Leave blank for defaults."
-    },
-    currency = {
-        type = "string",
-        label = "Currency",
-        tooltip = "Override pool, shop and global currency values for this item."
-    },
-    minPrice = {
-        type = "int",
-        label = "Min Price",
-        tooltip = "Overrides pool, shop and global min price for this item.",
-        default = ""
-    },
-    maxPrice = {
-        type = "int",
-        label = "Max Price",
-        tooltip = "Overrides pool, shop and global max price values for this item.",
-        default = ""
-    },
-    minInventory = {
-        type = "int",
-        label = "Min Inventory",
-        tooltip = "Overrides the pool, shop and global min inventory values for this item.",
-        default = ""
-    },
-    maxInventory = {
-        type = "int",
-        label = "Max Inventory",
-        tooltip = "Overrides the pool, shop and global max inventory values for this item.",
-        default = ""
-    }
+-- ---------------------------------------------------------------------------
+-- Offer item data shape (PhunMart2_Items.lua):
+--   price        = "coin_50"           (named price key)
+--   reward       = "add_brave"         (named reward key)
+--   offer = {
+--     weight     = 1.0,
+--     stock = { min=0, max=1, restockHours=168 }
+--   }
+--   conditions = {
+--     all = {"condKey1", "condKey2"},  (ALL must pass)
+--     any = {"condKey3"}               (ANY must pass)
+--   }
+-- ---------------------------------------------------------------------------
+
+-- Props fields rendered as labelled text inputs
+local offerProps = {
+    { key = "price",            label = "Price Key",       tooltip = "Named price key (e.g. coin_5, coin_50, vehicle_common). Overrides pool and shop defaults." },
+    { key = "reward",           label = "Reward Key",      tooltip = "Named reward key. Leave blank for standard item grant." },
+    { key = "offer_weight",     label = "Weight",          tooltip = "Relative probability this item is drawn when the pool rolls. e.g. 1.0 (normal) or 0.5 (half as likely)." },
+    { key = "stock_min",        label = "Stock Min",       tooltip = "Minimum stock quantity per restock. Leave blank for pool defaults." },
+    { key = "stock_max",        label = "Stock Max",       tooltip = "Maximum stock quantity per restock. Leave blank for pool defaults." },
+    { key = "stock_restockHours", label = "Restock Hours", tooltip = "Game hours before this item's stock refreshes. Leave blank for pool defaults." },
 }
 
-local itemLimits = {
-    maxCharPurchases = {
-        type = "int",
-        label = "Max Purchases",
-        tooltip = "Maximum times this item can be purchased by a character.",
-        default = ""
-    },
-    maxActPurchases = {
-        type = "int",
-        label = "Max Act Purchases",
-        tooltip = "Maximum times this item can be purchased by an account.",
-        default = ""
-    },
-    minCharTime = {
-        type = "int",
-        label = "Min Time",
-        tooltip = "Minimum amount of time played before character can purchase item.",
-        default = ""
-    },
-    minActTime = {
-        type = "int",
-        label = "Min Act Time",
-        tooltip = "Minimum amount of time user must have played before character can purchase item.",
-        default = ""
-    }
-}
+-- ---------------------------------------------------------------------------
+-- open()
+-- ---------------------------------------------------------------------------
 
 function UI.open(player, item, cb)
-
     local playerIndex = player:getPlayerNum()
-
     local core = getCore()
-    local width = 600 * FONT_SCALE
-    local height = 400 * FONT_SCALE
+    local width  = math.floor(560 * FONT_SCALE)
+    local height = math.floor(420 * FONT_SCALE)
+    local x = math.floor((core:getScreenWidth()  - width)  / 2)
+    local y = math.floor((core:getScreenHeight() - height) / 2)
 
-    local x = (core:getScreenWidth() - width) / 2
-    local y = (core:getScreenHeight() - height) / 2
-
-    local instance = UI:new(x, y, width, height, player, playerIndex);
+    local instance = UI:new(x, y, width, height, player, playerIndex)
     instance.item = item
-    if type(item) == "table" then
-        instance.data = Core.tools.deepCopy(item)
-    else
-        instance.data = {}
-    end
+    instance.data = type(item) == "table" and Core.tools.deepCopy(item) or {}
+    instance.cb   = cb
 
-    instance:initialise();
-
+    instance:initialise()
     ISLayoutManager.RegisterWindow(profileName, UI, instance)
-
-    instance.cb = cb
-    instance:addToUIManager();
-    instance:setVisible(true);
+    instance:addToUIManager()
+    instance:setVisible(true)
     instance:ensureVisible()
     instance:bringToTop()
-    return instance;
-
+    instance:populate()
+    return instance
 end
+
+-- ---------------------------------------------------------------------------
+-- Constructor
+-- ---------------------------------------------------------------------------
 
 function UI:new(x, y, width, height, player, playerIndex)
-    local o = {};
-    o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
-    setmetatable(o, self);
-    self.__index = self;
-
-    o.variableColor = {
-        r = 0.9,
-        g = 0.55,
-        b = 0.1,
-        a = 1
-    };
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    };
-    o.buttonBorderColor = {
-        r = 0.7,
-        g = 0.7,
-        b = 0.7,
-        a = 1
-    };
-    o.controls = {}
-    o.data = {}
-    o.moveWithMouse = false;
-    o.anchorRight = true
-    o.anchorBottom = true
-    o.player = player
+    local o = ISCollapsableWindowJoypad:new(x, y, width, height, player)
+    setmetatable(o, self)
+    self.__index = self
+    o.variableColor   = { r = 0.9, g = 0.55, b = 0.1, a = 1 }
+    o.backgroundColor = { r = 0,   g = 0,    b = 0,   a = 0.8 }
+    o.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 1 }
+    o.controls    = {}
+    o.data        = {}
+    o.moveWithMouse   = false
+    o.anchorRight     = true
+    o.anchorBottom    = true
+    o.player      = player
     o.playerIndex = playerIndex
-    o.zOffsetLargeFont = 25;
-    o.zOffsetMediumFont = 20;
-    o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    o:setTitle("shop_config_item")
-    return o;
+    o:setTitle("Item Offer Properties")
+    return o
 end
 
-function UI:RestoreLayout(name, layout)
+-- ---------------------------------------------------------------------------
+-- Layout helpers
+-- ---------------------------------------------------------------------------
 
-    -- ISLayoutManager.DefaultRestoreWindow(self, layout)
-    -- if name == profileName then
-    --     ISLayoutManager.DefaultRestoreWindow(self, layout)
-    --     self.userPosition = layout.userPosition == 'true'
-    -- end
-    self:recalcSize();
-end
+function UI:RestoreLayout(name, layout) self:recalcSize() end
 
 function UI:SaveLayout(name, layout)
     ISLayoutManager.DefaultSaveWindow(self, layout)
-    if self.userPosition then
-        layout.userPosition = 'true'
-    else
-        layout.userPosition = 'false'
-    end
+    layout.userPosition = self.userPosition and 'true' or 'false'
 end
 
 function UI:close()
-    if not self.locked then
-        ISCollapsableWindowJoypad.close(self);
-    end
+    if not self.locked then ISCollapsableWindowJoypad.close(self) end
 end
 
-function UI:refreshAll()
-    self.controls.propsSkills:clear()
-    for _, v in ipairs(Core.getAllSkills()) do
-        self.controls.propsSkills:addItem(v.label, v)
-    end
+function UI:isKeyConsumed(key) return key == Keyboard.KEY_ESCAPE end
 
-    self.controls.propsBoosts:clear()
-    for _, v in ipairs(Core.getAllSkills()) do
-        self.controls.propsBoosts:addItem(v.label, v)
-    end
-
-    self.controls.propsTraits:clear()
-    for _, v in ipairs(Core.getAllTraits()) do
-        self.controls.propsTraits:addItem(v.label, v)
-    end
-
-    self.controls.propsProf:clear()
-    for _, v in ipairs(Core.getAllProfessions()) do
-        self.controls.propsProf:addItem(v.label, v)
-    end
+function UI:onKeyRelease(key)
+    if key == Keyboard.KEY_ESCAPE then self:close() end
 end
 
-function UI:addLabel(text, parent, y)
-    local label = ISLabel:new(10, y, FONT_HGT_SMALL, text, 1, 1, 1, 1, UIFont.Small, true);
-    label:initialise();
-    label:instantiate();
-    parent:addChild(label);
-    return label;
-end
-
-function UI:addTextbox(name, text, tooltip, parent, y)
-    local textbox = ISTextEntryBox:new("", 120, y, 100, FONT_HGT_SMALL + 4);
-    textbox:initialise();
-    textbox:instantiate();
-    textbox:setTooltip(tooltip)
-    parent:addChild(textbox);
-    self.controls[name] = textbox
-    return textbox;
-end
-
-function UI:addLabeledTextbox(name, text, tooltip, parent, y)
-    self:addLabel(text, parent, y)
-    return self:addTextbox(name, text, tooltip, parent, y)
-end
-
-function UI:addPropTabListbox(label, drawFn, columns)
-
-    local y = HEADER_HGT
-    local panel = ISPanel:new(0, y, self.controls.itemPropsTabs.width,
-        self.controls.itemPropsTabs.height - y - self:resizeWidgetHeight());
-    panel:initialise();
-    panel:instantiate();
-    panel:setAnchorRight(true);
-    panel:setAnchorBottom(true);
-
-    local box = ISScrollingListBox:new(0, y, panel.width, panel.height - y);
-    box:initialise();
-    box:instantiate();
-    box.doDrawItem = drawFn;
-    box.itemheight = FONT_HGT_SMALL + 6 * 2
-    box.selected = 0;
-    box.joypadParent = self;
-    box.font = UIFont.NewSmall;
-    box:setAnchorRight(true);
-    box:setAnchorBottom(true);
-    box:setAnchorTop(true);
-    box:setAnchorLeft(true);
-
-    for i, v in ipairs(columns) do
-        box:addColumn(v, (i - 1) * 200);
-    end
-
-    panel:addChild(box);
-    self.controls.itemPropsTabs:addView(label, panel);
-    local view = self.controls.itemPropsTabs.viewList[#self.controls.itemPropsTabs.viewList].view
-
-    return box
-end
+-- ---------------------------------------------------------------------------
+-- createChildren
+-- ---------------------------------------------------------------------------
 
 function UI:createChildren()
+    ISCollapsableWindowJoypad.createChildren(self)
 
-    ISCollapsableWindowJoypad.createChildren(self);
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
-
-    local padding = 10
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
-    local w = self.width - 200
-    local h = self.height - rh - th
-    local x = padding
-    local y = th
+    local th  = self:titleBarHeight()
+    local rh  = self:resizeWidgetHeight()
+    local pad = 10
+    local w   = self.width
+    local h   = self.height - rh - th
 
     self.controls = {}
 
-    local panel = ISPanel:new(x, y, w, h);
-    panel:initialise();
-    panel:instantiate();
-    panel:setAnchorRight(true);
-    panel:setAnchorBottom(true);
-    self:addChild(panel);
-    self.controls._panel = panel;
+    -- ---- Left panel: item info ----
+    local infoW = 180
+    local infoPanel = ISPanel:new(w - infoW, th, infoW, h)
+    infoPanel:initialise(); infoPanel:instantiate()
+    infoPanel:setAnchorBottom(true)
+    self:addChild(infoPanel)
+    self.controls.infoPanel = infoPanel
 
-    self.controls.itemPropsTabs = ISTabPanel:new(0, y, panel.width, panel.height);
-    self.controls.itemPropsTabs:initialise();
-    self.controls.itemPropsTabs:instantiate();
-    self.controls.itemPropsTabs:setAnchorRight(true);
-    self.controls.itemPropsTabs:setAnchorBottom(true);
-    panel:addChild(self.controls.itemPropsTabs);
+    -- Preview (texture or 3D for vehicles)
+    if self.item and self.item.source == "vehicles" then
+        local preview = ISUI3DScene:new(10, 10, infoW - 20, infoW - 20)
+        preview:initialise()
+        infoPanel:addChild(preview)
+        self.controls.previewPanel = preview
+    elseif self.item and self.item.texture then
+        local preview = ISPanel:new(10, 10, infoW - 20, infoW - 20)
+        preview:initialise(); preview:instantiate()
+        preview.render = function(p)
+            local it = p.parent.parent.item
+            if it and it.texture then
+                p:drawTextureScaledAspect(it.texture, 0, 0, p:getWidth(), p:getHeight(), 1)
+            end
+        end
+        infoPanel:addChild(preview)
+        self.controls.previewPanel = preview
+    end
 
-    local propsPanel = ISPanel:new(0, 0, self.controls.itemPropsTabs.width, self.controls.itemPropsTabs.height);
-    propsPanel:initialise();
-    propsPanel:instantiate();
-    propsPanel:setAnchorRight(true);
-    propsPanel:setAnchorBottom(true);
+    local lblY = self.controls.previewPanel and (self.controls.previewPanel.y + self.controls.previewPanel.height + 6) or 10
+    local nameStr = self.item and getTextManager():WrapText(UIFont.Medium, self.item.label or self.item.key or "", infoW - 20) or ""
+    local nameLabel = ISLabel:new(10, lblY, FONT_HGT_MEDIUM, nameStr, 1, 1, 1, 1, UIFont.Medium, true)
+    nameLabel:initialise(); nameLabel:instantiate(); infoPanel:addChild(nameLabel)
+    self.controls.nameLabel = nameLabel
 
-    self.controls.itemPropsTabs:addView("Props", propsPanel);
+    local catLabel = ISLabel:new(10, nameLabel.y + nameLabel.height + 4, FONT_HGT_SMALL,
+        (self.item and self.item.category) or "", 0.7, 0.7, 0.7, 1, UIFont.Small, true)
+    catLabel:initialise(); catLabel:instantiate(); infoPanel:addChild(catLabel)
+    self.controls.catLabel = catLabel
 
-    local lbl, txt
+    local saveBtn = ISButton:new(pad, h - BUTTON_HGT - pad, infoW - pad * 2, BUTTON_HGT, "Save", self, UI.onSave)
+    saveBtn:initialise(); saveBtn:instantiate()
+    if saveBtn.enableAcceptColor then saveBtn:enableAcceptColor() end
+    saveBtn:setAnchorBottom(true)
+    infoPanel:addChild(saveBtn)
+    self.controls.saveBtn = saveBtn
 
-    for k, v in pairs(itemProperties) do
-        lbl, txt = tools.getLabeledTextbox(v.label, v.tooltip, "", x, y, 100, 300)
-        self.controls[k] = txt
-        propsPanel:addChild(lbl)
+    -- ---- Right panel: tabs ----
+    local tabW = w - infoW - pad
+    local tabPanel = ISTabPanel:new(pad, th, tabW, h - th)
+    tabPanel:initialise(); tabPanel:instantiate()
+    tabPanel:setAnchorRight(true); tabPanel:setAnchorBottom(true)
+    self:addChild(tabPanel)
+    self.controls.tabPanel = tabPanel
+
+    -- Props tab
+    local propsPanel = ISPanel:new(0, 0, tabW, tabPanel.height - HEADER_HGT)
+    propsPanel:initialise(); propsPanel:instantiate()
+    tabPanel:addView("Props", propsPanel)
+    self.controls.propsPanel = propsPanel
+
+    local fy = pad
+    local labelW = 110
+    local inputX = labelW + pad * 2
+    local inputW = tabW - inputX - pad
+
+    for _, def in ipairs(offerProps) do
+        local lbl = ISLabel:new(pad, fy, FONT_HGT_SMALL, def.label .. ":", 1, 1, 1, 0.85, UIFont.Small, true)
+        lbl:initialise(); lbl:instantiate(); propsPanel:addChild(lbl)
+
+        local txt = ISTextEntryBox:new("", inputX, fy, inputW, FONT_HGT_SMALL + 4)
+        txt:initialise(); txt:instantiate()
+        txt:setTooltip(def.tooltip)
         propsPanel:addChild(txt)
-        y = y + txt.height + 10
+        self.controls[def.key] = txt
+
+        fy = fy + FONT_HGT_SMALL + pad
     end
 
-    y = 100
+    -- Conditions tab
+    local condPanel = ISPanel:new(0, 0, tabW, tabPanel.height - HEADER_HGT)
+    condPanel:initialise(); condPanel:instantiate()
+    tabPanel:addView("Conditions", condPanel)
+    self.controls.condPanel = condPanel
 
-    -- Skills
-    local skills = self:addPropTabListbox("Skills", self.drawSkillDatas, {"Skill", "Requires"})
-    skills:setOnMouseDoubleClick(self, function()
-        local item = self.controls.propsSkills.items[self.controls.propsSkills.selected].item
-        self:promptMinMaxSkills(item)
-    end)
-    self.controls.propsSkills = skills
-
-    -- Boosts
-    local boosts = self:addPropTabListbox("Boosts", self.drawBoostsDatas, {"Boost", "Requires"})
-    boosts:setOnMouseDoubleClick(self, function()
-        local item = self.controls.propsBoosts.items[self.controls.propsBoosts.selected].item
-        self:promptMinMaxBoosts(item)
-    end)
-    self.controls.propsBoosts = boosts
-
-    -- Traits
-    local traits = self:addPropTabListbox("Traits", self.drawTraitDatas, {"Trait", "Requires"})
-    traits:setOnMouseDoubleClick(self, self.toggleTraitRequirement)
-    traits.onRightMouseUp = function(target, x, y, a, b)
-        local row = target:rowAt(x, y)
-        if row == -1 then
-            return
-        end
-        if target.selected ~= row then
-            target.selected = row
-            target:ensureVisible(target.selected)
-        end
-        local item = target.items[target.selected].item
-
-        if item then
-            local context = ISContextMenu.get(self.playerIndex, target:getAbsoluteX() + x,
-                target:getAbsoluteY() + y + target:getYScroll())
-            context:removeFromUIManager()
-            context:addToUIManager()
-
-            context:addOption("Required", self, function()
-                if self.data.traits == nil then
-                    self.data.traits = {}
-                end
-                self.data.traits[item.type] = true
-            end, item)
-            context:addOption("Forbidden", self, function()
-                if self.data.traits == nil then
-                    self.data.traits = {}
-                end
-                self.data.traits[item.type] = false
-            end, item)
-            context:addOption("No restriction", self, function()
-                if self.data.traits == nil then
-                    self.data.traits = {}
-                end
-                self.data.traits[item.type] = nil
-            end, item)
-        end
-    end
-    self.controls.propsTraits = traits
-
-    -- Professions
-    local profs = self:addPropTabListbox("Professions", self.drawProfDatas, {"Profession", "Requires"})
-    profs:setOnMouseDoubleClick(self, self.toggleProfRequirement)
-    profs.onRightMouseUp = function(target, x, y, a, b)
-        local row = target:rowAt(x, y)
-        if row == -1 then
-            return
-        end
-        if target.selected ~= row then
-            target.selected = row
-            target:ensureVisible(target.selected)
-        end
-        local item = target.items[target.selected].item
-
-        if item then
-            local context = ISContextMenu.get(self.playerIndex, target:getAbsoluteX() + x,
-                target:getAbsoluteY() + y + target:getYScroll())
-            context:removeFromUIManager()
-            context:addToUIManager()
-
-            context:addOption("Required", self, function()
-                if self.data.professions == nil then
-                    self.data.professions = {}
-                end
-                self.data.professions[item.type] = true
-            end, item)
-            context:addOption("Forbidden", self, function()
-                if self.data.professions == nil then
-                    self.data.professions = {}
-                end
-                self.data.professions[item.type] = false
-            end, item)
-            context:addOption("No restriction", self, function()
-                if self.data.professions == nil then
-                    self.data.professions = {}
-                end
-                self.data.professions[item.type] = nil
-            end, item)
-        end
-    end
-    self.controls.propsProf = profs
-
-    -- Limits
-    self.controls.purchaseLimitsPanel = ISPanel:new(0, 0, self.controls.itemPropsTabs.width,
-        self.controls.itemPropsTabs.height);
-    self.controls.purchaseLimitsPanel:initialise();
-    self.controls.purchaseLimitsPanel:instantiate();
-    self.controls.purchaseLimitsPanel:setAnchorRight(true);
-    self.controls.purchaseLimitsPanel:setAnchorBottom(true);
-    self.controls.itemPropsTabs:addView("Purchase Limits", self.controls.purchaseLimitsPanel);
-
-    y = 20
-    for k, v in pairs(itemLimits) do
-        lbl, txt = tools.getLabeledTextbox(v.label, v.tooltip, "", x, y, 100, 300)
-        self.controls[k] = txt
-        self.controls.purchaseLimitsPanel:addChild(lbl)
-        self.controls.purchaseLimitsPanel:addChild(txt)
-        y = y + txt.height + 10
-    end
-
-    x = self.controls._panel.width + padding
-    y = th
-    local infoPanel = ISPanel:new(x, y, 200, h);
-    infoPanel:initialise();
-    infoPanel:instantiate();
-    infoPanel:setAnchorBottom(true);
-    self:addChild(infoPanel);
-    self.controls.infoPanel = infoPanel;
-
-    local previewPanel = nil
-    local lblY = 200
-
-    if self.item.source == "vehicles" then
-        previewPanel = ISUI3DScene:new(10, 10, 180, 180)
-        previewPanel:initialise()
-        previewPanel.onMouseMove = function(self, dx, dy)
-            if self.mouseDown then
-                local vector = self:getRotation()
-                local x = vector:x() + dy
-                x = x > 90 and 90 or x < -90 and -90 or x
-                self:setRotation(x, vector:y() + dx)
-            end
-        end
-        previewPanel.setRotation = function(self, x, y)
-            self.javaObject:fromLua3("setViewRotation", x, y, 0)
-        end
-        previewPanel.getRotation = function(self)
-            return self.javaObject:fromLua0("getViewRotation")
-        end
-        infoPanel:addChild(previewPanel);
-        self.controls.previewPanel = previewPanel;
-    elseif self.item.texture then
-        previewPanel = ISPanel:new(10, 10, 180, 180);
-        previewPanel:initialise();
-        previewPanel:instantiate();
-
-        previewPanel.render = function(self)
-            local item = self.parent.parent.item
-            if item.texture then
-                self:drawTextureScaledAspect(item.texture, 0, 0, self:getWidth(), self:getHeight(), 1)
-            end
-        end
-        infoPanel:addChild(previewPanel);
-        self.controls.previewPanel = previewPanel;
-    else
-        lblY = 10
-    end
-
-    local label = getTextManager():WrapText(UIFont.Medium, self.item.label, infoPanel.width - 20)
-
-    local name = ISLabel:new(10, lblY, FONT_HGT_MEDIUM, label, 1, 1, 1, 1, UIFont.Medium, true);
-    name:initialise();
-    name:instantiate();
-    infoPanel:addChild(name);
-    self.controls.name = name;
-
-    local category = ISLabel:new(10, name.y + name.height + 10, FONT_HGT_SMALL, self.item.category, 1, 1, 1, 1,
-        UIFont.Small, true);
-    category:initialise();
-    category:instantiate();
-    infoPanel:addChild(category);
-    self.controls.category = category;
-
-    local save = ISButton:new(padding, infoPanel.height - BUTTON_HGT, infoPanel.width - (padding * 2), BUTTON_HGT,
-        "Save", self, UI.onSave);
-    save:initialise();
-    save:instantiate();
-    if save.enableAcceptColor then
-        save:enableAcceptColor()
-    end
-    save:setAnchorRight(true);
-    save:setAnchorBottom(true);
-    infoPanel:addChild(save);
-    self.controls.save = save;
-
-    local y = category.y + category.height + 10
-    local description = ISRichTextPanel:new(padding, y, infoPanel.width - (padding * 2), save.y - y - 20);
-    description:initialise();
-    description:instantiate();
-    description.borderColor = {
-        r = 0.7,
-        g = 0.7,
-        b = 0.7,
-        a = 1
-    };
-    description.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    };
-    description:setMargins(10, 10, 10, 10);
-    description:setAnchorRight(true);
-    description:setAnchorBottom(true);
-    description.autosetheight = false
-    description:setText("")
-    description:paginate()
-    infoPanel:addChild(description);
-    self.controls.description = description;
-
-    self:refreshAll()
+    self:buildConditionsTab(condPanel, tabW)
 end
+
+-- ---------------------------------------------------------------------------
+-- Conditions tab: two lists (all / any) with add/remove per list
+-- ---------------------------------------------------------------------------
+
+function UI:buildConditionsTab(parent, tabW)
+    local pad    = 10
+    local halfH  = math.floor((parent.height - pad * 3) / 2)
+    local listW  = tabW - pad * 2
+
+    -- "all" section
+    local lblAll = ISLabel:new(pad, pad, FONT_HGT_SMALL,
+        "ALL of these conditions must pass:", 1, 1, 1, 0.85, UIFont.Small, true)
+    lblAll:initialise(); lblAll:instantiate(); parent:addChild(lblAll)
+
+    local listAllH = halfH - FONT_HGT_SMALL - BUTTON_HGT - pad * 2
+    local listAll = self:makeConditionList(pad, lblAll.y + lblAll.height + 4, listW, listAllH)
+    parent:addChild(listAll)
+    self.controls.listAll = listAll
+
+    local btnAddAll = ISButton:new(pad, listAll.y + listAll.height + 4, 80, BUTTON_HGT, "Add", parent, function()
+        self:promptConditionKey(function(key) self:addConditionKey("all", key) end)
+    end)
+    btnAddAll:initialise(); btnAddAll:instantiate()
+    if btnAddAll.enableAcceptColor then btnAddAll:enableAcceptColor() end
+    parent:addChild(btnAddAll)
+
+    local btnRemAll = ISButton:new(pad + 90, listAll.y + listAll.height + 4, 80, BUTTON_HGT, "Remove", parent, function()
+        self:removeConditionKey("all")
+    end)
+    btnRemAll:initialise(); btnRemAll:instantiate()
+    if btnRemAll.enableCancelColor then btnRemAll:enableCancelColor() end
+    parent:addChild(btnRemAll)
+    self.controls.btnRemAll = btnRemAll
+
+    -- "any" section
+    local anyY = listAll.y + listAll.height + BUTTON_HGT + pad * 2
+    local lblAny = ISLabel:new(pad, anyY, FONT_HGT_SMALL,
+        "ANY one of these conditions must pass:", 1, 1, 1, 0.85, UIFont.Small, true)
+    lblAny:initialise(); lblAny:instantiate(); parent:addChild(lblAny)
+
+    local listAnyH = halfH - FONT_HGT_SMALL - BUTTON_HGT - pad * 2
+    local listAny = self:makeConditionList(pad, lblAny.y + lblAny.height + 4, listW, listAnyH)
+    parent:addChild(listAny)
+    self.controls.listAny = listAny
+
+    local btnAddAny = ISButton:new(pad, listAny.y + listAny.height + 4, 80, BUTTON_HGT, "Add", parent, function()
+        self:promptConditionKey(function(key) self:addConditionKey("any", key) end)
+    end)
+    btnAddAny:initialise(); btnAddAny:instantiate()
+    if btnAddAny.enableAcceptColor then btnAddAny:enableAcceptColor() end
+    parent:addChild(btnAddAny)
+
+    local btnRemAny = ISButton:new(pad + 90, listAny.y + listAny.height + 4, 80, BUTTON_HGT, "Remove", parent, function()
+        self:removeConditionKey("any")
+    end)
+    btnRemAny:initialise(); btnRemAny:instantiate()
+    if btnRemAny.enableCancelColor then btnRemAny:enableCancelColor() end
+    parent:addChild(btnRemAny)
+    self.controls.btnRemAny = btnRemAny
+end
+
+function UI:makeConditionList(x, y, w, h)
+    local list = ISScrollingListBox:new(x, y, w, h)
+    list:initialise(); list:instantiate()
+    list.itemheight   = FONT_HGT_SMALL + 6
+    list.selected     = 0
+    list.joypadParent = self
+    list.font         = UIFont.NewSmall
+    list.drawBorder   = true
+    list.doDrawItem   = self.drawConditionRow
+    list:addColumn("Condition Key", 0)
+    return list
+end
+
+function UI:drawConditionRow(y, item, alt)
+    if y + self:getYScroll() + self.itemheight < 0 or
+       y + self:getYScroll() >= self.height then
+        return y + self.itemheight
+    end
+    local a = 0.9
+    if self.selected == item.index then
+        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15)
+    end
+    if alt then
+        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5)
+    end
+    self:drawRectBorder(0, y, self:getWidth(), self.itemheight, a,
+        self.borderColor.r, self.borderColor.g, self.borderColor.b)
+    self:drawText(item.item or "", 8, y + 3, 1, 1, 1, a, self.font)
+    self.itemsHeight = y + self.itemheight
+    return self.itemsHeight
+end
+
+function UI:addConditionKey(slot, key)
+    if not self.data.conditions then self.data.conditions = {} end
+    if not self.data.conditions[slot] then self.data.conditions[slot] = {} end
+    table.insert(self.data.conditions[slot], key)
+    self:refreshConditionList(slot)
+end
+
+function UI:removeConditionKey(slot)
+    local list = slot == "all" and self.controls.listAll or self.controls.listAny
+    if not (list.selected and list.selected > 0) then return end
+    if self.data.conditions and self.data.conditions[slot] then
+        table.remove(self.data.conditions[slot], list.selected)
+        list.selected = math.min(list.selected, #self.data.conditions[slot])
+    end
+    self:refreshConditionList(slot)
+end
+
+function UI:refreshConditionList(slot)
+    local list = slot == "all" and self.controls.listAll or self.controls.listAny
+    list:clear()
+    local keys = (self.data.conditions and self.data.conditions[slot]) or {}
+    for _, k in ipairs(keys) do
+        list:addItem(k, k)
+    end
+end
+
+function UI:promptConditionKey(cb)
+    local fs   = FONT_SCALE
+    local dw   = math.floor(300 * fs)
+    local dh   = math.floor(110 * fs)
+    local core = getCore()
+    local dlg  = ISPanel:new(
+        math.floor((core:getScreenWidth()  - dw) / 2),
+        math.floor((core:getScreenHeight() - dh) / 2),
+        dw, dh)
+    dlg:initialise(); dlg:instantiate()
+    dlg.backgroundColor = { r = 0.1, g = 0.1, b = 0.1, a = 0.95 }
+    dlg.moveWithMouse = true
+    dlg:addToUIManager(); dlg:setAlwaysOnTop(true)
+
+    local pad = 10
+    local lbl = ISLabel:new(pad, pad, FONT_HGT_SMALL, "Condition key:", 1, 1, 1, 1, UIFont.Small, true)
+    lbl:initialise(); lbl:instantiate(); dlg:addChild(lbl)
+
+    local txt = ISTextEntryBox:new("", pad + 100, pad, dw - pad * 2 - 100, FONT_HGT_SMALL + 4)
+    txt:initialise(); txt:instantiate(); dlg:addChild(txt)
+
+    local btnOK = ISButton:new(dw - 90 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "OK", dlg, function()
+        local key = txt:getText():match("^%s*(.-)%s*$")
+        if key ~= "" then cb(key) end
+        dlg:removeFromUIManager()
+    end)
+    btnOK:initialise(); btnOK:instantiate()
+    if btnOK.enableAcceptColor then btnOK:enableAcceptColor() end
+    dlg:addChild(btnOK)
+
+    local btnCancel = ISButton:new(dw - 180 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "Cancel", dlg, function()
+        dlg:removeFromUIManager()
+    end)
+    btnCancel:initialise(); btnCancel:instantiate()
+    if btnCancel.enableCancelColor then btnCancel:enableCancelColor() end
+    dlg:addChild(btnCancel)
+end
+
+-- ---------------------------------------------------------------------------
+-- populate() — fill controls from self.data
+-- ---------------------------------------------------------------------------
+
+function UI:populate()
+    local d = self.data or {}
+
+    -- offer.* flattened into controls
+    local offer = d.offer or {}
+    local stock = offer.stock or {}
+
+    local function setText(key, val)
+        local ctrl = self.controls[key]
+        if ctrl then
+            ctrl:clear()
+            if val ~= nil then ctrl:setText(tostring(val)) end
+        end
+    end
+
+    setText("price",              d.price)
+    setText("reward",             d.reward)
+    setText("offer_weight",       offer.weight)
+    setText("stock_min",          stock.min)
+    setText("stock_max",          stock.max)
+    setText("stock_restockHours", stock.restockHours)
+
+    -- conditions lists
+    self:refreshConditionList("all")
+    self:refreshConditionList("any")
+
+    -- vehicle 3D preview
+    if self.item and self.item.source == "vehicles" and self.controls.previewPanel then
+        local p = self.controls.previewPanel
+        p.javaObject:fromLua1("setDrawGrid", false)
+        p.javaObject:fromLua1("createVehicle", "vehicle")
+        p.javaObject:fromLua3("setViewRotation", 22.5, 45, 0)
+        p.javaObject:fromLua1("setView", "UserDefined")
+        p.javaObject:fromLua2("dragView", 0, 30)
+        p.javaObject:fromLua1("setZoom", 6)
+        p.javaObject:fromLua2("setVehicleScript", "vehicle", self.item.type)
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- onSave() — collect controls back into structured data and call cb
+-- ---------------------------------------------------------------------------
 
 function UI:onSave()
-    print("Saving item config")
-
     local data = {}
-    for k, v in pairs(itemProperties) do
-        local value = self.controls[k]:getText()
-        if value ~= "" then
-            if v.type == "int" then
-                value = tonumber(value)
-            elseif v.type == "string" then
-                value = value:match("^%s*(.-)%s*$")
-            end
-            data[k] = value
+
+    local function getNum(key)
+        local ctrl = self.controls[key]
+        return ctrl and tonumber(ctrl:getText()) or nil
+    end
+    local function getStr(key)
+        local ctrl = self.controls[key]
+        if not ctrl then return nil end
+        local s = ctrl:getText():match("^%s*(.-)%s*$")
+        return s ~= "" and s or nil
+    end
+
+    data.price  = getStr("price")
+    data.reward = getStr("reward")
+
+    local weight = tonumber((self.controls.offer_weight:getText() or ""):match("[%d%.]+"))
+    local sMin   = getNum("stock_min")
+    local sMax   = getNum("stock_max")
+    local sHours = getNum("stock_restockHours")
+
+    if weight or sMin or sMax or sHours then
+        data.offer = {}
+        if weight then data.offer.weight = weight end
+        if sMin or sMax or sHours then
+            data.offer.stock = {}
+            if sMin   then data.offer.stock.min          = sMin   end
+            if sMax   then data.offer.stock.max          = sMax   end
+            if sHours then data.offer.stock.restockHours = sHours end
         end
     end
 
-    for k, v in pairs(itemLimits) do
-        local value = self.controls[k]:getText()
-        if value ~= "" then
-            if v.type == "int" then
-                value = tonumber(value)
-            elseif v.type == "string" then
-                value = value:match("^%s*(.-)%s*$")
-            end
-            data[k] = value
-        end
+    -- conditions
+    local cAll = self.data.conditions and self.data.conditions.all or {}
+    local cAny = self.data.conditions and self.data.conditions.any or {}
+    if #cAll > 0 or #cAny > 0 then
+        data.conditions = {}
+        if #cAll > 0 then data.conditions.all = cAll end
+        if #cAny > 0 then data.conditions.any = cAny end
     end
 
-    -- skills
-    if self.data.skills then
-        local d = {}
-        local add = false
-        for k, v in pairs(self.data.skills) do
-            if v.min and v.max then
-                d[k] = v
-                add = true
-            elseif v.min then
-                d[k] = {
-                    min = v.min,
-                    max = v.max
-                }
-                add = true
-            elseif v.max then
-                d[k] = {
-                    min = 0,
-                    max = v.max
-                }
-                add = true
-            end
-        end
-        if add then
-            data.skills = d
-        end
-    end
+    -- return nil if nothing was set
+    local empty = true
+    for _ in pairs(data) do empty = false; break end
 
-    -- boosts
-    if self.data.boosts then
-        local d = {}
-        local add = false
-        for k, v in pairs(self.data.boosts) do
-            if v.min and v.max then
-                d[k] = v
-                add = true
-            elseif v.min then
-                d[k] = {
-                    min = v.min,
-                    max = v.max
-                }
-                add = true
-            elseif v.max then
-                d[k] = {
-                    min = 0,
-                    max = v.max
-                }
-                add = true
-            end
-        end
-        if add then
-            data.boosts = d
-        end
-    end
-
-    -- boosts
-    if self.data.traits then
-        local d = {}
-        local add = false
-        for k, v in pairs(self.data.traits) do
-            if v == true then
-                d[k] = true
-                add = true
-            elseif v == false then
-                d[k] = false
-                add = true
-            end
-        end
-        if add then
-            data.traits = d
-        end
-    end
-
-    -- boosts
-    if self.data.professions then
-        local d = {}
-        local add = false
-        for k, v in pairs(self.data.professions) do
-            if v == true then
-                d[k] = true
-                add = true
-            elseif v == false then
-                d[k] = false
-                add = true
-            end
-        end
-        if add then
-            data.professions = d
-        end
-    end
-
-    -- if there are no properties set, return nil
-    local dataEmpty = true
-    for _ in pairs(data) do dataEmpty = false; break end
-    if dataEmpty then
-        self.cb(nil)
-    else
-        self.cb(data)
+    if self.cb then
+        self.cb(empty and nil or data)
     end
     self:close()
-
 end
 
-function UI:instantiate()
-    ISCollapsableWindowJoypad.instantiate(self);
-    if self.item.source == "vehicles" then
-        local previewPanel = self.controls.previewPanel
-        previewPanel.initialized = true
-        previewPanel.javaObject:fromLua1("setDrawGrid", false)
-        previewPanel.javaObject:fromLua1("createVehicle", "vehicle")
-        previewPanel.javaObject:fromLua3("setViewRotation", 45 / 2, 45, 0)
-        previewPanel.javaObject:fromLua1("setView", "UserDefined")
-        previewPanel.javaObject:fromLua2("dragView", 0, 30)
-        previewPanel.javaObject:fromLua1("setZoom", 6)
-        previewPanel.vehicleName = self.item.type
-        previewPanel.javaObject:fromLua2("setVehicleScript", "vehicle", previewPanel.vehicleName)
-    end
-
-end
-
-function UI:setSelectedItem()
-
-    local item = self.list.items[self.list.selected].item
-    local data = self.data[self.list.selected]
-
-    self.controls.propsSkills:clear()
-    for _, v in ipairs(Core.getAllSkills()) do
-        self.controls.propsSkills:addItem(v.label, v)
-    end
-
-    self.controls.propsBoosts:clear()
-    for _, v in ipairs(Core.getAllSkills()) do
-        self.controls.propsBoosts:addItem(v.label, v)
-    end
-
-    self.controls.propsTraits:clear()
-    for _, v in ipairs(Core.getAllTraits()) do
-        self.controls.propsTraits:addItem(v.label, v)
-    end
-
-    self.controls.propsProf:clear()
-    for _, v in ipairs(Core.getAllProfessions()) do
-        self.controls.propsProf:addItem(v.label, v)
-    end
-
-end
-
-function UI:promptMinMaxSkills(item)
-
-    local list = self.controls.propsSkills
-    if self.data.skills == nil then
-        self.data.skills = {}
-    end
-    local data = {}
-    if self.data.skills[item.type] then
-        data = self.data.skills[item.type]
-    end
-    Core.ui.minmax.open(self.player, item, {
-        minMin = 0,
-        maxMax = 10
-    }, function(data)
-        local s = self
-        if self.data.skills == nil then
-            self.data.skills = {}
-        end
-        if data.min or data.max then
-            self.data.skills[item.type] = data
-        else
-            self.data.skills[item.type] = nil
-        end
-    end)
-end
-
-function UI:promptMinMaxBoosts(item)
-
-    local list = self.controls.propsboosts
-    if self.data.boosts == nil then
-        self.data.boosts = {}
-    end
-    local data = {}
-    if self.data.boosts[item.type] then
-        data = self.data.boosts[item.type]
-    end
-    Core.ui.minmax.open(self.player, data, {
-        minMin = 0,
-        maxMax = 3
-    }, function(data)
-        local s = self
-        if self.data.boosts == nil then
-            self.data.boosts = {}
-        end
-        if data.min or data.max then
-            self.data.boosts[item.type] = data
-        else
-            self.data.boosts[item.type] = nil
-        end
-    end)
-end
-
-function UI:drawDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9;
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local value = item.item.category
-
-    local valueWidth = getTextManager():MeasureStringX(self.font, value)
-    local w = self.width
-    local cw = self.columns[2].size
-    self:drawText(value, w - valueWidth - xoffset - 4, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
-end
-
-function UI:drawSkillDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9;
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.item.label or item.item.type, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local value = ""
-    local data = self.parent.parent.parent.parent.data
-    if data.skills and data.skills[item.item.type] then
-        if data.skills[item.item.type].min and data.skills[item.item.type].max then
-            value = "Min: " .. data.skills[item.item.type].min .. " Max: " .. data.skills[item.item.type].max
-        elseif data.skills[item.item.type].min then
-            value = "Min: " .. data.skills[item.item.type].min
-        elseif data.skills[item.item.type].max then
-            value = "Max: " .. data.skills[item.item.type].max
-        end
-    end
-
-    local cw = self.columns[2].size
-    self:drawText(value, cw + 10, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
-end
-
-function UI:drawBoostsDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9;
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.item.label or item.item.type, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local value = ""
-    local data = self.parent.parent.parent.parent.data
-    if data.boosts and data.boosts[item.item.type] then
-        if data.boosts[item.item.type].min and data.boosts[item.item.type].max then
-            value = "Min: " .. data.boosts[item.item.type].min .. " Max: " .. data.boosts[item.item.type].max
-        elseif data.boosts[item.item.type].min then
-            value = "Min: " .. data.boosts[item.item.type].min
-        elseif data.boosts[item.item.type].max then
-            value = "Max: " .. data.boosts[item.item.type].max
-        end
-    end
-
-    local cw = self.columns[2].size
-    self:drawText(value, cw + 10, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
-end
-
-function UI:drawTraitDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local value = nil
-    local data = self.parent.parent.parent.parent.data.traits
-    if data and data[item.item.type] ~= nil then
-        if data[item.item.type] then
-            value = "Required"
-            self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.4, 0, 0.7, 0.15);
-        else
-            value = "Forbidden"
-            self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.4, 1, 0, 0.15);
-        end
-    end
-
-    local a = 0.9;
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.item.label or item.item.type, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local cw = self.columns[2].size
-    self:drawText(value or "", cw + 4, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
-end
-
-function UI:drawProfDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local value = nil
-    local data = self.parent.parent.parent.parent.data.professions
-    if data and data[item.item.type] ~= nil then
-        if data[item.item.type] then
-            value = "Required"
-            self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.4, 0, 0.7, 0.15);
-        else
-            value = "Forbidden"
-            self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.4, 1, 0, 0.15);
-        end
-    end
-
-    local a = 0.9;
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.item.label or item.item.type, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local cw = self.columns[2].size
-    self:drawText(value or "", cw + 4, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
-end
+-- ---------------------------------------------------------------------------
+-- prerender: keep info panel pinned to the right
+-- ---------------------------------------------------------------------------
 
 function UI:prerender()
+    ISCollapsableWindowJoypad.prerender(self)
+    local rh  = self:resizeWidgetHeight()
+    local pad = 10
+    local info = self.controls.infoPanel
+    info:setX(self.width - info.width)
+    info:setHeight(self.height - self:titleBarHeight() - rh)
+    self.controls.saveBtn:setY(info.height - BUTTON_HGT - pad)
 
-    ISCollapsableWindowJoypad.prerender(self);
-
-    self.controls.infoPanel:setX(self.width - self.controls.infoPanel.width)
-    self.controls.save:setHeight(BUTTON_HGT)
-    self.controls.save:setY(self.controls.infoPanel.height - BUTTON_HGT - 10)
-
-    -- self.controls.propsSkills:setY(30)
-    if self.lastActiveViewName ~= self.controls.itemPropsTabs.activeView.name then
-
-        self.lastActiveViewName = self.controls.itemPropsTabs.activeView.name
-        local txt = ""
-        if self.controls.itemPropsTabs.activeView.name == "Skills" then
-            txt =
-                "Skills: Double click to set min/max levels required to purchase this item. Leave the value blank to ignore."
-        elseif self.controls.itemPropsTabs.activeView.name == "Boosts" then
-            txt =
-                "Boosts: Double click to set min/max levels required to purchase this item. Leave the value blank to ignore."
-        elseif self.controls.itemPropsTabs.activeView.name == "Traits" then
-            txt =
-                "Traits: Right click to set if the trait is required, forbidden or no restriction. You can also toggle between states by double clicking"
-        elseif self.controls.itemPropsTabs.activeView.name == "Professions" then
-            txt =
-                "Professions: Right click to set if the profession is required, forbidden or no restriction. You can also toggle between states by double clicking"
-        elseif self.controls.itemPropsTabs.activeView.name == "Purchase Limits" then
-            txt =
-                "Purchase Limits: Set the limits to how many times this item can be purchased. Leave the value blank to ignore."
-        elseif self.controls.itemPropsTabs.activeView.name == "Props" then
-            txt =
-                "Props: Set the min/max price, currency, inventory and probability of this item. Leave blank to use defaults"
-        end
-
-        self.controls.description:setText(txt)
-        self.controls.description:paginate()
-        self.controls.description.textDirty = true;
-
-    end
-
-end
-
-function UI:toggleTraitRequirement(item)
-    self:toggleRequirement("traits", item)
-end
-
-function UI:toggleProfRequirement(item)
-    self:toggleRequirement("professions", item)
-end
-
-function UI:toggleRequirement(source, item)
-
-    if not self.data[source] then
-        self.data[source] = {}
-    end
-
-    if self.data[source][item.type] == nil then
-        self.data[source][item.type] = true
-    elseif self.data[source][item.type] == true then
-        self.data[source][item.type] = false
-    else
-        self.data[source][item.type] = nil
-    end
+    local tabPanel = self.controls.tabPanel
+    tabPanel:setWidth(self.width - info.width - pad)
+    tabPanel:setHeight(self.height - self:titleBarHeight() - rh)
 end

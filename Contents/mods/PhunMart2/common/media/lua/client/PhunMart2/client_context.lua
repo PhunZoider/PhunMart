@@ -85,6 +85,10 @@ Core.contexts.open = function(player, context, worldobjects, test)
 
         end
 
+        adminSubMenu:addOption("Wallet", player, function()
+            Core.ui.admin.OnOpenPanel(getSpecificPlayer(player))
+        end)
+
         adminSubMenu:addOption("Compile", player, function()
             sendClientCommand(Core.name, Core.commands.compile, {})
         end)

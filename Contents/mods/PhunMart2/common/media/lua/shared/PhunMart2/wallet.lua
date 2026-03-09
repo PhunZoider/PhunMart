@@ -1,69 +1,33 @@
-PhunWallet = {
-    name = "PhunWallet",
-    inied = false,
-    consts = {
-        log = "wallet.log"
-    },
-    commands = {
+require "PhunMart2/core"
+local Core = PhunMart
 
-        addToWallet = "PhunWalletAddToWallet",
-        getWallet = "PhunWalletGetWallet",
-        resetWallet = "PhunWalletResetWallet",
-        updateWallet = "PhunWalletUpdateWallet",
-        playerSetup = "PhunWalletPlayerSetup",
-        getPlayerList = "PhunWalletGetPlayerList",
-        getPlayersWallet = "PhunWalletGetPlayersWallet"
-
-    },
-    events = {
-        OnReady = "OnPhunWalletOnReady"
-    },
-    settings = {},
-    ui = {
-        client = {},
-        admin = {}
-    },
+Core.wallet = {
+    name = "PhunMart_Wallet",
     currencies = {
-        ["PhunWallet.QuarterCoin"] = {
+        ["PhunMart.QuarterCoin"] = {
             bound = false
         },
-        ["PhunWallet.SilverDollar"] = {
+        ["PhunMart.SilverDollar"] = {
             bound = false
         },
-        ["PhunWallet.TraiterToken"] = {
+        ["PhunMart.TraiterToken"] = {
             bound = true
         }
     }
 }
 
-local Core = PhunWallet
-Core.isLocal = not isClient() and not isServer() and not isCoopHost()
-local sb = SandboxVars
-Core.settings = sb["PhunWallet"]
-
-for _, event in pairs(PhunWallet.events) do
-    if not Events[event] then
-        LuaEventManager.AddEvent(event)
-    end
+function Core.wallet:isCurrency(item)
+    return Core.wallet.currencies[item] ~= nil
 end
 
-function Core:ini()
-    self.inied = true
-    triggerEvent(self.events.OnReady, self)
+function Core.wallet:isBound(item)
+    return (Core.wallet.currencies[item] or {}).bound == true
 end
 
-function Core:isCurrency(item)
-    return Core.currencies[item] ~= nil
-end
-
-function Core:isBound(item)
-    return (Core.currencies[item] or {}).bound == true
-end
-
-function Core:get(player)
+function Core.wallet:get(player)
     local key = nil
-    if self.data == nil then
-        self.data = ModData.getOrCreate(self.name)
+    if self.wallet.data == nil then
+        self.wallet.data = ModData.getOrCreate(self.wallet.name)
     end
     if self.isLocal then
         key = 0
@@ -73,23 +37,23 @@ function Core:get(player)
         key = player:getUsername()
     end
     if key then
-        if not self.data[key] then
-            self.data[key] = {
+        if not self.wallet.data[key] then
+            self.wallet.data[key] = {
                 current = {},
                 bound = {},
                 purchases = {}
             }
         end
-        return self.data[key]
+        return self.wallet.data[key]
     end
 end
 
-function Core:setPlayerData(player, data)
+function Core.wallet:setPlayerData(player, data)
     local w = self:get(player) -- ensure it has at least default
-    self.data[player] = data
+    self.wallet.data[player] = data
 end
 
-function Core:reset(player)
+function Core.wallet:reset(player)
 
     local name = type(player) == "string" and player or player:getUsername()
 
@@ -114,13 +78,13 @@ function Core:reset(player)
             -- overwrite any bound amount
             if (w.bound[k] or 0) > 0 then
                 w.current[k] = w.bound[k]
-                Core.tools.logTo(self.consts.log, name, k, w.current[k])
+                Core.tools.logTo("wallet.log", name, k, w.current[k])
             end
         end
     end
 end
 
-function Core:adjust(player, item, amount)
+function Core.wallet:adjust(player, item, amount)
 
     local name = type(player) == "string" and player or player:getUsername()
     -- print("Adjusting wallet for ", tostring(name), tostring(item), tostring(amount))

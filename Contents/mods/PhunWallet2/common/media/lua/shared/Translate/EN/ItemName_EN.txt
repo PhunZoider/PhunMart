@@ -1,4 +1,0 @@
-ItemName_EN = {
-    ItemName_PhunWallet_DroppedWallet = "Dropped Wallet",
-    ItemName_PhunWallet_CharsWallet = "%1's Wallet",
-}

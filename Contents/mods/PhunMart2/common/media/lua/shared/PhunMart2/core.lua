@@ -40,8 +40,15 @@ PhunMart = {
         rerollAllShops = "PhunMartRerollAllShops",
         changeTo = "PhunMartChangeShopType",
         restock = "PhunMartRestockShop",
-        onShopChange = "PhunMartOnShopChange"
+        onShopChange = "PhunMartOnShopChange",
 
+        addToWallet = "PhunMartAddToWallet",
+        getWallet = "PhunMartGetWallet",
+        resetWallet = "PhunMartResetWallet",
+        updateWallet = "PhunMartUpdateWallet",
+
+        getPlayerList = "PhunMartGetPlayerList",
+        getPlayersWallet = "PhunMartGetPlayersWallet"
     },
     events = {
         OnReady = "OnPhunMartOnReady",
@@ -204,137 +211,6 @@ function Core:getInstanceInventory(key)
     return nil
 end
 
-local tid = nil
-function Core.getCategory(item)
-    -- from the awesome BetterSorting mod by Blindcoder,
-    -- but modified to return the category rather than just set it
-
-    if tid == nil then
-        if TweakItemData then
-            tid = TweakItemData
-        else
-            tid = false
-        end
-    end
-    if tid then
-        local test = TweakItemData[item:getFullName()]["DisplayCategory"] or
-                         TweakItemData[item:getFullName()]["displaycategory"]
-        if test then
-            return test
-        end
-    end
-
-    local category = tostring(item:getDisplayCategory());
-
-    if item.fluidContainer then
-        local fluid = item.fluidContainer:getFluidContainer():getPrimaryFluid();
-        if fluid and item:getFluidContainer():getAmount() > 0 then
-            if fluid:isCategory(FluidCategory.Alcoholic) then
-                category = "FoodA";
-            elseif fluid:isCategory(FluidCategory.Beverage) then
-                category = "FoodB";
-            elseif fluid:isCategory(FluidCategory.Fuel) then
-                category = "Fuel"
-            end
-        else
-            category = "Container";
-        end
-    elseif item.getCanStoreWater and item:getCanStoreWater() then
-        if item:getTypeString() ~= "Drainable" then
-            category = "Container";
-        else
-            category = "FoodB";
-        end
-
-    elseif item:getDisplayCategory() == "Water" then
-        category = "FoodB";
-
-    elseif item:getTypeString() == "Food" then
-        if item:getDaysTotallyRotten() > 0 and item:getDaysTotallyRotten() < 1000000000 then
-            category = "FoodP";
-        else
-            category = "FoodN";
-        end
-
-    elseif item:getTypeString() == "Literature" then
-        if string.len(item:getSkillTrained()) > 0 then
-            category = "LitS";
-        elseif item:getTeachedRecipes() and not item:getTeachedRecipes():isEmpty() then
-            category = "LitR";
-        elseif item:getStressChange() ~= 0 or item:getBoredomChange() ~= 0 or item:getUnhappyChange() ~= 0 then
-            category = "LitE";
-        else
-            category = "LitW";
-        end
-
-    elseif item:getTypeString() == "Weapon" then
-        if item:getDisplayCategory() == "Explosives" or item:getDisplayCategory() == "Devices" then
-            category = "WepBomb";
-        end
-
-        -- Tsar's True Music Cassette and Vinyls
-    elseif string.find(item:getFullName(), "Tsarcraft.Cassette") or string.find(item:getFullName(), "Tsarcraft.Vinyl") then
-        category = "MediaA";
-
-        -- Tsar's True Actions Dance Cards
-    elseif item:getTypeString() == "Normal" and item:getModuleName() == "TAD" then
-        category = "Misc";
-    end
-
-    return category or "Unknown"
-end
-
-function Core.getAllItemCategories()
-
-    if Core.itemCategories == nil then
-        Core.getAllItems()
-    end
-
-    return Core.itemCategories
-
-end
-
-function Core.getAllItems(refresh)
-
-    if Core.itemsAll ~= nil and not refresh then
-        return Core.itemsAll
-    end
-    Core.itemsAll = {}
-    Core.itemCategories = {}
-    local catMap = {}
-
-    local itemList = getScriptManager():getAllItems()
-    for i = 0, itemList:size() - 1 do
-        local item = itemList:get(i)
-        if not item:getObsolete() and not item:isHidden() then
-
-            local cat = Core.getCategory(item)
-            if cat ~= "" and catMap[cat] == nil then
-                catMap[cat] = true
-                table.insert(Core.itemCategories, {
-                    label = cat,
-                    type = ""
-                })
-            end
-            table.insert(Core.itemsAll, {
-                type = item:getFullName(),
-                label = item:getDisplayName(),
-                texture = item:getNormalTexture(),
-                category = cat
-            })
-        end
-    end
-
-    table.sort(Core.itemsAll, function(a, b)
-        return a.label:lower() < b.label:lower()
-    end)
-    table.sort(Core.itemCategories, function(a, b)
-        return a.label:lower() < b.label:lower()
-    end)
-
-    return Core.itemsAll
-end
-
 function Core.getAllVehicleCategories()
 
     if Core.vehicleCategories == nil then
@@ -457,7 +333,7 @@ function Core.getAllTraits(refresh)
     Core.traitCategories = {}
     local catMap = {}
 
-    local traits = TraitFactory.getTraits()
+    local traits = CharacterTraitDefinition.getTraits()
     for i = 0, traits:size() - 1 do
         local trait = traits:get(i)
 
@@ -647,3 +523,4 @@ function Core.getAllProfessions(refresh)
     end)
     return Core.ProfessionsAll
 end
+

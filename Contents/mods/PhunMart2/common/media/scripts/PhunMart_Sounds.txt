@@ -6,7 +6,7 @@ module Base
 		loop = false, 
 		is3D = true,
         clip { 
-			file = media/sound/PhunWallet_Pickup.ogg, 
+			file = media/sound/PhunMart_Pickup.ogg, 
 			distanceMax = 20, 
 			volume = 0.3f 
 		}

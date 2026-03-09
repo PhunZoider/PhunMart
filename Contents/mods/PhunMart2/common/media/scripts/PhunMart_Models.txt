@@ -1,4 +1,4 @@
-module PhunWallet
+module PhunMart
 {
 
 	model PhunWallet
@@ -8,16 +8,16 @@ module PhunWallet
 		scale = 0.015,
 	}
 
-	model PhunWallet_Quarter
+	model PhunMart_Quarter
 	{
-		mesh = PhunWalletQuarter,
+		mesh = PhunMartQuarter,
 		texture = QuarterTexture,
 		scale = 0.001,
 	}
 
-    model PhunWallet_SilverDollar
+    model PhunMart_SilverDollar
 	{
-		mesh = PhunWalletSilverDollar,
+		mesh = PhunMartSilverDollar,
 		texture = SilverDollarTexture,
 		scale = 0.001,
 	}

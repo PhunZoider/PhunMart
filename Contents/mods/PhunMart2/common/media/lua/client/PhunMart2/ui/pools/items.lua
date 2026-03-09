@@ -217,16 +217,18 @@ function UI:createChildren()
         self.data.items = Core.getAllBoosts()
         self.tooltip = ISToolTip:new();
     else
-        self.data.categories = Core.getAllItemCategories()
-        self.data.items = Core.getAllItems()
+        self.data.categories = Core.tools.getAllItemCategories()
+        self.data.items = Core.tools.getAllItems()
         self.tooltip = ISToolTipInv:new();
     end
 
-    self.tooltip:initialise();
-    self.tooltip:setVisible(false);
-    self.tooltip:setAlwaysOnTop(true)
-    self.tooltip.description = "";
-    self.tooltip:setOwner(self.controls.list)
+    if self.tooltip then
+        self.tooltip:initialise();
+        self.tooltip:setVisible(false);
+        self.tooltip:setAlwaysOnTop(true)
+        self.tooltip.description = "";
+        self.tooltip:setOwner(self.controls.list)
+    end
 
     local catMap = {}
     local categories = {}

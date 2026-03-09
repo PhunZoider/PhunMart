@@ -1,5 +1,3 @@
-local Core = nil
-
 local queue = {
     module = "PhunWallet",
     sendCommand = "addToWallet",

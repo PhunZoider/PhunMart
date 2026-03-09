@@ -8,6 +8,31 @@ option PhunMart.Debug
     translation=PhunMart_Debug,
 }
 
+option PhunMart.DropOnDeath
+{
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMart_WalletDropOnDeath,
+}
+
+option PhunMart.OnlyPickupOwn
+{ 
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMart_WalletOnlyPickupOwn,
+}
+
+option PhunMart.ReturnRate
+{ 
+    type = integer, 
+    default = 100, 
+    min = 1,
+    max = 100,
+    page = PhunMart,
+    translation = PhunMart_WalletReturnRate,
+}
 
 option PhunMart.ChanceToConvertVanillaMachines
 {

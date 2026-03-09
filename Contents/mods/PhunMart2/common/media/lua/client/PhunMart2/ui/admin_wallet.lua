@@ -4,7 +4,7 @@ end
 
 require "ISUI/ISPanel"
 
-local Core = PhunWallet
+local Core = PhunMart
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)

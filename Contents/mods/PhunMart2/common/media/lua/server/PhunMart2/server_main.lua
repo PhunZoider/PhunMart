@@ -78,7 +78,7 @@ function Core:getPoolItems(pool)
     local filters = pool.filters or {}
 
     if filters.items then
-        local allItems = Core.getAllItems()
+        local allItems = Core.tools.getAllItems()
         for _, v in ipairs(allItems) do
             if not filters.items.exclude[v.type] then
                 if filters.items.include[v.type] or filters.items.categories[v.category] then

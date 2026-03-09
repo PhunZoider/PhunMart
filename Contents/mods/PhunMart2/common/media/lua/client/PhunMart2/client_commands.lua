@@ -11,6 +11,16 @@ local Commands = {}
 -- PS.cmds["compile"] = function(args)
 --     sendClientCommand(Core.name, Core.commands.compile, {})
 -- end
+Commands[Core.commands.updateWallet] = function(args)
+    local player = Core.tools.getPlayerByUsername(args.username)
+    for k, v in pairs(args.wallet) do
+        Core:adjust(player, k, v, true)
+    end
+end
+
+Commands[Core.commands.getWallet] = function(args)
+    Core:setPlayerData(args.username, args.wallet)
+end
 
 Commands[Core.commands.openError] = function(args)
     local player = getSpecificPlayer(args.playerIndex)

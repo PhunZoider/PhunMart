@@ -166,7 +166,7 @@ function UI:createChildren()
     });
     pools:initialise()
     self.controls.pools = pools
-    self.controls.tabPanel:addView("Pools", self.controls.pools)
+    self.controls.tabPanel:addView("Pool Sets", self.controls.pools)
 
     local btnCancel = ISButton:new(0, 0, tools.BUTTON_WID, tools.BUTTON_HGT, getText("UI_btn_cancel"), self, UI.close)
     btnCancel:initialise()

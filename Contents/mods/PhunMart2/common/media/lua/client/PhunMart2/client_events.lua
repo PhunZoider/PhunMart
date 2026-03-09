@@ -3,41 +3,6 @@ if isServer() then
 end
 local Core = PhunMart
 local Commands = require("PhunMart2/client_commands")
--- Events.OnIsoThumpableLoad.Add(function()
---     print("PhunMart2: OnIsoThumpableLoad")
--- end)
-
--- Events.OnDoTileBuilding.Add(function()
---     print("PhunMart2: OnDoTileBuilding")
--- end)
-
--- Events.OnDoTileBuilding2.Add(function()
---     print("PhunMart2: OnDoTileBuilding2")
--- end)
-
--- Events.OnDoTileBuilding3.Add(function()
---     print("PhunMart2: OnDoTileBuilding3")
--- end)
-
--- Events.OnDestroyIsoThumpable.Add(function()
---     print("PhunMart2: OnDestroyIsoThumpable")
--- end)
-
--- Events.LoadGridsquare.Add(function(square)
-
--- end)
-
--- Events.OnTileRemoved.Add(function()
---     print("PhunMart2: OnTileRemoved")
--- end)
-
--- Events.OnRainStart.Add(function()
---     print("PhunMart2: OnRainStart")
--- end)
-
--- Events.OnRainStop.Add(function()
---     print("PhunMart2: OnRainStop")
--- end)
 
 local _lastHighlighted = nil
 
@@ -46,9 +11,6 @@ Events.OnServerCommand.Add(function(module, command, arguments)
         if Commands[command] then
             Commands[command](arguments)
         end
-        -- if command == Core.commands.requestShop then
-        --     Core:updateInstanceInventory(arguments.key, arguments.data)
-        -- end
     end
 end)
 
@@ -79,13 +41,22 @@ Events.OnPreFillWorldObjectContextMenu.Add(function(playerObj, context, worldobj
 end)
 
 Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobjects, test)
-    if isAdmin() or isDebugEnabled() then return end
+    if isAdmin() or isDebugEnabled() then
+        return
+    end
     for _, obj in ipairs(worldobjects) do
         if Core.ClientSystem:isValidIsoObject(obj) then
             context:removeOptionByName("Pick Up")
             context:removeOptionByName("Dismantle")
             break
         end
+    end
+end)
+
+Events.OnCharacterDeath.Add(function(playerObj)
+    if instanceof(playerObj, "IsoPlayer") and playerObj:isLocalPlayer() then
+        Core:drop(playerObj)
+        Core:reset(playerObj)
     end
 end)
 

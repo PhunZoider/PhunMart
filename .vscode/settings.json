@@ -7,6 +7,7 @@
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 2>nul"
             },
+
             // Copy mod files to local mod folder
             {
                 "match": ".*",
@@ -35,19 +36,19 @@
             {
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test 2>nul"
-            },
+            },          
 
             // copy TEST from live
             {
                 "match": ".*",
                 "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2 ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test /Y /I /E /F /EXCLUDE:xclude"
-            },            
+            },   
 
             // copy TEST overrides
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart2Test /Y /I /E /F /EXCLUDE:xclude"
-            }, 
+            },           
 
             // remove TEST workshop
             {
@@ -67,8 +68,9 @@
             // copy TEST mod root overrides (mod.info, icon, poster) into workshop mod subfolder
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\Contents\\mods\\PhunMart2 /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\PhunMart2 ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart2Test\\Contents\\mods\\PhunMart2 /Y /I /E /F"
             },
+
             // copy TEST preview file to workshop version
             {
                 "match": ".*",

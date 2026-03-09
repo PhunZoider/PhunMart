@@ -24,7 +24,7 @@ function UI:refreshAll()
     for _, v in ipairs(self.data or {}) do
         self.controls.list:addItem(getTextOrNull("IGUI_PhunMart_Shop_" .. v.type) or v.type, {
             type = v.type,
-            group = v.group or "NONE"
+            category = v.category or "NONE"
             -- texture = v.sprites and v.sprites[1] or nil
         })
     end
@@ -195,7 +195,7 @@ function UI:createChildren()
     list.onMouseMoveOutside = self.doOnMouseMoveOutside
 
     list:addColumn("Shop", 0);
-    list:addColumn("Group", 150);
+    list:addColumn("Category", 150);
     self.controls.list = list;
     self.controls._listPanel:addChild(list);
 
@@ -326,7 +326,7 @@ function UI:drawDatas(y, item, alt)
     self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
-    local value = item.item.group
+    local value = item.item.category
     local cw = self.columns[2].size
     self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
     self.itemsHeight = y + self.itemheight;
