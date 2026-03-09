@@ -38,7 +38,7 @@ local function formatPool(data)
     for k, v in pairs(data) do
         result[k] = {
             currency = data.currency or nil,
-            price = data.price and getRangeResult(data, "price", Core.settings.DefaultPrice or 1) or nil,
+            price = data.price and getRangeResult(data, "price", 25) or nil,
             totalItems = data.totalItems and
                 getRangeResult(data, "totalItems", Core.settings.DefaultNumOfItemsWhenRestocking or 1) or nil,
             items = v.items or {},
@@ -67,7 +67,7 @@ local function getShopPool(entry)
 
     local result = {
         currency = entry.currency or nil,
-        price = entry.price and getRangeResult(entry, "price", Core.settings.DefaultPrice or 1) or nil,
+        price = entry.price and getRangeResult(entry, "price", 25) or nil,
         totalItems = entry.totalItems and
             getRangeResult(entry, "totalItems", Core.settings.DefaultNumOfItemsWhenRestocking or 1) or nil,
         zones = entry.zones or {},
@@ -110,8 +110,8 @@ local function formatShop(data)
         powered = data.powered == true,
         restock = data.restock or 48,
         pools = getShopPools(data),
-        currency = data.currency or Core.settings.DefaultCurrencyItemType or "base.money",
-        price = getRangeResult(data, "price", Core.settings.DefaultPrice or 1),
+        currency = data.currency or "change",
+        price = getRangeResult(data, "price", 25),
         totalItems = getRangeResult(data, "totalItems", Core.settings.DefaultNumOfItemsWhenRestocking or 1),
         image = data.image or "machine-none.png",
         sprites = data.sprites or {"phunmart_01_0", -- east

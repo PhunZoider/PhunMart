@@ -265,7 +265,7 @@ Commands[Core.commands.getPlayersWallet] = function(player, args)
 end
 
 Commands[Core.commands.adjustPlayerWallet] = function(player, args)
-    Core.wallet:adjustByType(args.playername, args.walletType, args.currencyType, tonumber(args.value or 0))
+    Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
         wallet = Core.wallet:get(args.playername)
     })

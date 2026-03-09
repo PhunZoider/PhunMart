@@ -2,11 +2,11 @@
     "Sandbox_PhunMart": "PhunMart",
     "Sandbox_PhunMartSettings": "PhunMart Global Settings",
 
-    "Sandbox_PhunMart_DefaultCurrencyItemType": "Default Currency Type",
-    "Sandbox_PhunMart_DefaultCurrencyItemType_tooltip": "The default item to use as currency (eg PhunMart.QuarterCoin or Base.Money) when no other currency is specified",
+    "Sandbox_PhunMart_ChangeCapCents": "Change Balance Cap (cents)",
+    "Sandbox_PhunMart_ChangeCapCents_tooltip": "Maximum cents a player can carry (9999 = $99.99). At cap, coins left on the ground will not be consumed.",
 
-    "Sandbox_PhunMart_DefaultPrice": "Default Price",
-    "Sandbox_PhunMart_DefaultPrice_tooltip": "The default price for items when no other is specified",
+    "Sandbox_PhunMart_TokenCap": "Token Balance Cap",
+    "Sandbox_PhunMart_TokenCap_tooltip": "Maximum number of special tokens a player can carry.",
 
     "Sandbox_PhunMart_DefaultHoursToRestock": "Default hours between restocking",
     "Sandbox_PhunMart_DefaultHoursToRestock_tooltip": "The default number of hours between restocking a shop. 0 would mean that (by default) the shops are only ever stocked once",

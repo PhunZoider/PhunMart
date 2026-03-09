@@ -13,50 +13,43 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
     local itemType = item:getFullType()
     local wallet = nil
 
-    -- if srcContainer and instanceof(srcContainer:getParent(), "IsoDeadBody") then
     if itemType == "PhunMart.DroppedWallet" then
-        -- picking up a players wallet
+        -- picking up a players dropped wallet
         wallet = item:getModData().PhunWallet
         if wallet then
             local name = player:getUsername()
             if Core.isLocal then
                 name = player:getPlayerNum()
             end
-            if wallet.wallet and (not Core.settings.OnlyPickupOwn or name == wallet.owner) then
-            elseif wallet.wallet and Core.settings.OnlyPickupOwn and name ~= wallet.owner then
-                return {
-                    ignoreAction = true
-                }
+            if wallet.wallet and Core.settings.OnlyPickupOwn and name ~= wallet.owner then
+                return { ignoreAction = true }
             end
         end
     end
-    -- end
 
     local action = originalNewInventoryTransaferAction(self, player, item, srcContainer, destContainer, time)
 
     if wallet and wallet.wallet then
         action:setOnComplete(function()
-            -- add the items in the dropped wallet to the player
+            -- Merge dropped wallet currencies into player. Cap applies per-adjust call.
             for k, v in pairs(wallet.wallet or {}) do
                 Wallet:adjust(player, v.item, v.amount)
             end
-            -- destContainer:removeItemOnServer(item);
             destContainer:DoRemoveItem(item)
-            destContainer:setDrawDirty(true);
-            -- local invItem = player:getInventory():getItemFromTypeRecurse("PhunMart.DroppedWallet")
-            -- if invItem then -- ?
-            --     invItem:getContainer():DoRemoveItem(invItem)
-            -- end
-            getSoundManager():PlaySound("PhunWallet_Pickup", false, 0):setVolume(0.50);
-
+            destContainer:setDrawDirty(true)
+            getSoundManager():PlaySound("PhunWallet_Pickup", false, 0):setVolume(0.50)
         end)
     elseif Wallet:isCurrency(itemType) then
         action:setOnComplete(function()
             local destType = destContainer:getType()
             if destType ~= "floor" then
-                Wallet:adjust(player, itemType, 1)
-                destContainer:DoRemoveItem(item)
-                destContainer:setDrawDirty(true);
+                -- Client-side cap gate: only consume the coin if we're not at cap.
+                local adjusted, atCap = Wallet:adjust(player, itemType, 1)
+                if adjusted then
+                    destContainer:DoRemoveItem(item)
+                    destContainer:setDrawDirty(true)
+                end
+                -- If atCap (adjusted=false), coin stays in inventory as a visual cue.
             end
         end)
     end

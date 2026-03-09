@@ -1,3 +1,13 @@
+-- PhunMart2 Prices
+-- Defines named price configs referenced by pools and offers.
+--
+-- kind = "free"                              no cost
+-- kind = "currency", pool, amount            deducted from the player's wallet pool
+-- kind = "items", items = {{item, amount}}   physical items consumed from inventory
+--
+-- pool "change"  = loose coin balance (stored in cents: 25 = $0.25)
+-- pool "tokens"  = special bound tokens (integer count)
+
 return {
 
     -- ── Free ─────────────────────────────────────────────────────────────────
@@ -5,186 +15,91 @@ return {
         kind = "free"
     },
 
-    -- ── Silver coins ─────────────────────────────────────────────────────────
-    coin_1 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 1
-        }}
+    -- ── Change (cents) ───────────────────────────────────────────────────────
+    -- Typical vending machine prices. Remember: 1 nickel = 5¢, 1 dime = 10¢, 1 quarter = 25¢.
+
+    change_05 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 5        -- $0.05  (one nickel)
     },
-    coin_5 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 5
-        }}
+    change_10 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 10       -- $0.10  (one dime)
     },
-    coin_10 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 10
-        }}
+    change_25 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 25       -- $0.25  (one quarter)
     },
-    coin_15 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 15
-        }}
+    change_50 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 50       -- $0.50
     },
-    coin_25 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 25
-        }}
+    change_75 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 75       -- $0.75
     },
-    coin_40 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 40
-        }}
+    change_100 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 100      -- $1.00
     },
-    coin_50 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 50
-        }}
+    change_150 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 150      -- $1.50
     },
-    coin_75 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 75
-        }}
+    change_200 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 200      -- $2.00
     },
-    coin_100 = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 100
-        }}
+    change_250 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 250      -- $2.50
+    },
+    change_500 = {
+        kind   = "currency",
+        pool   = "change",
+        amount = 500      -- $5.00
     },
 
-    -- Range variants (for shops that feel more organic)
-    coin_low = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 5,
-                max = 15
-            }
-        }}
+    -- ── Tokens ───────────────────────────────────────────────────────────────
+    -- Special bound tokens. Used for premium shops (traits, vehicles, etc.)
+
+    token_1 = {
+        kind   = "currency",
+        pool   = "tokens",
+        amount = 1
     },
-    coin_mid = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 20,
-                max = 40
-            }
-        }}
+    token_2 = {
+        kind   = "currency",
+        pool   = "tokens",
+        amount = 2
     },
-    coin_high = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 50,
-                max = 80
-            }
-        }}
+    token_3 = {
+        kind   = "currency",
+        pool   = "tokens",
+        amount = 3
     },
-    coin_vhigh = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = {
-                min = 80,
-                max = 120
-            }
-        }}
+    token_5 = {
+        kind   = "currency",
+        pool   = "tokens",
+        amount = 5
     },
 
-    -- ── Gold coins ───────────────────────────────────────────────────────────
-    gold_1 = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = 1
-        }}
-    },
-    gold_5 = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = 5
-        }}
-    },
-    gold_10 = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = 10
-        }}
-    },
-    gold_25 = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = 25
-        }}
-    },
+    -- ── Physical items ───────────────────────────────────────────────────────
+    -- Use for barter-style shops or recipes that require inventory items.
+    -- (Uncomment and adapt as needed)
 
-    -- XP boosts (slightly more expensive than same-tier XP to reflect duration benefit)
-    coin_boost = {
-        kind = "items",
-        items = {{
-            item = "Base.Silver",
-            amount = 20
-        }}
-    },
-
-    -- ── Trait token (placeholder - replace item key when implemented) ─────────
-    -- token_trait = { kind = "items", items = {{ item = "PhunMart.TraitToken", amount = 1 }} },
-
-    -- ── Vehicle (separate kind, not items) ───────────────────────────────────
-    -- Vehicles use gold coins as premium currency
-    vehicle_common = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = {
-                min = 5,
-                max = 10
-            }
-        }}
-    },
-    vehicle_uncommon = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = {
-                min = 10,
-                max = 20
-            }
-        }}
-    },
-    vehicle_rare = {
-        kind = "items",
-        items = {{
-            item = "Base.Gold",
-            amount = {
-                min = 20,
-                max = 40
-            }
-        }}
-    }
+    -- bandage_1 = {
+    --     kind  = "items",
+    --     items = {{ item = "Base.Bandage", amount = 1 }}
+    -- },
 
 }

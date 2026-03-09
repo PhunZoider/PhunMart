@@ -62,20 +62,24 @@ option PhunMart.ReplacementKey
     translation=PhunMart_ReplacementKey,
 }
 
-option PhunMart.DefaultCurrencyItemType
+option PhunMart.ChangeCapCents
 {
-    type = string,
-    default = PhunMart.QuarterCoin,
+    type = integer,
+    default = 9999,
+    min = 0,
+    max = 999999,
     page = PhunMartSettings,
-    translation=PhunMart_DefaultCurrencyItemType,
+    translation = PhunMart_ChangeCapCents,
 }
 
-option PhunMart.DefaultPrice
+option PhunMart.TokenCap
 {
-    type = string,
-    default = 5,
+    type = integer,
+    default = 99,
+    min = 0,
+    max = 9999,
     page = PhunMartSettings,
-    translation=PhunMart_DefaultPrice,
+    translation = PhunMart_TokenCap,
 }
 
 option PhunMart.DefaultHoursToRestock

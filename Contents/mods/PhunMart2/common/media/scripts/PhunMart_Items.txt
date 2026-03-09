@@ -17,36 +17,44 @@ module PhunMart
         StaticModel 	= PhunWallet,
     }
 
-    item QuarterCoin
+    item Nickel
     {
         Weight = 0.01,
         Type = Normal,
         ItemType = phunmart:currency,
-	    DisplayName = Quarter,
-	    Icon = QuarterCoin,
+        DisplayName = Nickel,
+        Icon = Nickel,
         DisplayCategory = Currency,
-
     }
 
-    item SilverDollar
+    item Dime
     {
         Weight = 0.01,
         Type = Normal,
         ItemType = phunmart:currency,
-	    DisplayName = Silver Dollar,
-	    Icon = SilverDollar,
-        scale = 0.4,
+        DisplayName = Dime,
+        Icon = Dime,
         DisplayCategory = Currency,
-    } 
+    }
 
-    item TraiterToken
+    item Quarter
+    {
+        Weight = 0.01,
+        Type = Normal,
+        ItemType = phunmart:currency,
+        DisplayName = Quarter,
+        Icon = QuarterCoin,
+        DisplayCategory = Currency,
+    }
+
+    item Token
     {
         Weight = 0.01,
         Type = Normal,
         ItemType = phunwallet2:currency,
-	    DisplayName = Traiter Joe Token,
-	    Icon = TraiterToken,
-        DisplayCategory = Currency, 
+        DisplayName = Traiter Joe Token,
+        Icon = TraiterToken,
+        DisplayCategory = Currency,
     }
 
     item VehicleKeySpawner
@@ -54,14 +62,6 @@ module PhunMart
         ItemType        =   base:normal,
         Weight          =   1,
         Icon            =   CarKey,
-    }
-    item TraiterToken
-    {
-        ItemType        = base:normal,
-        Weight          = 0.01,
-        DisplayName     = Traiter Joe Token,
-        Icon            = TraiterToken,
-        DisplayCategory = Currency,
     }
 
     item GoodPhoods

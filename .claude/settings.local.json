@@ -25,7 +25,8 @@
       "Bash(grep -rn \"\\\\\\\\[A-Za-z_]\" /d/pz-dev/code/PhunMart2/Docs/luas/)",
       "Bash(xargs -0 grep -E '[\\\\\"\"\\\\047][A-Za-z0-9_]+\\\\\\\\\\\\\\\\[A-Za-z0-9_:]')",
       "Bash(xargs -0 grep -E '\\(Base|phunmart|farmer|sanph\\)[\"\"\\\\047]?\\\\\\\\[^\"\"]')",
-      "Bash(grep -r \"\\\\\\\\Base\\\\|\\\\\\\\phunmart\\\\|\\\\\\\\farming\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2)"
+      "Bash(grep -r \"\\\\\\\\Base\\\\|\\\\\\\\phunmart\\\\|\\\\\\\\farming\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2)",
+      "Bash(wc -l /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/data/*.lua)"
     ],
     "additionalDirectories": [
       "\\tmp"
