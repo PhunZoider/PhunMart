@@ -230,18 +230,18 @@ end
 Commands[Core.commands.addToWallet] = function(_, args)
     for k, v in pairs(args.wallet) do
         for kk, vv in pairs(v) do
-            Core:adjust(k, kk, vv)
+            Core.wallet:adjust(k, kk, vv)
         end
     end
 end
 
 Commands[Core.commands.resetWallet] = function(playerObj, args)
     print("Resetting wallet for ", playerObj:getUsername())
-    Core:reset(playerObj)
+    Core.wallet:reset(playerObj)
 end
 
 Commands[Core.commands.playerSetup] = function(playerObj, args)
-    local wallet = Core:get(playerObj)
+    local wallet = Core.wallet:get(playerObj)
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
         username = playerObj:getUsername(),
         wallet = wallet
@@ -250,17 +250,24 @@ end
 
 Commands[Core.commands.getPlayerList] = function(player, args)
     local players = {}
-    for k, v in pairs(Core.data) do
+    for k, v in pairs(Core.wallet.data) do
         table.insert(players, tostring(k))
     end
-    sendServerCommand(player, Core.name, Core.commands.getPlayersList, {
+    sendServerCommand(player, Core.name, Core.commands.getPlayerList, {
         players = players
     })
 end
 
 Commands[Core.commands.getPlayersWallet] = function(player, args)
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
-        wallet = Core:get(args.playername)
+        wallet = Core.wallet:get(args.playername)
+    })
+end
+
+Commands[Core.commands.adjustPlayerWallet] = function(player, args)
+    Core.wallet:adjustByType(args.playername, args.walletType, args.currencyType, tonumber(args.value or 0))
+    sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
+        wallet = Core.wallet:get(args.playername)
     })
 end
 

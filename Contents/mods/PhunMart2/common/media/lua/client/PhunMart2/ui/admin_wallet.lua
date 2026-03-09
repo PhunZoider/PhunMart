@@ -17,10 +17,6 @@ Core.ui.admin = ISPanel:derive(windowName);
 Core.ui.admin.instances = {}
 local UI = Core.ui.admin
 
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
-
 local function refreshPlayers()
     sendClientCommand(Core.name, Core.commands.getPlayerList, {})
 end
@@ -80,7 +76,7 @@ end
 function UI:setWallet(wallet)
     self.datas:clear();
     local bound = {}
-    for k, v in pairs(Core.currencies or {}) do
+    for k, v in pairs(Core.wallet.currencies or {}) do
         local item = getScriptManager():getItem(k)
         if item then
             v.label = v.label or k
@@ -106,7 +102,7 @@ function UI:promptForValue(playerName, walletType, currencyType, value)
         tostring(value), nil, function(target, button, obj)
             if button.internal == "OK" then
                 sendClientCommand(Core.name, Core.commands.adjustPlayerWallet, {
-                    player = playerName,
+                    playername = playerName,
                     walletType = walletType,
                     currencyType = currencyType,
                     value = button.parent.entry:getText()
@@ -244,7 +240,7 @@ end
 function UI:close()
     self:setVisible(false);
     self:removeFromUIManager();
-    UI.instance = nil
+    UI.instances[self.playerIndex] = nil
 end
 
 function UI:new(x, y, width, height, player)

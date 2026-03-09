@@ -65,8 +65,8 @@ function UI:new(x, y, width, height, player)
     o.itemsHeight = 200
     o.player = getSpecificPlayer(player)
     o.playerName = o.player:getUsername()
-    o.data = Core:get(o.player)
-    o.currencies = Core.currencies
+    o.data = Core.wallet:get(o.player)
+    o.currencies = Core.wallet.currencies
     UI.instance = o;
     Events.EveryOneMinute.Add(setup)
     return o;
@@ -75,7 +75,7 @@ end
 function UI:refreshData()
     self.datas:clear();
     local currentCatagories = {}
-    for k, v in pairs(Core.currencies or {}) do
+    for k, v in pairs(Core.wallet.currencies or {}) do
         local item = getScriptManager():getItem(k)
         if item then
             v.label = item:getDisplayName() or k
@@ -101,6 +101,13 @@ function UI:createChildren()
     self.datas:addColumn("Value", 200);
 
     self:addChild(self.datas);
+
+    self.tooltip = ISToolTip:new();
+    self.tooltip:initialise();
+    self.tooltip:setVisible(false);
+    self.tooltip:setAlwaysOnTop(true)
+    self.tooltip.description = "";
+
     self:refreshData()
 end
 
@@ -155,7 +162,7 @@ function UI:drawDatas(y, item, alt)
 
     self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
 
-    local wallet = Core:get(self.parent.player)
+    local wallet = Core.wallet:get(self.parent.player)
     local value = tostring(wallet.current[item.text] or 0)
 
     if item.item.texture then
@@ -179,8 +186,10 @@ end
 
 function UI:doOnMouseMoveOutside(dx, dy)
     local tooltip = self.parent.tooltip
-    tooltip:setVisible(false)
-    tooltip:removeFromUIManager()
+    if tooltip then
+        tooltip:setVisible(false)
+        tooltip:removeFromUIManager()
+    end
 end
 function UI:doOnMouseMove(dx, dy)
 
@@ -195,10 +204,10 @@ function UI:doOnMouseMove(dx, dy)
                 item = self.items[row] and self.items[row].item
                 if item and item.bound then
                     tooltip = self.parent.tooltip
-                    local viewer = self.parent.playerObj
+                    local viewer = self.parent.player
                     tooltip:setName(item.label)
                     tooltip.description = getText("IGUI_PhunWallet.BalanceReplenishedOnDeath",
-                        formatWholeNumber(self.data[item.key] or 0))
+                        formatWholeNumber(self.parent.data.bound[item.text] or 0))
                     if not tooltip:isVisible() then
 
                         tooltip:addToUIManager();

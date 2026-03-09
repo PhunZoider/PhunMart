@@ -48,7 +48,8 @@ PhunMart = {
         updateWallet = "PhunMartUpdateWallet",
 
         getPlayerList = "PhunMartGetPlayerList",
-        getPlayersWallet = "PhunMartGetPlayersWallet"
+        getPlayersWallet = "PhunMartGetPlayersWallet",
+        adjustPlayerWallet = "PhunMartAdjustPlayerWallet"
     },
     events = {
         OnReady = "OnPhunMartOnReady",

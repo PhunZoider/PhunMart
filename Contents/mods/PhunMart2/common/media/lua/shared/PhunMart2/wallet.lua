@@ -3,6 +3,7 @@ local Core = PhunMart
 
 Core.wallet = {
     name = "PhunMart_Wallet",
+    log = "wallet.log",
     currencies = {
         ["PhunMart.QuarterCoin"] = {
             bound = false
@@ -26,10 +27,10 @@ end
 
 function Core.wallet:get(player)
     local key = nil
-    if self.wallet.data == nil then
-        self.wallet.data = ModData.getOrCreate(self.wallet.name)
+    if self.data == nil then
+        self.data = ModData.getOrCreate(self.name)
     end
-    if self.isLocal then
+    if Core.isLocal then
         key = 0
     elseif type(player) == "string" then
         key = player
@@ -37,20 +38,20 @@ function Core.wallet:get(player)
         key = player:getUsername()
     end
     if key then
-        if not self.wallet.data[key] then
-            self.wallet.data[key] = {
+        if not self.data[key] then
+            self.data[key] = {
                 current = {},
                 bound = {},
                 purchases = {}
             }
         end
-        return self.wallet.data[key]
+        return self.data[key]
     end
 end
 
 function Core.wallet:setPlayerData(player, data)
     local w = self:get(player) -- ensure it has at least default
-    self.wallet.data[player] = data
+    self.data[player] = data
 end
 
 function Core.wallet:reset(player)
@@ -59,7 +60,7 @@ function Core.wallet:reset(player)
 
     if isClient() then
         -- tell the server to do the same thing
-        sendClientCommand(player, self.name, self.commands.resetWallet, {
+        sendClientCommand(Core.name, Core.commands.resetWallet, {
             username = name
         })
     end
@@ -70,7 +71,7 @@ function Core.wallet:reset(player)
 
         if (w.current[k] or 0) > 0 then
             -- deduct current amount
-            Core.tools.logTo(self.consts.log, name, k, 0 - w.current[k])
+            Core.tools.logTo(self.log, name, k, 0 - w.current[k])
             w.current[k] = 0
         end
 
@@ -78,9 +79,18 @@ function Core.wallet:reset(player)
             -- overwrite any bound amount
             if (w.bound[k] or 0) > 0 then
                 w.current[k] = w.bound[k]
-                Core.tools.logTo("wallet.log", name, k, w.current[k])
+                Core.tools.logTo(self.log, name, k, w.current[k])
             end
         end
+    end
+end
+
+function Core.wallet:adjustByType(player, walletType, item, amount)
+    local name = type(player) == "string" and player or player:getUsername()
+    local w = self:get(name)
+    if w then
+        w[walletType][item] = (w[walletType][item] or 0) + amount
+        Core.tools.logTo(self.log, name, item, amount)
     end
 end
 
@@ -98,15 +108,14 @@ function Core.wallet:adjust(player, item, amount)
         if isClient() then
             -- add to queue to send to server
             if not self.queue then
-                self.queue = require "PhunWallet/queue"
-                self.queue.module = self.name
-                self.queue.sendCommand = self.commands.addToWallet
+                self.queue = require "PhunMart2/itemqueue"
+                self.queue.module = Core.name
+                self.queue.sendCommand = Core.commands.addToWallet
             end
             self.queue:add(player, item, amount or 1)
         end
-        if PL then
-            local pl = PL
-            Core.tools.logTo(self.consts.log, name, item, amount or 1)
-        end
+
+        Core.tools.logTo(self.log, name, item, amount or 1)
+
     end
 end

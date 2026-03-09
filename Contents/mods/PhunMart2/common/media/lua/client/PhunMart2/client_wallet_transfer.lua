@@ -3,7 +3,8 @@ if isServer() then
 end
 
 require "TimedActions/ISInventoryTransferAction"
-local Core = PhunWallet
+local Core = PhunMart
+local Wallet = Core.wallet
 
 -- Hook the original New Inventory Transfer Method
 local originalNewInventoryTransaferAction = ISInventoryTransferAction.new
@@ -13,7 +14,7 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
     local wallet = nil
 
     -- if srcContainer and instanceof(srcContainer:getParent(), "IsoDeadBody") then
-    if itemType == "PhunWallet.DroppedWallet" then
+    if itemType == "PhunMart.DroppedWallet" then
         -- picking up a players wallet
         wallet = item:getModData().PhunWallet
         if wallet then
@@ -37,7 +38,7 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
         action:setOnComplete(function()
             -- add the items in the dropped wallet to the player
             for k, v in pairs(wallet.wallet or {}) do
-                Core:adjust(player, v.item, v.amount)
+                Wallet:adjust(player, v.item, v.amount)
             end
             -- destContainer:removeItemOnServer(item);
             destContainer:DoRemoveItem(item)
@@ -49,11 +50,11 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
             getSoundManager():PlaySound("PhunWallet_Pickup", false, 0):setVolume(0.50);
 
         end)
-    elseif Core:isCurrency(itemType) then
+    elseif Wallet:isCurrency(itemType) then
         action:setOnComplete(function()
             local destType = destContainer:getType()
             if destType ~= "floor" then
-                Core:adjust(player, itemType, 1)
+                Wallet:adjust(player, itemType, 1)
                 destContainer:DoRemoveItem(item)
                 destContainer:setDrawDirty(true);
             end

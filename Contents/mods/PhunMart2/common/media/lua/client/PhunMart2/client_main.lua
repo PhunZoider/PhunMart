@@ -4,25 +4,17 @@ end
 
 local Core = PhunMart
 
-function Core.initiateOpen()
-
-end
-
-function Core.completeOpen(player, shopObj)
-
-end
-
 function Core:drop(player)
 
-    local wallet = self:get(player).current or {}
+    local wallet = self.wallet:get(player).current or {}
     local toAdd = {}
 
     if self.settings.DropOnDeath then
         local doAdd = false
         for k, v in pairs(wallet) do
-            local currency = self.currencies[k]
+            local currency = self.wallet.currencies[k]
             -- skip bound entries
-            if not self.currencies[k].bound then
+            if not self.wallet.currencies[k].bound then
                 local rate = 100
                 if currency.returnRate then
                     rate = currency.returnRate
@@ -41,8 +33,8 @@ function Core:drop(player)
         if #toAdd > 0 then
             -- drop the wallet
             local square = player:getSquare()
-            local item = instanceItem("PhunWallet.DroppedWallet")
-            item:setName(getText("IGUI_PhunWallet_CharsWallet", player:getUsername()))
+            local item = InventoryItemFactory.CreateItem("PhunMart.DroppedWallet")
+            item:setName(getText("IGUI_PhunMart_CharsWallet", player:getUsername()))
             local data = {
                 owner = player:getUsername(),
                 wallet = toAdd

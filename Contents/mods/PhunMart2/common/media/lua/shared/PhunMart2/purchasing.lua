@@ -1,6 +1,6 @@
 require "PhunMart2/core"
 local Core = PhunMart
-local PW = PhunWallet
+local Wallet = Core.wallet
 
 function Core:canAffords(player, itemsAndPrice)
 
@@ -18,8 +18,8 @@ function Core:canAffords(player, itemsAndPrice)
 end
 
 function Core:canAfford(player, item, price)
-    if PW and PW:isCurrency(item) then
-        return Core:getCurrent(player)[item] >= price
+    if Wallet:isCurrency(item) then
+        return Wallet:getCurrent(player)[item] >= price
     else
         return player:getInventory():getItemCountRecursive(item) >= price
     end

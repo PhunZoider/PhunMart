@@ -1,10 +1,10 @@
 local queue = {
-    module = "PhunWallet",
+    module = "PhunMart",
     sendCommand = "addToWallet",
     items = {}
 }
 
-local processing = {}
+-- local processing = {}
 
 local function sendQueue()
     queue:send()
@@ -32,18 +32,18 @@ function queue:send()
     queue.items = {}
 end
 
-function queue:complete(index)
+-- function queue:complete(index)
 
-    local toSend = processing[index]
-    for i, v in ipairs(toSend) do
-        local player = v[1]
-        local items = v[2]
-        for item, qty in pairs(items) do
-            Core.wallet:adjust(player, item, qty)
-        end
-    end
-    table.remove(processing, index)
+--     local toSend = processing[index]
+--     for i, v in ipairs(toSend) do
+--         local player = v[1]
+--         local items = v[2]
+--         for item, qty in pairs(items) do
+--             Core.wallet:adjust(player, item, qty)
+--         end
+--     end
+--     table.remove(processing, index)
 
-end
+-- end
 
 return queue
