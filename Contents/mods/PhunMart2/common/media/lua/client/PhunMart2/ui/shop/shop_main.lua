@@ -844,6 +844,28 @@ function UI:render()
             self.feedbackText = nil
         end
     end
+
+    -- Wallet balance — right-aligned, always visible
+    if Core.wallet then
+        local function fmtChange(n)
+            if n % 100 == 0 then return "$" .. tostring(n / 100)
+            else return string.format("$%.2f", n / 100) end
+        end
+        local change = Core.wallet:getBalance(self.player, "change")
+        local tokens = Core.wallet:getBalance(self.player, "tokens")
+        local balTxt
+        if change > 0 and tokens > 0 then
+            balTxt = fmtChange(change) .. "  " .. tokens .. "t"
+        elseif tokens > 0 then
+            balTxt = tokens .. "t"
+        else
+            balTxt = fmtChange(change)
+        end
+        local bw = getTextManager():MeasureStringX(UIFont.Small, balTxt)
+        self:drawText(balTxt, fz.x + fz.w - bw - 6,
+            math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.72, 0.88, 0.28, 0.85, UIFont.Small)
+    end
+
     if self.feedbackText then
         local fc = self.feedbackColor
         local txt = truncate(self.feedbackText, fz.w - 12, UIFont.Small)
