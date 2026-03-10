@@ -1,0 +1,94 @@
+if isClient() then
+    return
+end
+local Core = PhunMart
+
+function Core.getCoinChance(zed)
+    local loot = Core.loot or {}
+    local chance = loot.chance or 0.30 -- probability a zombie carries change
+    local minCents = loot.minCents or 5
+    local maxCents = loot.maxCents or 75
+
+    return chance, minCents, maxCents
+end
+
+local activeMods = getActivatedMods()
+if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) then
+
+    require "PhunZones/core"
+    local PZ = PhunZones
+    local checkSprinters = false
+    if PZ and PZ.fields then
+
+        PZ.fields.coinchance = {
+            label = "IGUI_PhunMart_CoinDropChance",
+            type = "string",
+            tooltip = "IGUI_PhunMart_CoinDropChance_tooltip",
+            group = "PhunMart",
+            order = 200
+        }
+        PZ.fields.coinmin = {
+            label = "IGUI_PhunMart_CoinMinCents",
+            type = "string",
+            tooltip = "IGUI_PhunMart_CoinMinCents_tooltip",
+            group = "PhunMart",
+            order = 200
+        }
+        PZ.fields.coinmax = {
+            label = "IGUI_PhunMart_CoinMaxCents",
+            type = "string",
+            tooltip = "IGUI_PhunMart_CoinMaxCents_tooltip",
+            group = "PhunMart",
+            order = 200
+        }
+        if activeMods:contains("phunsprinters2") or activeMods:contains("phunsprinters2test") then
+
+            checkSprinters = true
+            PZ.fields.coinsprinterchance = {
+                label = "IGUI_PhunMart_CoinSprinterDropChance",
+                type = "string",
+                tooltip = "IGUI_PhunMart_CoinSprinterDropChance_tooltip",
+                group = "PhunMart",
+                order = 200
+            }
+            PZ.fields.coinsprintermin = {
+                label = "IGUI_PhunMart_CoinSprinterMinCents",
+                type = "string",
+                tooltip = "IGUI_PhunMart_CoinSprinterMinCents_tooltip",
+                group = "PhunMart",
+                order = 200
+            }
+            PZ.fields.coinsprintermax = {
+                label = "IGUI_PhunMart_CoinSprinterMaxCents",
+                type = "string",
+                tooltip = "IGUI_PhunMart_CoinSprinterMaxCents_tooltip",
+                group = "PhunMart",
+                order = 200
+            }
+        end
+
+        Core.getCoinChance = function(zed)
+
+            local location = PZ.getLocation(zed:getX(), zed:getY())
+            local isSprinter = false
+
+            local loot = Core.loot or {
+                chance = location.coinchance or 0.30, -- probability a zombie carries change
+                minCents = location.coinmin or 5,
+                maxCents = location.coinmax or 75
+            }
+
+            if checkSprinters then
+                -- was this a sprinter?
+                if (zed:getModData().PhunSprinters or {}).sprinter then
+                    loot.chance = location.coinsprinterchance or loot.chance
+                    loot.minCents = location.coinsprintermin or loot.minCents
+                    loot.maxCents = location.coinsprintermax or loot.maxCents
+                end
+            end
+
+            return tonumber(loot.chance), tonumber(loot.minCents), tonumber(loot.maxCents)
+        end
+
+    end
+end

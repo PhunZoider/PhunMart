@@ -53,12 +53,7 @@ Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobject
     end
 end)
 
-Events.OnCharacterDeath.Add(function(playerObj)
-    if instanceof(playerObj, "IsoPlayer") and playerObj:isLocalPlayer() then
-        Core:drop(playerObj)
-        Core:reset(playerObj)
-    end
-end)
+-- wallet drop and reset are handled server-side in server_events.lua
 
 local function setup()
     Events.OnTick.Remove(setup)

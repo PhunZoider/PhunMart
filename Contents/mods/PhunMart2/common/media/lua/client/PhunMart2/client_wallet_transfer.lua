@@ -22,7 +22,9 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                 name = player:getPlayerNum()
             end
             if wallet.wallet and Core.settings.OnlyPickupOwn and name ~= wallet.owner then
-                return { ignoreAction = true }
+                return {
+                    ignoreAction = true
+                }
             end
         end
     end
@@ -31,13 +33,20 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
 
     if wallet and wallet.wallet then
         action:setOnComplete(function()
-            -- Merge dropped wallet currencies into player. Cap applies per-adjust call.
-            for k, v in pairs(wallet.wallet or {}) do
-                Wallet:adjust(player, v.item, v.amount)
+            -- Merge dropped wallet pool balances into player, respecting caps.
+            for _, entry in ipairs(wallet.wallet or {}) do
+                if entry.pool and entry.amount and entry.amount > 0 then
+                    local cap = Wallet:getCap(entry.pool)
+                    local bal = Wallet:getBalance(player, entry.pool)
+                    local toAdd = cap and math.min(entry.amount, cap - bal) or entry.amount
+                    if toAdd > 0 then
+                        Wallet:adjustByPool(player, "current", entry.pool, toAdd)
+                    end
+                end
             end
             destContainer:DoRemoveItem(item)
             destContainer:setDrawDirty(true)
-            getSoundManager():PlaySound("PhunWallet_Pickup", false, 0):setVolume(0.50)
+            getSoundManager():PlaySound("PhunMart_WalletPickup", false, 0):setVolume(0.50)
         end)
     elseif Wallet:isCurrency(itemType) then
         action:setOnComplete(function()
