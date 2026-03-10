@@ -346,6 +346,18 @@ end
 -- -----------------------------
 -- Price normalization / resolution
 -- -----------------------------
+local function snapNickelUp(n)
+    return math.ceil(n / 5) * 5
+end
+
+local function snapNickelDown(n)
+    return math.floor(n / 5) * 5
+end
+
+local function snapNickelNearest(n)
+    return math.floor((n + 2) / 5) * 5
+end
+
 local function normalizeAmount(amount)
     if amount == nil then
         return 1
@@ -416,6 +428,48 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
     end
 
     p.kind = p.kind or "items"
+
+    if p.kind == "currency" then
+        -- Nickel-align change amounts (pool="change" only; tokens use integer counts)
+        if p.pool == "change" then
+            local ref = type(priceRefOrInline) == "string" and priceRefOrInline or "(inline)"
+            if type(p.amount) == "number" then
+                local snapped = snapNickelNearest(p.amount)
+                if snapped ~= p.amount then
+                    logger:warn(
+                        "Price '" .. ref .. "': amount " .. p.amount .. " is not a multiple of 5; snapped to " ..
+                            snapped)
+                end
+                if snapped <= 0 then
+                    logger:error("Price '" .. ref .. "': amount snapped to 0 or less; minimum is 5")
+                    return nil
+                end
+                p.amount = snapped
+            elseif type(p.amount) == "table" and p.amount.min and p.amount.max then
+                local sMin = snapNickelUp(p.amount.min)
+                local sMax = snapNickelDown(p.amount.max)
+                if sMin ~= p.amount.min or sMax ~= p.amount.max then
+                    logger:warn("Price '" .. ref .. "': range {min=" .. p.amount.min .. ", max=" .. p.amount.max ..
+                                    "} snapped to {min=" .. sMin .. ", max=" .. sMax .. "}")
+                end
+                if sMin <= 0 then
+                    logger:error("Price '" .. ref .. "': snapped min is 0 or less; minimum is 5")
+                    return nil
+                end
+                if sMin > sMax then
+                    logger:error("Price '" .. ref .. "': range {min=" .. p.amount.min .. ", max=" .. p.amount.max ..
+                                     "} has no valid multiples of 5")
+                    return nil
+                end
+                p.amount = {
+                    min = sMin,
+                    max = sMax
+                }
+            end
+        end
+        return p
+    end
+
     if p.kind ~= "items" then
         -- keep future-proof; you can implement other kinds later
         return p
@@ -617,16 +671,6 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         groupDef and groupDef.defaults and groupDef.defaults.conditions), itemDef and itemDef.conditions)
 
     merged.offer = normalizeOffer(merged.offer)
-
-    if itemType == "Base.Katana" then
-        print("[PhunMart2] poolDef.defaults.price=" .. tostring(poolDef.defaults and poolDef.defaults.price))
-        print("[PhunMart2] poolDef.defaults.prices=" .. tostring(poolDef.defaults and poolDef.defaults.prices))
-    end
-
-    if itemType == "Base.Katana" then
-        print("[PhunMart2] Katana merged.price = " .. tostring(merged.price))
-        print("[PhunMart2] Prices.low10 exists? " .. tostring(ctx.prices and ctx.prices["low10"] ~= nil))
-    end
 
     local priceResolved = resolvePrice(ctx.prices, merged.price, logger)
     local rewardResolved = resolveReward(ctx.rewards, merged.reward, itemType, merged.offer.qty, logger)

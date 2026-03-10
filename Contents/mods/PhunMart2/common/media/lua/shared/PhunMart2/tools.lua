@@ -391,8 +391,15 @@ local function tableOfStringsToTable(lines)
         return nil, "invalid input: empty or non-table"
     end
 
-    local firstLine = lines[1] or ""
-    local startsWithReturn = firstLine:match("^%s*return") ~= nil
+    -- Scan past blank/comment lines to find the first real line
+    local startsWithReturn = false
+    for _, line in ipairs(lines) do
+        local trimmed = line:match("^%s*(.-)%s*$")
+        if trimmed ~= "" and not trimmed:match("^%-%-") then
+            startsWithReturn = trimmed:match("^return") ~= nil
+            break
+        end
+    end
     local src
     if startsWithReturn then
         src = table.concat(lines, "\n")

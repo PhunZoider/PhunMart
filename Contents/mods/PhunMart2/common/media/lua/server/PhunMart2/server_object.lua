@@ -21,19 +21,24 @@ local function bakePrice(price)
         return nil
     end
     if price.kind == "free" then
-        return {
-            kind = "free"
-        }
+        return {kind = "free"}
     end
-    local baked = {
-        kind = price.kind,
-        items = {}
-    }
+    if price.kind == "currency" then
+        local amt = price.amount
+        local bakedAmt
+        if type(amt) == "table" and amt.min and amt.max then
+            -- resolve range to a concrete nickel-aligned value at restock time
+            local steps = math.floor((amt.max - amt.min) / 5)
+            bakedAmt = amt.min + ZombRand(0, steps + 1) * 5
+        else
+            bakedAmt = amt
+        end
+        return {kind = "currency", pool = price.pool, amount = bakedAmt}
+    end
+    -- kind = "items"
+    local baked = {kind = price.kind, items = {}}
     for _, line in ipairs(price.items or {}) do
-        local bl = {
-            item = line.item,
-            itemAny = line.itemAny
-        }
+        local bl = {item = line.item, itemAny = line.itemAny}
         local amt = line.amount
         if type(amt) == "table" then
             bl.amount = ZombRand(amt.min or 1, amt.max or amt.min or 1)

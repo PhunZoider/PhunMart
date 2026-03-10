@@ -752,11 +752,27 @@ function UI:renderDetails(z)
 
     -- price
     local price = offer.price
+    local function fmtCents(n)
+        if n % 100 == 0 then
+            return "$" .. tostring(n / 100)
+        else
+            return string.format("$%.2f", n / 100)
+        end
+    end
     local priceText
     if not price then
         priceText = "Price: ?"
     elseif price.kind == "free" then
         priceText = "Price: FREE"
+    elseif price.kind == "currency" then
+        local amt = price.amount
+        if type(amt) == "table" and amt.min and amt.max then
+            priceText = "Price: " .. fmtCents(amt.min) .. " - " .. fmtCents(amt.max)
+        elseif type(amt) == "number" then
+            priceText = "Price: " .. fmtCents(amt)
+        else
+            priceText = "Price: ?"
+        end
     elseif price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
@@ -765,12 +781,19 @@ function UI:renderDetails(z)
         priceText = "Price: ?"
     end
     local pr, pg, pb = 0.72, 0.88, 0.28 -- green: affordable
-    if adapter and price and price.items then
-        for _, pi in ipairs(price.items) do
-            local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-            if (adapter:countItem(pi.item) or 0) < need then
-                pr, pg, pb = 0.90, 0.30, 0.30;
-                break -- red: can't afford
+    if adapter and price then
+        if price.kind == "currency" and adapter.player and Core.wallet then
+            local balance = Core.wallet:getBalance(adapter.player, price.pool)
+            if balance < (price.amount or 0) then
+                pr, pg, pb = 0.90, 0.30, 0.30
+            end
+        elseif price.kind == "items" and price.items then
+            for _, pi in ipairs(price.items) do
+                local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+                if (adapter:countItem(pi.item) or 0) < need then
+                    pr, pg, pb = 0.90, 0.30, 0.30
+                    break
+                end
             end
         end
     end

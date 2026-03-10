@@ -7,7 +7,6 @@
 --
 -- pool "change"  = loose coin balance (stored in cents: 25 = $0.25)
 -- pool "tokens"  = special bound tokens (integer count)
-
 return {
 
     -- ── Free ─────────────────────────────────────────────────────────────────
@@ -19,79 +18,111 @@ return {
     -- Typical vending machine prices. Remember: 1 nickel = 5¢, 1 dime = 10¢, 1 quarter = 25¢.
 
     change_05 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 5        -- $0.05  (one nickel)
+        kind = "currency",
+        pool = "change",
+        amount = 5 -- $0.05  (one nickel)
     },
     change_10 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 10       -- $0.10  (one dime)
+        kind = "currency",
+        pool = "change",
+        amount = 10 -- $0.10  (one dime)
     },
     change_25 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 25       -- $0.25  (one quarter)
+        kind = "currency",
+        pool = "change",
+        amount = 25 -- $0.25  (one quarter)
     },
     change_50 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 50       -- $0.50
+        kind = "currency",
+        pool = "change",
+        amount = 50 -- $0.50
     },
     change_75 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 75       -- $0.75
+        kind = "currency",
+        pool = "change",
+        amount = 75 -- $0.75
     },
     change_100 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 100      -- $1.00
+        kind = "currency",
+        pool = "change",
+        amount = 100 -- $1.00
     },
     change_150 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 150      -- $1.50
+        kind = "currency",
+        pool = "change",
+        amount = 150 -- $1.50
     },
     change_200 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 200      -- $2.00
+        kind = "currency",
+        pool = "change",
+        amount = 200 -- $2.00
     },
     change_250 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 250      -- $2.50
+        kind = "currency",
+        pool = "change",
+        amount = 250 -- $2.50
     },
     change_500 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 500      -- $5.00
+        kind = "currency",
+        pool = "change",
+        amount = 500 -- $5.00
     },
 
     -- ── Tokens ───────────────────────────────────────────────────────────────
     -- Special bound tokens. Used for premium shops (traits, vehicles, etc.)
 
     token_1 = {
-        kind   = "currency",
-        pool   = "tokens",
+        kind = "currency",
+        pool = "tokens",
         amount = 1
     },
     token_2 = {
-        kind   = "currency",
-        pool   = "tokens",
+        kind = "currency",
+        pool = "tokens",
         amount = 2
     },
     token_3 = {
-        kind   = "currency",
-        pool   = "tokens",
+        kind = "currency",
+        pool = "tokens",
         amount = 3
     },
     token_5 = {
-        kind   = "currency",
-        pool   = "tokens",
+        kind = "currency",
+        pool = "tokens",
         amount = 5
     },
+
+    -- ── Named tiers (used by pool defaults) ──────────────────────────────────
+
+    coin_5 = {
+        kind = "currency",
+        pool = "change",
+        amount = 5 -- $0.05
+    },
+    coin_low = {
+        kind = "currency",
+        pool = "change",
+        amount = {
+            min = 250,
+            max = 600
+        } -- $5.00
+    },
+    coin_mid = {
+        kind = "currency",
+        pool = "change",
+        amount = {
+            min = 1000,
+            max = 1200
+        } -- $10.00
+    },
+    coin_high = {
+        kind = "currency",
+        pool = "change",
+        amount = {
+            min = 3000,
+            max = 6000
+        } -- $50.00
+    }
 
     -- ── Physical items ───────────────────────────────────────────────────────
     -- Use for barter-style shops or recipes that require inventory items.
