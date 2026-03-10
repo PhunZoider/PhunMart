@@ -56,6 +56,10 @@ local function getAdapter(player)
         return tostring(self.player:getDescriptor():getForename() .. " " .. self.player:getDescriptor():getSurname())
     end
 
+    function PA:getCharacterId()
+        return self:getCharacterName()
+    end
+
     function PA:nowSeconds()
         return getTimestamp()
     end

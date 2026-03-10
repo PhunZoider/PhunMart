@@ -226,8 +226,10 @@ function ServerSystem:openShop(player, args, forceRestock)
     -- offers live on the shop object (synced via modData); send them alongside
     -- conditionsDefs (shared runtime data, not stored per-object)
     local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shop.type]
+    local shopCfg = Core.shops and Core.shops[shop.type]
     local inventoryData = {
         key = shop:getKey(),
+        shopType = shop.type,
         location = {
             x = shop.x,
             y = shop.y,
@@ -236,7 +238,10 @@ function ServerSystem:openShop(player, args, forceRestock)
         offers = shop.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
         background = shopDef and shopDef.background,
-        defaultView = shopDef and shopDef.defaultView
+        defaultView = shopDef and shopDef.defaultView,
+        poolSets = shopDef and shopDef.poolSets,
+        lastRestock = shop.lastRestock,
+        restockFrequency = (shopCfg and shopCfg.restock) or 24
     }
 
     if Core.isLocal then
@@ -355,9 +360,13 @@ end
 
 function ServerSystem:upsertShopDefinition(data)
 
-    local copy = Core.tools.table.deepCopy(data)
-    Core.shops[data.type] = copy
-    Core.tools.saveTable(Core.consts.shopsLuaFile, Core.shops)
+    -- Load the current override file (only admin-edited entries, not all defaults).
+    local override = Core.tools.loadTable("PhunMart2_Shops.lua") or {}
+    -- Update just this shop's entry in the override.
+    override[data.type] = data
+    -- Persist the override, then recompile so defaults + override merge correctly.
+    Core.tools.saveTable("PhunMart2_Shops.lua", override)
+    self:recompileShops()
 
 end
 
@@ -416,8 +425,20 @@ function ServerSystem:OnClientCommand(command, playerObj, args)
 end
 
 function ServerSystem:recompileShops()
-    Core:compile()
-    print("Recompiled shop definitions")
+    Core.compile()
+    print("PhunMart: Recompiled shop definitions")
+    -- Push updated shop defs to all connected clients.
+    if Core.runtime and Core.runtime.shops then
+        local players = getOnlinePlayers()
+        if players then
+            for i = 0, players:size() - 1 do
+                local player = players:get(i)
+                sendServerCommand(player, Core.name, Core.commands.requestShopDefs, {
+                    shops = Core.runtime.shops
+                })
+            end
+        end
+    end
 end
 
 SGlobalObjectSystem.RegisterSystemClass(ServerSystem)

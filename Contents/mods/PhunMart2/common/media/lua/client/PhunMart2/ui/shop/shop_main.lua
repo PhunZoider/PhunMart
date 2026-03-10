@@ -77,10 +77,10 @@ local L = {
     closeY = 5,
     closeSize = 24,
 
-    -- Admin buttons: stacked in the un-overlaid band (right col, 488-575)
-    adminY1 = 495, -- Restock
-    adminY2 = 536, -- Reroll
-    adminBtnH = 34
+    -- Admin button: top-left corner of banner (mirrors close button top-right)
+    adminBtnX = 5,
+    adminBtnY = 5,
+    adminBtnSize = 24
 }
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -190,6 +190,14 @@ function UI.open(player, data)
         Events[Core.events.OnShopChange].Add(instance._shopChangeFn)
         instance._shopChangeBound = true
     end
+
+    if not instance._purchaseBound then
+        instance._purchaseFn = function(result)
+            instance:onPurchaseComplete(result)
+        end
+        Events[Core.events.OnPurchaseComplete].Add(instance._purchaseFn)
+        instance._purchaseBound = true
+    end
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -256,6 +264,9 @@ function UI:createChildren()
         player = self.player,
         onSelect = function(id, offer)
             self:onOfferSelected(id, offer)
+        end,
+        onRightClick = function(id, offer, screenX, screenY)
+            self:onItemRightClick(id, offer, screenX, screenY)
         end
     })
     self.controls.grid:initialise()
@@ -312,57 +323,18 @@ function UI:createChildren()
     }
     self:addChild(self.controls.closeBtn)
 
-    -- ── admin buttons (only for privileged players) ───────────────────────────
+    -- ── admin button (only for privileged players) ────────────────────────────
     if Core.tools.isAdmin(self.player) then
-        self.controls.restockBtn = ISButton:new(rightX, px(L.adminY1), rightW, px(L.adminBtnH), "RESTOCK", self,
-            UI.onAdminRestock)
-        self.controls.restockBtn:initialise()
-        self.controls.restockBtn:instantiate()
-        self.controls.restockBtn.font = UIFont.Small
-        self.controls.restockBtn.backgroundColor = {
-            r = 0.15,
-            g = 0.09,
-            b = 0.02,
-            a = 0.90
-        }
-        self.controls.restockBtn.backgroundColorMouseOver = {
-            r = 0.30,
-            g = 0.18,
-            b = 0.03,
-            a = 0.95
-        }
-        self.controls.restockBtn.borderColor = {
-            r = 0.70,
-            g = 0.45,
-            b = 0.10,
-            a = 1.00
-        }
-        self:addChild(self.controls.restockBtn)
-
-        self.controls.rerollBtn = ISButton:new(rightX, px(L.adminY2), rightW, px(L.adminBtnH), "REROLL", self,
-            UI.onAdminReroll)
-        self.controls.rerollBtn:initialise()
-        self.controls.rerollBtn:instantiate()
-        self.controls.rerollBtn.font = UIFont.Small
-        self.controls.rerollBtn.backgroundColor = {
-            r = 0.02,
-            g = 0.05,
-            b = 0.15,
-            a = 0.90
-        }
-        self.controls.rerollBtn.backgroundColorMouseOver = {
-            r = 0.04,
-            g = 0.10,
-            b = 0.30,
-            a = 0.95
-        }
-        self.controls.rerollBtn.borderColor = {
-            r = 0.20,
-            g = 0.35,
-            b = 0.70,
-            a = 1.00
-        }
-        self:addChild(self.controls.rerollBtn)
+        local adminSize = px(L.adminBtnSize)
+        self.controls.adminBtn = ISButton:new(px(L.adminBtnX), px(L.adminBtnY), adminSize, adminSize, "⚙", self,
+            UI.onAdminMenu)
+        self.controls.adminBtn:initialise()
+        self.controls.adminBtn:instantiate()
+        self.controls.adminBtn.font = UIFont.Small
+        self.controls.adminBtn.backgroundColor = {r = 0.10, g = 0.10, b = 0.12, a = 0.70}
+        self.controls.adminBtn.backgroundColorMouseOver = {r = 0.20, g = 0.20, b = 0.25, a = 0.90}
+        self.controls.adminBtn.borderColor = {r = 0.35, g = 0.35, b = 0.40, a = 0.80}
+        self:addChild(self.controls.adminBtn)
     end
 
     -- ── 3D vehicle preview (fills the preview zone; hidden until a vehicle offer is selected) ──
@@ -531,8 +503,53 @@ function UI:onBuy()
     if not self.selectedId then
         return
     end
-    -- TODO: sendClientCommand("PhunMart2", "purchase", { offerId = self.selectedId })
+    local loc = self.data and self.data.location
+    if not loc then
+        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        return
+    end
+    -- Disable button immediately to prevent double-click
+    self.controls.buyBtn:setEnable(false)
     self:showFeedback("Purchasing...", 0.9, 0.9, 0.3)
+    sendClientCommand(Core.name, Core.commands.buy, {
+        offerId  = self.selectedId,
+        location = loc,
+        qty      = 1
+    })
+end
+
+function UI:onPurchaseComplete(result)
+    if result.failed then
+        local msgs = {
+            OutOfStock       = "Out of stock",
+            InsufficientFunds = "Not enough funds",
+            ConditionsFailed = "Requirements not met",
+            ShopNotFound     = "Shop not found",
+            OfferNotFound    = "Offer not found",
+        }
+        local msg = msgs[result.message] or ("Purchase failed: " .. tostring(result.message))
+        self:showFeedback(msg, 0.9, 0.3, 0.3)
+        -- Re-enable buy button so the player can try again or choose another
+        if self.selectedId then
+            self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer))
+        end
+        return
+    end
+
+    -- Update stock count in the local offer data (grid re-reads this on next render)
+    if result.offerId and self.data and self.data.offers then
+        local offer = self.data.offers[result.offerId]
+        if offer and offer.offer then
+            offer.offer.stockQty = result.stockQty
+        end
+    end
+
+    -- Re-evaluate buy button for the still-selected offer
+    if self.selectedId == result.offerId then
+        self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer))
+    end
+
+    self:showFeedback("Purchased!", 0.35, 0.90, 0.35)
 end
 
 function UI:showFeedback(msg, r, g, b)
@@ -585,7 +602,6 @@ function UI:onAdminRestock()
 end
 
 function UI:onAdminReroll()
-    local c = Core
     local obj = self:getClientObject()
     if not obj then
         self:showFeedback("No location data", 0.9, 0.3, 0.3)
@@ -593,6 +609,131 @@ function UI:onAdminReroll()
     end
     obj:reroll()
     self:showFeedback("Rerolling shop...", 0.3, 0.5, 0.9)
+end
+
+function UI:onAdminMenu(btn)
+    local screenX = self:getAbsoluteX() + btn:getX()
+    local screenY = self:getAbsoluteY() + btn:getY() + btn.height
+
+    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    context:clear()
+
+    -- ── Change To (replaces Reroll) ───────────────────────────────────────
+    local changeMenu = context:getNew(context)
+    changeMenu:addOption("Random", self, UI.onAdminReroll)
+    -- Fall back to Core.runtime.shops in SP (same Lua state; Core.defs.shops
+    -- may not be populated yet if sendServerCommand is still queued).
+    local shopDefs = (Core.defs and Core.defs.shops) or (Core.runtime and Core.runtime.shops)
+    if shopDefs then
+        local types = {}
+        for k in pairs(shopDefs) do
+            if k ~= self.data.shopType then
+                table.insert(types, k)
+            end
+        end
+        table.sort(types)
+        for _, shopType in ipairs(types) do
+            changeMenu:addOption(shopType, self, UI.onChangeTo, shopType)
+        end
+    end
+    local changeOpt = context:addOption("Change To")
+    context:addSubMenu(changeOpt, changeMenu)
+
+    -- ── Restock ───────────────────────────────────────────────────────────
+    context:addOption("Restock", self, UI.onAdminRestock)
+
+    -- ── Edit Shop ─────────────────────────────────────────────────────────
+    context:addOption("Edit Shop", self, UI.onEditShop)
+
+    -- ── Pools (grouped by pool set; each pool → View / Edit submenu) ──────
+    local poolSets = self.data and self.data.poolSets or {}
+    if #poolSets > 0 then
+        local poolsMenu = context:getNew(context)
+        for si, poolSet in ipairs(poolSets) do
+            local setLabel = #poolSets > 1 and ("Set " .. si) or "Active pools"
+            poolsMenu:addOption("-- " .. setLabel .. " --")
+            for _, poolRef in ipairs(poolSet.keys or {}) do
+                local key = type(poolRef) == "table" and poolRef.key or poolRef
+                local poolSub = poolsMenu:getNew(poolsMenu)
+                poolSub:addOption("View", self, UI.onViewPool, key)
+                poolSub:addOption("Edit", self, UI.onEditPool, key)
+                local poolOpt = poolsMenu:addOption("* " .. key)
+                poolsMenu:addSubMenu(poolOpt, poolSub)
+            end
+        end
+        poolsMenu:addOption("+ Add Pool", self, UI.onNewPool)
+        local poolsOpt = context:addOption("Pools")
+        context:addSubMenu(poolsOpt, poolsMenu)
+    end
+
+    -- ── Blacklist (only when an offer is selected) ────────────────────────
+    if self.selectedOffer then
+        context:addOption("Blacklist in pool", self, UI.onBlacklistSelected)
+    end
+end
+
+-- ── Item right-click (admin only) ─────────────────────────────────────────
+
+function UI:onItemRightClick(id, offer, screenX, screenY)
+    if not Core.tools.isAdmin(self.player) then
+        return
+    end
+    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    context:clear()
+    context:addOption("Blacklist in pool", self, UI.onBlacklistOffer, id, offer)
+    context:addOption("Edit offer", self, UI.onEditOffer, id, offer)
+end
+
+-- ── Action stubs (each will become a panel) ───────────────────────────────
+
+function UI:onChangeTo(shopType)
+    local loc = self.data and self.data.location
+    if not loc then
+        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        return
+    end
+    sendClientCommand(Core.name, Core.commands.changeTo, {to = shopType, location = loc})
+    self:showFeedback("Changing to " .. shopType .. "...", 0.5, 0.7, 0.9)
+end
+
+function UI:onEditShop()
+    local shopDefs = (Core.defs and Core.defs.shops) or (Core.runtime and Core.runtime.shops) or {}
+    local shopDef = shopDefs[self.data.shopType] or {}
+    -- Merge in fields already available from the open-shop payload
+    shopDef.background  = shopDef.background  or self.data.background
+    shopDef.defaultView = shopDef.defaultView or self.data.defaultView
+    shopDef.poolSets    = shopDef.poolSets    or self.data.poolSets
+    Core.ui.client.shopEditor.open(self.player, self.data.shopType, shopDef)
+end
+
+function UI:onViewPool(poolKey)
+    -- TODO: open Pool Viewer panel
+    self:showFeedback("Pool Viewer: " .. poolKey, 0.7, 0.7, 0.3)
+end
+
+function UI:onEditPool(poolKey)
+    -- TODO: open Pool Editor panel
+    self:showFeedback("Pool Editor: " .. poolKey, 0.7, 0.7, 0.3)
+end
+
+function UI:onNewPool()
+    -- TODO: open Pool Editor with blank pool
+    self:showFeedback("Add Pool coming soon", 0.7, 0.7, 0.3)
+end
+
+function UI:onBlacklistSelected()
+    self:onBlacklistOffer(self.selectedId, self.selectedOffer)
+end
+
+function UI:onBlacklistOffer(id, offer)
+    -- TODO: send blacklist command to server
+    local item = offer and offer.item
+    self:showFeedback("Blacklist coming soon: " .. tostring(item), 0.9, 0.4, 0.1)
+end
+
+function UI:onEditOffer(id, offer)
+    -- TODO: open Offer Editor modal
+    self:showFeedback("Offer Editor coming soon", 0.7, 0.7, 0.3)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -604,6 +745,11 @@ function UI:close()
         Events[Core.events.OnShopChange].Remove(self._shopChangeFn)
         self._shopChangeBound = false
         self._shopChangeFn = nil
+    end
+    if self._purchaseBound then
+        Events[Core.events.OnPurchaseComplete].Remove(self._purchaseFn)
+        self._purchaseBound = false
+        self._purchaseFn = nil
     end
     self:setVisible(false)
 end
@@ -704,6 +850,24 @@ function UI:render()
         local tw = getTextManager():MeasureStringX(UIFont.Small, txt)
         self:drawText(txt, math.floor(fz.x + (fz.w - tw) / 2), math.floor(fz.y + (fz.h - FONT_SM) / 2), fc.r, fc.g,
             fc.b, fc.a, UIFont.Small)
+    elseif not (Core.settings and Core.settings.ShowRestockStatus == false) then
+        -- Subtle restock timer — only shown when no feedback message is active
+        local lastRestock = self.data and self.data.lastRestock
+        local freq = self.data and self.data.restockFrequency or 24
+        if lastRestock then
+            local now = GameTime.getInstance():getWorldAgeHours()
+            local hoursLeft = math.max(0, (lastRestock + freq) - now)
+            local statusText
+            if hoursLeft < 0.1 then
+                statusText = "Restock ready"
+            elseif hoursLeft < 1 then
+                statusText = string.format("Restocks in %dm", math.floor(hoursLeft * 60))
+            else
+                statusText = string.format("Restocks in %.1fh", hoursLeft)
+            end
+            self:drawText(statusText, fz.x + 6,
+                math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.32, 0.32, 0.35, 0.75, UIFont.Small)
+        end
     end
 end
 

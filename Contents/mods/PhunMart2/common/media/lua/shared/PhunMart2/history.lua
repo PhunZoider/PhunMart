@@ -29,6 +29,9 @@ function Core.purchases:add(player, key, value)
     if not purchases[charname] then
         purchases[charname] = {}
     end
+    if not purchases[charname][key] then
+        purchases[charname][key] = {}
+    end
     table.insert(purchases[charname][key], {
         value = value or 1,
         timestamp = getTimestamp(),

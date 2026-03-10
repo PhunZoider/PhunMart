@@ -1,6 +1,8 @@
 require "PhunMart2/core"
 local Core = PhunMart
-local Wallet = Core.wallet
+-- NOTE: Do NOT cache Core.wallet here — wallet.lua loads after purchasing.lua
+-- (alphabetical order), so Core.wallet is nil at module load time.
+-- Access Core.wallet directly inside each function instead.
 
 -- Price formats supported:
 --   { kind = "free" }
@@ -12,7 +14,7 @@ function Core:canAfford(player, price)
     if price.kind == "free" then
         return true
     elseif price.kind == "currency" then
-        return Wallet:getBalance(player, price.pool) >= price.amount
+        return Core.wallet:getBalance(player, price.pool) >= price.amount
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do
             if player:getInventory():getItemCountRecursive(entry.item) < entry.amount then
@@ -42,7 +44,7 @@ function Core:deduct(player, price)
     if price.kind == "free" then
         return true
     elseif price.kind == "currency" then
-        Wallet:adjustByPool(player, "current", price.pool, -price.amount)
+        Core.wallet:adjustByPool(player, "current", price.pool, -price.amount)
         return true
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do

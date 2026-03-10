@@ -4,34 +4,78 @@ end
 local Core = PhunMart
 Core.instances = {}
 
-local function mergeInto(base, extra)
-    if type(extra) ~= "table" then
-        return
+-- Deep merge: maps are merged recursively; arrays and primitives are replaced by patch.
+local function deepMerge(base, patch)
+    if type(patch) ~= "table" then
+        return patch
     end
-    for k, v in pairs(extra) do
-        base[k] = v
+    if type(base) ~= "table" then
+        return patch
     end
+    if patch[1] ~= nil then
+        return patch
+    end -- array: replace entirely
+    local result = {}
+    for k, v in pairs(base) do
+        result[k] = v
+    end
+    for k, v in pairs(patch) do
+        if type(v) == "table" and type(result[k]) == "table" and v[1] == nil then
+            result[k] = deepMerge(result[k], v)
+        else
+            result[k] = v
+        end
+    end
+    return result
+end
+
+-- Load a baked-in default file from the mod via require.
+-- Defaults only change when the mod is updated (restart required), so caching is fine.
+local function loadDefaults(path)
+    local ok, result = pcall(require, path)
+    if not ok then
+        print("PhunMart: Warning: could not load defaults '" .. path .. "': " .. tostring(result))
+        return {}
+    end
+    return result or {}
+end
+
+-- Load an optional server-side override file. Returns {} if not present.
+local function loadOverride(filename)
+    return Core.tools.loadTable(filename) or {}
+end
+
+-- Merge multiple default files (key union, no conflicts expected), then apply
+-- multiple override files on top via deep merge.
+local function buildCtx(defaultPaths, overrideNames)
+    local base = {}
+    for _, path in ipairs(defaultPaths) do
+        for k, v in pairs(loadDefaults(path)) do
+            base[k] = v
+        end
+    end
+    local patch = {}
+    for _, name in ipairs(overrideNames) do
+        for k, v in pairs(loadOverride(name)) do
+            patch[k] = v
+        end
+    end
+    return deepMerge(base, patch)
 end
 
 function Core.compile()
 
-    local items = Core.tools.loadTable("PhunMart2_Items.lua") or {}
-    mergeInto(items, Core.tools.loadTable("PhunMart2_XP_Items.lua"))
-
-    local rewards = Core.tools.loadTable("PhunMart2_Rewards.lua") or {}
-    mergeInto(rewards, Core.tools.loadTable("PhunMart2_XP_Rewards.lua"))
-
-    local conditionsDefs = Core.tools.loadTable("PhunMart2_Conditions.lua") or {}
-    mergeInto(conditionsDefs, Core.tools.loadTable("PhunMart2_XP_Conditions.lua"))
-
     local ctx = {
-        prices = Core.tools.loadTable("PhunMart2_Prices.lua"),
-        rewards = rewards,
-        conditionsDefs = conditionsDefs,
-        items = items,
-        groups = Core.tools.loadTable("PhunMart2_Groups.lua"),
-        pools = Core.tools.loadTable("PhunMart2_Pools.lua"),
-        shops = Core.tools.loadTable("PhunMart2_Shops.lua")
+        prices = buildCtx({"PhunMart2/defaults/prices"}, {"PhunMart2_Prices.lua"}),
+        rewards = buildCtx({"PhunMart2/defaults/rewards", "PhunMart2/defaults/xp_rewards"},
+            {"PhunMart2_Rewards.lua", "PhunMart2_XP_Rewards.lua"}),
+        conditionsDefs = buildCtx({"PhunMart2/defaults/conditions", "PhunMart2/defaults/xp_conditions"},
+            {"PhunMart2_Conditions.lua", "PhunMart2_XP_Conditions.lua"}),
+        items = buildCtx({"PhunMart2/defaults/items", "PhunMart2/defaults/xp_items"},
+            {"PhunMart2_Items.lua", "PhunMart2_XP_Items.lua"}),
+        groups = buildCtx({"PhunMart2/defaults/groups"}, {"PhunMart2_Groups.lua"}),
+        pools = buildCtx({"PhunMart2/defaults/pools"}, {"PhunMart2_Pools.lua"}),
+        shops = buildCtx({"PhunMart2/defaults/shops"}, {"PhunMart2_Shops.lua"})
     }
 
     local runtime, log = Core.compiler.compileAll(ctx)
@@ -39,6 +83,79 @@ function Core.compile()
     Core.tools.debug("Warn", log.warnings, "Errors", log.errors)
     return runtime, log
 
+end
+
+-- Dispatch a single reward action onto a player. Called once per action after deduction.
+function Core:grantReward(player, action, qty)
+    qty = qty or 1
+    local t = action.type
+
+    if t == "giveItem" then
+        for i = 1, qty do
+            local item = player:getInventory():AddItem(action.item)
+            if not item then
+                print("[PhunMart2] grantReward: AddItem failed for '" .. tostring(action.item) .. "'")
+            end
+        end
+
+    elseif t == "addTrait" or t == "removeTrait" then
+        -- CharacterTraitDefinition is client-side only. Delegate to the client
+        -- which has the full definition cache and can apply the trait correctly.
+        if Core.isLocal then
+            triggerEvent(Core.events.OnApplyTraitReward, {
+                trait = action.trait,
+                add = (t == "addTrait"),
+                player = player
+            })
+        else
+            sendServerCommand(player, Core.name, Core.commands.applyTraitReward, {
+                playerIndex = player:getPlayerNum(),
+                trait = action.trait,
+                add = (t == "addTrait")
+            })
+        end
+
+    elseif t == "giveXP" then
+        local perk = Perks[action.skill]
+        if perk then
+            addXp(player, perk, (action.amount or 0) * qty)
+        else
+            print("[PhunMart2] grantReward: unknown perk '" .. tostring(action.skill) .. "'")
+        end
+
+    elseif t == "spawnVehicle" then
+        local scripts = action.scripts or (action.script and {action.script}) or {}
+        if #scripts > 0 then
+            local scriptName = scripts[ZombRand(#scripts) + 1]
+            local vehicle = addVehicleDebug(scriptName, IsoDirections.S, nil, player:getSquare())
+            if vehicle then
+                local args = action.args or {}
+                -- Apply condition range
+                local cond = args.condition
+                if cond then
+                    local v = type(cond) == "table" and ZombRand(cond.min or 40, (cond.max or 80) + 1) or cond
+                    for i = 0, vehicle:getPartCount() - 1 do
+                        pcall(function()
+                            vehicle:getPartByIndex(i):setCondition(v)
+                        end)
+                    end
+                end
+                -- Give key to player
+                pcall(function()
+                    player:sendObjectChange("addItem", {
+                        item = vehicle:createVehicleKey()
+                    })
+                end)
+            end
+        end
+
+    elseif t == "applyBoost" then
+        -- XP multiplier boost — not yet implemented
+        print("[PhunMart2] grantReward: applyBoost not yet implemented (skill=" .. tostring(action.skill) .. ")")
+
+    else
+        print("[PhunMart2] grantReward: unknown action type '" .. tostring(t) .. "'")
+    end
 end
 
 function Core:addInstance(instance)

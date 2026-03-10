@@ -78,17 +78,19 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
                 maxCents = location.coinmax or 75
             }
 
+            local chance = loot.chance
+            local minCents = loot.minCents
+            local maxCents = loot.maxCents
+
             if checkSprinters then
-                -- was this a sprinter?
                 if (zed:getModData().PhunSprinters or {}).sprinter then
-                    loot.chance = location.coinsprinterchance or loot.chance
-                    loot.minCents = location.coinsprintermin or loot.minCents
-                    loot.maxCents = location.coinsprintermax or loot.maxCents
+                    chance = location.coinsprinterchance or chance
+                    minCents = location.coinsprintermin or minCents
+                    maxCents = location.coinsprintermax or maxCents
                 end
             end
 
-            return tonumber(loot.chance), tonumber(loot.minCents), tonumber(loot.maxCents)
+            return tonumber(chance), tonumber(minCents), tonumber(maxCents)
         end
-
     end
 end

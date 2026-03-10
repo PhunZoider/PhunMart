@@ -65,8 +65,71 @@ Commands[Core.commands.updateHistory] = function(arguments)
 end
 
 Commands[Core.commands.buy] = function(arguments)
-    Core:completeTransaction(arguments)
+    -- Update local wallet copy so balance display stays current
+    if arguments.wallet and arguments.wallet.current then
+        local username = getSpecificPlayer(arguments.playerIndex or 0)
+        if username then
+            Core.wallet:setPlayerData(username:getUsername(), arguments.wallet)
+        end
+    end
+    -- Fire event so the open shop window can update stock and buy button
+    triggerEvent(Core.events.OnPurchaseComplete, arguments)
 end
+
+-- Scans CharacterTraitDefinition.getTraits() to find the def whose type string
+-- matches our key (e.g. "base:irongut"). getCharacterTraitDefinition() does NOT
+-- accept a plain Lua string — it needs the Java CharacterTrait type object.
+local function findTraitDef(traitKey)
+    local all = CharacterTraitDefinition.getTraits()
+    for i = 0, all:size() - 1 do
+        local t = all:get(i)
+        if t and tostring(t:getType()) == traitKey then
+            return t
+        end
+    end
+    return nil
+end
+
+local function applyTrait(player, traitKey, add)
+    local def = findTraitDef(traitKey)
+    if not def then
+        print("[PhunMart2] applyTrait: no definition found for '" .. tostring(traitKey) .. "'")
+        return
+    end
+    local traitType = def:getType()
+    if add then
+        player:getCharacterTraits():add(traitType)
+        player:modifyTraitXPBoost(traitType, false)
+    else
+        player:getCharacterTraits():remove(traitType)
+        player:modifyTraitXPBoost(traitType, true)
+    end
+    SyncXp(player)
+end
+
+-- Trait rewards are applied client-side because CharacterTraitDefinition is
+-- only available on the client. Server sends this after deducting payment.
+Commands[Core.commands.applyTraitReward] = function(arguments)
+    local player = getSpecificPlayer(arguments.playerIndex or 0)
+    if not player then
+        return
+    end
+    local ok, err = pcall(applyTrait, player, arguments.trait, arguments.add)
+    if not ok then
+        print("[PhunMart2] applyTraitReward error: " .. tostring(err))
+    end
+end
+
+-- SP path: server fires event directly since client and server share Lua state
+Events[Core.events.OnApplyTraitReward].Add(function(args)
+    if not args or not args.player then
+        return
+    end
+    local ok, err = pcall(applyTrait, args.player, args.trait, args.add)
+    if not ok then
+        print("[PhunMart2] OnApplyTraitReward error: " .. tostring(err))
+    end
+end)
 
 Commands[Core.commands.payWithInventory] = function(arguments)
     local player = getSpecificPlayer(arguments.playerIndex)

@@ -27,10 +27,6 @@ Commands[Core.commands.openShop] = function(playerObj, args)
     Core.ServerSystem.instance:openShop(playerObj, args)
 end
 
-Commands[Core.commands.buy] = function(playerObj, args)
-    Core.ServerSystem.instance:purchase(playerObj, args.location, args.itemId, args.qty or 1)
-end
-
 Commands[Core.commands.restock] = function(playerObj, args)
     local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)
     if not obj then
@@ -38,8 +34,10 @@ Commands[Core.commands.restock] = function(playerObj, args)
     end
     obj:restock()
     local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[obj.type]
+    local shopCfg = Core.shops and Core.shops[obj.type]
     local payload = {
         key = obj:getKey(),
+        shopType = obj.type,
         location = {
             x = obj.x,
             y = obj.y,
@@ -48,7 +46,10 @@ Commands[Core.commands.restock] = function(playerObj, args)
         offers = obj.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
         background = shopDef and shopDef.background,
-        defaultView = shopDef and shopDef.defaultView
+        defaultView = shopDef and shopDef.defaultView,
+        poolSets = shopDef and shopDef.poolSets,
+        lastRestock = obj.lastRestock,
+        restockFrequency = (shopCfg and shopCfg.restock) or 24
     }
     if Core.isLocal then
         triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
@@ -61,7 +62,37 @@ Commands[Core.commands.restock] = function(playerObj, args)
 end
 
 Commands[Core.commands.changeTo] = function(playerObj, args)
-    Core.ServerSystem.instance:changeTo(args.to, args.location)
+    local loc = args.location
+    local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+    local oldKey = oldObj and oldObj:getKey()
+    Core.ServerSystem.instance:changeTo(args.to, loc)
+    -- Send back new shop data under the OLD key so the open window can update itself.
+    local newObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+    local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
+    local shopCfg = newObj and Core.shops and Core.shops[newObj.type]
+    local payload = newObj and oldKey and {
+        key = newObj:getKey(),
+        shopType = newObj.type,
+        location = loc,
+        offers = newObj.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        background = shopDef and shopDef.background,
+        defaultView = shopDef and shopDef.defaultView,
+        poolSets = shopDef and shopDef.poolSets,
+        lastRestock = newObj.lastRestock,
+        restockFrequency = (shopCfg and shopCfg.restock) or 24
+    }
+    if payload then
+        if Core.isLocal then
+            triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
+        else
+            sendServerCommand(playerObj, Core.name, Core.commands.onShopChange, {
+                key = oldKey,
+                data = payload,
+                replaced = true
+            })
+        end
+    end
 end
 
 Commands[Core.commands.closeShop] = function(playerObj, args)
@@ -70,6 +101,95 @@ end
 
 Commands[Core.commands.upsertShopDefinition] = function(playerObj, args)
     Core.ServerSystem.instance:upsertShopDefinition(args)
+end
+
+Commands[Core.commands.buy] = function(playerObj, args)
+    local loc = args.location
+    local offerId = args.offerId
+    local qty = args.qty or 1
+
+    local function fail(msg)
+        if Core.isLocal then
+            triggerEvent(Core.events.OnPurchaseComplete, {
+                failed = true,
+                message = msg
+            })
+        else
+            sendServerCommand(playerObj, Core.name, Core.commands.serverPurchaseFailed, {
+                playerIndex = playerObj:getPlayerNum(),
+                message = msg
+            })
+        end
+    end
+
+    local shopObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
+    if not shopObj then
+        return fail("ShopNotFound")
+    end
+
+    local offer = shopObj.offers and shopObj.offers[offerId]
+    if not offer then
+        return fail("OfferNotFound")
+    end
+
+    -- Stock check
+    local stockQty = offer.offer and offer.offer.stockQty
+    if stockQty and stockQty ~= -1 and stockQty < qty then
+        return fail("OutOfStock")
+    end
+
+    -- Conditions check
+    local adapter = Core.getPlayerAdapter(playerObj)
+    local condDefs = Core.runtime and Core.runtime.conditionsDefs
+    if offer.conditions and condDefs and adapter then
+        local result = Core.conditionsRuntime.evaluate(offer.conditions, condDefs, adapter, Core.purchases, {
+            offerId = offerId
+        })
+        if not result.ok then
+            return fail("ConditionsFailed")
+        end
+    end
+
+    -- Affordability + deduct
+    local price = offer.price
+    if price and price.kind ~= "free" then
+        local ok = Core:deductAll(playerObj, {price})
+        if not ok then
+            return fail("InsufficientFunds")
+        end
+    end
+
+    -- Grant all reward actions
+    if offer.reward and offer.reward.actions then
+        for _, action in ipairs(offer.reward.actions) do
+            Core:grantReward(playerObj, action, qty)
+        end
+    end
+
+    -- Decrement stock and persist
+    local newStockQty = -1
+    if stockQty and stockQty ~= -1 then
+        newStockQty = stockQty - qty
+        offer.offer.stockQty = newStockQty
+        shopObj:saveData()
+    end
+
+    -- Record purchase history
+    Core.purchases:add(playerObj, offerId, qty)
+    Core.purchases:save()
+
+    -- Send confirmation to client
+    local wallet = Core.wallet:get(playerObj)
+    local result = {
+        offerId = offerId,
+        stockQty = newStockQty,
+        wallet = wallet
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnPurchaseComplete, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.buy, result)
+    end
 end
 
 Commands[Core.commands.requestItemDefs] = function(playerObj, args)
@@ -123,8 +243,10 @@ Commands[Core.commands.reroll] = function(playerObj, args)
     if oldKey then
         local newObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
         local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
+        local shopCfg = newObj and Core.shops and Core.shops[newObj.type]
         local payload = newObj and {
             key = newObj:getKey(),
+            shopType = newObj.type,
             location = {
                 x = newObj.x,
                 y = newObj.y,
@@ -133,7 +255,10 @@ Commands[Core.commands.reroll] = function(playerObj, args)
             offers = newObj.offers or {},
             conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
             background = shopDef and shopDef.background,
-            defaultView = shopDef and shopDef.defaultView
+            defaultView = shopDef and shopDef.defaultView,
+            poolSets = shopDef and shopDef.poolSets,
+            lastRestock = newObj.lastRestock,
+            restockFrequency = (shopCfg and shopCfg.restock) or 24
         }
         if Core.isLocal then
             triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
@@ -165,7 +290,7 @@ end
 
 -- generates or re-generates shop and inventory
 Commands[Core.commands.requestShopGenerate] = function(playerObj, args)
-    SPhunMartSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
+    Core.ServerSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
 end
 
 Commands[Core.commands.spawnVehicle] = function(playerObj, args)
@@ -183,7 +308,7 @@ Commands[Core.commands.spawnVehicle] = function(playerObj, args)
 end
 
 Commands[Core.commands.requestLocations] = function(playerObj, args)
-    local locations = SPhunMartSystem.instance:getShopLocations(args.key)
+    local locations = Core.ServerSystem.instance:getShopLocations(args.key)
     sendServerCommand(playerObj, Core.name, Core.commands.requestLocations, {
         playerIndex = playerObj:getPlayerNum(),
         locations = locations
@@ -215,13 +340,13 @@ Commands[Core.commands.getShopDefinition] = function(playerObj, args)
                 username = playerObj:getUsername(),
                 data = shop
             }
-            sendServerCommand(playerObj, Core.name, Core.commands.getShopList, data)
+            sendServerCommand(playerObj, Core.name, Core.commands.getShopDefinition, data)
         end
     end
 end
 
 Commands[Core.commands.getShopData] = function(playerObj, args)
-    local data = SPhunMartSystem.instance:getShopData(args.location)
+    local data = Core.ServerSystem.instance:getShopData(args.location)
     if data then
         sendServerCommand(playerObj, Core.name, Core.commands.getShopData, data)
     end
@@ -246,6 +371,12 @@ Commands[Core.commands.playerSetup] = function(playerObj, args)
         username = playerObj:getUsername(),
         wallet = wallet
     })
+    -- Send compiled shop defs so the client has them for admin menus from the start.
+    if Core.runtime and Core.runtime.shops then
+        sendServerCommand(playerObj, Core.name, Core.commands.requestShopDefs, {
+            shops = Core.runtime.shops
+        })
+    end
 end
 
 Commands[Core.commands.getPlayerList] = function(player, args)

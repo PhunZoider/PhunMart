@@ -45,6 +45,7 @@ function UI:new(x, y, w, h, opts)
     self.__index = self
     o.player = (opts and opts.player) or getPlayer()
     o.onSelectFn = opts and opts.onSelect
+    o.onRightClickFn = opts and opts.onRightClick
     o.groups = {}
     o.selected = nil
     o.hovered = nil
@@ -98,6 +99,8 @@ function UI:setData(data)
                 displayName = scriptItem:getDisplayName()
             elseif Core.getVehicleLabel and Core.getVehicleLabel(offer.item) ~= offer.item then
                 displayName = Core.getVehicleLabel(offer.item)
+            elseif offer.reward and offer.reward.display and offer.reward.display.text then
+                displayName = offer.reward.display.text
             else
                 displayName = Traits.getLabel(offer.item)
             end
@@ -347,6 +350,18 @@ function UI:onMouseUp(x, y)
     if self.onSelectFn then
         self.onSelectFn(e.id, e.offer)
     end
+end
+
+function UI:onRightMouseUp(x, y)
+    if not self.onRightClickFn then
+        return
+    end
+    local gi, idx = self:indexAt(x, y)
+    if not gi then
+        return
+    end
+    local e = self.groups[gi].items[idx]
+    self.onRightClickFn(e.id, e.offer, self:getAbsoluteX() + x, self:getAbsoluteY() + y)
 end
 
 function UI:onMouseWheel(del)

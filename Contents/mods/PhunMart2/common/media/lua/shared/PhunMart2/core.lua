@@ -25,28 +25,49 @@ PhunMart = {
         }
     },
     commands = {
+        -- Shop admin
         getBlackList = "PhunMartGetBlacklist",
         setBlacklist = "PhunMartSetBlacklist",
-        playerSetup = "PhunMartPlayerSetup",
-        getShopList = "PhunMartGetShopList",
-        getShopData = "PhunMartGetShopData",
-        openShop = "PhunMartOpenShop",
-        openError = "PhunMartOpenError",
-        unlockShop = "PhunMartUnlockShop",
-        upsertShopDefinition = "PhunMartUpsertShopDefinition",
-        getShopDefinition = "PhunMartGetShopDefinition",
         compile = "PhunMartCompileShops",
         reroll = "PhunMartReroll",
         rerollAllShops = "PhunMartRerollAllShops",
+        restockAllShops = "PhunMartRestockAllShops",
         changeTo = "PhunMartChangeShopType",
         restock = "PhunMartRestockShop",
+        closeShop = "PhunMartCloseShop",
+        closeAllShops = "PhunMartCloseAllShops",
+        updateShop = "PhunMartUpdateShop",
+        requestShopGenerate = "PhunMartRequestShopGenerate",
+        upsertShopDefinition = "PhunMartUpsertShopDefinition",
+        getShopDefinition = "PhunMartGetShopDefinition",
+        getShopList = "PhunMartGetShopList",
+        getShopData = "PhunMartGetShopData",
+        requestShopDefs = "PhunMartRequestShopDefs",
+        requestLocations = "PhunMartRequestLocations",
+        requestItemDefs = "PhunMartRequestItemDefs",
+        -- Shop player flow
+        playerSetup = "PhunMartPlayerSetup",
+        openShop = "PhunMartOpenShop",
+        requestShop = "PhunMartRequestShop",
+        requestLock = "PhunMartRequestLock",
         onShopChange = "PhunMartOnShopChange",
-
+        openError = "PhunMartOpenError",
+        -- Purchase
+        buy = "PhunMartBuy",
+        applyTraitReward = "PhunMartApplyTraitReward",
+        serverPurchaseFailed = "PhunMartServerPurchaseFailed",
+        payWithInventory = "PhunMartPayWithInventory",
+        modifyTraits = "PhunMartModifyTraits",
+        spawnVehicle = "PhunMartSpawnVehicle",
+        -- History / misc
+        updateHistory = "PhunMartUpdateHistory",
+        unlockShop = "PhunMartUnlockShop",
+        -- Wallet
         addToWallet = "PhunMartAddToWallet",
         getWallet = "PhunMartGetWallet",
         resetWallet = "PhunMartResetWallet",
         updateWallet = "PhunMartUpdateWallet",
-
+        -- Admin wallet
         getPlayerList = "PhunMartGetPlayerList",
         getPlayersWallet = "PhunMartGetPlayersWallet",
         adjustPlayerWallet = "PhunMartAdjustPlayerWallet"
@@ -54,7 +75,9 @@ PhunMart = {
     events = {
         OnReady = "OnPhunMartOnReady",
         recievedInventory = "OnPhunMartRecievedInventory",
-        OnShopChange = "OnPhunMartShopChange"
+        OnShopChange = "OnPhunMartShopChange",
+        OnPurchaseComplete = "OnPhunMartPurchaseComplete",
+        OnApplyTraitReward = "OnPhunMartApplyTraitReward"
     },
     tools = require "PhunMart2/tools",
     settings = {},

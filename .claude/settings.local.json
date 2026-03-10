@@ -26,7 +26,18 @@
       "Bash(xargs -0 grep -E '[\\\\\"\"\\\\047][A-Za-z0-9_]+\\\\\\\\\\\\\\\\[A-Za-z0-9_:]')",
       "Bash(xargs -0 grep -E '\\(Base|phunmart|farmer|sanph\\)[\"\"\\\\047]?\\\\\\\\[^\"\"]')",
       "Bash(grep -r \"\\\\\\\\Base\\\\|\\\\\\\\phunmart\\\\|\\\\\\\\farming\" /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2)",
-      "Bash(wc -l /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/data/*.lua)"
+      "Bash(wc -l /d/pz-dev/code/PhunMart2/Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/data/*.lua)",
+      "Bash(mkdir -p \"d:/pz-dev/code/PhunMart2/Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Prices.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/prices.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Rewards.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/rewards.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Conditions.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/conditions.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Items.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/items.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Groups.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/groups.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Pools.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/pools.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_Shops.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/shops.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_XP_Items.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_items.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_XP_Rewards.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_rewards.lua\")",
+      "Bash(cp \"Docs/luas/PhunMart2_XP_Conditions.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_conditions.lua\")"
     ],
     "additionalDirectories": [
       "\\tmp"
