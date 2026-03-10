@@ -488,4 +488,49 @@ function tools.merge(tableA, tableB, excludeKeys)
     return mergedTable
 end
 
+local logQueue = {}
+
+function tools.log(...)
+    tools.logTo("Phun.log", ...)
+end
+
+function tools.logTo(filename, ...)
+    Events.EveryOneMinute.Remove(tools.doLogs)
+    if not logQueue[filename] then
+        logQueue[filename] = {}
+    end
+    local entry = os.date("%Y-%m-%d %H:%M:%S") .. "\t" .. table.concat({...}, "\t")
+    table.insert(logQueue[filename], entry)
+    Events.EveryOneMinute.Add(tools.doLogs)
+end
+
+function tools.doLogs()
+    Events.EveryOneMinute.Remove(tools.doLogs)
+    for filename, entries in pairs(logQueue) do
+        if #entries > 0 then
+            tools.appendToFile(filename, entries, true)
+            logQueue[filename] = {}
+        end
+    end
+end
+
+function tools.appendToFile(filename, line, createIfNotExist)
+    if not line then
+        return
+    end
+    local ls = {}
+    if type(line) == "table" then
+        ls = line
+    else
+        ls[1] = line
+    end
+    local fileWriterObj = getFileWriter(filename, createIfNotExist ~= false, true)
+    for _, l in ipairs(ls) do
+        if l and l ~= "" then
+            fileWriterObj:write(l .. "\r\n")
+        end
+    end
+    fileWriterObj:close()
+end
+
 return tools

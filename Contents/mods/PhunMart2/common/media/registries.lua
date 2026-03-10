@@ -1,3 +1,4 @@
 -- ItemType registrations removed; items now use built-in base types (base:moveable, base:normal)
-ItemType.register("phunmart:wallet")
-ItemType.register("phunmart:currency")
+PhunMartItems = PhunMartItems or {}
+PhunMartItems.wallet = ItemType.register("phunmart:wallet")
+PhunMartItems.currency = ItemType.register("phunmart:currency")

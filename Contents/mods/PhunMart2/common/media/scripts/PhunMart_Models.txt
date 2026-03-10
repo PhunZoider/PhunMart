@@ -12,8 +12,22 @@ module PhunMart
 	{
 		mesh = PhunMartQuarter,
 		texture = QuarterTexture,
-		scale = 0.001,
+		scale = 0.0001,
 	}
+
+	model PhunMart_Nickle
+	{
+		mesh = PhunMartQuarter,
+		texture = QuarterTexture,
+		scale = 0.0001,
+	}
+
+	model PhunMart_Dime
+	{
+		mesh = PhunMartQuarter,
+		texture = QuarterTexture,
+		scale = 0.00001,
+	}		
 
     model PhunMart_SilverDollar
 	{

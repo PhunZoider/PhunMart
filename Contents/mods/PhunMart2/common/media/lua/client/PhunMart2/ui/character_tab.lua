@@ -73,16 +73,26 @@ function UI:new(x, y, width, height, player)
 end
 
 function UI:refreshData()
-    self.datas:clear();
-    local currentCatagories = {}
-    for k, v in pairs(Core.wallet.currencies or {}) do
-        local item = getScriptManager():getItem(k)
-        if item then
-            v.label = item:getDisplayName() or k
-            v.texture = item:getNormalTexture()
-            v.bound = v.bound == true
+    self.datas:clear()
+    for poolKey, poolDef in pairs(Core.wallet.pools or {}) do
+        -- Find a representative coin texture for this pool
+        local texture = nil
+        for itemKey, cur in pairs(Core.wallet.currencies or {}) do
+            if cur.pool == poolKey then
+                local scriptItem = getScriptManager():getItem(itemKey)
+                if scriptItem then
+                    texture = scriptItem:getNormalTexture()
+                    -- prefer the highest-value coin as representative
+                    if cur.value >= 25 then break end
+                end
+            end
         end
-        self.datas:addItem(k, v)
+        self.datas:addItem(poolKey, {
+            label   = poolDef.label or poolKey,
+            format  = poolDef.format,
+            bound   = poolDef.bound == true,
+            texture = texture,
+        })
     end
 end
 
@@ -163,7 +173,13 @@ function UI:drawDatas(y, item, alt)
     self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
 
     local wallet = Core.wallet:get(self.parent.player)
-    local value = tostring(wallet.current[item.text] or 0)
+    local raw = wallet.current[item.text] or 0
+    local value
+    if item.item.format == "cents" then
+        value = string.format("$%.2f", raw / 100)
+    else
+        value = tostring(raw)
+    end
 
     if item.item.texture then
         local boa = " *"

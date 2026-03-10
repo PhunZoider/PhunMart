@@ -5,21 +5,45 @@ local Core = PhunMart
 -- Pools are what get stored and checked against prices.
 Core.wallet = {
     name = "PhunMart_Wallet",
-    log  = "wallet.log",
+    log = "wallet.log",
 
     -- Coin items: define which pool they feed and how much value each pickup adds.
     currencies = {
-        ["PhunMart.Nickel"]  = { pool = "change", value = 5,  bound = false },
-        ["PhunMart.Dime"]    = { pool = "change", value = 10, bound = false },
-        ["PhunMart.Quarter"] = { pool = "change", value = 25, bound = false },
-        ["PhunMart.Token"]   = { pool = "tokens", value = 1,  bound = true  },
+        ["PhunMart.Nickel"] = {
+            pool = "change",
+            value = 5,
+            bound = false
+        },
+        ["PhunMart.Dime"] = {
+            pool = "change",
+            value = 10,
+            bound = false
+        },
+        ["PhunMart.Quarter"] = {
+            pool = "change",
+            value = 25,
+            bound = false
+        },
+        ["PhunMart.Token"] = {
+            pool = "tokens",
+            value = 1,
+            bound = true
+        }
     },
 
     -- Pool definitions. bound=true pools are preserved on reset.
     pools = {
-        change = { label = "Change", format = "cents", bound = false },
-        tokens = { label = "Tokens", format = "count", bound = true  },
-    },
+        change = {
+            label = "Change",
+            format = "cents",
+            bound = false
+        },
+        tokens = {
+            label = "Tokens",
+            format = "count",
+            bound = true
+        }
+    }
 }
 
 -- Returns the cap for a given pool, read from sandbox settings.
@@ -57,8 +81,13 @@ function Core.wallet:get(player)
     if key ~= nil then
         if not self.data[key] then
             self.data[key] = {
-                current   = { change = 0, tokens = 0 },
-                bound     = { tokens = 0 },
+                current = {
+                    change = 0,
+                    tokens = 0
+                },
+                bound = {
+                    tokens = 0
+                },
                 purchases = {}
             }
         end
@@ -76,7 +105,9 @@ function Core.wallet:reset(player)
     local name = type(player) == "string" and player or player:getUsername()
 
     if isClient() then
-        sendClientCommand(Core.name, Core.commands.resetWallet, { username = name })
+        sendClientCommand(Core.name, Core.commands.resetWallet, {
+            username = name
+        })
     end
 
     local w = self:get(name)
@@ -112,15 +143,19 @@ end
 -- If already at cap, returns false, true and the coin is NOT consumed — leave it in inventory.
 function Core.wallet:adjust(player, item, amount)
     local currency = self.currencies[item]
-    if not currency then return false, false end
+    if not currency then
+        return false, false
+    end
 
     local name = type(player) == "string" and player or player:getUsername()
     local w = self:get(name)
-    if not w then return false, false end
+    if not w then
+        return false, false
+    end
 
-    local pool    = currency.pool
-    local value   = currency.value * (amount or 1)
-    local cap     = self:getCap(pool)
+    local pool = currency.pool
+    local value = currency.value * (amount or 1)
+    local cap = self:getCap(pool)
     local current = w.current[pool] or 0
 
     if cap and current >= cap then
@@ -156,6 +191,8 @@ end
 -- Returns the current balance for a given pool.
 function Core.wallet:getBalance(player, pool)
     local w = self:get(player)
-    if w then return w.current[pool] or 0 end
+    if w then
+        return w.current[pool] or 0
+    end
     return 0
 end

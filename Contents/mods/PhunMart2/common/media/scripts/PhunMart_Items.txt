@@ -7,53 +7,53 @@ module PhunMart
 
 	item DroppedWallet
     {
-        type = Normal,
         DisplayName = Wallet,
-        ItemType = phunmart:wallet,
+        ItemType = base:normal,
         Weight = 1,
         Icon = DroppedWallet,
 		IsHidden = true,
         WorldStaticModel 	= PhunWallet,
         StaticModel 	= PhunWallet,
+        DisplayCategory = Currency,
     }
 
     item Nickel
     {
         Weight = 0.01,
-        Type = Normal,
-        ItemType = phunmart:currency,
+        ItemType = base:normal,
         DisplayName = Nickel,
-        Icon = Nickel,
+        Icon = NickelCoin,
+        Scale = 0.1,
         DisplayCategory = Currency,
     }
 
     item Dime
     {
         Weight = 0.01,
-        Type = Normal,
-        ItemType = phunmart:currency,
+        ItemType = base:normal,
         DisplayName = Dime,
-        Icon = Dime,
+        Icon = DimeCoin,
+        Scale = 0.1,
         DisplayCategory = Currency,
     }
 
     item Quarter
     {
         Weight = 0.01,
-        Type = Normal,
-        ItemType = phunmart:currency,
+        ItemType = base:normal,
         DisplayName = Quarter,
         Icon = QuarterCoin,
+        Scale = 0.1,
         DisplayCategory = Currency,
     }
 
     item Token
     {
         Weight = 0.01,
-        Type = Normal,
-        ItemType = phunwallet2:currency,
+        ItemType = base:normal,
         DisplayName = Traiter Joe Token,
         Icon = TraiterToken,
+        Scale = 0.1,
         DisplayCategory = Currency,
     }
 
@@ -62,6 +62,7 @@ module PhunMart
         ItemType        =   base:normal,
         Weight          =   1,
         Icon            =   CarKey,
+         DisplayCategory = Currency,
     }
 
     item GoodPhoods
