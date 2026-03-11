@@ -1,5 +1,3 @@
-local allShops = require "PhunMart2/data/shops"
-
 PhunMart = {
     name = "PhunMart",
     inied = false,
@@ -81,7 +79,7 @@ PhunMart = {
     },
     tools = require "PhunMart2/tools",
     settings = {},
-    shops = allShops,
+    shops = {}, -- populated after Core.compile() on the server; Core.defs.shops on the client
     spriteToShop = {},
     opensquares = {},
     actions = {},
@@ -153,14 +151,10 @@ function Core.debug(...)
 end
 
 function Core:reloadShopDefinitions()
-    local file = nil
-    if file then
-        self.shops = file
-    else
-        self.shops = allShops
-    end
+    -- Rebuild spriteToShop index from whatever is currently in Core.shops.
+    -- On the server this is called after Core.compile() sets Core.shops = runtime.shops.
     self.spriteToShop = {}
-    for k, v in pairs(Core.shops or {}) do
+    for k, v in pairs(self.shops or {}) do
         for _, sprite in ipairs(v.sprites or {}) do
             self.spriteToShop[sprite] = k
         end

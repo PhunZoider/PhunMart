@@ -100,14 +100,14 @@ return {
         }}
     },
 
-    CarAPart = {
+    CarAParts = {
         category = "Vehicle",
         background = "machine-car-a-part.png",
         sprites = {"phunmart_01_56", "phunmart_01_57", "phunmart_01_58", "phunmart_01_59"},
         unpoweredSprites = {"phunmart_01_60", "phunmart_01_61", "phunmart_01_62", "phunmart_01_63"},
         poolSets = {{
             keys = {{
-                key = "pool_carapart",
+                key = "pool_caraparts",
                 weight = 1.0
             }}
         }}

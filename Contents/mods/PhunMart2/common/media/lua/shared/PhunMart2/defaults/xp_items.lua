@@ -27,7 +27,7 @@ return {
         offer = {
             weight = 0.4,
             stock = {
-                min = 0,
+                min = 1,
                 max = 1,
                 restockHours = 48
             }
@@ -977,6 +977,84 @@ return {
         inherit = "boost_base_xp",
         price = "coin_boost",
         reward = "boost_Glassmaking"
-    }
+    },
+
+    ---------------------------------------------------------------------------
+    -- TIER 2 BOOST ITEMS (enhanced — GiftedXPerience shop)
+    ---------------------------------------------------------------------------
+    boost_Cooking_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Cooking_t2"      },
+    boost_Fitness_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Fitness_t2"      },
+    boost_Strength_t2     = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Strength_t2"     },
+    boost_Blunt_t2        = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Blunt_t2"        },
+    boost_Axe_t2          = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Axe_t2"          },
+    boost_Lightfoot_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Lightfoot_t2"    },
+    boost_Nimble_t2       = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Nimble_t2"       },
+    boost_Sprinting_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Sprinting_t2"    },
+    boost_Sneak_t2        = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Sneak_t2"        },
+    boost_Woodwork_t2     = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Woodwork_t2"     },
+    boost_Aiming_t2       = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Aiming_t2"       },
+    boost_Reloading_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Reloading_t2"    },
+    boost_Farming_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Farming_t2"      },
+    boost_Fishing_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Fishing_t2"      },
+    boost_Trapping_t2     = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Trapping_t2"     },
+    boost_PlantScavenging_t2 = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_PlantScavenging_t2" },
+    boost_Doctor_t2       = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Doctor_t2"       },
+    boost_Electricity_t2  = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Electricity_t2"  },
+    boost_Blacksmith_t2   = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Blacksmith_t2"   },
+    boost_MetalWelding_t2 = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_MetalWelding_t2" },
+    boost_Mechanics_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Mechanics_t2"    },
+    boost_Spear_t2        = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Spear_t2"        },
+    boost_Maintenance_t2  = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Maintenance_t2"  },
+    boost_SmallBlade_t2   = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_SmallBlade_t2"   },
+    boost_LongBlade_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_LongBlade_t2"    },
+    boost_SmallBlunt_t2   = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_SmallBlunt_t2"   },
+    boost_Tailoring_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Tailoring_t2"    },
+    boost_Tracking_t2     = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Tracking_t2"     },
+    boost_Husbandry_t2    = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Husbandry_t2"    },
+    boost_FlintKnapping_t2 = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_FlintKnapping_t2" },
+    boost_Masonry_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Masonry_t2"      },
+    boost_Pottery_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Pottery_t2"      },
+    boost_Carving_t2      = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Carving_t2"      },
+    boost_Butchering_t2   = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Butchering_t2"   },
+    boost_Glassmaking_t2  = { inherit = "boost_base_xp", price = "coin_boost_t2", reward = "boost_Glassmaking_t2"  },
+
+    ---------------------------------------------------------------------------
+    -- TIER 3 BOOST ITEMS (superior — LuxuryXPerience shop)
+    ---------------------------------------------------------------------------
+    boost_Cooking_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Cooking_t3"      },
+    boost_Fitness_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Fitness_t3"      },
+    boost_Strength_t3     = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Strength_t3"     },
+    boost_Blunt_t3        = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Blunt_t3"        },
+    boost_Axe_t3          = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Axe_t3"          },
+    boost_Lightfoot_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Lightfoot_t3"    },
+    boost_Nimble_t3       = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Nimble_t3"       },
+    boost_Sprinting_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Sprinting_t3"    },
+    boost_Sneak_t3        = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Sneak_t3"        },
+    boost_Woodwork_t3     = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Woodwork_t3"     },
+    boost_Aiming_t3       = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Aiming_t3"       },
+    boost_Reloading_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Reloading_t3"    },
+    boost_Farming_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Farming_t3"      },
+    boost_Fishing_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Fishing_t3"      },
+    boost_Trapping_t3     = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Trapping_t3"     },
+    boost_PlantScavenging_t3 = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_PlantScavenging_t3" },
+    boost_Doctor_t3       = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Doctor_t3"       },
+    boost_Electricity_t3  = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Electricity_t3"  },
+    boost_Blacksmith_t3   = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Blacksmith_t3"   },
+    boost_MetalWelding_t3 = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_MetalWelding_t3" },
+    boost_Mechanics_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Mechanics_t3"    },
+    boost_Spear_t3        = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Spear_t3"        },
+    boost_Maintenance_t3  = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Maintenance_t3"  },
+    boost_SmallBlade_t3   = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_SmallBlade_t3"   },
+    boost_LongBlade_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_LongBlade_t3"    },
+    boost_SmallBlunt_t3   = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_SmallBlunt_t3"   },
+    boost_Tailoring_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Tailoring_t3"    },
+    boost_Tracking_t3     = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Tracking_t3"     },
+    boost_Husbandry_t3    = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Husbandry_t3"    },
+    boost_FlintKnapping_t3 = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_FlintKnapping_t3" },
+    boost_Masonry_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Masonry_t3"      },
+    boost_Pottery_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Pottery_t3"      },
+    boost_Carving_t3      = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Carving_t3"      },
+    boost_Butchering_t3   = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Butchering_t3"   },
+    boost_Glassmaking_t3  = { inherit = "boost_base_xp", price = "coin_boost_t3", reward = "boost_Glassmaking_t3"  }
 
 }

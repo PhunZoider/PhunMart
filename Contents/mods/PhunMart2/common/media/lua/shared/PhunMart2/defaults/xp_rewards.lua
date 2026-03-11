@@ -91,12 +91,12 @@ return {
     boost_Cooking = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Cooking Boost x2 (24h)"
+            text = "Cooking Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Cooking",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -140,12 +140,12 @@ return {
     boost_Fitness = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Fitness Boost x2 (24h)"
+            text = "Fitness Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Fitness",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -189,12 +189,12 @@ return {
     boost_Strength = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Strength Boost x2 (24h)"
+            text = "Strength Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Strength",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -238,12 +238,12 @@ return {
     boost_Blunt = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Long Blunt Boost x2 (24h)"
+            text = "Long Blunt Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Blunt",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -287,12 +287,12 @@ return {
     boost_Axe = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Axe Boost x2 (24h)"
+            text = "Axe Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Axe",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -336,12 +336,12 @@ return {
     boost_Lightfoot = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Lightfooted Boost x2 (24h)"
+            text = "Lightfooted Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Lightfoot",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -385,12 +385,12 @@ return {
     boost_Nimble = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Nimble Boost x2 (24h)"
+            text = "Nimble Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Nimble",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -434,12 +434,12 @@ return {
     boost_Sprinting = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Running Boost x2 (24h)"
+            text = "Running Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Sprinting",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -483,12 +483,12 @@ return {
     boost_Sneak = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Sneaking Boost x2 (24h)"
+            text = "Sneaking Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Sneak",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -532,12 +532,12 @@ return {
     boost_Woodwork = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Carpentry Boost x2 (24h)"
+            text = "Carpentry Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Woodwork",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -581,12 +581,12 @@ return {
     boost_Aiming = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Aiming Boost x2 (24h)"
+            text = "Aiming Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Aiming",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -630,12 +630,12 @@ return {
     boost_Reloading = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Reloading Boost x2 (24h)"
+            text = "Reloading Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Reloading",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -679,12 +679,12 @@ return {
     boost_Farming = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Agriculture Boost x2 (24h)"
+            text = "Agriculture Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Farming",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -728,12 +728,12 @@ return {
     boost_Fishing = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Fishing Boost x2 (24h)"
+            text = "Fishing Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Fishing",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -777,12 +777,12 @@ return {
     boost_Trapping = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Trapping Boost x2 (24h)"
+            text = "Trapping Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Trapping",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -826,12 +826,12 @@ return {
     boost_PlantScavenging = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Foraging Boost x2 (24h)"
+            text = "Foraging Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "PlantScavenging",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -875,12 +875,12 @@ return {
     boost_Doctor = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "First Aid Boost x2 (24h)"
+            text = "First Aid Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Doctor",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -924,12 +924,12 @@ return {
     boost_Electricity = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Electrical Boost x2 (24h)"
+            text = "Electrical Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Electricity",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -973,12 +973,12 @@ return {
     boost_Blacksmith = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Blacksmithing Boost x2 (24h)"
+            text = "Blacksmithing Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Blacksmith",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1022,12 +1022,12 @@ return {
     boost_MetalWelding = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Welding Boost x2 (24h)"
+            text = "Welding Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "MetalWelding",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1071,12 +1071,12 @@ return {
     boost_Mechanics = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Mechanics Boost x2 (24h)"
+            text = "Mechanics Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Mechanics",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1120,12 +1120,12 @@ return {
     boost_Spear = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Spear Boost x2 (24h)"
+            text = "Spear Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Spear",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1169,12 +1169,12 @@ return {
     boost_Maintenance = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Maintenance Boost x2 (24h)"
+            text = "Maintenance Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Maintenance",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1218,12 +1218,12 @@ return {
     boost_SmallBlade = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Short Blade Boost x2 (24h)"
+            text = "Short Blade Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "SmallBlade",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1267,12 +1267,12 @@ return {
     boost_LongBlade = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Long Blade Boost x2 (24h)"
+            text = "Long Blade Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "LongBlade",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1316,12 +1316,12 @@ return {
     boost_SmallBlunt = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Short Blunt Boost x2 (24h)"
+            text = "Short Blunt Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "SmallBlunt",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1365,12 +1365,12 @@ return {
     boost_Tailoring = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Tailoring Boost x2 (24h)"
+            text = "Tailoring Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Tailoring",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1414,12 +1414,12 @@ return {
     boost_Tracking = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Tracking Boost x2 (24h)"
+            text = "Tracking Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Tracking",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1463,12 +1463,12 @@ return {
     boost_Husbandry = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Animal Care Boost x2 (24h)"
+            text = "Animal Care Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Husbandry",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1512,12 +1512,12 @@ return {
     boost_FlintKnapping = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Knapping Boost x2 (24h)"
+            text = "Knapping Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "FlintKnapping",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1561,12 +1561,12 @@ return {
     boost_Masonry = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Masonry Boost x2 (24h)"
+            text = "Masonry Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Masonry",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1610,12 +1610,12 @@ return {
     boost_Pottery = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Pottery Boost x2 (24h)"
+            text = "Pottery Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Pottery",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1659,12 +1659,12 @@ return {
     boost_Carving = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Carving Boost x2 (24h)"
+            text = "Carving Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Carving",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1708,12 +1708,12 @@ return {
     boost_Butchering = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Butchering Boost x2 (24h)"
+            text = "Butchering Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Butchering",
-            multiplier = 2.0,
+            multiplier = 1,
             hours = 24
         }}
     },
@@ -1757,13 +1757,790 @@ return {
     boost_Glassmaking = {
         inherit = "boost_reward_t1_base",
         display = {
-            text = "Glassmaking Boost x2 (24h)"
+            text = "Glassmaking Boost (basic)"
         },
         actions = {{
             type = "applyBoost",
             skill = "Glassmaking",
-            multiplier = 2.0,
-            hours = 24
+            multiplier = 1
+        }}
+    },
+
+    ---------------------------------------------------------------------------
+    -- TIER 2 BOOST REWARDS (enhanced — setPerkBoost level 2, 100% XP bonus)
+    ---------------------------------------------------------------------------
+    boost_Cooking_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Cooking Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Cooking",
+            multiplier = 2
+        }}
+    },
+    boost_Fitness_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Fitness Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Fitness",
+            multiplier = 2
+        }}
+    },
+    boost_Strength_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Strength Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Strength",
+            multiplier = 2
+        }}
+    },
+    boost_Blunt_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Blunt Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Blunt",
+            multiplier = 2
+        }}
+    },
+    boost_Axe_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Axe Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Axe",
+            multiplier = 2
+        }}
+    },
+    boost_Lightfoot_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Lightfoot Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Lightfoot",
+            multiplier = 2
+        }}
+    },
+    boost_Nimble_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Nimble Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Nimble",
+            multiplier = 2
+        }}
+    },
+    boost_Sprinting_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Sprinting Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Sprinting",
+            multiplier = 2
+        }}
+    },
+    boost_Sneak_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Sneak Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Sneak",
+            multiplier = 2
+        }}
+    },
+    boost_Woodwork_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Woodwork Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Woodwork",
+            multiplier = 2
+        }}
+    },
+    boost_Aiming_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Aiming Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Aiming",
+            multiplier = 2
+        }}
+    },
+    boost_Reloading_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Reloading Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Reloading",
+            multiplier = 2
+        }}
+    },
+    boost_Farming_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Farming Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Farming",
+            multiplier = 2
+        }}
+    },
+    boost_Fishing_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Fishing Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Fishing",
+            multiplier = 2
+        }}
+    },
+    boost_Trapping_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Trapping Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Trapping",
+            multiplier = 2
+        }}
+    },
+    boost_PlantScavenging_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Foraging Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "PlantScavenging",
+            multiplier = 2
+        }}
+    },
+    boost_Doctor_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "First Aid Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Doctor",
+            multiplier = 2
+        }}
+    },
+    boost_Electricity_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Electrical Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Electricity",
+            multiplier = 2
+        }}
+    },
+    boost_Blacksmith_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Blacksmithing Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Blacksmith",
+            multiplier = 2
+        }}
+    },
+    boost_MetalWelding_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Welding Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "MetalWelding",
+            multiplier = 2
+        }}
+    },
+    boost_Mechanics_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Mechanics Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Mechanics",
+            multiplier = 2
+        }}
+    },
+    boost_Spear_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Spear Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Spear",
+            multiplier = 2
+        }}
+    },
+    boost_Maintenance_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Maintenance Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Maintenance",
+            multiplier = 2
+        }}
+    },
+    boost_SmallBlade_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Short Blade Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "SmallBlade",
+            multiplier = 2
+        }}
+    },
+    boost_LongBlade_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Long Blade Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "LongBlade",
+            multiplier = 2
+        }}
+    },
+    boost_SmallBlunt_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Short Blunt Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "SmallBlunt",
+            multiplier = 2
+        }}
+    },
+    boost_Tailoring_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Tailoring Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Tailoring",
+            multiplier = 2
+        }}
+    },
+    boost_Tracking_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Tracking Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Tracking",
+            multiplier = 2
+        }}
+    },
+    boost_Husbandry_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Husbandry Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Husbandry",
+            multiplier = 2
+        }}
+    },
+    boost_FlintKnapping_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Knapping Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "FlintKnapping",
+            multiplier = 2
+        }}
+    },
+    boost_Masonry_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Masonry Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Masonry",
+            multiplier = 2
+        }}
+    },
+    boost_Pottery_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Pottery Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Pottery",
+            multiplier = 2
+        }}
+    },
+    boost_Carving_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Carving Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Carving",
+            multiplier = 2
+        }}
+    },
+    boost_Butchering_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Butchering Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Butchering",
+            multiplier = 2
+        }}
+    },
+    boost_Glassmaking_t2 = {
+        inherit = "boost_reward_t2_base",
+        display = {
+            text = "Glassmaking Boost (enhanced)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Glassmaking",
+            multiplier = 2
+        }}
+    },
+
+    ---------------------------------------------------------------------------
+    -- TIER 3 BOOST REWARDS (superior — setPerkBoost level 3, 125% XP bonus)
+    ---------------------------------------------------------------------------
+    boost_Cooking_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Cooking Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Cooking",
+            multiplier = 3
+        }}
+    },
+    boost_Fitness_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Fitness Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Fitness",
+            multiplier = 3
+        }}
+    },
+    boost_Strength_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Strength Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Strength",
+            multiplier = 3
+        }}
+    },
+    boost_Blunt_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Blunt Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Blunt",
+            multiplier = 3
+        }}
+    },
+    boost_Axe_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Axe Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Axe",
+            multiplier = 3
+        }}
+    },
+    boost_Lightfoot_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Lightfoot Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Lightfoot",
+            multiplier = 3
+        }}
+    },
+    boost_Nimble_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Nimble Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Nimble",
+            multiplier = 3
+        }}
+    },
+    boost_Sprinting_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Sprinting Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Sprinting",
+            multiplier = 3
+        }}
+    },
+    boost_Sneak_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Sneak Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Sneak",
+            multiplier = 3
+        }}
+    },
+    boost_Woodwork_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Woodwork Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Woodwork",
+            multiplier = 3
+        }}
+    },
+    boost_Aiming_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Aiming Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Aiming",
+            multiplier = 3
+        }}
+    },
+    boost_Reloading_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Reloading Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Reloading",
+            multiplier = 3
+        }}
+    },
+    boost_Farming_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Farming Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Farming",
+            multiplier = 3
+        }}
+    },
+    boost_Fishing_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Fishing Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Fishing",
+            multiplier = 3
+        }}
+    },
+    boost_Trapping_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Trapping Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Trapping",
+            multiplier = 3
+        }}
+    },
+    boost_PlantScavenging_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Foraging Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "PlantScavenging",
+            multiplier = 3
+        }}
+    },
+    boost_Doctor_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "First Aid Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Doctor",
+            multiplier = 3
+        }}
+    },
+    boost_Electricity_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Electrical Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Electricity",
+            multiplier = 3
+        }}
+    },
+    boost_Blacksmith_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Blacksmithing Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Blacksmith",
+            multiplier = 3
+        }}
+    },
+    boost_MetalWelding_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Welding Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "MetalWelding",
+            multiplier = 3
+        }}
+    },
+    boost_Mechanics_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Mechanics Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Mechanics",
+            multiplier = 3
+        }}
+    },
+    boost_Spear_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Spear Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Spear",
+            multiplier = 3
+        }}
+    },
+    boost_Maintenance_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Maintenance Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Maintenance",
+            multiplier = 3
+        }}
+    },
+    boost_SmallBlade_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Short Blade Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "SmallBlade",
+            multiplier = 3
+        }}
+    },
+    boost_LongBlade_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Long Blade Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "LongBlade",
+            multiplier = 3
+        }}
+    },
+    boost_SmallBlunt_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Short Blunt Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "SmallBlunt",
+            multiplier = 3
+        }}
+    },
+    boost_Tailoring_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Tailoring Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Tailoring",
+            multiplier = 3
+        }}
+    },
+    boost_Tracking_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Tracking Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Tracking",
+            multiplier = 3
+        }}
+    },
+    boost_Husbandry_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Husbandry Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Husbandry",
+            multiplier = 3
+        }}
+    },
+    boost_FlintKnapping_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Knapping Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "FlintKnapping",
+            multiplier = 3
+        }}
+    },
+    boost_Masonry_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Masonry Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Masonry",
+            multiplier = 3
+        }}
+    },
+    boost_Pottery_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Pottery Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Pottery",
+            multiplier = 3
+        }}
+    },
+    boost_Carving_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Carving Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Carving",
+            multiplier = 3
+        }}
+    },
+    boost_Butchering_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Butchering Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Butchering",
+            multiplier = 3
+        }}
+    },
+    boost_Glassmaking_t3 = {
+        inherit = "boost_reward_t3_base",
+        display = {
+            text = "Glassmaking Boost (superior)"
+        },
+        actions = {{
+            type = "applyBoost",
+            skill = "Glassmaking",
+            multiplier = 3
         }}
     }
 

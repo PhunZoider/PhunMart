@@ -202,7 +202,9 @@ function ServerObject:buildOffers()
                     local stockQty, restockHours
                     local stock = srcOffer.stock
                     if stock then
-                        stockQty = ZombRand(stock.min or 1, stock.max or stock.min or 1)
+                        local sMin = stock.min or 1
+                        local sMax = stock.max or sMin
+                        stockQty = sMin + ZombRand(sMax - sMin + 1) -- inclusive [sMin, sMax]
                         restockHours = stock.restockHours
                     else
                         stockQty = -1
@@ -303,8 +305,10 @@ function ServerObject:updateSprite(force)
     if not isoObject then
         return
     end
-    local shops = Core.shops
-    local def = shops[self.type]
+    local def = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
+    if not def then
+        return
+    end
     local sprite = isoObject:getSprite():getName()
 
     if def.powered == true then
@@ -370,16 +374,16 @@ function ServerObject:toModData(modData)
 end
 
 function ServerObject:requiresRestock()
-    local shop = Core.shops[self.type]
-    local frequency = (shop and shop.restock) or 24
+    local shop = Core.runtime.shops and Core.runtime.shops[self.type]
+    local frequency = (shop and shop.restockFrequency) or 24
     local now = GameTime:getInstance():getWorldAgeHours()
     return now >= (self.lastRestock or 0) + frequency
 end
 
 -- regenerate inventory and persist
 function ServerObject:restock()
-    local shop = Core.shops[self.type]
-    local frequency = (shop and shop.restock) or 24
+    local shop = Core.runtime.shops and Core.runtime.shops[self.type]
+    local frequency = (shop and shop.restockFrequency) or 24
     local now = GameTime:getInstance():getWorldAgeHours()
     local lastRestock = self.lastRestock or 0
     local times = math.floor((now - lastRestock) / frequency)
@@ -394,10 +398,8 @@ function ServerObject:validate()
 end
 
 function ServerObject:requiresPower()
-    local c = Core
-    local shops = c.shops
-    local def = shops[self.type]
-    if def.powered == true then
+    local def = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
+    if def and def.powered == true then
         return not self:getSquare():haveElectricity() and SandboxVars.ElecShutModifier > -1 and
                    GameTime:getInstance():getNightsSurvived() > SandboxVars.ElecShutModifier
     end

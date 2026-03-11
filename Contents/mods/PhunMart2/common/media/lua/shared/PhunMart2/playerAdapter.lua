@@ -24,7 +24,7 @@ local function getAdapter(player)
     PA.getPerkBoost = function(self, perkName)
         local perk = Perks[perkName]
         if perk then
-            return self.player:getXp():getPerkBoost(perkName)
+            return self.player:getXp():getPerkBoost(perk)
         else
             print("PhunMart Error: No perk with name " .. perkName)
             return 0

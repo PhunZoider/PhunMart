@@ -37,7 +37,8 @@
       "Bash(cp \"Docs/luas/PhunMart2_Shops.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/shops.lua\")",
       "Bash(cp \"Docs/luas/PhunMart2_XP_Items.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_items.lua\")",
       "Bash(cp \"Docs/luas/PhunMart2_XP_Rewards.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_rewards.lua\")",
-      "Bash(cp \"Docs/luas/PhunMart2_XP_Conditions.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_conditions.lua\")"
+      "Bash(cp \"Docs/luas/PhunMart2_XP_Conditions.lua\" \"Contents/mods/PhunMart2/common/media/lua/shared/PhunMart2/defaults/xp_conditions.lua\")",
+      "Bash(grep -rn CarAPart d:/pz-dev/code/PhunMart2/Contents/ --include=*.txt --include=*.tiles)"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -178,7 +178,7 @@ return {
     },
 
     -- =========================================================
-    -- CarAPart  (vehicle maintenance)
+    -- CarAParts  (vehicle maintenance)
     -- =========================================================
 
     vehicle_parts = {

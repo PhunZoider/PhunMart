@@ -125,7 +125,7 @@ module PhunMart
         WorldObjectSprite = phunmart_01_48,
     }
 
-    item CarAPart
+    item CarAParts
     {
         DisplayCategory   = Furniture,
         ItemType          = base:moveable,

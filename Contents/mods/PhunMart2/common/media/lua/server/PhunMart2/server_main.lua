@@ -80,6 +80,8 @@ function Core.compile()
 
     local runtime, log = Core.compiler.compileAll(ctx)
     Core.runtime = runtime
+    Core.shops = runtime.shops -- alias: all Core.shops readers now use compiled data
+    Core:reloadShopDefinitions()  -- rebuild spriteToShop from compiled sprites
     Core.tools.debug("Warn", log.warnings, "Errors", log.errors)
     return runtime, log
 
@@ -150,8 +152,16 @@ function Core:grantReward(player, action, qty)
         end
 
     elseif t == "applyBoost" then
-        -- XP multiplier boost — not yet implemented
-        print("[PhunMart2] grantReward: applyBoost not yet implemented (skill=" .. tostring(action.skill) .. ")")
+        local ok, err = pcall(function()
+            local perk = Perks[action.skill]
+            if not perk then error("unknown perk: " .. tostring(action.skill)) end
+            local level = math.min(3, math.max(1, math.floor(action.multiplier or 1)))
+            player:getXp():setPerkBoost(perk, level)
+            SyncXp(player)
+        end)
+        if not ok then
+            print("[PhunMart2] grantReward: applyBoost failed for '" .. tostring(action.skill) .. "': " .. tostring(err))
+        end
 
     else
         print("[PhunMart2] grantReward: unknown action type '" .. tostring(t) .. "'")
@@ -294,3 +304,4 @@ function Core:ini()
     Core.debug("Server System initialized", self:getShops())
     triggerEvent(self.events.OnReady, self)
 end
+

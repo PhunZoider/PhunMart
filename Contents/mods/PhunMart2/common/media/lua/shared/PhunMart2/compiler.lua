@@ -692,7 +692,8 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                         if t and tostring(t:getType()) == action.trait then
                             local disabled = false
                             pcall(function()
-                                disabled = t:isRemoveInMP()
+                                -- TODO: I don't think this does anything
+                                disabled = t.isRemoveInMP and t:isRemoveInMP()
                             end)
                             if disabled then
                                 logger:warn("Offer '" .. offerId .. "' grants trait '" .. action.trait ..
@@ -727,6 +728,36 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                 end
                 if not found then
                     table.insert(offerConditions.all, condKey)
+                end
+            end
+
+            -- Auto-inject perkBoostBetween for applyBoost actions: gate purchase if boost already active
+            if action.type == "applyBoost" and type(action.skill) == "string" then
+                local level = math.min(3, math.max(1, math.floor(action.multiplier or 1)))
+                local prevTier = level - 1 -- must hold exactly the previous tier to upgrade
+                local boostCondKey = "__boost:" .. action.skill .. ":" .. tostring(prevTier)
+                ctx.autoCondsDefs = ctx.autoCondsDefs or {}
+                ctx.autoCondsDefs[boostCondKey] = {
+                    test = "perkBoostBetween",
+                    args = {
+                        perk = action.skill,
+                        min = prevTier, -- exact match: must be at previous tier
+                        max = prevTier
+                    }
+                }
+                offerConditions = offerConditions or {
+                    all = {}
+                }
+                offerConditions.all = offerConditions.all or {}
+                local boostFound = false
+                for _, k in ipairs(offerConditions.all) do
+                    if k == boostCondKey then
+                        boostFound = true;
+                        break
+                    end
+                end
+                if not boostFound then
+                    table.insert(offerConditions.all, boostCondKey)
                 end
             end
         end
@@ -796,7 +827,7 @@ function Compiler.compileAll(ctx)
     end
 
     -- Compile pools -> offers
-    local autoCondsDefs = {} -- accumulates auto-generated canGrantTrait defs
+    ctx.autoCondsDefs = ctx.autoCondsDefs or {} -- accumulates auto-generated condition defs
     local runtime = {
         shops = {},
         pools = {},
@@ -896,7 +927,7 @@ function Compiler.compileAll(ctx)
                         local offerId, offer = compileOfferForItem({
                             prices = resolved.prices,
                             rewards = resolved.rewards,
-                            autoCondsDefs = autoCondsDefs
+                            autoCondsDefs = ctx.autoCondsDefs
                         }, poolKey, poolDef, meta.fromGroup and (function()
                             local g = meta.fromGroup
                             g.__key = g.__key or nil
@@ -921,8 +952,8 @@ function Compiler.compileAll(ctx)
         end
     end
 
-    -- Merge auto-generated condition defs (canGrantTrait etc.) into runtime
-    for k, v in pairs(autoCondsDefs) do
+    -- Merge auto-generated condition defs (canGrantTrait, perkBoostBetween etc.) into runtime
+    for k, v in pairs(ctx.autoCondsDefs) do
         runtime.conditionsDefs[k] = v
     end
 
@@ -936,6 +967,7 @@ function Compiler.compileAll(ctx)
                 unpoweredSprites = shopDef.unpoweredSprites,
                 poolSets = shopDef.poolSets,
                 throttle = shopDef.throttle,
+                restockFrequency = shopDef.restockFrequency,
                 background = shopDef.background,
                 defaultView = shopDef.defaultView
             }

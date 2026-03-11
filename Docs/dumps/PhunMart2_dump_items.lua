@@ -5097,7 +5097,7 @@ return {
   { id = "PhunMart.PittyTheTool",                                name = "Pitty The Tool Vending Machine",        category = "Furniture" },
   { id = "PhunMart.WrentAWreck",                                 name = "Wrent A Wreck Vending Machine",         category = "Furniture" },
   { id = "PhunMart.MichellesCrafts",                             name = "Michelle Crafts Vending Machine",       category = "Furniture" },
-  { id = "PhunMart.CarAPart",                                    name = "Car-A-Part Vending Machine",            category = "Furniture" },
+  { id = "PhunMart.CarAParts",                                    name = "Car-A-Part Vending Machine",            category = "Furniture" },
   { id = "PhunMart.HoesNMoes",                                   name = "HoesNMoes Vending Machine",             category = "Furniture" },
   { id = "PhunMart.TraiterJoes",                                 name = "Traiter Joes Vending Machine",          category = "Furniture" },
   { id = "PhunMart.RadioHacks",                                  name = "Radio Hacks Vending Machine",           category = "Furniture" },

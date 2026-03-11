@@ -405,7 +405,13 @@ function UI:renderGrid()
                 else
                     bg_a, bg_r, bg_g, bg_b = 0.60, 0.04, 0.04, 0.06
                 end
+                local stockQty = e.offer and e.offer.stockQty
+                local isOOS = stockQty ~= nil and stockQty ~= -1 and stockQty <= 0
+
                 self:drawRect(cx, cy, cs, cs, bg_a, bg_r, bg_g, bg_b)
+                if isOOS then
+                    self:drawRect(cx, cy, cs, cs, 0.45, 0.20, 0.04, 0.04) -- red dim overlay
+                end
 
                 if isSel then
                     self:drawRectBorder(cx, cy, cs, cs, 1.0, 0.35, 0.80, 0.35)
@@ -416,14 +422,15 @@ function UI:renderGrid()
                 end
 
                 -- icon (centred, shifted up to leave room for badge)
+                local iconA = isOOS and 0.30 or 1
                 local ix = cx + (cs - iconSize) / 2
                 local iy = cy + (cs - iconSize) / 2 - 3
                 if e.texture then
-                    self:drawTextureScaledAspect(e.texture, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(e.texture, ix, iy, iconSize, iconSize, iconA, 1, 1, 1)
                 else
                     local abbr = e.displayName:sub(1, 2):upper()
                     local tw = getTextManager():MeasureStringX(UIFont.Small, abbr)
-                    self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5, 0.5, 0.5, 1, UIFont.Small)
+                    self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5 * iconA, 0.5 * iconA, 0.5 * iconA, 1, UIFont.Small)
                 end
 
                 -- slot code top-left (globally incremented: A1, A2... B1... across all groups)
@@ -432,14 +439,14 @@ function UI:renderGrid()
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
 
                 -- stock badge bottom-right (-1 = unlimited, no badge)
-                local stockQty = e.offer and e.offer.stockQty
                 if stockQty and stockQty ~= -1 then
-                    local badge = tostring(stockQty) .. "x"
+                    local badge = isOOS and "OUT" or (tostring(stockQty) .. "x")
                     local bw = getTextManager():MeasureStringX(UIFont.Small, badge)
                     local bx = cx + cs - bw - 3
                     local by = cy + cs - FONT_SM - 2
                     self:drawRect(bx - 1, by - 1, bw + 2, FONT_SM + 2, 0.75, 0, 0, 0)
-                    self:drawText(badge, bx, by, 0.65, 0.85, 0.35, 1, UIFont.Small)
+                    local tr, tg, tb = isOOS and 0.85 or 0.65, isOOS and 0.25 or 0.85, isOOS and 0.25 or 0.35
+                    self:drawText(badge, bx, by, tr, tg, tb, 1, UIFont.Small)
                 end
             end
         end
@@ -476,7 +483,13 @@ function UI:renderList()
                 else
                     bg_a, bg_r, bg_g, bg_b = 0.60, 0.04, 0.04, 0.06
                 end
+                local stockQty = e.offer and e.offer.stockQty
+                local isOOS = stockQty ~= nil and stockQty ~= -1 and stockQty <= 0
+
                 self:drawRect(PAD_EDGE, ry, rowW, rowH, bg_a, bg_r, bg_g, bg_b)
+                if isOOS then
+                    self:drawRect(PAD_EDGE, ry, rowW, rowH, 0.35, 0.20, 0.04, 0.04)
+                end
 
                 if isSel then
                     self:drawRectBorder(PAD_EDGE, ry, rowW, rowH, 1.0, 0.35, 0.80, 0.35)
@@ -487,18 +500,18 @@ function UI:renderList()
                 end
 
                 -- icon (shown when texture available, including fallback textures)
+                local iconA = isOOS and 0.30 or 1
                 local nameX = PAD_EDGE + 2
                 if e.texture then
                     local iconY = ry + math.floor((rowH - iconH) / 2)
-                    self:drawTextureScaledAspect(e.texture, nameX, iconY, iconH, iconH, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(e.texture, nameX, iconY, iconH, iconH, iconA, 1, 1, 1)
                     nameX = nameX + iconH + 4
                 end
 
                 -- stock badge (compute width first so name can avoid it)
-                local stockQty = e.offer and e.offer.stockQty
                 local badge, badgeW
                 if stockQty and stockQty ~= -1 then
-                    badge = tostring(stockQty) .. "x"
+                    badge = isOOS and "OUT" or (tostring(stockQty) .. "x")
                     badgeW = getTextManager():MeasureStringX(font, badge) + PAD_EDGE
                 else
                     badgeW = 0
@@ -507,13 +520,15 @@ function UI:renderList()
                 -- name (truncated to avoid badge)
                 local availW = (PAD_EDGE + rowW) - nameX - badgeW - PAD_EDGE
                 local nameStr = truncate(e.displayName, availW, font)
+                local na = isOOS and 0.45 or 1
                 local nr, ng, nb = isSel and 1.0 or 0.85, isSel and 1.0 or 0.85, isSel and 1.0 or 0.85
-                self:drawText(nameStr, nameX, ry + math.floor((rowH - fontH) / 2), nr, ng, nb, 1, font)
+                self:drawText(nameStr, nameX, ry + math.floor((rowH - fontH) / 2), nr * na, ng * na, nb * na, 1, font)
 
                 if badge then
                     local bx = PAD_EDGE + rowW - badgeW + 2
                     local by = ry + math.floor((rowH - fontH) / 2)
-                    self:drawText(badge, bx, by, 0.65, 0.85, 0.35, 1, font)
+                    local tr, tg, tb = isOOS and 0.85 or 0.65, isOOS and 0.25 or 0.85, isOOS and 0.25 or 0.35
+                    self:drawText(badge, bx, by, tr, tg, tb, 1, font)
                 end
             end
         end

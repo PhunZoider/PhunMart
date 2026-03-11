@@ -127,7 +127,17 @@ return {
     coin_boost = {
         kind = "currency",
         pool = "change",
-        amount = 200 -- $2.00  (premium: boost items are scarce, max 1 in stock)
+        amount = 200 -- $2.00  (basic boost, budget shop)
+    },
+    coin_boost_t2 = {
+        kind = "currency",
+        pool = "change",
+        amount = 350 -- $3.50  (enhanced boost, gifted shop)
+    },
+    coin_boost_t3 = {
+        kind = "currency",
+        pool = "change",
+        amount = 500 -- $5.00  (superior boost, luxury shop)
     },
     coin_low = {
         kind = "currency",

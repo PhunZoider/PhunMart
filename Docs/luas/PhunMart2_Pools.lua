@@ -166,9 +166,9 @@ return {
     },
 
     -- =========================================================
-    -- CarAPart  (vehicle maintenance)
+    -- CarAParts  (vehicle maintenance)
     -- =========================================================
-    pool_carapart = {
+    pool_caraparts = {
         defaults = {
             price = "coin_mid"
         },

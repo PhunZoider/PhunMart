@@ -63,6 +63,7 @@ return {
     WrentAWreck = {
         category = "Vehicle",
         defaultView = "list",
+        restockFrequency = 168, -- weekly car delivery
         background = "machine-wrent-a-wreck.png",
         sprites = {"phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43"},
         unpoweredSprites = {"phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47"},
@@ -100,14 +101,14 @@ return {
         }}
     },
 
-    CarAPart = {
+    CarAParts = {
         category = "Vehicle",
         background = "machine-car-a-part.png",
         sprites = {"phunmart_01_56", "phunmart_01_57", "phunmart_01_58", "phunmart_01_59"},
         unpoweredSprites = {"phunmart_01_60", "phunmart_01_61", "phunmart_01_62", "phunmart_01_63"},
         poolSets = {{
             keys = {{
-                key = "pool_carapart",
+                key = "pool_caraparts",
                 weight = 1.0
             }}
         }}

@@ -34,7 +34,7 @@ function UI:refreshAll()
         if self.shopKey == nil or self.shopKey == v.key then
             table.insert(data, {
                 key = k,
-                group = Core.shops[v.key].category or "NONE",
+                group = ((Core.defs and Core.defs.shops or Core.shops)[v.key] or {}).category or "NONE",
                 -- texture = v.sprites and v.sprites[1] or nil,
                 location = {
                     x = v.x,

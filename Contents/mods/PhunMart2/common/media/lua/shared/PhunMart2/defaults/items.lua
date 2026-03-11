@@ -526,9 +526,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -538,9 +537,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -550,9 +548,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -562,9 +559,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -574,9 +570,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -586,9 +581,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -598,9 +592,8 @@ return {
         offer = {
             weight = 0.5,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 336
+                min = 1,
+                max = 1
             }
         }
     },
@@ -610,9 +603,8 @@ return {
         offer = {
             weight = 0.5,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 336
+                min = 1,
+                max = 1
             }
         }
     },
@@ -622,9 +614,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -634,9 +625,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -646,9 +636,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -658,9 +647,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -670,9 +658,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -682,9 +669,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     },
@@ -694,9 +680,8 @@ return {
         offer = {
             weight = 1.0,
             stock = {
-                min = 0,
-                max = 1,
-                restockHours = 168
+                min = 1,
+                max = 1
             }
         }
     }

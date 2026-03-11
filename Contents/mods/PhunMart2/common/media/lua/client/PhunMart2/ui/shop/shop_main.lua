@@ -439,6 +439,12 @@ function UI:canPurchase(offer)
     if not offer then
         return false
     end
+
+    -- stock check: -1 = unlimited, 0 = out of stock
+    local stockQty = offer.offer and offer.offer.stockQty
+    if stockQty ~= nil and stockQty ~= -1 and stockQty <= 0 then
+        return false
+    end
     local condDefs = self.data and self.data.conditionsDefs
     local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
     local R = Core.conditionsRuntime
