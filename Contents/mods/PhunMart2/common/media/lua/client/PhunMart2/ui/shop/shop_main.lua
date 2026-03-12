@@ -476,27 +476,34 @@ function UI:onOfferSelected(id, offer)
     self.selectedOffer = offer
     self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer))
 
-    -- Show 3D vehicle preview when the offer item has no game-item entry (vehicles have no ".").
+    -- Show 3D vehicle preview only for spawnVehicle reward actions.
     local p3d = self.controls.preview3d
     if p3d then
-        local isVehicle =
-            offer and offer.item and not offer.item:find("%.") and getScriptManager():getItem(offer.item) == nil and
-                Traits.getOfferTraitKey(offer) == nil
-        if isVehicle then
+        local vehicleScript = nil
+        if offer and offer.reward and offer.reward.actions then
+            for _, action in ipairs(offer.reward.actions) do
+                if action.type == "spawnVehicle" then
+                    -- Use first script in the list for the preview
+                    local scripts = action.scripts or (action.script and {action.script})
+                    vehicleScript = scripts and scripts[1]
+                    break
+                end
+            end
+        end
+        if vehicleScript then
             if not p3d.initialized then
                 p3d.initialized = true
                 p3d.javaObject:fromLua1("setDrawGrid", false)
                 p3d.javaObject:fromLua1("createVehicle", "vehicle")
             end
-            -- Always reset rotation, pan and drag state on new selection
             p3d.rotX = 22;
             p3d.rotY = 45
             p3d._dragX = nil
             p3d.javaObject:fromLua3("setViewRotation", p3d.rotX, p3d.rotY, 0)
             p3d.javaObject:fromLua1("setView", "UserDefined")
             p3d.javaObject:fromLua1("setZoom", 3)
-            p3d.vehicleName = offer.item
-            p3d.javaObject:fromLua2("setVehicleScript", "vehicle", offer.item)
+            p3d.vehicleName = vehicleScript
+            p3d.javaObject:fromLua2("setVehicleScript", "vehicle", vehicleScript)
             p3d:setVisible(true)
         else
             p3d.vehicleName = nil
@@ -823,9 +830,7 @@ function UI:render()
             local tex = scriptItem and scriptItem:getNormalTexture()
             if not tex then
                 local tk = Traits.getOfferTraitKey(self.selectedOffer)
-                if tk then
-                    tex = Traits.getTexture(tk)
-                end
+                tex = Traits.getTexture(tk or self.selectedOffer.item)
             end
             if tex then
                 local iconSize = math.floor(math.min(pz.w, pz.h) * 0.78)
@@ -925,10 +930,13 @@ function UI:renderDetails(z)
         name = Traits.getLabel(traitKey)
     elseif scriptItem then
         name = scriptItem:getDisplayName()
-    elseif Core.getVehicleLabel then
+    elseif offer.reward and offer.reward.display and offer.reward.display.text then
+        name = offer.reward.display.text
+    elseif Core.getVehicleLabel and Core.getVehicleLabel(offer.item) ~= offer.item then
         name = Core.getVehicleLabel(offer.item)
     else
-        name = offer.item
+        -- Last resort: try the item key directly as a trait/display label (covers boost/xp offer types)
+        name = Traits.getLabel(offer.item) or offer.item
     end
     local nameLines = wrapText(name, maxW, UIFont.Small)
     for i = 1, math.min(2, #nameLines) do

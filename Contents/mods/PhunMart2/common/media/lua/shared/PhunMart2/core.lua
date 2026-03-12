@@ -60,6 +60,9 @@ PhunMart = {
         -- History / misc
         updateHistory = "PhunMartUpdateHistory",
         unlockShop = "PhunMartUnlockShop",
+        -- Token rewards
+        reportKills = "PhunMartReportKills",
+        grantReward = "PhunMartGrantReward",
         -- Wallet
         addToWallet = "PhunMartAddToWallet",
         getWallet = "PhunMartGetWallet",
@@ -75,7 +78,8 @@ PhunMart = {
         recievedInventory = "OnPhunMartRecievedInventory",
         OnShopChange = "OnPhunMartShopChange",
         OnPurchaseComplete = "OnPhunMartPurchaseComplete",
-        OnApplyTraitReward = "OnPhunMartApplyTraitReward"
+        OnApplyTraitReward = "OnPhunMartApplyTraitReward",
+        OnRewardGranted = "OnPhunMartRewardGranted"
     },
     tools = require "PhunMart2/tools",
     settings = {},

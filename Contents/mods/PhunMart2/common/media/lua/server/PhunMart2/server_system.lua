@@ -10,19 +10,6 @@ local ServerSystem = Core.ServerSystem
 
 function ServerSystem:new()
     local o = SGlobalObjectSystem.new(self, "phunmart")
-
-    local shops = {"NONE", "GoodPhoods", "PhatPhoods", "PittyTheTool", "FinalAmmendment", "WrentAWreck",
-                   "MichellesCrafts", "CarAParts", "TraiterJoes", "CSVPharmacy", "RadioHacks", "Phish4U", "HoesNMoes",
-                   "BudgetXPerience", "GiftedXPerience", "LuxuryXPerience", "HardWear", "Collectors", "Travelers",
-                   "ShedsAndCommoners"}
-
-    self.spritesToShop = {}
-    for i = 1, 3 do
-        for i = 1, 63 do
-
-        end
-    end
-
     return o
 end
 
@@ -104,11 +91,7 @@ function ServerSystem:initSystem()
 end
 
 function ServerSystem:isValidIsoObject(isoObject)
-
-    local name = isoObject:getName()
-    local texture = isoObject:getTextureName()
-    print("*** isValidIsoObject " .. tostring(name) .. " " .. tostring(texture))
-    return name == "PhunMartVendingMachine"
+    return isoObject:getName() == "PhunMartVendingMachine"
 end
 
 function ServerSystem:newLuaObjectAt(x, y, z)
@@ -116,7 +99,6 @@ function ServerSystem:newLuaObjectAt(x, y, z)
     return self:newLuaObject(globalObject)
 end
 function ServerSystem:newLuaObject(globalObject)
-    print("*** newLuaObjectAt")
     return Core.ServerObject:new(self, globalObject)
 end
 
@@ -173,38 +155,11 @@ function ServerSystem:rerollAll()
     end
 end
 
-function ServerSystem:purchase(playerObj, item, location)
-    local shop = self:getLuaObjectAt(location.x, location.y, location.z)
-    local shop2 = self:getIsoObjectAt(location.x, location.y, location.z)
-
-    local fred = type(shop.setType)
-    local success, reason = shop:purchase(playerObj, item)
-    if success then
-        Core:addToPurchaseHistory(playerObj, item)
-        sendServerCommand(playerObj, Core.name, Core.commands.buy, {
-            playerIndex = playerObj:getUsername(),
-            success = true,
-            item = item,
-            location = location
-
-        })
-    else
-        -- notify user that this failed
-    end
-end
-
-local doit = false
-
 function ServerSystem:openShop(player, args, forceRestock)
     local shop = self:getLuaObjectAt(args.x, args.y, args.z)
 
     if not shop then
-        print("ERROR! shop not found for " .. shop.id)
-        self:sendCommand(player, Core.commands.openError, {
-            id = shop.id,
-            location = shop.location,
-            error = "shopNotFound"
-        })
+        print("[PhunMart2] openShop: no shop at " .. args.x .. "," .. args.y .. "," .. args.z)
         return
     end
 
@@ -429,15 +384,9 @@ function ServerSystem:recompileShops()
     print("PhunMart: Recompiled shop definitions")
     -- Push updated shop defs to all connected clients.
     if Core.runtime and Core.runtime.shops then
-        local players = getOnlinePlayers()
-        if players then
-            for i = 0, players:size() - 1 do
-                local player = players:get(i)
-                sendServerCommand(player, Core.name, Core.commands.requestShopDefs, {
-                    shops = Core.runtime.shops
-                })
-            end
-        end
+        sendServerCommand(Core.name, Core.commands.requestShopDefs, {
+            shops = Core.runtime.shops
+        })
     end
 end
 

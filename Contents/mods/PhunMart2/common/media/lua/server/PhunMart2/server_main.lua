@@ -81,7 +81,7 @@ function Core.compile()
     local runtime, log = Core.compiler.compileAll(ctx)
     Core.runtime = runtime
     Core.shops = runtime.shops -- alias: all Core.shops readers now use compiled data
-    Core:reloadShopDefinitions()  -- rebuild spriteToShop from compiled sprites
+    Core:reloadShopDefinitions() -- rebuild spriteToShop from compiled sprites
     Core.tools.debug("Warn", log.warnings, "Errors", log.errors)
     return runtime, log
 
@@ -154,7 +154,9 @@ function Core:grantReward(player, action, qty)
     elseif t == "applyBoost" then
         local ok, err = pcall(function()
             local perk = Perks[action.skill]
-            if not perk then error("unknown perk: " .. tostring(action.skill)) end
+            if not perk then
+                error("unknown perk: " .. tostring(action.skill))
+            end
             local level = math.min(3, math.max(1, math.floor(action.multiplier or 1)))
             player:getXp():setPerkBoost(perk, level)
             SyncXp(player)
@@ -165,6 +167,48 @@ function Core:grantReward(player, action, qty)
 
     else
         print("[PhunMart2] grantReward: unknown action type '" .. tostring(t) .. "'")
+    end
+end
+
+-- Grant a reward from token reward config (playtime/kill).
+-- reward: { item="PhunMart.Token", amount=1 }
+-- For bound currency items, credits both current and bound wallet pools.
+-- For regular items, spawns into player inventory.
+-- reason: display string included in the notification message.
+function Core:grantConfigReward(player, reward, reason)
+    local item = reward.item
+    local amount = reward.amount or 1
+    local currency = Core.wallet.currencies[item]
+
+    if currency then
+        local totalValue = currency.value * amount
+        Core.wallet:adjustByPool(player, "current", currency.pool, totalValue)
+        if currency.bound then
+            Core.wallet:adjustByPool(player, "bound", currency.pool, totalValue)
+        end
+    else
+        for i = 1, amount do
+            player:getInventory():AddItem(item)
+        end
+    end
+
+    local label = currency and (amount .. " " .. currency.pool) or (amount .. "x " .. item)
+    local msg = "+" .. label .. " (" .. reason .. ")"
+    local wallet = Core.wallet:get(player)
+
+    if Core.isLocal then
+        triggerEvent(Core.events.OnRewardGranted, {
+            message = msg,
+            wallet = wallet,
+            username = player:getUsername()
+        })
+    else
+        sendServerCommand(player, Core.name, Core.commands.grantReward, {
+            playerIndex = player:getPlayerNum(),
+            username = player:getUsername(),
+            message = msg,
+            wallet = wallet
+        })
     end
 end
 
@@ -301,6 +345,16 @@ function Core:ini()
     self.lastStart = getTimestamp()
     Core.ServerSystem.instance:removeInvalidInstanceData()
     Core.compile()
+
+    -- Load token rewards config: try server override file first, then built-in defaults.
+    local ok, tokenDefaults = pcall(require, "PhunMart2/defaults/token_rewards")
+    Core.tokenRewardsCfg = Core.tools.loadTable("PhunMart2_TokenRewards.lua") or (ok and tokenDefaults) or {}
+
+    -- Wire playtime and kill-tracking modules.
+    require "PhunMart2/playtime_rewards"
+    require "PhunMart2/kill_rewards"
+    Core.playtimeRewards:load()
+    Core.killRewards:load()
     Core.debug("Server System initialized", self:getShops())
     triggerEvent(self.events.OnReady, self)
 end

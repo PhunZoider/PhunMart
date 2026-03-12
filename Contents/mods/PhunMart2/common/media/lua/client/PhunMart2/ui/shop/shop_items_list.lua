@@ -28,6 +28,28 @@ PhunMartUIShopItemsList = ISPanel:derive("PhunMartUIShopItemsList")
 local UI = PhunMartUIShopItemsList
 Core.ui.client.shopItemsList = UI
 
+local function formatPrice(offer)
+    local price = offer and offer.price
+    if not price then return nil end
+    if price.kind == "free" then return "FREE" end
+    if price.kind == "currency" then
+        local amt = price.amount
+        if type(amt) == "table" then amt = amt.min end
+        if price.pool == "tokens" then
+            return tostring(amt) .. "t"
+        else
+            if amt % 100 == 0 then return "$" .. tostring(amt / 100)
+            else return string.format("$%.2f", amt / 100) end
+        end
+    end
+    if price.kind == "items" and price.items and price.items[1] then
+        local pi = price.items[1]
+        local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+        return tostring(amt) .. "x"
+    end
+    return nil
+end
+
 local function truncate(text, maxWidth, font)
     if getTextManager():MeasureStringX(font, text) <= maxWidth then
         return text
@@ -405,7 +427,7 @@ function UI:renderGrid()
                 else
                     bg_a, bg_r, bg_g, bg_b = 0.60, 0.04, 0.04, 0.06
                 end
-                local stockQty = e.offer and e.offer.stockQty
+                local stockQty = e.offer and e.offer.offer and e.offer.offer.stockQty
                 local isOOS = stockQty ~= nil and stockQty ~= -1 and stockQty <= 0
 
                 self:drawRect(cx, cy, cs, cs, bg_a, bg_r, bg_g, bg_b)
@@ -433,19 +455,26 @@ function UI:renderGrid()
                     self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5 * iconA, 0.5 * iconA, 0.5 * iconA, 1, UIFont.Small)
                 end
 
-                -- slot code top-left (globally incremented: A1, A2... B1... across all groups)
+                -- slot code top-left
                 local globalRow = gl.rowOffset + row
                 local code = string.char(65 + globalRow) .. tostring(col + 1)
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
 
-                -- stock badge bottom-right (-1 = unlimited, no badge)
-                if stockQty and stockQty ~= -1 then
-                    local badge = isOOS and "OUT" or (tostring(stockQty) .. "x")
+                -- price/OOS badge bottom-right
+                local badge = isOOS and "OUT" or formatPrice(e.offer)
+                if badge then
                     local bw = getTextManager():MeasureStringX(UIFont.Small, badge)
                     local bx = cx + cs - bw - 3
                     local by = cy + cs - FONT_SM - 2
                     self:drawRect(bx - 1, by - 1, bw + 2, FONT_SM + 2, 0.75, 0, 0, 0)
-                    local tr, tg, tb = isOOS and 0.85 or 0.65, isOOS and 0.25 or 0.85, isOOS and 0.25 or 0.35
+                    local tr, tg, tb
+                    if isOOS then
+                        tr, tg, tb = 0.85, 0.25, 0.25
+                    elseif e.offer.price and e.offer.price.kind == "free" then
+                        tr, tg, tb = 0.30, 0.90, 0.30
+                    else
+                        tr, tg, tb = 0.92, 0.88, 0.30
+                    end
                     self:drawText(badge, bx, by, tr, tg, tb, 1, UIFont.Small)
                 end
             end
@@ -483,7 +512,7 @@ function UI:renderList()
                 else
                     bg_a, bg_r, bg_g, bg_b = 0.60, 0.04, 0.04, 0.06
                 end
-                local stockQty = e.offer and e.offer.stockQty
+                local stockQty = e.offer and e.offer.offer and e.offer.offer.stockQty
                 local isOOS = stockQty ~= nil and stockQty ~= -1 and stockQty <= 0
 
                 self:drawRect(PAD_EDGE, ry, rowW, rowH, bg_a, bg_r, bg_g, bg_b)
@@ -499,7 +528,7 @@ function UI:renderList()
                     self:drawRectBorder(PAD_EDGE, ry, rowW, rowH, 0.35, 0.20, 0.20, 0.25)
                 end
 
-                -- icon (shown when texture available, including fallback textures)
+                -- icon
                 local iconA = isOOS and 0.30 or 1
                 local nameX = PAD_EDGE + 2
                 if e.texture then
@@ -508,14 +537,9 @@ function UI:renderList()
                     nameX = nameX + iconH + 4
                 end
 
-                -- stock badge (compute width first so name can avoid it)
-                local badge, badgeW
-                if stockQty and stockQty ~= -1 then
-                    badge = isOOS and "OUT" or (tostring(stockQty) .. "x")
-                    badgeW = getTextManager():MeasureStringX(font, badge) + PAD_EDGE
-                else
-                    badgeW = 0
-                end
+                -- price/OOS badge (compute width first so name can avoid it)
+                local badge = isOOS and "OUT" or formatPrice(e.offer)
+                local badgeW = badge and (getTextManager():MeasureStringX(font, badge) + PAD_EDGE) or 0
 
                 -- name (truncated to avoid badge)
                 local availW = (PAD_EDGE + rowW) - nameX - badgeW - PAD_EDGE
@@ -527,7 +551,14 @@ function UI:renderList()
                 if badge then
                     local bx = PAD_EDGE + rowW - badgeW + 2
                     local by = ry + math.floor((rowH - fontH) / 2)
-                    local tr, tg, tb = isOOS and 0.85 or 0.65, isOOS and 0.25 or 0.85, isOOS and 0.25 or 0.35
+                    local tr, tg, tb
+                    if isOOS then
+                        tr, tg, tb = 0.85, 0.25, 0.25
+                    elseif e.offer.price and e.offer.price.kind == "free" then
+                        tr, tg, tb = 0.30, 0.90, 0.30
+                    else
+                        tr, tg, tb = 0.92, 0.88, 0.30
+                    end
                     self:drawText(badge, bx, by, tr, tg, tb, 1, font)
                 end
             end

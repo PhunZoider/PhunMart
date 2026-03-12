@@ -39,57 +39,36 @@ function Core.purchases:add(player, key, value)
     })
 end
 
-function Core.purchases:getEntries(player, key, windowSeconds)
-
-    local purchases = self:get(player)
-    local charname = getCharname(player)
+-- Returns purchase counts for a player keyed by username + charId.
+-- scope: "character" counts only entries for charId; anything else counts all chars on the account.
+-- Called by conditions runtime as: getCount(scope, username, charId, key, windowSeconds)
+function Core.purchases:getCount(scope, username, charId, key, windowSeconds)
+    if not self.histories then
+        return 0
+    end
+    local playerHistory = self.histories[username]
+    if not playerHistory then
+        return 0
+    end
 
     local now = getTimestamp()
-
+    local byChar = (scope == "character")
     local total = 0
-    local charTotal = 0
 
-    local totals = {}
-    local charTotals = {}
-
-    for c, histories in pairs(purchases) do
-        local entry = histories[key]
-        if entry then
-            if windowSeconds then
-                if now - entry.timestamp <= windowSeconds then
-                    table.insert(totals, entry.value or 1)
-                    total = total + 1
-                    if c == charname then
-                        table.insert(charTotals, entry.value or 1)
-                        charTotal = charTotal + 1
+    for charName, charHistory in pairs(playerHistory) do
+        if not byChar or charName == charId then
+            local entries = charHistory[key]
+            if entries then
+                for _, e in ipairs(entries) do
+                    if not windowSeconds or (now - e.timestamp <= windowSeconds) then
+                        total = total + (e.value or 1)
                     end
-                end
-            else
-                table.insert(totals, entry.value or 1)
-                total = total + 1
-                if c == charname then
-                    table.insert(charTotals, entry.value or 1)
-                    charTotal = charTotal + 1
                 end
             end
         end
     end
 
-    return {
-        total = total,
-        charTotal = charTotal,
-        all = totals,
-        current = charTotals
-    }
-end
-
-function Core.purchases:getCount(player, isCharacter, key, windowSeconds)
-    local entries = self:getEntries(player, key, windowSeconds)
-    if isCharacter then
-        return entries.charTotal
-    else
-        return entries.total
-    end
+    return total
 end
 
 function Core.purchases:load()

@@ -263,7 +263,7 @@ Commands[Core.commands.reroll] = function(playerObj, args)
         if Core.isLocal then
             triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
         else
-            sendServerCommand(Core.name, Core.commands.onShopChange, {
+            sendServerCommand(playerObj, Core.name, Core.commands.onShopChange, {
                 key = oldKey,
                 data = payload,
                 replaced = true
@@ -366,6 +366,7 @@ Commands[Core.commands.resetWallet] = function(playerObj, args)
 end
 
 Commands[Core.commands.playerSetup] = function(playerObj, args)
+
     local wallet = Core.wallet:get(playerObj)
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
         username = playerObj:getUsername(),
@@ -377,6 +378,10 @@ Commands[Core.commands.playerSetup] = function(playerObj, args)
             shops = Core.runtime.shops
         })
     end
+end
+
+Commands[Core.commands.reportKills] = function(playerObj, args)
+    Core.killRewards:reportKills(playerObj, args.normal or 0, args.sprinter or 0)
 end
 
 Commands[Core.commands.getPlayerList] = function(player, args)

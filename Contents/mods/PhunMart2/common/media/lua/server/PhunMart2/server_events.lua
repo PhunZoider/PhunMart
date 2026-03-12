@@ -59,6 +59,8 @@ Events.OnCharacterDeath.Add(function(character)
         return
     end
 
+    Core.playertimeRewards:getPlayerData(character).previousHours = character:getHoursSurvived()
+
     -- Drop wallet item if enabled
     if Core.settings.DropOnDeath then
         local walletData = Core.wallet:get(character)
@@ -115,6 +117,10 @@ Events.OnCharacterDeath.Add(function(character)
 
     -- Reset wallet (zero unbound, restore bound)
     Core.wallet:reset(character)
+end)
+
+Events.EveryTenMinutes.Add(function()
+    Core.playtimeRewards:tick()
 end)
 
 Events.OnZombieDead.Add(function(character)

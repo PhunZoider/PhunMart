@@ -311,21 +311,26 @@ function ServerObject:updateSprite(force)
     end
     local sprite = isoObject:getSprite():getName()
 
+    -- Build lookup sets so we can check membership by sprite name (the arrays are 1-indexed)
+    local poweredSet, unpoweredSet = {}, {}
+    for _, s in ipairs(def.sprites or {}) do poweredSet[s] = true end
+    for _, s in ipairs(def.unpoweredSprites or {}) do unpoweredSet[s] = true end
+
     if def.powered == true then
         local hasPower = self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
                              GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
-        if hasPower and def.unpoweredSprites[sprite] then
-            -- sprite is powered and sprite is unpowered so changeSprite
+        if hasPower and unpoweredSet[sprite] then
+            -- currently showing unpowered sprite but has power → switch to powered
             isoObject:setSprite(def.sprites[self:getSpriteIndex()])
             isoObject:transmitUpdatedSpriteToClients()
-        elseif not hasPower and def.sprites[sprite] then
-            -- sprite is unpowered and sprite is powered so changeSprite
+        elseif not hasPower and poweredSet[sprite] then
+            -- currently showing powered sprite but no power → switch to unpowered
             isoObject:setSprite(def.unpoweredSprites[self:getSpriteIndex()])
             isoObject:transmitUpdatedSpriteToClients()
         end
-    elseif def.unpoweredSprites[sprite] then
-        -- sprite is unpowered but def does not require power so changeSprite
-        isoObject:setSprite(def.unpoweredSprites[self:getSpriteIndex()])
+    elseif unpoweredSet[sprite] then
+        -- powered not required but showing unpowered sprite → switch to powered
+        isoObject:setSprite(def.sprites[self:getSpriteIndex()])
         isoObject:transmitUpdatedSpriteToClients()
     end
 end
@@ -334,12 +339,6 @@ function ServerObject:getKey()
     return tostring(self.type) .. "-" .. self.x .. "-" .. self.y .. "-" .. self.z
 end
 
-function ServerObject:setType(type)
-    -- generate from definitions
-    self:changeSprite(true)
-    self:saveData()
-
-end
 
 function ServerObject:saveData()
     local isoObject = self:getIsoObject()
@@ -392,11 +391,6 @@ function ServerObject:restock()
     self:saveData() -- toModData + transmitModData → engine syncs offers to all clients
 end
 
--- check to ensure we are setup correctly and restock if needed
-function ServerObject:validate()
-
-end
-
 function ServerObject:requiresPower()
     local def = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
     if def and def.powered == true then
@@ -406,26 +400,3 @@ function ServerObject:requiresPower()
     return false
 end
 
-function ServerObject:purchase(playerObj, item, qty)
-
-    qty = qty or 1
-
-    if self:requiresPower() then
-        return false, "Shop is out of power"
-    end
-
-    if not self.items[item] then
-        return false, "Shop does not have item"
-    end
-
-    if not self.items[item].inventory ~= false then
-        if self.items[item].inventory < qty then
-            return false, "Shop does not have enough inventory"
-        end
-    end
-
-    self.items[item].inventory = self.items[item].inventory - qty
-    self:saveData()
-    return true, "Purchase successful"
-
-end

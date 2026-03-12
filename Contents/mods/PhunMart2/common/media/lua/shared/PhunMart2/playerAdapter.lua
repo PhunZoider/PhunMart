@@ -3,8 +3,6 @@ require("PhunMart2/core")
 local Core = PhunMart
 local Traits = require "PhunMart2/traits"
 
-Core.playerAdapters = {}
-
 local function getAdapter(player)
 
     local PA = {
@@ -72,10 +70,8 @@ Core.getPlayerAdapter = function(player)
     if not player then
         return nil
     end
-    if not Core.playerAdapters[player:getUsername()] then
-        local adapter = getAdapter(player)
-        Core.playerAdapters[player:getUsername()] = adapter
-    end
-    return Core.playerAdapters[player:getUsername()]
+    -- Always create a fresh adapter — the player Java object may change across
+    -- disconnect/reconnect cycles, so caching by username is not safe.
+    return getAdapter(player)
 end
 

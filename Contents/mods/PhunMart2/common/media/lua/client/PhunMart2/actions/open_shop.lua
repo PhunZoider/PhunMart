@@ -54,6 +54,7 @@ function action:start()
     self.animDone = false
     self.shopData = nil
     self.uiOpened = false
+    self.waitTicks = 0
 
     -- Send the openShop request immediately so server processing overlaps
     -- with the animation.  The response will arrive in Core.pendingShopData.
@@ -95,7 +96,14 @@ function action:update()
 
     -- 4. Animation finished but still waiting for data → freeze the progress
     --    bar just below 100% so perform() is not called prematurely.
+    --    Abort if the server hasn't responded within ~10 seconds (200 ticks).
     if self.animDone then
+        self.waitTicks = (self.waitTicks or 0) + 1
+        if self.waitTicks > 200 then
+            print("[PhunMart2] openShop timed out waiting for server response")
+            self:forceStop()
+            return
+        end
         self:resetJobDelta()
     end
 end

@@ -53,8 +53,6 @@ Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobject
     end
 end)
 
--- wallet drop and reset are handled server-side in server_events.lua
-
 local function setup()
     Events.OnTick.Remove(setup)
     Core:ini()

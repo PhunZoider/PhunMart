@@ -197,7 +197,7 @@ function UI:save()
     local pools = self.controls.pools:getData()
     data.pools = pools
 
-    PL.debug("----", "Saving shop config", data, "----")
+    Core.debug("----", "Saving shop config", data, "----")
 
     Core.ClientSystem.instance:sendCommand(self.player, Core.commands.upsertShopDefinition, data)
 

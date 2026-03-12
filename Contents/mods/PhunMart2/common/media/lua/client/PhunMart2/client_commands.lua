@@ -3,14 +3,10 @@ if isServer() then
 end
 
 local Core = PhunMart
+local Toast = require "PhunMart2/ui/toast"
 
 local Commands = {}
 
--- local PS = PhunServer
-
--- PS.cmds["compile"] = function(args)
---     sendClientCommand(Core.name, Core.commands.compile, {})
--- end
 Commands[Core.commands.updateWallet] = function(args)
     local player = Core.tools.getPlayerByUsername(args.username)
     for k, v in pairs(args.wallet) do
@@ -51,12 +47,6 @@ Commands[Core.commands.serverPurchaseFailed] = function(arguments)
     modal:initialise()
     modal:addToUIManager()
 
-end
-
-Commands[Core.commands.requestLock] = function(arguments)
-    local shop = Core.ClientSystem.instance:getLuaObjectAt(arguments.location.x, arguments.location.y,
-        arguments.location.z)
-    shop:updateFromIsoObject()
 end
 
 Commands[Core.commands.updateHistory] = function(arguments)
@@ -143,35 +133,6 @@ Commands[Core.commands.payWithInventory] = function(arguments)
     end
 end
 
-Commands[Core.commands.closeAllShops] = function()
-    for _, v in pairs(PhunMartShopWindow.instances) do
-        v:close()
-    end
-end
-
-Commands[Core.commands.closeShop] = function(arguments)
-    for _, v in pairs(PhunMartShopWindow.instances) do
-        if v.shopObj.id == arguments.shopId then
-            v:close()
-        end
-    end
-end
-
-Commands[Core.commands.updateShop] = function(arguments)
-    CPhunMartSystem.instance:updateShop(arguments.location)
-end
-
-Commands[Core.commands.modifyTraits] = function(arguments)
-    local player = getSpecificPlayer(arguments.playerIndex)
-    for _, v in ipairs(arguments.items) do
-        local item = getScriptManager():getItem(v.name)
-        for i = 1, v.value do
-            local inv = player:getInventory()
-            local target = inv:getItemFromTypeRecurse(v.name)
-            target:getContainer():DoRemoveItem(target)
-        end
-    end
-end
 
 Commands[Core.commands.onShopChange] = function(args)
     triggerEvent(Core.events.OnShopChange, args.key, args.data, args.replaced == true)
@@ -226,5 +187,30 @@ end
 Commands[Core.commands.requestLocations] = function(args)
     triggerEvent(Core.events.OnShopLocationsReceived, args.locations)
 end
+
+-- ---------------------------------------------------------------------------
+-- Token reward grant (playtime / kill milestone)
+-- ---------------------------------------------------------------------------
+
+-- Shared handler for both MP (server command) and SP (triggered event) paths.
+local function handleGrant(args)
+    -- Sync the local wallet copy so balance displays stay current.
+    if args.wallet and args.username then
+        Core.wallet:setPlayerData(args.username, args.wallet)
+    end
+    -- Show toast notification.
+    Toast.show({ text = args.message or "Reward!" })
+end
+
+-- MP path: server sends this command after crediting the reward.
+Commands[Core.commands.grantReward] = function(args)
+    handleGrant(args)
+end
+
+-- SP path: server fires the event directly (same Lua state, no network hop).
+Events[Core.events.OnRewardGranted].Add(function(args)
+    if not args then return end
+    handleGrant(args)
+end)
 
 return Commands
