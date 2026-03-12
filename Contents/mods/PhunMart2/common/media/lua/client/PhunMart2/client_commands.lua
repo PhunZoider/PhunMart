@@ -133,9 +133,16 @@ Commands[Core.commands.payWithInventory] = function(arguments)
     end
 end
 
-
 Commands[Core.commands.onShopChange] = function(args)
     triggerEvent(Core.events.OnShopChange, args.key, args.data, args.replaced == true)
+end
+
+Commands[Core.commands.syncPurchases] = function(arguments)
+    print("-------------------- SYNC PURCHASES")
+    Core.debug(arguments)
+
+    Core.purchases.histories = Core.purchases.histories or {}
+    Core.purchases.histories[arguments.username] = arguments.history
 end
 
 Commands[Core.commands.requestShop] = function(arguments)
@@ -199,7 +206,9 @@ local function handleGrant(args)
         Core.wallet:setPlayerData(args.username, args.wallet)
     end
     -- Show toast notification.
-    Toast.show({ text = args.message or "Reward!" })
+    Toast.show({
+        text = args.message or "Reward!"
+    })
 end
 
 -- MP path: server sends this command after crediting the reward.
@@ -209,7 +218,9 @@ end
 
 -- SP path: server fires the event directly (same Lua state, no network hop).
 Events[Core.events.OnRewardGranted].Add(function(args)
-    if not args then return end
+    if not args then
+        return
+    end
     handleGrant(args)
 end)
 

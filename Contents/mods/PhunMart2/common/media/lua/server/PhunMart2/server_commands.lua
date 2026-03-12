@@ -378,6 +378,14 @@ Commands[Core.commands.playerSetup] = function(playerObj, args)
             shops = Core.runtime.shops
         })
     end
+    -- Send this player's purchase history so the client can evaluate
+    -- purchaseCountMax conditions without a round-trip per shop open.
+    local username = playerObj:getUsername()
+    local history = Core.purchases.histories and Core.purchases.histories[username] or {}
+    sendServerCommand(playerObj, Core.name, Core.commands.syncPurchases, {
+        username = username,
+        history = history
+    })
 end
 
 Commands[Core.commands.reportKills] = function(playerObj, args)

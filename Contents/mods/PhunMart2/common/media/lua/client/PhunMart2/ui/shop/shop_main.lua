@@ -326,14 +326,33 @@ function UI:createChildren()
     -- ── admin button (only for privileged players) ────────────────────────────
     if Core.tools.isAdmin(self.player) then
         local adminSize = px(L.adminBtnSize)
-        self.controls.adminBtn = ISButton:new(px(L.adminBtnX), px(L.adminBtnY), adminSize, adminSize, "⚙", self,
+        self.controls.adminBtn = ISButton:new(px(L.adminBtnX), px(L.adminBtnY), adminSize, adminSize, "", self,
             UI.onAdminMenu)
         self.controls.adminBtn:initialise()
         self.controls.adminBtn:instantiate()
         self.controls.adminBtn.font = UIFont.Small
-        self.controls.adminBtn.backgroundColor = {r = 0.10, g = 0.10, b = 0.12, a = 0.70}
-        self.controls.adminBtn.backgroundColorMouseOver = {r = 0.20, g = 0.20, b = 0.25, a = 0.90}
-        self.controls.adminBtn.borderColor = {r = 0.35, g = 0.35, b = 0.40, a = 0.80}
+        self.controls.adminBtn.backgroundColor = {
+            r = 0.10,
+            g = 0.10,
+            b = 0.12,
+            a = 0.70
+        }
+        self.controls.adminBtn.backgroundColorMouseOver = {
+            r = 0.20,
+            g = 0.20,
+            b = 0.25,
+            a = 0.90
+        }
+        self.controls.adminBtn.borderColor = {
+            r = 0.35,
+            g = 0.35,
+            b = 0.40,
+            a = 0.80
+        }
+        self.controls.adminBtn.texture = getTexture("media/ui/inventoryPanes/Button_Gear.png")
+        self.controls.adminBtn.textureX = 2 -- optional padding
+        self.controls.adminBtn.textureY = 2
+
         self:addChild(self.controls.adminBtn)
     end
 
@@ -435,7 +454,7 @@ end
 -- selection / buy
 -- ─────────────────────────────────────────────────────────────────────────────
 
-function UI:canPurchase(offer)
+function UI:canPurchase(offer, offerId)
     if not offer then
         return false
     end
@@ -451,7 +470,9 @@ function UI:canPurchase(offer)
 
     -- conditions
     if R and adapter and condDefs and offer.conditions then
-        local result = R.evaluate(offer.conditions, condDefs, adapter, nil, nil)
+        local result = R.evaluate(offer.conditions, condDefs, adapter, Core.purchases, {
+            offerId = offerId
+        })
         if not result.ok then
             return false
         end
@@ -459,7 +480,13 @@ function UI:canPurchase(offer)
 
     -- price affordability
     local price = offer.price
-    if adapter and price and price.items then
+    if price and price.kind == "currency" and Core.wallet then
+        local balance = Core.wallet:getBalance(self.player, price.pool)
+        local need = type(price.amount) == "table" and price.amount.min or (price.amount or 0)
+        if balance < need then
+            return false
+        end
+    elseif adapter and price and price.items then
         for _, pi in ipairs(price.items) do
             local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
             if (adapter:countItem(pi.item) or 0) < need then
@@ -474,7 +501,7 @@ end
 function UI:onOfferSelected(id, offer)
     self.selectedId = id
     self.selectedOffer = offer
-    self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer))
+    self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
 
     -- Show 3D vehicle preview only for spawnVehicle reward actions.
     local p3d = self.controls.preview3d
@@ -525,26 +552,26 @@ function UI:onBuy()
     self.controls.buyBtn:setEnable(false)
     self:showFeedback("Purchasing...", 0.9, 0.9, 0.3)
     sendClientCommand(Core.name, Core.commands.buy, {
-        offerId  = self.selectedId,
+        offerId = self.selectedId,
         location = loc,
-        qty      = 1
+        qty = 1
     })
 end
 
 function UI:onPurchaseComplete(result)
     if result.failed then
         local msgs = {
-            OutOfStock       = "Out of stock",
+            OutOfStock = "Out of stock",
             InsufficientFunds = "Not enough funds",
             ConditionsFailed = "Requirements not met",
-            ShopNotFound     = "Shop not found",
-            OfferNotFound    = "Offer not found",
+            ShopNotFound = "Shop not found",
+            OfferNotFound = "Offer not found"
         }
         local msg = msgs[result.message] or ("Purchase failed: " .. tostring(result.message))
         self:showFeedback(msg, 0.9, 0.3, 0.3)
         -- Re-enable buy button so the player can try again or choose another
         if self.selectedId then
-            self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer))
+            self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer, self.selectedId))
         end
         return
     end
@@ -559,7 +586,10 @@ function UI:onPurchaseComplete(result)
 
     -- Re-evaluate buy button for the still-selected offer
     if self.selectedId == result.offerId then
-        self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer))
+        -- Record the purchase locally so purchaseCountMax evaluates correctly
+        -- on repeated buys without waiting for the next playerSetup sync.
+        Core.purchases:add(self.player, result.offerId, 1)
+        self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer, self.selectedId))
     end
 
     self:showFeedback("Purchased!", 0.35, 0.90, 0.35)
@@ -705,7 +735,10 @@ function UI:onChangeTo(shopType)
         self:showFeedback("No location data", 0.9, 0.3, 0.3)
         return
     end
-    sendClientCommand(Core.name, Core.commands.changeTo, {to = shopType, location = loc})
+    sendClientCommand(Core.name, Core.commands.changeTo, {
+        to = shopType,
+        location = loc
+    })
     self:showFeedback("Changing to " .. shopType .. "...", 0.5, 0.7, 0.9)
 end
 
@@ -713,9 +746,9 @@ function UI:onEditShop()
     local shopDefs = (Core.defs and Core.defs.shops) or (Core.runtime and Core.runtime.shops) or {}
     local shopDef = shopDefs[self.data.shopType] or {}
     -- Merge in fields already available from the open-shop payload
-    shopDef.background  = shopDef.background  or self.data.background
+    shopDef.background = shopDef.background or self.data.background
     shopDef.defaultView = shopDef.defaultView or self.data.defaultView
-    shopDef.poolSets    = shopDef.poolSets    or self.data.poolSets
+    shopDef.poolSets = shopDef.poolSets or self.data.poolSets
     Core.ui.client.shopEditor.open(self.player, self.data.shopType, shopDef)
 end
 
@@ -859,8 +892,11 @@ function UI:render()
     -- Wallet balance — right-aligned, always visible
     if Core.wallet then
         local function fmtChange(n)
-            if n % 100 == 0 then return "$" .. tostring(n / 100)
-            else return string.format("$%.2f", n / 100) end
+            if n % 100 == 0 then
+                return "$" .. tostring(n / 100)
+            else
+                return string.format("$%.2f", n / 100)
+            end
         end
         local change = Core.wallet:getBalance(self.player, "change")
         local tokens = Core.wallet:getBalance(self.player, "tokens")
@@ -873,8 +909,8 @@ function UI:render()
             balTxt = fmtChange(change)
         end
         local bw = getTextManager():MeasureStringX(UIFont.Small, balTxt)
-        self:drawText(balTxt, fz.x + fz.w - bw - 6,
-            math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.72, 0.88, 0.28, 0.85, UIFont.Small)
+        self:drawText(balTxt, fz.x + fz.w - bw - 6, math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.72, 0.88, 0.28, 0.85,
+            UIFont.Small)
     end
 
     if self.feedbackText then
@@ -898,8 +934,8 @@ function UI:render()
             else
                 statusText = string.format("Restocks in %.1fh", hoursLeft)
             end
-            self:drawText(statusText, fz.x + 6,
-                math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.32, 0.32, 0.35, 0.75, UIFont.Small)
+            self:drawText(statusText, fz.x + 6, math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.32, 0.32, 0.35, 0.75,
+                UIFont.Small)
         end
     end
 end
@@ -1030,7 +1066,9 @@ function UI:renderDetails(z)
         if R and adapter and condDefs then
             local result = R.evaluate({
                 all = {condKey}
-            }, condDefs, adapter, nil, nil)
+            }, condDefs, adapter, Core.purchases, {
+                offerId = self.selectedId
+            })
             if result.ok then
                 cr, cg, cb = 0.30, 0.90, 0.30 -- green: passes
                 passed = true

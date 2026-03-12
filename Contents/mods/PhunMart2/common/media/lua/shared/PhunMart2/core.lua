@@ -59,6 +59,7 @@ PhunMart = {
         spawnVehicle = "PhunMartSpawnVehicle",
         -- History / misc
         updateHistory = "PhunMartUpdateHistory",
+        syncPurchases = "PhunMartSyncPurchases",
         unlockShop = "PhunMartUnlockShop",
         -- Token rewards
         reportKills = "PhunMartReportKills",

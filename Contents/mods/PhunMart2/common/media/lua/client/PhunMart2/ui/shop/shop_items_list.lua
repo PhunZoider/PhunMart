@@ -30,16 +30,25 @@ Core.ui.client.shopItemsList = UI
 
 local function formatPrice(offer)
     local price = offer and offer.price
-    if not price then return nil end
-    if price.kind == "free" then return "FREE" end
+    if not price then
+        return nil
+    end
+    if price.kind == "free" then
+        return "FREE"
+    end
     if price.kind == "currency" then
         local amt = price.amount
-        if type(amt) == "table" then amt = amt.min end
+        if type(amt) == "table" then
+            amt = amt.min
+        end
         if price.pool == "tokens" then
             return tostring(amt) .. "t"
         else
-            if amt % 100 == 0 then return "$" .. tostring(amt / 100)
-            else return string.format("$%.2f", amt / 100) end
+            if amt % 100 == 0 then
+                return "$" .. tostring(amt / 100)
+            else
+                return string.format("$%.2f", amt / 100)
+            end
         end
     end
     if price.kind == "items" and price.items and price.items[1] then
@@ -76,6 +85,8 @@ function UI:new(x, y, w, h, opts)
     o.viewMode = VIEW_GRID
     o.compactList = false
     o.noBackground = true
+    o.iconList = getTexture("media/ui/craftingMenus/Icon_List.png");
+    o.iconGrid = getTexture("media/ui/craftingMenus/Icon_Grid.png");
     return o
 end
 
@@ -324,6 +335,7 @@ function UI:toggleBtnRect()
     local label = self.viewMode == VIEW_GRID and "List" or "Grid"
     local lw = getTextManager():MeasureStringX(UIFont.Small, label)
     local bw = lw + PAD_EDGE * 2
+    bw = TOGGLE_H - 2
     local bh = TOGGLE_H - 2
     return self.width - bw - PAD_EDGE, 1, bw, bh, label
 end
@@ -452,7 +464,8 @@ function UI:renderGrid()
                 else
                     local abbr = e.displayName:sub(1, 2):upper()
                     local tw = getTextManager():MeasureStringX(UIFont.Small, abbr)
-                    self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5 * iconA, 0.5 * iconA, 0.5 * iconA, 1, UIFont.Small)
+                    self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5 * iconA, 0.5 * iconA,
+                        0.5 * iconA, 1, UIFont.Small)
                 end
 
                 -- slot code top-left
@@ -577,10 +590,13 @@ function UI:render()
     local hovBg = self.toggleHov and 0.55 or 0.30
     self:drawRect(bx, by, bw, bh, hovBg, 0.05, 0.10, 0.05)
     self:drawRectBorder(bx, by, bw, bh, 0.60, 0.25, 0.45, 0.25)
+    self:drawTextureScaledAspect(self.viewMode == VIEW_GRID and self.iconList or self.iconGrid, bx + 4, by + 4, FONT_SM,
+        FONT_SM, 1, 1, 1, 1)
+
     local lx = bx + math.floor((bw - getTextManager():MeasureStringX(UIFont.Small, label)) / 2)
     local ly = by + math.floor((bh - FONT_SM) / 2)
     local tc = self.toggleHov and 1.0 or 0.70
-    self:drawText(label, lx, ly, tc, tc, tc, 1, UIFont.Small)
+    -- self:drawText(label, lx, ly, tc, tc, tc, 1, UIFont.Small)
 
     -- ── empty state ───────────────────────────────────────────────────────────
     if self:totalItems() == 0 then

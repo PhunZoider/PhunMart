@@ -24,6 +24,14 @@ return {
         }
     },
 
+    oneTimePurchase = {
+        test = "purchaseCountMax",
+        args = {
+            max = 1,
+            scope = "player_item_shop"
+        }
+    },
+
     highBoost = {
         test = "perkBoostBetween",
         args = {

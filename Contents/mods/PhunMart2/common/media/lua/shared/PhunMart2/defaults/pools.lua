@@ -24,7 +24,8 @@ return {
     -- =========================================================
     pool_phatphoods = {
         defaults = {
-            price = "coin_5"
+            price = "coin_5",
+            conditions = "oneTimePurchase"
         },
         sources = {
             groups = {"food_junk", "food_alcohol"}

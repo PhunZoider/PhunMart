@@ -182,6 +182,7 @@ function ServerSystem:openShop(player, args, forceRestock)
     -- conditionsDefs (shared runtime data, not stored per-object)
     local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shop.type]
     local shopCfg = Core.shops and Core.shops[shop.type]
+
     local inventoryData = {
         key = shop:getKey(),
         shopType = shop.type,
