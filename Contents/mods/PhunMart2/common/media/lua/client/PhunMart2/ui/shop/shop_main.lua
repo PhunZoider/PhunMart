@@ -66,7 +66,11 @@ local L = {
     screenH = 140, -- display screen  (preview)
     keypadY = 278,
     keypadH = 210, -- keypad area     (details)
-    -- 478 → 571: lower machine section deliberately left un-overlaid
+    -- 488 → 580: lower machine section — balance pane lives here
+
+    -- Balance zone: between keypad bottom (488) and tray (580)
+    balanceY = 493,
+    balanceH = 80,
 
     -- Bottom strip: dispenser tray (feedback left, buy right)
     trayY = 580,
@@ -323,38 +327,33 @@ function UI:createChildren()
     }
     self:addChild(self.controls.closeBtn)
 
-    -- ── admin button (only for privileged players) ────────────────────────────
-    if Core.tools.isAdmin(self.player) then
-        local adminSize = px(L.adminBtnSize)
-        self.controls.adminBtn = ISButton:new(px(L.adminBtnX), px(L.adminBtnY), adminSize, adminSize, "", self,
-            UI.onAdminMenu)
-        self.controls.adminBtn:initialise()
-        self.controls.adminBtn:instantiate()
-        self.controls.adminBtn.font = UIFont.Small
-        self.controls.adminBtn.backgroundColor = {
-            r = 0.10,
-            g = 0.10,
-            b = 0.12,
-            a = 0.70
-        }
-        self.controls.adminBtn.backgroundColorMouseOver = {
-            r = 0.20,
-            g = 0.20,
-            b = 0.25,
-            a = 0.90
-        }
-        self.controls.adminBtn.borderColor = {
-            r = 0.35,
-            g = 0.35,
-            b = 0.40,
-            a = 0.80
-        }
-        self.controls.adminBtn.texture = getTexture("media/ui/inventoryPanes/Button_Gear.png")
-        self.controls.adminBtn.textureX = 2 -- optional padding
-        self.controls.adminBtn.textureY = 2
-
-        self:addChild(self.controls.adminBtn)
-    end
+    -- ── admin button (always created; visibility toggled each frame in prerender) ─
+    local adminSize = px(L.adminBtnSize)
+    self.controls.adminBtn = ISButton:new(px(L.adminBtnX), px(L.adminBtnY), adminSize, adminSize, "", self,
+        UI.onAdminMenu)
+    self.controls.adminBtn:initialise()
+    self.controls.adminBtn:instantiate()
+    self.controls.adminBtn.font = UIFont.Small
+    self.controls.adminBtn.backgroundColor = {
+        r = 0.10,
+        g = 0.10,
+        b = 0.12,
+        a = 0.70
+    }
+    self.controls.adminBtn.backgroundColorMouseOver = {
+        r = 0.20,
+        g = 0.20,
+        b = 0.25,
+        a = 0.90
+    }
+    self.controls.adminBtn.borderColor = {
+        r = 0.35,
+        g = 0.35,
+        b = 0.40,
+        a = 0.80
+    }
+    self.controls.adminBtn:setVisible(false) -- prerender updates this each frame
+    self:addChild(self.controls.adminBtn)
 
     -- ── 3D vehicle preview (fills the preview zone; hidden until a vehicle offer is selected) ──
     local p3d = ISUI3DScene:new(rightX, previewY, rightW, previewH)
@@ -405,6 +404,12 @@ function UI:createChildren()
             y = detailY,
             w = rightW,
             h = detailH
+        },
+        balance = {
+            x = rightX,
+            y = px(L.balanceY),
+            w = rightW,
+            h = px(L.balanceH)
         },
         feedback = {
             x = px(L.glassX),
@@ -840,10 +845,20 @@ function UI:prerender()
         self:drawRect(dz.x, dz.y, dz.w, dz.h, 0.82, 0.04, 0.04, 0.06)
         self:drawRectBorder(dz.x, dz.y, dz.w, dz.h, 0.50, 0.30, 0.30, 0.35)
     end
+    local bz = self.zones and self.zones.balance
+    if bz then
+        self:drawRect(bz.x, bz.y, bz.w, bz.h, 0.82, 0.04, 0.04, 0.06)
+        self:drawRectBorder(bz.x, bz.y, bz.w, bz.h, 0.50, 0.30, 0.30, 0.35)
+    end
     if fz then
         -- feedback tray: always visible as a recessed slot
         self:drawRect(fz.x, fz.y, fz.w, fz.h, 0.70, 0.03, 0.03, 0.04)
         self:drawRectBorder(fz.x, fz.y, fz.w, fz.h, 0.40, 0.25, 0.25, 0.28)
+    end
+
+    -- Toggle admin button each frame so mid-game admin promotion works
+    if self.controls.adminBtn then
+        self.controls.adminBtn:setVisible(Core.tools.isAdmin(self.player))
     end
 end
 
@@ -852,6 +867,7 @@ function UI:render()
 
     local pz = self.zones.preview
     local dz = self.zones.details
+    local bz = self.zones.balance
     local fz = self.zones.feedback
 
     -- ── preview zone ─────────────────────────────────────────────────────────
@@ -880,6 +896,74 @@ function UI:render()
             0.38, 1, UIFont.Small)
     end
 
+    -- ── balance zone ──────────────────────────────────────────────────────────
+    if bz and Core.wallet then
+        -- Build icon cache once: highest-value coin texture per pool
+        if not self._poolIcons then
+            self._poolIcons = {}
+            for item, def in pairs(Core.wallet.currencies) do
+                local cur = self._poolIcons[def.pool]
+                if not cur or def.value > cur.value then
+                    local si = getScriptManager():getItem(item)
+                    self._poolIcons[def.pool] = {
+                        value = def.value,
+                        tex = si and si:getNormalTexture()
+                    }
+                end
+            end
+        end
+
+        local function fmtBalance(pool, amount)
+            local fmt = Core.wallet.pools[pool] and Core.wallet.pools[pool].format
+            if fmt == "cents" then
+                if amount % 100 == 0 then
+                    return "$" .. tostring(amount / 100)
+                else
+                    return string.format("$%.2f", amount / 100)
+                end
+            else
+                return tostring(amount)
+            end
+        end
+
+        local pad = 6
+        local iconSz = FONT_SM
+        local rowH = iconSz + 4
+        local poolOrder = {"change", "tokens"}
+        local rows = {}
+        for _, pool in ipairs(poolOrder) do
+            local def = Core.wallet.pools[pool]
+            if def then
+                table.insert(rows, {
+                    label = def.label,
+                    amount = fmtBalance(pool, Core.wallet:getBalance(self.player, pool)),
+                    tex = self._poolIcons[pool] and self._poolIcons[pool].tex
+                })
+            end
+        end
+
+        -- "Balance" header + divider
+        self:drawText("Balance", bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
+        local divY = bz.y + pad + FONT_SM + 2
+        self:drawRect(bz.x + pad, divY, bz.w - pad * 2, 1, 0.35, 0.30, 0.30, 0.40)
+
+        -- Rows: [icon] label ... amount
+        local headerH = pad + FONT_SM + 2 + 1 + 2 -- pad + text + gap + divider + gap
+        local contentH = #rows * rowH + math.max(0, #rows - 1) * 3
+        local startY = math.floor(bz.y + headerH + (bz.h - headerH - contentH) / 2) - 6
+        for _, row in ipairs(rows) do
+            local ry = startY
+            local mid = ry + math.floor((iconSz - FONT_SM) / 2)
+            if row.tex then
+                self:drawTextureScaledAspect(row.tex, bz.x + pad, ry, iconSz, iconSz, 0.85, 1, 1, 1)
+            end
+            self:drawText(row.label, bz.x + pad + iconSz + 4, mid, 0.72, 0.72, 0.76, 0.90, UIFont.Small)
+            local aw = getTextManager():MeasureStringX(UIFont.Small, row.amount)
+            self:drawText(row.amount, bz.x + bz.w - aw - pad, mid, 0.88, 0.88, 0.50, 1, UIFont.Small)
+            startY = startY + rowH + 3
+        end
+    end
+
     -- ── feedback zone ─────────────────────────────────────────────────────────
     if self.feedbackText then
         if self.feedbackTimer > 0 then
@@ -889,53 +973,23 @@ function UI:render()
         end
     end
 
-    -- Wallet balance — right-aligned, always visible
-    if Core.wallet then
-        local function fmtChange(n)
-            if n % 100 == 0 then
-                return "$" .. tostring(n / 100)
-            else
-                return string.format("$%.2f", n / 100)
-            end
-        end
-        local change = Core.wallet:getBalance(self.player, "change")
-        local tokens = Core.wallet:getBalance(self.player, "tokens")
-        local balTxt
-        if change > 0 and tokens > 0 then
-            balTxt = fmtChange(change) .. "  " .. tokens .. "t"
-        elseif tokens > 0 then
-            balTxt = tokens .. "t"
-        else
-            balTxt = fmtChange(change)
-        end
-        local bw = getTextManager():MeasureStringX(UIFont.Small, balTxt)
-        self:drawText(balTxt, fz.x + fz.w - bw - 6, math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.72, 0.88, 0.28, 0.85,
-            UIFont.Small)
-    end
-
     if self.feedbackText then
         local fc = self.feedbackColor
         local txt = truncate(self.feedbackText, fz.w - 12, UIFont.Small)
         local tw = getTextManager():MeasureStringX(UIFont.Small, txt)
         self:drawText(txt, math.floor(fz.x + (fz.w - tw) / 2), math.floor(fz.y + (fz.h - FONT_SM) / 2), fc.r, fc.g,
             fc.b, fc.a, UIFont.Small)
-    elseif not (Core.settings and Core.settings.ShowRestockStatus == false) then
-        -- Subtle restock timer — only shown when no feedback message is active
-        local lastRestock = self.data and self.data.lastRestock
-        local freq = self.data and self.data.restockFrequency or 24
-        if lastRestock then
-            local now = GameTime.getInstance():getWorldAgeHours()
-            local hoursLeft = math.max(0, (lastRestock + freq) - now)
-            local statusText
-            if hoursLeft < 0.1 then
-                statusText = "Restock ready"
-            elseif hoursLeft < 1 then
-                statusText = string.format("Restocks in %dm", math.floor(hoursLeft * 60))
-            else
-                statusText = string.format("Restocks in %.1fh", hoursLeft)
-            end
-            self:drawText(statusText, fz.x + 6, math.floor(fz.y + (fz.h - FONT_SM) / 2), 0.32, 0.32, 0.35, 0.75,
-                UIFont.Small)
+    end
+
+    -- ── admin button gear icon ────────────────────────────────────────────────
+    -- ISButton doesn't reliably render textures in all PZ versions; draw manually.
+    local adminBtn = self.controls.adminBtn
+    if adminBtn and adminBtn:isVisible() then
+        local gearTex = getTexture("media/ui/inventoryPanes/Button_Gear.png")
+        if gearTex then
+            local pad = 3
+            self:drawTextureScaled(gearTex, adminBtn.x + pad, adminBtn.y + pad, adminBtn.width - pad * 2,
+                adminBtn.height - pad * 2, 1)
         end
     end
 end
@@ -1050,7 +1104,7 @@ function UI:renderDetails(z)
 
     local condDefs = self.data and self.data.conditionsDefs
     local R = Core.conditionsRuntime
-    local headerY = y -- reserve space; header drawn on first visible condition
+    local headerY = y -- reserve space; header drawn on first blocking condition
     local headerDrawn = false
     y = y + lh
 
@@ -1060,35 +1114,28 @@ function UI:renderDetails(z)
             break
         end
 
-        -- evaluate this single condition to get pass/fail colour
-        local cr, cg, cb = 0.52, 0.52, 0.58 -- default: grey (unknown)
-        local passed = false
+        -- Only show conditions that are currently blocking the purchase
+        local passed = true
         if R and adapter and condDefs then
             local result = R.evaluate({
                 all = {condKey}
             }, condDefs, adapter, Core.purchases, {
                 offerId = self.selectedId
             })
-            if result.ok then
-                cr, cg, cb = 0.30, 0.90, 0.30 -- green: passes
-                passed = true
-            else
-                cr, cg, cb = 0.90, 0.30, 0.30 -- red: fails
-            end
+            passed = result.ok
         end
 
-        -- Skip internal (__) conditions when they pass — only show them when blocking a purchase
-        if not (passed and condKey:sub(1, 2) == "__") then
+        if not passed then
             if not headerDrawn then
-                self:drawText("Requirements:", x, headerY, 0.50, 0.50, 0.55, 1, UIFont.Small)
+                self:drawText("Requires:", x, headerY, 0.75, 0.55, 0.25, 1, UIFont.Small)
                 headerDrawn = true
             end
             local label = truncate("- " .. conditionLabel(condKey, condDefs), maxW - 4, UIFont.Small)
-            self:drawText(label, x + 4, y, cr, cg, cb, 1, UIFont.Small)
+            self:drawText(label, x + 4, y, 0.90, 0.30, 0.30, 1, UIFont.Small)
             y = y + lh
         end
     end
     if not headerDrawn then
-        y = headerY -- reclaim the reserved line if nothing was shown
+        y = headerY -- reclaim the reserved line — all conditions pass
     end
 end

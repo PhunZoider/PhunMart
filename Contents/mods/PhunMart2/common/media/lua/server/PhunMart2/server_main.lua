@@ -355,6 +355,7 @@ function Core:ini()
     require "PhunMart2/kill_rewards"
     Core.playtimeRewards:load()
     Core.killRewards:load()
+    Core.purchases:load()
     Core.debug("Server System initialized", self:getShops())
     triggerEvent(self.events.OnReady, self)
 end

@@ -3,6 +3,8 @@ if isServer() then
 end
 
 require "ISUI/ISPanel"
+require "ISUI/ISToolTipInv"
+require "ISUI/ISToolTip"
 local Core = PhunMart
 local Traits = require "PhunMart2/traits"
 
@@ -90,6 +92,90 @@ function UI:new(x, y, w, h, opts)
     return o
 end
 
+function UI:initialise()
+    ISPanel.initialise(self)
+
+    -- Tooltips are NOT added to UIManager here — added/removed dynamically so
+    -- render() is never called when hidden (avoids DoTooltip crashes on hidden panels).
+    self.invTooltip = ISToolTipInv:new()
+    self.invTooltip:initialise()
+    self.invTooltip:setAlwaysOnTop(true)
+    self.invTooltip.followMouse = true
+    -- B42 requires a character reference for DoTooltip to render correctly
+    self.invTooltip:setCharacter(self.player)
+    self._invInUI = false
+
+    self.txtTooltip = ISToolTip:new()
+    self.txtTooltip:initialise()
+    self.txtTooltip:setAlwaysOnTop(true)
+    self._txtInUI = false
+end
+
+function UI:hideTooltips()
+    if self._invInUI then
+        self.invTooltip:setVisible(false)
+        self.invTooltip:removeFromUIManager()
+        self._invInUI = false
+    end
+    if self._txtInUI then
+        self.txtTooltip:setVisible(false)
+        self.txtTooltip:removeFromUIManager()
+        self._txtInUI = false
+    end
+end
+
+-- Show the appropriate tooltip for the currently hovered entry, or hide both.
+function UI:updateTooltip()
+    if not self.hovered then
+        self:hideTooltips()
+        return
+    end
+
+    local gi, idx = self.hovered[1], self.hovered[2]
+    local e = self.groups[gi] and self.groups[gi].items[idx]
+    if not e then
+        self:hideTooltips()
+        return
+    end
+
+    -- Try inventory item tooltip first (real items only, not traits/vehicles/boosts)
+    local itemName = e.offer and e.offer.item
+    if itemName and getScriptManager():getItem(itemName) then
+        -- Cache InventoryItem per key — instanceItem is a Java call, avoid per-frame
+        if self._tipItemKey ~= itemName then
+            self._tipItemKey = itemName
+            self._tipItem = instanceItem(itemName)
+        end
+        if self._tipItem then
+            if self._txtInUI then
+                self.txtTooltip:setVisible(false)
+                self.txtTooltip:removeFromUIManager()
+                self._txtInUI = false
+            end
+            self.invTooltip:setItem(self._tipItem)
+            if not self._invInUI then
+                self.invTooltip:addToUIManager()
+                self._invInUI = true
+            end
+            self.invTooltip:setVisible(true)
+            return
+        end
+    end
+
+    -- Fall back: plain text tooltip (traits, vehicles, boosts, unknown types)
+    if self._invInUI then
+        self.invTooltip:setVisible(false)
+        self.invTooltip:removeFromUIManager()
+        self._invInUI = false
+    end
+    self.txtTooltip.description = e.displayName or ""
+    if not self._txtInUI then
+        self.txtTooltip:addToUIManager()
+        self._txtInUI = true
+    end
+    self.txtTooltip:setVisible(true)
+end
+
 function UI:listRowH()
     return self.compactList and LIST_ROW_H_COMP or LIST_ROW_H
 end
@@ -111,6 +197,11 @@ function UI:setData(data)
     self.selected = nil
     self.hovered = nil
     self.scrollY = 0
+    self._tipItemKey = nil
+    self._tipItem = nil
+    self.lastRestock = data and data.lastRestock
+    self.restockFrequency = (data and data.restockFrequency) or 24
+    self:hideTooltips()
     if not (data and data.offers) then
         return
     end
@@ -350,17 +441,25 @@ end
 function UI:onMouseMove(dx, dy)
     local mx, my = self:getMouseX(), self:getMouseY()
     self.toggleHov = my < TOGGLE_H and self:isInToggleBtn(mx, my)
+    local prev = self.hovered
     if my < TOGGLE_H then
         self.hovered = nil
     else
         local gi, idx = self:indexAt(mx, my)
         self.hovered = gi and {gi, idx} or nil
     end
+    -- Only update tooltip when the hovered cell actually changes
+    local changed = (prev == nil) ~= (self.hovered == nil) or
+                        (prev and self.hovered and (prev[1] ~= self.hovered[1] or prev[2] ~= self.hovered[2]))
+    if changed then
+        self:updateTooltip()
+    end
 end
 
 function UI:onMouseMoveOutside(dx, dy)
     self.hovered = nil
     self.toggleHov = false
+    self:updateTooltip()
 end
 
 function UI:onMouseUp(x, y)
@@ -384,6 +483,10 @@ function UI:onMouseUp(x, y)
     if self.onSelectFn then
         self.onSelectFn(e.id, e.offer)
     end
+    -- Re-assert tooltip after the callback — the UI state change from onSelectFn
+    -- (enabling buy button, 3D preview, etc.) can trigger a stray mouse event that
+    -- clears the tooltip even though the mouse hasn't moved.
+    self:updateTooltip()
 end
 
 function UI:onRightMouseUp(x, y)
@@ -593,10 +696,23 @@ function UI:render()
     self:drawTextureScaledAspect(self.viewMode == VIEW_GRID and self.iconList or self.iconGrid, bx + 4, by + 4, FONT_SM,
         FONT_SM, 1, 1, 1, 1)
 
-    local lx = bx + math.floor((bw - getTextManager():MeasureStringX(UIFont.Small, label)) / 2)
-    local ly = by + math.floor((bh - FONT_SM) / 2)
-    local tc = self.toggleHov and 1.0 or 0.70
-    -- self:drawText(label, lx, ly, tc, tc, tc, 1, UIFont.Small)
+    -- Restock timer: left side of toggle bar
+    if self.lastRestock then
+        local now = GameTime.getInstance():getWorldAgeHours()
+        local hoursLeft = math.max(0, (self.lastRestock + self.restockFrequency) - now)
+        local statusText
+        if hoursLeft < 0.1 then
+            statusText = "Restock ready"
+        elseif hoursLeft < 1 then
+            statusText = string.format("Restocks in %dm", math.floor(hoursLeft * 60))
+        else
+            statusText = string.format("Restocks in %.1fh", hoursLeft)
+        end
+        local ty = math.floor((TOGGLE_H - FONT_SM) / 2)
+        local ready = hoursLeft < 0.1
+        self:drawText(statusText, PAD_EDGE, ty, ready and 0.40 or 0.62, ready and 0.92 or 0.62, ready and 0.40 or 0.66,
+            1, UIFont.Small)
+    end
 
     -- ── empty state ───────────────────────────────────────────────────────────
     if self:totalItems() == 0 then
@@ -626,30 +742,4 @@ function UI:render()
         self:drawRect(self.width - 3, dotY, 2, dotH, 0.5, 0.5, 0.5, 0.5)
     end
 
-    -- ── hover tooltip (grid mode only, floats above stencil) ─────────────────
-    if self.viewMode == VIEW_GRID and self.hovered then
-        local gi, idx = self.hovered[1], self.hovered[2]
-        local cs = self:cellSize()
-        local layout = self:groupLayout(cs)
-        local gl = layout[gi]
-        local e = gl and gl.items[idx]
-        if e then
-            local row = math.floor((idx - 1) / COLS)
-            local col = (idx - 1) % COLS
-            local itemsY = gl.y + HEADER_H + PAD_GAP
-            local cx = PAD_EDGE + col * (cs + PAD_GAP)
-            local cy = itemsY + row * (cs + PAD_GAP) - self.scrollY
-            local name = e.displayName
-            local tw = getTextManager():MeasureStringX(UIFont.Small, name)
-            local th = FONT_SM + 6
-            local tx = math.min(cx, self.width - tw - 10)
-            local ty = cy - th - 3
-            if ty < TOGGLE_H then
-                ty = cy + cs + 3
-            end
-            self:drawRect(tx, ty, tw + 8, th, 0.92, 0.06, 0.06, 0.08)
-            self:drawRectBorder(tx, ty, tw + 8, th, 0.80, 0.35, 0.35, 0.45)
-            self:drawText(name, tx + 4, ty + 3, 1, 1, 1, 1, UIFont.Small)
-        end
-    end
 end

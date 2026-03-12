@@ -190,6 +190,9 @@ return {
     -- Sources use reward `category` field, not game item groups.
     -- =========================================================
     pool_traiter_good = {
+        defaults = {
+            price = "tokens_mid"
+        },
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
@@ -204,6 +207,9 @@ return {
         }
     },
     pool_traiter_bad_removal = {
+        defaults = {
+            price = "tokens_mid"
+        },
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Remove Negative Traits",
         sources = {

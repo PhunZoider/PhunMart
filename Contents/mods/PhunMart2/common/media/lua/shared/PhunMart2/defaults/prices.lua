@@ -92,6 +92,24 @@ return {
         amount = 5
     },
 
+    tokens = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 2
+    },
+
+    tokens_mid = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 4
+    },
+
+    tokens_high = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 8
+    },
+
     -- ── Named tiers (used by pool defaults) ──────────────────────────────────
 
     coin_5 = {
