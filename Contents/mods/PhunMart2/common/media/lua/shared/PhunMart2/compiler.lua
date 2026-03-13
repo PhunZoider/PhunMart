@@ -470,6 +470,15 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
         return p
     end
 
+    -- "self" price: the offer's own item is the payment. Amount normalised here;
+    -- the baked concrete item reference is resolved in bakePrice() at restock time.
+    if p.kind == "self" then
+        return {
+            kind = "self",
+            amount = normalizeAmount(p.amount or 1)
+        }
+    end
+
     if p.kind ~= "items" then
         -- keep future-proof; you can implement other kinds later
         return p

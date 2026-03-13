@@ -27,7 +27,8 @@ return {
         kind = "skill",
         category = "xp_t1",
         display = {
-            texture = "media/textures/icons/xp_t1.png"
+            texture = "media/textures/icons/xp_t1.png",
+            overlay = "media/textures/plus-1.png"
         }
     },
 
@@ -36,7 +37,8 @@ return {
         kind = "skill",
         category = "xp_t2",
         display = {
-            texture = "media/textures/icons/xp_t2.png"
+            texture = "media/textures/icons/xp_t2.png",
+            overlay = "media/textures/plus-2.png"
         }
     },
 
@@ -45,7 +47,8 @@ return {
         kind = "skill",
         category = "xp_t3",
         display = {
-            texture = "media/textures/icons/xp_t3.png"
+            texture = "media/textures/icons/xp_t3.png",
+            overlay = "media/textures/plus-3.png"
         }
     },
 
@@ -54,7 +57,8 @@ return {
         kind = "boost",
         category = "boost_t1",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-1.png"
         }
     },
 
@@ -63,7 +67,8 @@ return {
         kind = "boost",
         category = "boost_t2",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-2.png"
         }
     },
 
@@ -72,7 +77,8 @@ return {
         kind = "boost",
         category = "boost_t3",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-3.png"
         }
     },
 
@@ -1016,6 +1022,32 @@ return {
                     max = 0.7
                 }
             }
+        }}
+    },
+
+    -- ── Collector rewards (grantBoundTokens) ─────────────────────────────────
+    -- Used by collector pools. The displayed item IS the price; the reward is
+    -- bound tokens credited to the player's wallet (survives death).
+
+    token_collector_common = {
+        kind = "collector",
+        display = {
+            texture = "media/textures/icons/token.png"
+        },
+        actions = {{
+            type = "grantBoundTokens",
+            amount = 1
+        }}
+    },
+
+    token_collector_rare = {
+        kind = "collector",
+        display = {
+            texture = "media/textures/icons/token.png"
+        },
+        actions = {{
+            type = "grantBoundTokens",
+            amount = 1
         }}
     }
 

@@ -182,6 +182,27 @@ return {
         } -- $50.00
     },
 
+    -- ── Collector self-pay ────────────────────────────────────────────────────
+    -- Used by collector pools. "self" means the player hands over N of the
+    -- displayed offer item; no coins or tokens are deducted.
+
+    self_1 = {
+        kind = "self",
+        amount = 1
+    },
+    self_3 = {
+        kind = "self",
+        amount = 3
+    },
+    self_5 = {
+        kind = "self",
+        amount = 5
+    },
+    self_10 = {
+        kind = "self",
+        amount = 10
+    },
+
     -- ── Vehicles (tokens) ────────────────────────────────────────────────────
     -- WrentAWreck and similar shops use token-based pricing for vehicles.
 

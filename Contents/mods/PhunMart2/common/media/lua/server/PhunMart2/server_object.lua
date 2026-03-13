@@ -16,13 +16,33 @@ local SandboxVars = SandboxVars
 -- -----------------------------
 
 -- Return a copy of a compiled price with any {min,max} amounts resolved to concrete numbers.
-local function bakePrice(price)
+-- selfItem: the offer's item type, used to resolve price.kind="self"
+local function bakePrice(price, selfItem)
     if not price then
         return nil
     end
     if price.kind == "free" then
         return {
             kind = "free"
+        }
+    end
+    -- "self" price: player pays by handing over N of the offer item itself (collector offers).
+    -- Bake into a standard items price so canAfford/deduct need no special-casing.
+    if price.kind == "self" then
+        local amt = price.amount
+        local bakedAmt
+        if type(amt) == "table" and amt.min and amt.max then
+            bakedAmt = amt.min + ZombRand(0, amt.max - amt.min + 1)
+        else
+            bakedAmt = amt or 1
+        end
+        return {
+            kind = "items",
+            items = {{
+                item = selfItem,
+                amount = bakedAmt
+            }},
+            selfPay = true -- flag: the price IS the displayed item (collector offer)
         }
     end
     if price.kind == "currency" then
@@ -233,7 +253,7 @@ function ServerObject:buildOffers()
                     offers[offerId] = {
                         id = offerDef.id,
                         item = offerDef.item,
-                        price = bakePrice(offerDef.price), -- price amounts resolved from ranges
+                        price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
                         reward = offerDef.reward,
                         offer = {
                             qty = srcOffer.qty or 1, -- items given per purchase

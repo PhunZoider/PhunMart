@@ -301,6 +301,25 @@ return {
     },
 
     -- =========================================================
+    -- Collectors  (buyback machine: items → bound tokens)
+    -- Players bring scrap/valuables; the machine pays out bound tokens.
+    -- boundTokensBelowMax condition is set per-group via reward defaults
+    -- (see token_collector_* reward templates in rewards.lua).
+    -- =========================================================
+    pool_collectors = {
+        sources = {
+            groups = {"collectors_scrap", "collectors_valuables"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 6,
+                max = 10
+            }
+        }
+    },
+
+    -- =========================================================
     -- XPerience  (XP grants - one pool per tier, sources use reward category)
     -- Defined in PhunMart2_XP_Items.lua and PhunMart2_XP_Conditions.lua
     -- =========================================================

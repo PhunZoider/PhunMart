@@ -223,6 +223,7 @@ function UI:new(x, y, w, h, player, playerIndex)
     o.bgTexture = nil
     o.selectedId = nil
     o.selectedOffer = nil
+    o.selectedEntry = nil
     o.feedbackText = nil
     o.feedbackColor = {
         r = 1,
@@ -433,6 +434,7 @@ function UI:setData(data)
     self.shopKey = data and data.key
     self.selectedId = nil
     self.selectedOffer = nil
+    self.selectedEntry = nil
     self.feedbackText = nil
 
     local bg = data and data.background
@@ -507,9 +509,10 @@ function UI:canPurchase(offer, offerId)
     return true
 end
 
-function UI:onOfferSelected(id, offer)
+function UI:onOfferSelected(id, offer, entry)
     self.selectedId = id
     self.selectedOffer = offer
+    self.selectedEntry = entry
     self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
 
     -- Show 3D vehicle preview only for spawnVehicle reward actions.
@@ -880,9 +883,14 @@ function UI:render()
     if self.selectedOffer then
         local p3d = self.controls.preview3d
         if not (p3d and p3d:isVisible()) then
-            -- 2D icon for normal items; 3D scene handles its own rendering for vehicles
-            local scriptItem = getScriptManager():getItem(self.selectedOffer.item)
-            local tex = scriptItem and scriptItem:getNormalTexture()
+            -- 2D icon for normal items; 3D scene handles its own rendering for vehicles.
+            -- Prefer pre-resolved texture/overlay from the items list entry.
+            local tex = self.selectedEntry and self.selectedEntry.texture
+            local overlay = self.selectedEntry and self.selectedEntry.overlay
+            if not tex then
+                local scriptItem = getScriptManager():getItem(self.selectedOffer.item)
+                tex = scriptItem and scriptItem:getNormalTexture()
+            end
             if not tex then
                 local tk = Traits.getOfferTraitKey(self.selectedOffer)
                 tex = Traits.getTexture(tk or self.selectedOffer.item)
@@ -896,6 +904,9 @@ function UI:render()
                 local ix = pz.x + (pz.w - iconSize) / 2
                 local iy = pz.y + (pz.h - iconSize) / 2
                 self:drawTextureScaledAspect(tex, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
+                if overlay then
+                    self:drawTextureScaledAspect(overlay, ix, iy, iconSize, iconSize, 1, 1, 1, 1)
+                end
             end
         end
         self:renderDetails(dz)
@@ -1060,6 +1071,7 @@ function UI:renderDetails(z)
         end
     end
     local priceText
+    local isCollector = price and price.selfPay == true
     if not price then
         priceText = "Price: ?"
     elseif price.kind == "free" then
@@ -1080,6 +1092,16 @@ function UI:renderDetails(z)
         else
             priceText = "Price: ?"
         end
+    elseif isCollector and price.items and price.items[1] then
+        -- Collector offer: the displayed item IS the price. Show "Bring: Nx item".
+        local pi = price.items[1]
+        local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
+        local itemName = pi.item or "?"
+        local si = getScriptManager and getScriptManager():FindItem(itemName)
+        if si then
+            itemName = si:getDisplayName() or itemName
+        end
+        priceText = "Bring: " .. amt .. "x " .. itemName
     elseif price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
@@ -1104,8 +1126,23 @@ function UI:renderDetails(z)
             end
         end
     end
+    if isCollector then
+        pr, pg, pb = 0.30, 0.85, 0.85 -- cyan for collector "Bring:" line
+    end
     self:drawText(truncate(priceText, maxW, UIFont.Small), x, y, pr, pg, pb, 1, UIFont.Small)
     y = y + lh + 4
+
+    -- For collector offers, show what the player receives on the next line.
+    if isCollector and offer.reward and offer.reward.actions then
+        for _, action in ipairs(offer.reward.actions) do
+            if action.type == "grantBoundTokens" then
+                local receiveText = "Receive: " .. tostring(action.amount or 1) .. " token(s)"
+                self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
+                y = y + lh + 4
+                break
+            end
+        end
+    end
 
     -- conditions
     if not offer.conditions then

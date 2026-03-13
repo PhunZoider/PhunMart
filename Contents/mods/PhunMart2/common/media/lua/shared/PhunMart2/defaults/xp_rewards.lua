@@ -8,7 +8,8 @@ return {
         kind = "skill",
         category = "xp_t1",
         display = {
-            texture = "media/textures/icons/xp_t1.png"
+            texture = "media/textures/icons/xp_t1.png",
+            overlay = "media/textures/plus-1.png"
         }
     },
     xp_reward_t2_base = {
@@ -16,7 +17,8 @@ return {
         kind = "skill",
         category = "xp_t2",
         display = {
-            texture = "media/textures/icons/xp_t2.png"
+            texture = "media/textures/icons/xp_t2.png",
+            overlay = "media/textures/plus-2.png"
         }
     },
     xp_reward_t3_base = {
@@ -24,7 +26,8 @@ return {
         kind = "skill",
         category = "xp_t3",
         display = {
-            texture = "media/textures/icons/xp_t3.png"
+            texture = "media/textures/icons/xp_t3.png",
+            overlay = "media/textures/plus-3.png"
         }
     },
     boost_reward_t1_base = {
@@ -32,7 +35,8 @@ return {
         kind = "boost",
         category = "boost_t1",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-1.png"
         }
     },
     boost_reward_t2_base = {
@@ -40,7 +44,8 @@ return {
         kind = "boost",
         category = "boost_t2",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-2.png"
         }
     },
     boost_reward_t3_base = {
@@ -48,7 +53,8 @@ return {
         kind = "boost",
         category = "boost_t3",
         display = {
-            texture = "media/textures/icons/boost.png"
+            texture = "media/textures/icons/boost.png",
+            overlay = "media/textures/boost-3.png"
         }
     },
 

@@ -164,6 +164,12 @@ function Core:grantReward(player, action, qty, context)
             print("[PhunMart2] grantReward: applyBoost failed for '" .. tostring(action.skill) .. "': " .. tostring(err))
         end
 
+    elseif t == "grantBoundTokens" then
+        -- Grant bound tokens: credited to both current (spendable) and bound (death-restored) pools.
+        local amt = (action.amount or 1) * qty
+        Core.wallet:adjustByPool(player, "current", "tokens", amt)
+        Core.wallet:adjustByPool(player, "bound", "tokens", amt)
+
     else
         print("[PhunMart2] grantReward: unknown action type '" .. tostring(t) .. "'")
     end

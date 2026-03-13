@@ -459,7 +459,7 @@ return {
     -- Standard tier: modern/mid-range cars (gold 10-20)
     vehicles_normal = {
         label = "Cars & Sedans",
-        fallbackTexture = "Item_CarKey",  -- the classic
+        fallbackTexture = "Item_CarKey", -- the classic
         defaults = {
             price = "vehicle_uncommon",
             reward = "vehicle_normalcar",
@@ -505,6 +505,39 @@ return {
         },
         include = {
             items = {"OffRoad", "SUV"}
+        }
+    },
+
+    -- =========================================================
+    -- Collectors  (items the machine buys from players → bound tokens)
+    -- Each entry here becomes one offer slot: bring N of this item, receive tokens.
+    -- Add items players commonly loot that have trade value. Keep the list
+    -- manageable — too many slots makes the grid feel sparse on restock.
+    -- =========================================================
+
+    collectors_scrap = {
+        defaults = {
+            price = "self_5",
+            reward = "token_collector_common",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            categories = {"Memento"}
+        }
+    },
+
+    collectors_valuables = {
+        defaults = {
+            price = "self_1",
+            reward = "token_collector_rare",
+            offer = {
+                weight = 0.6
+            }
+        },
+        include = {
+            categories = {"Memento"}
         }
     },
 

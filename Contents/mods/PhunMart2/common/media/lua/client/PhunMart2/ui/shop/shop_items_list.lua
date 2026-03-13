@@ -30,6 +30,45 @@ PhunMartUIShopItemsList = ISPanel:derive("PhunMartUIShopItemsList")
 local UI = PhunMartUIShopItemsList
 Core.ui.client.shopItemsList = UI
 
+-- Maps skill perk names to the PZ script item whose texture is used as the base icon.
+-- Skills not listed here fall back to the reward's display.texture or no icon.
+local SKILL_BOOK = {
+    -- Ranged / combat
+    Aiming          = "Base.BookAiming1",
+    Reloading       = "Base.BookReloading1",
+    Axe             = "Base.BookAxe1",
+    Blunt           = "Base.BookBlunt1",
+    SmallBlade      = "Base.BookSmallBlade1",
+    LongBlade       = "Base.BookLongBlade1",
+    SmallBlunt      = "Base.BookSmallBlunt1",
+    Spear           = "Base.BookSpear1",
+    -- Survival / nature
+    Foraging        = "Base.BasicForaging1",
+    PlantScavenging = "Base.BasicForaging1",
+    Tracking        = "Base.BasicForaging1",
+    Farming         = "Base.BookFarming1",
+    Fishing         = "Base.BookFishing1",
+    Trapping        = "Base.BookTrapping1",
+    -- Crafting / trade
+    Cooking         = "Base.BookCooking1",
+    Tailoring       = "Base.BookTailoring1",
+    Woodwork        = "Base.BookCarpentry1",
+    Electricity     = "Base.BookElectricity1",
+    Mechanics       = "Base.BookMechanics1",
+    Maintenance     = "Base.BookMaintenance1",
+    MetalWelding    = "Base.BookMetalWelding1",
+    Blacksmith      = "Base.BookBlacksmith1",
+    Masonry         = "Base.BookMasonry1",
+    Butchering      = "Base.BookButchering1",
+    Husbandry       = "Base.BookHusbandry1",
+    FlintKnapping   = "Base.BookFlintKnapping1",
+    Pottery         = "Base.BookPottery1",
+    Carving         = "Base.BookCarving1",
+    Glassmaking     = "Base.BookGlassmaking1",
+    -- Medical
+    Doctor          = "Base.BookFirstAid1",
+}
+
 local function formatPrice(offer)
     local price = offer and offer.price
     if not price then
@@ -232,11 +271,36 @@ function UI:setData(data)
         if not texture then
             texture = scriptItem and scriptItem:getNormalTexture()
         end
+        -- For skill/boost rewards, try the corresponding PZ book item as the base icon
+        if not texture and offer.reward then
+            local kind = offer.reward.kind
+            if kind == "skill" or kind == "boost" then
+                local action = offer.reward.actions and offer.reward.actions[1]
+                if action and action.skill then
+                    local bookKey = SKILL_BOOK[action.skill]
+                    if bookKey then
+                        local bookItem = getScriptManager():getItem(bookKey)
+                        if bookItem then texture = bookItem:getNormalTexture() end
+                    end
+                end
+            end
+        end
         if not texture and offer.reward and offer.reward.display and offer.reward.display.texture then
-            texture = getTexture(offer.reward.display.texture)
+            local dt = offer.reward.display.texture
+            texture = getTexture(dt)
+            if not texture then
+                -- allow display.texture to be a script item name (e.g. "Base.BookButchering1")
+                local si = getScriptManager():getItem(dt)
+                if si then texture = si:getNormalTexture() end
+            end
         end
         if not texture and offer.meta and offer.meta.fallbackTexture then
             texture = getTexture(offer.meta.fallbackTexture)
+        end
+        -- Overlay (e.g. plus-1/2/3 for xp tier, boost-1/2/3 for boost tier)
+        local overlay = nil
+        if offer.reward and offer.reward.display and offer.reward.display.overlay then
+            overlay = getTexture(offer.reward.display.overlay)
         end
         local cat = (offer.meta and offer.meta.category) or (scriptItem and scriptItem:getDisplayCategory()) or "Other"
         if cat == "" then
@@ -255,7 +319,8 @@ function UI:setData(data)
             id = id,
             offer = offer,
             displayName = displayName,
-            texture = texture
+            texture = texture,
+            overlay = overlay
         })
     end
 
@@ -484,7 +549,7 @@ function UI:onMouseUp(x, y)
     self.selected = {gi, idx}
     local e = self.groups[gi].items[idx]
     if self.onSelectFn then
-        self.onSelectFn(e.id, e.offer)
+        self.onSelectFn(e.id, e.offer, e)
     end
     -- Re-assert tooltip after the callback — the UI state change from onSelectFn
     -- (enabling buy button, 3D preview, etc.) can trigger a stray mouse event that
@@ -573,6 +638,9 @@ function UI:renderGrid()
                     self:drawText(abbr, cx + (cs - tw) / 2, cy + (cs - FONT_SM) / 2, 0.5 * iconA, 0.5 * iconA,
                         0.5 * iconA, 1, UIFont.Small)
                 end
+                if e.overlay then
+                    self:drawTextureScaledAspect(e.overlay, ix, iy, iconSize, iconSize, iconA, 1, 1, 1)
+                end
 
                 -- slot code top-left
                 local globalRow = gl.rowOffset + row
@@ -589,6 +657,8 @@ function UI:renderGrid()
                     local tr, tg, tb
                     if isOOS then
                         tr, tg, tb = 0.85, 0.25, 0.25
+                    elseif e.offer.price and e.offer.price.selfPay then
+                        tr, tg, tb = 0.30, 0.85, 0.85 -- cyan: "bring this item"
                     elseif e.offer.price and e.offer.price.kind == "free" then
                         tr, tg, tb = 0.30, 0.90, 0.30
                     else
@@ -651,8 +721,12 @@ function UI:renderList()
                 local iconA = isOOS and 0.30 or 1
                 local nameX = PAD_EDGE + 2
                 if e.texture then
+                    local iconX = nameX
                     local iconY = ry + math.floor((rowH - iconH) / 2)
-                    self:drawTextureScaledAspect(e.texture, nameX, iconY, iconH, iconH, iconA, 1, 1, 1)
+                    self:drawTextureScaledAspect(e.texture, iconX, iconY, iconH, iconH, iconA, 1, 1, 1)
+                    if e.overlay then
+                        self:drawTextureScaledAspect(e.overlay, iconX, iconY, iconH, iconH, iconA, 1, 1, 1)
+                    end
                     nameX = nameX + iconH + 4
                 end
 
@@ -673,6 +747,8 @@ function UI:renderList()
                     local tr, tg, tb
                     if isOOS then
                         tr, tg, tb = 0.85, 0.25, 0.25
+                    elseif e.offer.price and e.offer.price.selfPay then
+                        tr, tg, tb = 0.30, 0.85, 0.85 -- cyan: "bring this item"
                     elseif e.offer.price and e.offer.price.kind == "free" then
                         tr, tg, tb = 0.30, 0.90, 0.30
                     else

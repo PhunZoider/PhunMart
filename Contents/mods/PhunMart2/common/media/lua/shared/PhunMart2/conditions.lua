@@ -180,6 +180,22 @@ R.tests.canGrantTrait = function(args, adapter)
     return true
 end
 
+-- Collector gate: player's *bound* token balance must be below the configured cap.
+-- This prevents infinite token accumulation via item exchange.
+-- Uses wallet.bound.tokens (the floor restored on death) so spending doesn't bypass the cap.
+R.tests.boundTokensBelowMax = function(args, adapter)
+    local max = args.max
+    if not max then
+        return true
+    end
+    local w = Core.wallet and Core.wallet:get(adapter:getUsername())
+    local boundAmt = w and w.bound and (w.bound.tokens or 0) or 0
+    if boundAmt >= max then
+        return false, "IGUI_PhunMart_Cond_BoundTokensBelowMax", {max, boundAmt}
+    end
+    return true
+end
+
 function R.evaluate(conditionsBlock, conditionsDefs, adapter, purchases, context)
     local out = {
         ok = true,

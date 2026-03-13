@@ -257,6 +257,19 @@ return {
                 weight = 1.0
             }}
         }}
+    },
+
+    Collectors = {
+        category = "Collectors",
+        background = "machine-collectors.png",
+        sprites = {"phunmart_03_8", "phunmart_03_9", "phunmart_03_10", "phunmart_03_11"},
+        unpoweredSprites = {"phunmart_03_12", "phunmart_03_13", "phunmart_03_14", "phunmart_03_15"},
+        poolSets = {{
+            keys = {{
+                key = "pool_collectors",
+                weight = 1.0
+            }}
+        }}
     }
 
 }
