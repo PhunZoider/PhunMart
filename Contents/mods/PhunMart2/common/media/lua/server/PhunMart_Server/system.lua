@@ -260,30 +260,45 @@ function ServerSystem:closestShopKeysTo(x, y)
 
 end
 
+-- Returns true if at least one pool in the shop's poolSets passes the zone filter at (x, y).
+local function shopHasEligiblePool(shopDef, x, y)
+    local fn = Core.poolPassesZoneFilter
+    for _, poolSet in ipairs(shopDef.poolSets or {}) do
+        for _, poolRef in ipairs(poolSet.keys or {}) do
+            local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
+            local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
+            if pool and (not fn or fn(pool, x, y)) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 -- returns a random shop key based on x,y location based on its probability
--- it will omit shops that are disabled and whose group/type would be too close to one another
+-- it will omit shops that are disabled, whose group/type would be too close to one another,
+-- or whose pools are all zone-filtered out at this location
 function ServerSystem:getRandomShop(x, y)
 
     local options = Core:getInstanceDistancesFrom(x, y)
     local candidates = {}
 
     local shops = Core.shops
+    local defaultDistance = Core.settings.DefaultDistance or 200
     local totalProbability = 0
-    -- remove options that are too close to each other
+    -- remove options that are too close or have no eligible pools at this location
     for k, v in pairs(options) do
-        if shops[k].enabled ~= false and Core.settings["ShopProbability" .. k] > 0 then
-            local key = "MinDistance" .. k
-            local sets = Core.settings
-            print("Checking " .. k .. " " .. tostring(v) .. " " .. tostring(sets[key]) .. " " ..
-                      tostring(sets[key] <= v))
-            if Core.settings["MinDistance" .. k] <= v then
+        local shopDef = shops[k]
+        local probability = shopDef and (shopDef.probability or 1) or 0
+        if shopDef and shopDef.enabled ~= false and probability > 0 then
+            local minDist = shopDef.minDistance or defaultDistance
+            if minDist <= v and shopHasEligiblePool(shopDef, x, y) then
                 table.insert(candidates, {
                     shop = k,
-                    p = Core.settings["ShopProbability" .. k]
+                    p = probability
                 })
-                totalProbability = totalProbability + Core.settings["ShopProbability" .. k]
+                totalProbability = totalProbability + probability
             end
-
         end
     end
 
@@ -363,9 +378,9 @@ function ServerSystem:loadGridsquare(square)
                 end
                 -- if modData.PhunMart.replacementKey ~= Core.settings.ReplacementKey then
                 --    modData.PhunMart.replacementKey = Core.settings.ReplacementKey
-                if Core.settings.ChanceToConvertVanillaMachines > 0 then
+                if Core.settings.ChanceToConvert > 0 then
                     local chance = ZombRand(100)
-                    if chance <= Core.settings.ChanceToConvertVanillaMachines then
+                    if chance <= Core.settings.ChanceToConvert then
                         local shopname = self:getRandomShop(square:getX(), square:getY())
                         if shopname then
                             local facing = obj:getFacing()

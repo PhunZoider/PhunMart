@@ -168,6 +168,36 @@ local fields = {
 
 }
 
+-- Returns false if the pool's zone.difficulty restriction excludes the given location.
+-- Permissive: no zones config, no PhunZones mod, or unzoned location all pass.
+-- Exposed on Core so system.lua can use it at placement time.
+local PZ = nil
+
+local function poolPassesZoneFilter(pool, x, y)
+    local zones = pool.zones
+    if not zones or not zones.difficulty then
+        return true
+    end
+    if PZ == nil then
+        PZ = PhunZones or false
+    end
+    if not PZ then
+        return true
+    end
+    local loc = PZ.getLocation(x, y)
+    local difficulty = loc and loc.difficulty
+    if difficulty == nil then
+        return true
+    end
+    for _, d in ipairs(zones.difficulty) do
+        if d == difficulty then
+            return true
+        end
+    end
+    return false
+end
+Core.poolPassesZoneFilter = poolPassesZoneFilter
+
 -- Build self.offers from Core.runtime for this shop's type.
 -- Called on first load (if offers absent) and on every restock.
 -- Each restock bakes concrete price amounts and stock quantities from their configured ranges.
@@ -192,6 +222,8 @@ function ServerObject:buildOffers()
             local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
             if not pool then
                 print("[PhunMart] buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
+            elseif not poolPassesZoneFilter(pool, self.x, self.y) then
+                -- pool excluded by zone difficulty at this location; skip silently
             else
                 local roll = pool.roll or {}
                 local mode = roll.mode or "weighted"

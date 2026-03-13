@@ -1,6 +1,7 @@
 return {
 
     GoodPhoods = {
+        probability = 15,
         category = "Food",
         background = "machine-good-phoods.png",
         sprites = {"phunmart_01_8", "phunmart_01_9", "phunmart_01_10", "phunmart_01_11"},
@@ -17,6 +18,7 @@ return {
     },
 
     PittyTheTool = {
+        probability = 15,
         category = "Tool",
         background = "machine-pity-the-tool.png",
         sprites = {"phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"},
@@ -30,6 +32,8 @@ return {
     },
 
     FinalAmmendment = {
+        probability = 8,
+        minDistance = 400,
         category = "Weapon",
         background = "machine-final-ammendment.png",
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
@@ -49,6 +53,8 @@ return {
     },
 
     WrentAWreck = {
+        probability = 5,
+        minDistance = 500,
         category = "Vehicle",
         defaultView = "list",
         restockFrequency = 168, -- weekly car delivery
@@ -60,23 +66,21 @@ return {
                 key = "pool_vehicles_budget",
                 weight = 1.0
             }}
-        }, -- safe zones
-        {
+        }, {
             keys = {{
                 key = "pool_vehicles_standard",
                 weight = 1.0
             }}
-        }, -- mid zones
-        {
+        }, {
             keys = {{
                 key = "pool_vehicles_premium",
                 weight = 1.0
             }}
-        } -- danger zones
-        }
+        }}
     },
 
     MichellesCrafts = {
+        probability = 15,
         category = "Crafts",
         background = "machine-michelles.png",
         sprites = {"phunmart_01_48", "phunmart_01_49", "phunmart_01_50", "phunmart_01_51"},
@@ -90,6 +94,7 @@ return {
     },
 
     CarAParts = {
+        probability = 15,
         category = "Vehicle",
         background = "machine-car-a-part.png",
         sprites = {"phunmart_01_56", "phunmart_01_57", "phunmart_01_58", "phunmart_01_59"},
@@ -103,6 +108,8 @@ return {
     },
 
     TraiterJoes = {
+        probability = 5,
+        minDistance = 500,
         category = "Trait",
         background = "machine-traiter-joes.png",
         sprites = {"phunmart_02_0", "phunmart_02_1", "phunmart_02_2", "phunmart_02_3"},
@@ -119,6 +126,7 @@ return {
     },
 
     CSVPharmacy = {
+        probability = 15,
         category = "Medical",
         background = "machine-csv.png",
         sprites = {"phunmart_02_8", "phunmart_02_9", "phunmart_02_10", "phunmart_02_11"},
@@ -132,6 +140,7 @@ return {
     },
 
     RadioHacks = {
+        probability = 15,
         category = "Electronics",
         background = "machine-electronics.png",
         sprites = {"phunmart_02_16", "phunmart_02_17", "phunmart_02_18", "phunmart_02_19"},
@@ -145,6 +154,7 @@ return {
     },
 
     Phish4U = {
+        probability = 15,
         category = "Fishing",
         background = "machine-phish4u.png",
         sprites = {"phunmart_02_24", "phunmart_02_25", "phunmart_02_26", "phunmart_02_27"},
@@ -158,6 +168,7 @@ return {
     },
 
     HoesNMoes = {
+        probability = 15,
         category = "Gardening",
         background = "machine-hoes.png",
         sprites = {"phunmart_02_32", "phunmart_02_33", "phunmart_02_34", "phunmart_02_35"},
@@ -171,6 +182,8 @@ return {
     },
 
     BudgetXPerience = {
+        probability = 5,
+        minDistance = 500,
         category = "XP",
         defaultView = "list",
         background = "machine-budget-xp.png",
@@ -200,6 +213,7 @@ return {
     },
 
     HardWear = {
+        probability = 15,
         category = "Clothing",
         background = "machine-hard-wear.png",
         sprites = {"phunmart_03_0", "phunmart_03_1", "phunmart_03_2", "phunmart_03_3"},
@@ -213,6 +227,7 @@ return {
     },
 
     ShedsAndCommoners = {
+        probability = 15,
         category = "Literature",
         background = "machine-sheds-and-commoners.png",
         sprites = {"phunmart_03_24", "phunmart_03_25", "phunmart_03_26", "phunmart_03_27"},
@@ -226,6 +241,8 @@ return {
     },
 
     Collectors = {
+        probability = 8,
+        minDistance = 300,
         category = "Collectors",
         background = "machine-collectors.png",
         sprites = {"phunmart_03_8", "phunmart_03_9", "phunmart_03_10", "phunmart_03_11"},

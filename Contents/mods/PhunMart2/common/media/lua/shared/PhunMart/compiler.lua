@@ -876,6 +876,7 @@ function Compiler.compileAll(ctx)
                 key = poolKey,
                 gate = poolDef.gate,
                 roll = poolDef.roll,
+                zones = poolDef.zones,
                 offers = {}
             }
 
@@ -1006,7 +1007,9 @@ function Compiler.compileAll(ctx)
                 throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,
                 background = shopDef.background,
-                defaultView = shopDef.defaultView
+                defaultView = shopDef.defaultView,
+                probability = shopDef.probability,
+                minDistance = shopDef.minDistance
             }
         end
     end

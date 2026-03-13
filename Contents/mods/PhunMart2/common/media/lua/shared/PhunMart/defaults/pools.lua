@@ -111,6 +111,7 @@ return {
     -- WrentAWreck  (vehicles - one pool per tier)
     -- =========================================================
     pool_vehicles_budget = {
+        zones = { difficulty = {1, 2} },
         sources = {
             groups = {"vehicles_small", "vehicles_vans"}
         },
@@ -123,6 +124,7 @@ return {
         }
     },
     pool_vehicles_standard = {
+        zones = { difficulty = {2, 3} },
         sources = {
             groups = {"vehicles_normal", "vehicles_trucks", "vehicles_4x4"}
         },
@@ -135,6 +137,7 @@ return {
         }
     },
     pool_vehicles_premium = {
+        zones = { difficulty = {4, 5} },
         sources = {
             groups = {"vehicles_luxury"}
         },
