@@ -125,37 +125,51 @@ local function truncate(text, maxWidth, font)
 end
 
 -- Human-readable label for a condition key, using the compiled def when available.
-local function conditionLabel(condKey, conditionsDefs)
-    if type(condKey) ~= "string" then
-        return tostring(condKey)
-    end
-    local def = conditionsDefs and conditionsDefs[condKey]
-    if not def then
-        return condKey
-    end
-    local t = def.test
-    local a = def.args or {}
-    if t == "worldAgeHoursBetween" then
-        local min = a.min or 0
-        local max = a.max
-        return "World age: " .. min .. "h" .. (max and (" - " .. max .. "h") or "+")
-    elseif t == "perkLevelBetween" then
-        return "Perk: " .. (a.perk or "?") .. " lv." .. (a.min or 0) .. "+"
-    elseif t == "perkBoostBetween" then
-        return "Trait boost: " .. (a.perk or "?")
-    elseif t == "purchaseCountMax" then
-        return "Purchase limit: " .. (a.max or "?")
-    elseif t == "professionIn" then
-        local profs = a.professions or {}
-        return "Profession: " .. (type(profs) == "table" and table.concat(profs, "/") or tostring(profs))
-    elseif t == "hasItems" then
-        return "Requires items"
-    elseif t == "canGrantTrait" then
-        return "Already owned: " .. Traits.getLabel(a.trait or "?")
-    elseif t == "canRemoveTrait" then
-        return "Missing trait: " .. Traits.getLabel(a.trait or "?")
+-- Maps a failure object from R.evaluate (has textKey + args) to a player-readable string.
+local function failureLabel(failure)
+    local tk = failure.textKey or ""
+    local a = failure.args or {}
+
+    if tk == "IGUI_PhunMart_Cond_WorldAgeMin" then
+        return "World too young (need " .. (a[1] or "?") .. "h)"
+    elseif tk == "IGUI_PhunMart_Cond_WorldAgeMax" then
+        return "World too old (max " .. (a[1] or "?") .. "h)"
+    elseif tk == "IGUI_PhunMart_Cond_PerkLevelMin" then
+        return (a[1] or "Perk") .. " lv." .. (a[2] or "?") .. "+ (have " .. (a[3] or "0") .. ")"
+    elseif tk == "IGUI_PhunMart_Cond_PerkLevelMax" then
+        return (a[1] or "Perk") .. " lv." .. (a[2] or "?") .. " or less"
+    elseif tk == "IGUI_PhunMart_Cond_PerkBoostMin" then
+        return (a[1] or "Perk") .. " boost lv." .. (a[2] or "?") .. "+"
+    elseif tk == "IGUI_PhunMart_Cond_PerkBoostMax" then
+        return (a[1] or "Perk") .. " trait boost too high"
+    elseif tk == "IGUI_PhunMart_Cond_ProfessionIn" then
+        return "Wrong profession"
+    elseif tk == "IGUI_PhunMart_Cond_HasItem" then
+        local itemShort = tostring(a[1] or "?"):match("%.(.+)$") or tostring(a[1] or "?")
+        return "Need " .. itemShort .. " x" .. (a[2] or 1)
+    elseif tk == "IGUI_PhunMart_Cond_PurchaseMax" then
+        local max = a[3]
+        if max == 1 then
+            return "Already purchased"
+        else
+            return "Limit reached (" .. (a[2] or "?") .. "/" .. (max or "?") .. ")"
+        end
+    elseif tk == "IGUI_PhunMart_Cond_PurchaseCooldown" then
+        return "Cooldown: " .. math.ceil(a[2] or 0) .. "s remaining"
+    elseif tk == "IGUI_PhunMart_Cond_AlreadyHasTrait" then
+        return "Already have: " .. Traits.getLabel(tostring(a[1] or "?"))
+    elseif tk == "IGUI_PhunMart_Cond_DoesNotHaveTrait" then
+        return "Missing: " .. Traits.getLabel(tostring(a[1] or "?"))
+    elseif tk == "IGUI_PhunMart_Cond_TraitMutex" then
+        return "Conflicts with: " .. Traits.getLabel(tostring(a[2] or "?"))
+    elseif tk == "IGUI_PhunMart_Cond_TraitDisabledMP" then
+        return "Not available in multiplayer"
+    elseif tk == "IGUI_PhunMart_Cond_BoundTokensBelowMax" then
+        return "Token storage full (" .. (a[2] or "?") .. "/" .. (a[1] or "?") .. ")"
+    elseif tk == "IGUI_PhunMart_Cond_AnyGroupFail" then
+        return "No valid options"
     else
-        return condKey
+        return failure.condKey or tk or "Condition failed"
     end
 end
 
@@ -1169,22 +1183,24 @@ function UI:renderDetails(z)
         end
 
         -- Only show conditions that are currently blocking the purchase
-        local passed = true
+        local failure = nil
         if R and adapter and condDefs then
             local result = R.evaluate({
                 all = {condKey}
             }, condDefs, adapter, Core.purchases, {
                 offerId = self.selectedId
             })
-            passed = result.ok
+            if not result.ok then
+                failure = result.failures[1] or {condKey = condKey, textKey = "", args = {}}
+            end
         end
 
-        if not passed then
+        if failure then
             if not headerDrawn then
                 self:drawText("Requires:", x, headerY, 0.75, 0.55, 0.25, 1, UIFont.Small)
                 headerDrawn = true
             end
-            local label = truncate("- " .. conditionLabel(condKey, condDefs), maxW - 4, UIFont.Small)
+            local label = truncate("- " .. failureLabel(failure), maxW - 4, UIFont.Small)
             self:drawText(label, x + 4, y, 0.90, 0.30, 0.30, 1, UIFont.Small)
             y = y + lh
         end
