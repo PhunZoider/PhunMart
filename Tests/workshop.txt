@@ -2,7 +2,8 @@ version=1
 title=PhunMart 2 [DEV]
 description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
 description=
-description=beta testing! Currently play testing and balance tweaking on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
+description=description=⚠️ DEV BRANCH — Preview build for testing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
+description=playtesting and balancing on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 tags=Build 42;Items;Multiplayer
 visibility=public
