@@ -731,6 +731,33 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                 end
             end
 
+            -- Auto-inject canRemoveTrait condition: player must actually have the trait to remove it
+            if action.type == "removeTrait" and type(action.trait) == "string" then
+                local condKey = "__removeTrait:" .. action.trait
+                ctx.autoCondsDefs = ctx.autoCondsDefs or {}
+                ctx.autoCondsDefs[condKey] = {
+                    test = "canRemoveTrait",
+                    args = {
+                        trait = action.trait
+                    }
+                }
+
+                offerConditions = offerConditions or {
+                    all = {}
+                }
+                offerConditions.all = offerConditions.all or {}
+                local found = false
+                for _, k in ipairs(offerConditions.all) do
+                    if k == condKey then
+                        found = true;
+                        break
+                    end
+                end
+                if not found then
+                    table.insert(offerConditions.all, condKey)
+                end
+            end
+
             -- Auto-inject perkBoostBetween for applyBoost actions: gate purchase if boost already active
             if action.type == "applyBoost" and type(action.skill) == "string" then
                 local level = math.min(3, math.max(1, math.floor(action.multiplier or 1)))
@@ -965,6 +992,7 @@ function Compiler.compileAll(ctx)
                 category = shopDef.category,
                 sprites = shopDef.sprites,
                 unpoweredSprites = shopDef.unpoweredSprites,
+                powered = shopDef.powered,
                 poolSets = shopDef.poolSets,
                 throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,

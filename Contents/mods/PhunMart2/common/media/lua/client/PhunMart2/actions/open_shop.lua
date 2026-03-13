@@ -22,16 +22,16 @@ local action = Core.actions.openShop
 -- ─────────────────────────────────────────────────────────────────────────────
 
 function action:isValidStart()
-    local txt
-    if self.shopObj.powered then
-        if not self.shopObj:getSquare():haveElectricity() and SandboxVars.ElecShutModifier > -1 and
-            GameTime:getInstance():getNightsSurvived() > SandboxVars.ElecShutModifier then
-            txt = getText("IGUI_PhunMart_Open_X_nopower_tooltip", getText("IGUI_PhunMart_Shop_" .. self.shopObj.type))
+    local shopDef = Core.defs and Core.defs.shops and Core.defs.shops[self.shopObj.type]
+    if shopDef and shopDef.powered then
+        local hasPower = self.shopObj:getSquare():haveElectricity() or
+            (SandboxVars.ElecShutModifier > -1 and
+             GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier)
+        if not hasPower then
+            self.character:Say(getText("IGUI_PhunMart_Open_X_nopower_tooltip",
+                getText("IGUI_PhunMart_Shop_" .. self.shopObj.type)))
+            return false
         end
-    end
-    if txt then
-        self.character:Say(txt)
-        return false
     end
     return true
 end
@@ -78,8 +78,13 @@ function action:update()
             local key = self.shopObj:getKey()
             local data = pending[key]
             if data then
-                self.shopData = data
                 pending[key] = nil
+                if data.error then
+                    -- Server rejected (e.g. power cut between click and response)
+                    self:forceStop()
+                    return
+                end
+                self.shopData = data
             end
         end
     end

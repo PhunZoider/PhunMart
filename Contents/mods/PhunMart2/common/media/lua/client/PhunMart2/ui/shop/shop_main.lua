@@ -152,6 +152,8 @@ local function conditionLabel(condKey, conditionsDefs)
         return "Requires items"
     elseif t == "canGrantTrait" then
         return "Already owned: " .. Traits.getLabel(a.trait or "?")
+    elseif t == "canRemoveTrait" then
+        return "Missing trait: " .. Traits.getLabel(a.trait or "?")
     else
         return condKey
     end
@@ -445,6 +447,8 @@ function UI:setData(data)
     local p3d = self.controls.preview3d
     if p3d then
         p3d.vehicleName = nil
+        -- NOTE: do NOT reset p3d.initialized here — the Java scene object persists
+        -- across setData calls and "vehicle" already exists; calling createVehicle again crashes.
         p3d.rotX = 22;
         p3d.rotY = 45
         p3d._dragX = nil
@@ -515,9 +519,10 @@ function UI:onOfferSelected(id, offer)
         if offer and offer.reward and offer.reward.actions then
             for _, action in ipairs(offer.reward.actions) do
                 if action.type == "spawnVehicle" then
-                    -- Use first script in the list for the preview
-                    local scripts = action.scripts or (action.script and {action.script})
-                    vehicleScript = scripts and scripts[1]
+                    -- Use the offer's item key as the preview script — this IS the
+                    -- vehicle script name (e.g. "ModernCarLightsCityLouisvillePD"),
+                    -- which matches exactly what the player sees in the list.
+                    vehicleScript = offer.item
                     break
                 end
             end
@@ -758,8 +763,9 @@ function UI:onEditShop()
 end
 
 function UI:onViewPool(poolKey)
-    -- TODO: open Pool Viewer panel
-    self:showFeedback("Pool Viewer: " .. poolKey, 0.7, 0.7, 0.3)
+    sendClientCommand(Core.name, Core.commands.requestPool, {
+        poolKey = poolKey
+    })
 end
 
 function UI:onEditPool(poolKey)
@@ -880,6 +886,10 @@ function UI:render()
             if not tex then
                 local tk = Traits.getOfferTraitKey(self.selectedOffer)
                 tex = Traits.getTexture(tk or self.selectedOffer.item)
+            end
+            if not tex and self.selectedOffer.reward and self.selectedOffer.reward.display and
+                self.selectedOffer.reward.display.texture then
+                tex = getTexture(self.selectedOffer.reward.display.texture)
             end
             if tex then
                 local iconSize = math.floor(math.min(pz.w, pz.h) * 0.78)
@@ -1020,10 +1030,10 @@ function UI:renderDetails(z)
         name = Traits.getLabel(traitKey)
     elseif scriptItem then
         name = scriptItem:getDisplayName()
+    elseif Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
+        name = Core.getVehicleLabel(offer.item)
     elseif offer.reward and offer.reward.display and offer.reward.display.text then
         name = offer.reward.display.text
-    elseif Core.getVehicleLabel and Core.getVehicleLabel(offer.item) ~= offer.item then
-        name = Core.getVehicleLabel(offer.item)
     else
         -- Last resort: try the item key directly as a trait/display label (covers boost/xp offer types)
         name = Traits.getLabel(offer.item) or offer.item
@@ -1056,10 +1066,17 @@ function UI:renderDetails(z)
         priceText = "Price: FREE"
     elseif price.kind == "currency" then
         local amt = price.amount
+        local isTokens = price.pool == "tokens"
+        local function fmtAmt(n)
+            if isTokens then
+                return tostring(n) .. "t"
+            end
+            return fmtCents(n)
+        end
         if type(amt) == "table" and amt.min and amt.max then
-            priceText = "Price: " .. fmtCents(amt.min) .. " - " .. fmtCents(amt.max)
+            priceText = "Price: " .. fmtAmt(amt.min) .. " - " .. fmtAmt(amt.max)
         elseif type(amt) == "number" then
-            priceText = "Price: " .. fmtCents(amt)
+            priceText = "Price: " .. fmtAmt(amt)
         else
             priceText = "Price: ?"
         end

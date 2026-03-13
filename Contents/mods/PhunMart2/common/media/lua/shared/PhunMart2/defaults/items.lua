@@ -520,7 +520,7 @@ return {
     -- stock=1 with long restock keeps vehicles feeling rare
     -- =========================================================
 
-    ["vehicle:SmallCar"] = {
+    SmallCar = {
         price = "vehicle_common",
         reward = "vehicle_smallcar",
         offer = {
@@ -531,7 +531,7 @@ return {
             }
         }
     },
-    ["vehicle:SmallCar02"] = {
+    SmallCar02 = {
         price = "vehicle_common",
         reward = "vehicle_smallcar",
         offer = {
@@ -542,7 +542,7 @@ return {
             }
         }
     },
-    ["vehicle:CarNormal"] = {
+    CarNormal = {
         price = "vehicle_uncommon",
         reward = "vehicle_normalcar",
         offer = {
@@ -553,7 +553,7 @@ return {
             }
         }
     },
-    ["vehicle:ModernCar"] = {
+    ModernCar = {
         price = "vehicle_uncommon",
         reward = "vehicle_normalcar",
         offer = {
@@ -564,7 +564,7 @@ return {
             }
         }
     },
-    ["vehicle:ModernCar02"] = {
+    ModernCar02 = {
         price = "vehicle_uncommon",
         reward = "vehicle_normalcar",
         offer = {
@@ -575,7 +575,7 @@ return {
             }
         }
     },
-    ["vehicle:CarStationWagon"] = {
+    CarStationWagon = {
         price = "vehicle_uncommon",
         reward = "vehicle_stationwagon",
         offer = {
@@ -586,7 +586,7 @@ return {
             }
         }
     },
-    ["vehicle:CarLuxury"] = {
+    CarLuxury = {
         price = "vehicle_rare",
         reward = "vehicle_luxury",
         offer = {
@@ -597,7 +597,7 @@ return {
             }
         }
     },
-    ["vehicle:SportsCar"] = {
+    SportsCar = {
         price = "vehicle_rare",
         reward = "vehicle_sportscar",
         offer = {
@@ -608,7 +608,7 @@ return {
             }
         }
     },
-    ["vehicle:SUV"] = {
+    SUV = {
         price = "vehicle_uncommon",
         reward = "vehicle_suv",
         offer = {
@@ -619,7 +619,7 @@ return {
             }
         }
     },
-    ["vehicle:OffRoad"] = {
+    OffRoad = {
         price = "vehicle_uncommon",
         reward = "vehicle_offroad",
         offer = {
@@ -630,7 +630,7 @@ return {
             }
         }
     },
-    ["vehicle:PickUpTruck"] = {
+    PickUpTruck = {
         price = "vehicle_uncommon",
         reward = "vehicle_pickup",
         offer = {
@@ -641,7 +641,7 @@ return {
             }
         }
     },
-    ["vehicle:PickUpVan"] = {
+    PickUpVan = {
         price = "vehicle_uncommon",
         reward = "vehicle_pickup",
         offer = {
@@ -652,7 +652,7 @@ return {
             }
         }
     },
-    ["vehicle:Van"] = {
+    Van = {
         price = "vehicle_common",
         reward = "vehicle_van",
         offer = {
@@ -663,7 +663,7 @@ return {
             }
         }
     },
-    ["vehicle:VanSeats"] = {
+    VanSeats = {
         price = "vehicle_common",
         reward = "vehicle_van",
         offer = {
@@ -674,7 +674,7 @@ return {
             }
         }
     },
-    ["vehicle:StepVan"] = {
+    StepVan = {
         price = "vehicle_common",
         reward = "vehicle_stepvan",
         offer = {

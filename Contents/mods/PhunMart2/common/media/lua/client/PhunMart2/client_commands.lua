@@ -7,6 +7,9 @@ local Toast = require "PhunMart2/ui/toast"
 
 local Commands = {}
 
+-- itemId (string) → { vehicleScript, condition } — populated by spawnVehicle command
+Core._vehicleKeys = Core._vehicleKeys or {}
+
 Commands[Core.commands.updateWallet] = function(args)
     local player = Core.tools.getPlayerByUsername(args.username)
     for k, v in pairs(args.wallet) do
@@ -19,12 +22,17 @@ Commands[Core.commands.getWallet] = function(args)
 end
 
 Commands[Core.commands.openError] = function(args)
-    local player = getSpecificPlayer(args.playerIndex)
+    -- Signal the open_shop timed action (if still waiting) to abort early.
+    if args.key then
+        Core.pendingShopData = Core.pendingShopData or {}
+        Core.pendingShopData[args.key] = { error = args.message }
+    end
+    local rawMsg = args.message or "Error"
+    local message = getTextOrNull("IGUI_PhunMart.Error." .. rawMsg) or rawMsg
     local w = 300
     local h = 150
-    local message = getTextOrNull("IGUI_PhunMart.Error." .. args.message) or args.message
     local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - w / 2, getCore():getScreenHeight() / 2 - h / 2, w,
-        h, message, false, nil, nil, nil);
+        h, message, false, nil, nil, nil)
     modal:initialise()
     modal:addToUIManager()
 end
@@ -222,6 +230,53 @@ Events[Core.events.OnRewardGranted].Add(function(args)
         return
     end
     handleGrant(args)
+end)
+
+Commands[Core.commands.requestPool] = function(args)
+    local player = Core.tools.getPlayerByUsername(args.username)
+    if player then
+        Core.ui.client.poolViewer.open(player, args.poolKey, args.data)
+    end
+end
+
+-- Server sends this after granting a VehicleKeySpawner so the client knows the vehicle script
+-- without relying on transmitModData (which may not exist in B42).
+Commands[Core.commands.spawnVehicle] = function(args)
+    if args.itemId then
+        Core._vehicleKeys[args.itemId] = {
+            vehicleScript = args.vehicleScript,
+            condition = args.condition
+        }
+    end
+end
+
+-- Right-click a VehicleKeySpawner to claim the vehicle.
+Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, ctx, items)
+    for _, v in ipairs(items) do
+        local item = type(v) == "table" and v.items and v.items[1] or v
+        if item and item.getFullType and item:getFullType() == "PhunMart.VehicleKeySpawner" then
+            local md = item:getModData()
+            -- modData may be empty if transmitModData failed; fall back to the lookup table
+            local keyData = Core._vehicleKeys[tostring(item:getID())]
+            local script = (md and md.vehicleScript) or (keyData and keyData.vehicleScript)
+            if script then
+                local label = Core.getVehicleLabel and Core.getVehicleLabel(script) or script
+                local player = getSpecificPlayer(playerNum)
+                local inBuilding = player and player:getSquare() and player:getSquare():getBuilding() ~= nil
+                local option = ctx:addOption("Claim: " .. label, playerNum, function(pNum)
+                    sendClientCommand(Core.name, Core.commands.claimVehicle, {
+                        vehicleScript = script
+                    })
+                end)
+                if inBuilding then
+                    option.notAvailable = true
+                    option.toolTip = ISToolTip:new()
+                    option.toolTip:initialise()
+                    option.toolTip.description = "You must be outside to claim a vehicle."
+                end
+            end
+        end
+    end
 end)
 
 return Commands

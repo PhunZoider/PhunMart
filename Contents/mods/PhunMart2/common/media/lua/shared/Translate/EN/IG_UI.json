@@ -42,6 +42,7 @@
   "IGUI_PhunMart_Open_X_tooltip": "Browse the %1 vending machine contents at your leisure",
   "IGUI_PhunMart_Open_X_locked_tooltip": "%1 is currently browsing the %2 vending machine",
   "IGUI_PhunMart_Open_X_nopower_tooltip": "The %1 vending machine requires power",
+  "IGUI_PhunMart.Error.requiresPower": "This machine requires power to operate.",
 
   "IGUI_PhunMart_Admin_ExportItemsFilename": "Name for file to export to",
 

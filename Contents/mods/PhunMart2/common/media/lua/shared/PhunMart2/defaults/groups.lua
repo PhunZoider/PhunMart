@@ -399,9 +399,10 @@ return {
     -- Budget tier: small cars (gold 5-10)
     vehicles_small = {
         label = "Small Cars",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_ToyCar",
         defaults = {
             price = "vehicle_common",
+            reward = "vehicle_smallcar",
             offer = {
                 weight = 1.0
             }
@@ -414,9 +415,10 @@ return {
     -- Budget tier: panel vans, step vans, pickup vans (gold 5-10)
     vehicles_vans = {
         label = "Vans & Pickups",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_CarSeat",
         defaults = {
             price = "vehicle_common",
+            reward = "vehicle_van",
             offer = {
                 weight = 1.0
             }
@@ -457,9 +459,10 @@ return {
     -- Standard tier: modern/mid-range cars (gold 10-20)
     vehicles_normal = {
         label = "Cars & Sedans",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_CarKey",  -- the classic
         defaults = {
             price = "vehicle_uncommon",
+            reward = "vehicle_normalcar",
             offer = {
                 weight = 1.0
             }
@@ -474,9 +477,10 @@ return {
     -- Standard tier: pickup trucks (gold 10-20)
     vehicles_trucks = {
         label = "Pickup Trucks",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_CarTrunk",
         defaults = {
             price = "vehicle_uncommon",
+            reward = "vehicle_pickup",
             offer = {
                 weight = 1.0
             }
@@ -491,9 +495,10 @@ return {
     -- Standard tier: off-road / SUV (gold 10-20)
     vehicles_4x4 = {
         label = "Off-Road & SUVs",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_CarTire",
         defaults = {
             price = "vehicle_uncommon",
+            reward = "vehicle_offroad",
             offer = {
                 weight = 1.0
             }
@@ -506,9 +511,10 @@ return {
     -- Premium tier: luxury, sports, race cars (gold 20-40)
     vehicles_luxury = {
         label = "Luxury & Sports Cars",
-        fallbackTexture = "Item_CarKey",
+        fallbackTexture = "Item_CarWindshield",
         defaults = {
             price = "vehicle_rare",
+            reward = "vehicle_luxury",
             offer = {
                 weight = 1.0
             }

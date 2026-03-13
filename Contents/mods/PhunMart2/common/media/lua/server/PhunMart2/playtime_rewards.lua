@@ -16,6 +16,7 @@ R.data = {}
 
 function R:load()
     self.data = Core.tools.loadTable(SAVE_FILE) or {}
+    self.loaded = true
 end
 
 function R:save()
@@ -71,6 +72,7 @@ end
 
 -- currently online players, then persists the updated data.
 function R:tick()
+    if not self.loaded then return end
     local players = Core.tools.onlinePlayers(true)
     if not players then
         return

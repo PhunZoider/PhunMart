@@ -59,7 +59,7 @@ Events.OnCharacterDeath.Add(function(character)
         return
     end
 
-    Core.playertimeRewards:getPlayerData(character).previousHours = character:getHoursSurvived()
+    Core.playtimeRewards:getPlayerData(character).previousHours = character:getHoursSurvived()
 
     -- Drop wallet item if enabled
     if Core.settings.DropOnDeath then

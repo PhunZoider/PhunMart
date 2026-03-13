@@ -43,6 +43,9 @@ PhunMart = {
         requestShopDefs = "PhunMartRequestShopDefs",
         requestLocations = "PhunMartRequestLocations",
         requestItemDefs = "PhunMartRequestItemDefs",
+        requestPool = "PhunMartRequestPool",
+        quickBlacklist = "PhunMartQuickBlacklist",
+        updateOfferWeight = "PhunMartUpdateOfferWeight",
         -- Shop player flow
         playerSetup = "PhunMartPlayerSetup",
         openShop = "PhunMartOpenShop",
@@ -72,7 +75,8 @@ PhunMart = {
         -- Admin wallet
         getPlayerList = "PhunMartGetPlayerList",
         getPlayersWallet = "PhunMartGetPlayersWallet",
-        adjustPlayerWallet = "PhunMartAdjustPlayerWallet"
+        adjustPlayerWallet = "PhunMartAdjustPlayerWallet",
+        claimVehicle = "PhunMartClaimVehicle"
     },
     events = {
         OnReady = "OnPhunMartOnReady",
@@ -324,11 +328,17 @@ function Core.getVehicleLabel(fullType)
     if Core.vehicleLabelCache == nil then
         Core.getAllVehicles()
     end
+    -- offer.item values are bare script names (e.g. "CarLuxury"); cache is keyed by
+    -- full name (e.g. "Base.CarLuxury"), so try both forms.
+    local lookupKey = fullType:find("%.") and fullType or ("Base." .. fullType)
+    if Core.vehicleLabelCache[lookupKey] then
+        return Core.vehicleLabelCache[lookupKey]
+    end
     if Core.vehicleLabelCache[fullType] then
         return Core.vehicleLabelCache[fullType]
     end
-    -- Direct lookup for types not yet in cache (e.g. called before getAllVehicles ran)
-    local vehicleObj = getScriptManager():getVehicle(fullType)
+    -- Direct lookup for types not yet in cache
+    local vehicleObj = getScriptManager():getVehicle(lookupKey)
     if vehicleObj and vehicleObj.getName then
         local key = "IGUI_VehicleName" .. vehicleObj:getName()
         local translated = getText(key)

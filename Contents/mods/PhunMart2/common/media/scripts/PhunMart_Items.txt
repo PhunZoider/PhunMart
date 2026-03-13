@@ -59,10 +59,11 @@ module PhunMart
 
     item VehicleKeySpawner
     {
+        DisplayName     =   Vehicle Claim Key,
         ItemType        =   base:normal,
-        Weight          =   1,
+        Weight          =   0.05,
         Icon            =   CarKey,
-         DisplayCategory = Currency,
+        DisplayCategory =   Currency,
     }
 
     item GoodPhoods

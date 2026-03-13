@@ -159,10 +159,13 @@ function ServerObject:buildOffers()
                 local roll = pool.roll or {}
                 local mode = roll.mode or "weighted"
 
-                -- flatten pool offers into a candidate list
+                -- flatten pool offers into a candidate list, respecting the runtime blacklist
                 local candidates = {}
+                local excluded = (Core.getBlacklist().items or {}).exclude or {}
                 for offerId, offer in pairs(pool.offers or {}) do
-                    table.insert(candidates, {offerId, offer})
+                    if not excluded[offer.item] then
+                        table.insert(candidates, {offerId, offer})
+                    end
                 end
 
                 -- resolve count: number | {min,max} | nil → default 5

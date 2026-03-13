@@ -22,6 +22,7 @@ R.data = {}
 
 function R:load()
     self.data = Core.tools.loadTable(SAVE_FILE) or {}
+    self.loaded = true
 end
 
 function R:save()
@@ -69,6 +70,7 @@ end
 -- normal:   count of non-sprinter zombies killed this batch
 -- sprinter: count of sprinter zombies killed this batch
 function R:reportKills(player, normal, sprinter)
+    if not self.loaded then return end
     local username = player:getUsername()
     local pd = self:getPlayerData(username)
 

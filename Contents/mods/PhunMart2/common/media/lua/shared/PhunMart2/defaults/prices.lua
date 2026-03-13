@@ -187,18 +187,27 @@ return {
 
     vehicle_common = {
         kind = "currency",
-        pool = "tokens",
-        amount = 5
+        pool = "change",
+        amount = {
+            min = 1000,
+            max = 2000
+        }
     },
     vehicle_uncommon = {
         kind = "currency",
-        pool = "tokens",
-        amount = 10
+        pool = "change",
+        amount = {
+            min = 2000,
+            max = 4000
+        }
     },
     vehicle_rare = {
         kind = "currency",
-        pool = "tokens",
-        amount = 20
+        pool = "change",
+        amount = {
+            min = 4000,
+            max = 8000
+        }
     }
 
     -- ── Physical items ───────────────────────────────────────────────────────

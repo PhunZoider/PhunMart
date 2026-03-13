@@ -140,6 +140,19 @@ R.tests.purchaseCountMax = function(args, adapter, purchases, context)
     return true
 end
 
+-- Auto-injected by compiler for removeTrait reward actions.
+-- Checks: player actually has the trait they want to remove.
+R.tests.canRemoveTrait = function(args, adapter)
+    local traitKey = args.trait
+    if not traitKey then
+        return false, "IGUI_PhunMart_Cond_TraitKeyMissing", {}
+    end
+    if not adapter:hasTrait(traitKey) then
+        return false, "IGUI_PhunMart_Cond_DoesNotHaveTrait", {traitKey}
+    end
+    return true
+end
+
 -- Auto-injected by compiler for grantTrait reward actions.
 -- Checks: player doesn't already have the trait, no mutex conflict, not disabled in MP.
 R.tests.canGrantTrait = function(args, adapter)

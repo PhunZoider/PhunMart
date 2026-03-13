@@ -79,10 +79,7 @@ return {
     vehicle_base = {
         template = true,
         kind = "vehicle",
-        category = "vehicle",
-        display = {
-            texture = "media/textures/icons/vehicle.png"
-        }
+        category = "vehicle"
     },
 
     -- =========================================================
@@ -831,12 +828,12 @@ return {
             scripts = {"SmallCar", "SmallCar02"},
             args = {
                 condition = {
-                    min = 40,
-                    max = 80
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.2,
-                    max = 0.6
+                    min = 0.3,
+                    max = 0.7
                 }
             }
         }}
@@ -851,8 +848,8 @@ return {
             scripts = {"CarNormal", "ModernCar", "ModernCar02"},
             args = {
                 condition = {
-                    min = 50,
-                    max = 85
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
                     min = 0.3,
@@ -871,8 +868,8 @@ return {
             scripts = {"CarStationWagon", "CarStationWagon2"},
             args = {
                 condition = {
-                    min = 50,
-                    max = 85
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
                     min = 0.3,
@@ -891,12 +888,12 @@ return {
             script = "CarLuxury",
             args = {
                 condition = {
-                    min = 60,
-                    max = 90
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.4,
-                    max = 0.8
+                    min = 0.3,
+                    max = 0.7
                 }
             }
         }}
@@ -911,8 +908,8 @@ return {
             script = "SportsCar",
             args = {
                 condition = {
-                    min = 50,
-                    max = 85
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
                     min = 0.3,
@@ -931,12 +928,12 @@ return {
             script = "SUV",
             args = {
                 condition = {
-                    min = 50,
-                    max = 85
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
                     min = 0.3,
-                    max = 0.8
+                    max = 0.7
                 }
             }
         }}
@@ -951,11 +948,11 @@ return {
             script = "OffRoad",
             args = {
                 condition = {
-                    min = 45,
-                    max = 80
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.2,
+                    min = 0.3,
                     max = 0.7
                 }
             }
@@ -971,11 +968,11 @@ return {
             scripts = {"PickUpTruck", "PickUpVan"},
             args = {
                 condition = {
-                    min = 45,
-                    max = 80
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.2,
+                    min = 0.3,
                     max = 0.7
                 }
             }
@@ -991,12 +988,12 @@ return {
             scripts = {"Van", "VanSeats"},
             args = {
                 condition = {
-                    min = 40,
-                    max = 75
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.2,
-                    max = 0.6
+                    min = 0.3,
+                    max = 0.7
                 }
             }
         }}
@@ -1011,12 +1008,12 @@ return {
             script = "StepVan",
             args = {
                 condition = {
-                    min = 35,
-                    max = 70
+                    min = 85,
+                    max = 100
                 },
                 fuel = {
-                    min = 0.1,
-                    max = 0.5
+                    min = 0.3,
+                    max = 0.7
                 }
             }
         }}

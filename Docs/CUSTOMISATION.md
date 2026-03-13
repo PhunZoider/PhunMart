@@ -78,15 +78,15 @@ SHOP  (PhunMart2_Shops.lua)
 
 ### What each layer controls
 
-| Layer | Controls | Lives in |
-|---|---|---|
-| **Shop** | Machine sprite, which pool sets to show | `PhunMart2_Shops.lua` |
-| **Pool** | How many offers per restock; sourcing strategy | `PhunMart2_Pools.lua` |
-| **Group** | Which game items are eligible; default price | `PhunMart2_Groups.lua` |
-| **Reward** | What the player actually receives | `PhunMart2_Rewards.lua` |
-| **Item/Offer** | Per-offer weight, stock, price, conditions | `PhunMart2_Items.lua` |
-| **Price** | Cost in change, tokens, or inventory items | `PhunMart2_Prices.lua` |
-| **Condition** | Who can buy it and how many times | `PhunMart2_Conditions.lua` |
+| Layer          | Controls                                       | Lives in                   |
+| -------------- | ---------------------------------------------- | -------------------------- |
+| **Shop**       | Machine sprite, which pool sets to show        | `PhunMart2_Shops.lua`      |
+| **Pool**       | How many offers per restock; sourcing strategy | `PhunMart2_Pools.lua`      |
+| **Group**      | Which game items are eligible; default price   | `PhunMart2_Groups.lua`     |
+| **Reward**     | What the player actually receives              | `PhunMart2_Rewards.lua`    |
+| **Item/Offer** | Per-offer weight, stock, price, conditions     | `PhunMart2_Items.lua`      |
+| **Price**      | Cost in change, tokens, or inventory items     | `PhunMart2_Prices.lua`     |
+| **Condition**  | Who can buy it and how many times              | `PhunMart2_Conditions.lua` |
 
 Layers in the middle (Pool, Group) are primarily used for **item-type shops** — things that
 come from the PZ item catalogue. Trait, vehicle, XP, and other non-item shops skip Groups
@@ -102,6 +102,7 @@ its own pool, a curated item group, prices, and one gated special offer.
 ### Step 1 — Define a price (if you need one that doesn't exist yet)
 
 `PhunMart2_Prices.lua`
+
 ```lua
 return {
     tools_cheap  = { kind = "currency", pool = "change", amount = 50  },  -- $0.50
@@ -116,6 +117,7 @@ Special offers (non-item rewards like a free item spawn) go in Rewards.
 Regular items sourced from a group don't need a reward entry — the game item itself is the reward.
 
 `PhunMart2_Rewards.lua`
+
 ```lua
 return {
     reward_sledgehammer = {
@@ -129,6 +131,7 @@ return {
 ### Step 3 — Define a condition for the special offer
 
 `PhunMart2_Conditions.lua`
+
 ```lua
 return {
     -- Must have level 3+ Carpentry skill
@@ -148,6 +151,7 @@ return {
 ### Step 4 — Register the special offer as an Item entry
 
 `PhunMart2_Items.lua`
+
 ```lua
 return {
     ["offer:sledgehammer_special"] = {
@@ -164,6 +168,7 @@ return {
 Groups describe which game items to pull in from the PZ catalogue.
 
 `PhunMart2_Groups.lua`
+
 ```lua
 return {
     bobs_tools = {
@@ -188,6 +193,7 @@ sledgehammer — enter the same weighted roll; 5–8 are chosen each restock. Th
 lower weight (0.5) means it appears roughly half as often as a weight-1 item.
 
 `PhunMart2_Pools.lua`
+
 ```lua
 return {
     pool_bobshardware = {
@@ -206,6 +212,7 @@ return {
 ### Step 7 — Define the shop
 
 `PhunMart2_Shops.lua`
+
 ```lua
 return {
     BobsHardware = {

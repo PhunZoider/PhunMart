@@ -20,7 +20,7 @@ Commands[Core.commands.getBlacklist] = function(playerObj, args)
 end
 
 Commands[Core.commands.setBlacklist] = function(playerObj, args)
-    Core.setBlacklistData(args)
+    Core.setBlacklist(args)
 end
 
 Commands[Core.commands.openShop] = function(playerObj, args)
@@ -159,10 +159,14 @@ Commands[Core.commands.buy] = function(playerObj, args)
         end
     end
 
-    -- Grant all reward actions
+    -- Grant all reward actions. Pass offer.item as context so spawnVehicle
+    -- gives exactly the vehicle the player selected, not a random pick.
     if offer.reward and offer.reward.actions then
+        local ctx = {
+            offerItem = offer.item
+        }
         for _, action in ipairs(offer.reward.actions) do
-            Core:grantReward(playerObj, action, qty)
+            Core:grantReward(playerObj, action, qty, ctx)
         end
     end
 
@@ -293,18 +297,65 @@ Commands[Core.commands.requestShopGenerate] = function(playerObj, args)
     Core.ServerSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
 end
 
-Commands[Core.commands.spawnVehicle] = function(playerObj, args)
-    local vehicle = addVehicleDebug(args.name, IsoDirections.S, nil, playerObj:getSquare())
-    for i = 0, vehicle:getPartCount() - 1 do
-        local container = vehicle:getPartByIndex(i):getItemContainer()
-        if container then
-            container:removeAllItems()
+-- Player uses a VehicleKeySpawner item to claim their vehicle.
+-- Finds the matching key in inventory, spawns the vehicle, then removes the key.
+Commands[Core.commands.claimVehicle] = function(playerObj, args)
+    local scriptName = args.vehicleScript
+    if not scriptName then
+        return
+    end
+
+    -- Find the claim key in the player's inventory.
+    -- getAllItemsRecurse may not exist in B42; fall back to getItems() (top-level only).
+    local inv = playerObj:getInventory()
+    local allItems = inv.getAllItemsRecurse and inv:getAllItemsRecurse() or inv:getItems()
+    local keyItem = nil
+    for i = 0, allItems:size() - 1 do
+        local item = allItems:get(i)
+        if item:getFullType() == "PhunMart.VehicleKeySpawner" then
+            local md = item:getModData()
+            if md and md.vehicleScript == scriptName then
+                keyItem = item
+                break
+            end
         end
     end
-    vehicle:repair()
-    playerObj:sendObjectChange("addItem", {
-        item = vehicle:createVehicleKey()
-    })
+
+    if not keyItem then
+        print("[PhunMart2] claimVehicle: no matching key for '" .. scriptName .. "' in inventory")
+        return
+    end
+
+    local vehicle = addVehicleDebug(scriptName, IsoDirections.S, nil, playerObj:getSquare())
+    if vehicle then
+        -- Clear spawned loot from all parts
+        for i = 0, vehicle:getPartCount() - 1 do
+            pcall(function()
+                local container = vehicle:getPartByIndex(i):getItemContainer()
+                if container then
+                    container:removeAllItems()
+                end
+            end)
+        end
+        -- Create a properly-bound vehicle key and give it to the player
+        local carKey = vehicle:createVehicleKey()
+        if carKey then
+            playerObj:getInventory():AddItem(carKey)
+            sendAddItemToContainer(playerObj:getInventory(), carKey)
+        end
+        -- Apply condition from key moddata if present
+        local cond = keyItem:getModData().condition
+        if cond then
+            for i = 0, vehicle:getPartCount() - 1 do
+                local v = type(cond) == "table" and ZombRand(cond.min or 80, (cond.max or 99) + 1) or cond
+                pcall(function()
+                    vehicle:getPartByIndex(i):setCondition(v)
+                end)
+            end
+        end
+        -- Consume the key (remove from whichever container holds it)
+        keyItem:getContainer():DoRemoveItem(keyItem)
+    end
 end
 
 Commands[Core.commands.requestLocations] = function(playerObj, args)
@@ -413,6 +464,60 @@ Commands[Core.commands.adjustPlayerWallet] = function(player, args)
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
         wallet = Core.wallet:get(args.playername)
     })
+end
+
+Commands[Core.commands.requestPool] = function(playerObj, args)
+    local poolKey = args and args.poolKey
+    if not poolKey then
+        return
+    end
+    local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+    local data = {
+        poolKey = poolKey,
+        offers = pool and pool.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs
+    }
+    if Core.isLocal then
+        Core.ui.client.poolViewer.open(playerObj, poolKey, data)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.requestPool, {
+            username = playerObj:getUsername(),
+            poolKey = poolKey,
+            data = data
+        })
+    end
+end
+
+Commands[Core.commands.quickBlacklist] = function(playerObj, args)
+    local itemKey = args and args.itemKey
+    if not itemKey then
+        return
+    end
+    local list = Core.getBlacklist() or {}
+    list.items = list.items or {}
+    list.items.exclude = list.items.exclude or {}
+    list.items.exclude[itemKey] = true
+    Core.setBlacklist(list)
+end
+
+Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
+    local poolKey = args and args.poolKey
+    local offerId = args and args.offerId
+    local weight = args and tonumber(args.weight)
+    if not (poolKey and offerId and weight and weight >= 0) then
+        return
+    end
+    local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+    if not pool then
+        return
+    end
+    local offer = pool.offers and pool.offers[offerId]
+    if not offer then
+        return
+    end
+    -- weight lives inside offer.offer sub-table
+    offer.offer = offer.offer or {}
+    offer.offer.weight = weight
 end
 
 return Commands

@@ -165,11 +165,10 @@ function ServerSystem:openShop(player, args, forceRestock)
 
     if shop:requiresPower() then
         self:sendCommand(player, Core.commands.openError, {
-            id = shop.id,
-            location = shop.location,
-            error = "requiresPower"
+            key = shop:getKey(),
+            message = "requiresPower"
         })
-        print("ERROR! shop requires power")
+        print("[PhunMart2] openShop: shop requires power")
         return
     end
 

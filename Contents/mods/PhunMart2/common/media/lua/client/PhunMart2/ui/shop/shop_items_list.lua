@@ -221,7 +221,7 @@ function UI:setData(data)
         if not displayName then
             if scriptItem then
                 displayName = scriptItem:getDisplayName()
-            elseif Core.getVehicleLabel and Core.getVehicleLabel(offer.item) ~= offer.item then
+            elseif Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
                 displayName = Core.getVehicleLabel(offer.item)
             elseif offer.reward and offer.reward.display and offer.reward.display.text then
                 displayName = offer.reward.display.text
@@ -231,6 +231,9 @@ function UI:setData(data)
         end
         if not texture then
             texture = scriptItem and scriptItem:getNormalTexture()
+        end
+        if not texture and offer.reward and offer.reward.display and offer.reward.display.texture then
+            texture = getTexture(offer.reward.display.texture)
         end
         if not texture and offer.meta and offer.meta.fallbackTexture then
             texture = getTexture(offer.meta.fallbackTexture)

@@ -88,7 +88,7 @@ function Core.compile()
 end
 
 -- Dispatch a single reward action onto a player. Called once per action after deduction.
-function Core:grantReward(player, action, qty)
+function Core:grantReward(player, action, qty, context)
     qty = qty or 1
     local t = action.type
 
@@ -126,28 +126,27 @@ function Core:grantReward(player, action, qty)
         end
 
     elseif t == "spawnVehicle" then
+        -- Use the offer's specific vehicle (context.offerItem) so the player gets
+        -- exactly the vehicle they selected, not a random pick from the reward pool.
         local scripts = action.scripts or (action.script and {action.script}) or {}
-        if #scripts > 0 then
-            local scriptName = scripts[ZombRand(#scripts) + 1]
-            local vehicle = addVehicleDebug(scriptName, IsoDirections.S, nil, player:getSquare())
-            if vehicle then
-                local args = action.args or {}
-                -- Apply condition range
-                local cond = args.condition
-                if cond then
-                    local v = type(cond) == "table" and ZombRand(cond.min or 40, (cond.max or 80) + 1) or cond
-                    for i = 0, vehicle:getPartCount() - 1 do
-                        pcall(function()
-                            vehicle:getPartByIndex(i):setCondition(v)
-                        end)
-                    end
-                end
-                -- Give key to player
-                pcall(function()
-                    player:sendObjectChange("addItem", {
-                        item = vehicle:createVehicleKey()
-                    })
-                end)
+        local scriptName = (context and context.offerItem) or
+                           (#scripts > 0 and scripts[ZombRand(#scripts) + 1]) or nil
+        if scriptName then
+            local item = player:getInventory():AddItem("PhunMart.VehicleKeySpawner")
+            if item then
+                local condition = action.args and action.args.condition or nil
+                local vehicleLabel = Core.getVehicleLabel(scriptName) or scriptName
+                item:setName("Vehicle Claim Key: " .. vehicleLabel)
+                item:getModData()["vehicleScript"] = scriptName
+                item:getModData()["condition"] = condition
+                -- transmitModData may not exist in B42; send a dedicated command instead
+                sendServerCommand(player, Core.name, Core.commands.spawnVehicle, {
+                    itemId      = tostring(item:getID()),
+                    vehicleScript = scriptName,
+                    condition   = condition,
+                })
+            else
+                print("[PhunMart2] grantReward: failed to add VehicleKeySpawner for '" .. scriptName .. "'")
             end
         end
 
