@@ -652,6 +652,7 @@ Conditions.price = function(self, playerObj, item, price, results)
                     table.insert(allocation, {
                         currency = cur.key,
                         type = "item",
+                        originalValue = v.value,
                         value = v.value
                     })
                     v.value = 0
@@ -659,7 +660,8 @@ Conditions.price = function(self, playerObj, item, price, results)
                     table.insert(allocation, {
                         currency = cur.key,
                         type = "item",
-                        value = v.value - count
+                        originalValue = v.value,
+                        value = count
                     })
                     v.value = v.value - count
                 end

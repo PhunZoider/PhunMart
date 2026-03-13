@@ -180,6 +180,7 @@ function Core:ini()
 
         self.players = ModData.getOrCreate(self.consts.players)
         self.history = ModData.getOrCreate(self.consts.history)
+
     else
         self.players = {}
     end

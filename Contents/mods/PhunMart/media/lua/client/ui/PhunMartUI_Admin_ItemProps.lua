@@ -145,7 +145,8 @@ function UI:setData(data)
         value = tostring(data.quantity)
     })
     self.list:addItem("Inventory", {
-        value = tostring(data.inventory.min or 0) .. " - " .. tostring(data.inventory.max or 0)
+        value = (data.inventory and tostring(data.inventory.min or 0) .. " - " .. tostring(data.inventory.max or 0)) or
+            "false"
     })
     self.list:addItem("File", {
         value = tostring(data.file)

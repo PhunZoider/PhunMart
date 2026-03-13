@@ -12,6 +12,7 @@ local function setup()
     --     FAVendingMachine.onUseVendingMachine = function(junk, player, VendingMachine, tempSetting)
     --     end
     -- end
+    PhunMart.collectables = ModData.getOrCreate("PhunMart_Collectables")
 end
 Events.EveryOneMinute.Add(setup)
 

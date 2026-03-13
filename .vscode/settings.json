@@ -2,42 +2,67 @@
     "emeraldwalk.runonsave": {
         "autoClearConsole": true,
         "commands": [
+            // del dest
             {
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart 2>nul"
             },
+            // copy src to dest
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods ${env.USERPROFILE}\\Zomboid\\mods /Y /I /E /F /EXCLUDE:xclude"
             },
+            // copy src/media/* from dest to dest/42
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\42\\media /Y /I /E /F"
             },
+            // copy src/common to dest/common
             {
                 "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\42\\mod.info /Y"
+                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunMart\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\common /Y /I /E /F"
             },
+            // copy src/mod.info to dest/42/mod.info
+            {
+                "match": ".*",
+                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart\\42\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\42\\mod.info /Y"
+            },
+            // copy src/poster to dest/42/poster
             {
                 "match": ".*",
                 "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\42\\poster.png /Y"
             },
+            // copy src/icon to dest/42/icon
             {
                 "match": ".*",
                 "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunMart\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart\\42\\icon.png /Y"
             },
+            // remove workshop/*
             {
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart 2>nul"
             },
+            // copy src to workshop
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart /Y /I /E /F /EXCLUDE:xclude"
             },
+            // copy dest to workshop
             {
                 "match": ".*",
                 "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunMart\\Contents\\mods\\PhunMart /Y /I /E /F"
             },
+            // del pz41
+            {
+                "match": ".*",
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\pz41\\mods\\PhunMart 2>nul"
+            },
+            // copy dest to pz41
+            {
+                "match": ".*",
+                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunMart ${env.USERPROFILE}\\pz41\\mods\\PhunMart /Y /I /E /F /EXCLUDE:xclude"
+            },
+
         ]
     },
     "editor.formatOnSave": true,

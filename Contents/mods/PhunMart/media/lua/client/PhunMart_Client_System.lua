@@ -52,10 +52,10 @@ function CPhunMartSystem:requestPurchase(obj, itemId, playerObj)
                             local remaining = a.value
                             -- asserting we have enough to consume or canBuy wouldn't have passed?
                             for i = 1, remaining do
-                                local invItem = playerObj:getInventory():getItemFromTypeRecurse(a.currency)
-                                if invItem then
-                                    invItem:getContainer():DoRemoveItem(invItem)
-                                end
+                                -- local invItem = playerObj:getInventory():getItemFromTypeRecurse(a.currency)
+                                -- if invItem then
+                                --     invItem:getContainer():DoRemoveItem(invItem)
+                                -- end
                             end
                         end
                     else

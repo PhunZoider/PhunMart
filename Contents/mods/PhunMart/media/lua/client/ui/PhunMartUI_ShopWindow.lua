@@ -137,6 +137,28 @@ function UI.OnOpenPanel(playerObj, obj)
     instance.shopObj = obj
     instance.tabPanel.shop = instance.shopObj
 
+    if instance.shopObj.type == "COLLECTABLES" then
+
+        local collectables = PhunMart.collectables
+        if not collectables then
+            PhunMart.collectables = ModData.getOrCreate("PhunMart_Collectables")
+            collectables = PhunMart.collectables
+        end
+
+        for k, v in pairs(instance.shopObj.items) do
+            for _, vv in ipairs(v.conditions) do
+                if vv.price then
+                    for itemstring, itemprops in pairs(vv.price or {}) do
+                        for i, ii in ipairs(itemprops.currencies or {}) do
+                            collectables[ii] = true
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+
     instance.data = {}
     instance.player = playerObj
     instance:addToUIManager();
