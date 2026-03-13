@@ -91,6 +91,41 @@ return {
         pool = "tokens",
         amount = 5
     },
+    token_6 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 6
+    },
+    token_9 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 9
+    },
+    token_12 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 12
+    },
+    token_15 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 15
+    },
+    token_18 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 18
+    },
+    token_24 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 24
+    },
+    token_30 = {
+        kind = "currency",
+        pool = "tokens",
+        amount = 30
+    },
 
     tokens = {
         kind = "currency",
