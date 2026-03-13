@@ -25,7 +25,9 @@ Commands[Core.commands.openError] = function(args)
     -- Signal the open_shop timed action (if still waiting) to abort early.
     if args.key then
         Core.pendingShopData = Core.pendingShopData or {}
-        Core.pendingShopData[args.key] = { error = args.message }
+        Core.pendingShopData[args.key] = {
+            error = args.message
+        }
     end
     local rawMsg = args.message or "Error"
     local message = getTextOrNull("IGUI_PhunMart.Error." .. rawMsg) or rawMsg

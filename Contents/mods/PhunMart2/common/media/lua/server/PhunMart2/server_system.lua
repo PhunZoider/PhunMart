@@ -164,10 +164,18 @@ function ServerSystem:openShop(player, args, forceRestock)
     end
 
     if shop:requiresPower() then
-        self:sendCommand(player, Core.commands.openError, {
-            key = shop:getKey(),
-            message = "requiresPower"
-        })
+        local key = shop:getKey()
+        if Core.isLocal then
+            Core.pendingShopData = Core.pendingShopData or {}
+            Core.pendingShopData[key] = {
+                error = "requiresPower"
+            }
+        else
+            sendServerCommand(player, Core.name, Core.commands.openError, {
+                key = key,
+                message = "requiresPower"
+            })
+        end
         print("[PhunMart2] openShop: shop requires power")
         return
     end

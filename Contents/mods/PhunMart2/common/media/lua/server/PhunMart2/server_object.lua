@@ -21,7 +21,9 @@ local function bakePrice(price)
         return nil
     end
     if price.kind == "free" then
-        return {kind = "free"}
+        return {
+            kind = "free"
+        }
     end
     if price.kind == "currency" then
         local amt = price.amount
@@ -33,12 +35,22 @@ local function bakePrice(price)
         else
             bakedAmt = amt
         end
-        return {kind = "currency", pool = price.pool, amount = bakedAmt}
+        return {
+            kind = "currency",
+            pool = price.pool,
+            amount = bakedAmt
+        }
     end
     -- kind = "items"
-    local baked = {kind = price.kind, items = {}}
+    local baked = {
+        kind = price.kind,
+        items = {}
+    }
     for _, line in ipairs(price.items or {}) do
-        local bl = {item = line.item, itemAny = line.itemAny}
+        local bl = {
+            item = line.item,
+            itemAny = line.itemAny
+        }
         local amt = line.amount
         if type(amt) == "table" then
             bl.amount = ZombRand(amt.min or 1, amt.max or amt.min or 1)
@@ -107,6 +119,11 @@ local fields = {
         -- what hour this shop was last restocked
         type = "numberToTens",
         default = 0
+    },
+    powered = {
+        -- whether this shop currently has power (if required)
+        type = "bool",
+        default = false
     },
     x = {
         -- x position of the shop
@@ -316,8 +333,12 @@ function ServerObject:updateSprite(force)
 
     -- Build lookup sets so we can check membership by sprite name (the arrays are 1-indexed)
     local poweredSet, unpoweredSet = {}, {}
-    for _, s in ipairs(def.sprites or {}) do poweredSet[s] = true end
-    for _, s in ipairs(def.unpoweredSprites or {}) do unpoweredSet[s] = true end
+    for _, s in ipairs(def.sprites or {}) do
+        poweredSet[s] = true
+    end
+    for _, s in ipairs(def.unpoweredSprites or {}) do
+        unpoweredSet[s] = true
+    end
 
     if def.powered == true then
         local hasPower = self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
@@ -341,7 +362,6 @@ end
 function ServerObject:getKey()
     return tostring(self.type) .. "-" .. self.x .. "-" .. self.y .. "-" .. self.z
 end
-
 
 function ServerObject:saveData()
     local isoObject = self:getIsoObject()

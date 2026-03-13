@@ -121,6 +121,17 @@ end)
 
 Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
+    -- Refresh sprites on all loaded powered shops so they switch
+    -- to the unpowered sprite when electricity goes out (and back).
+    local sys = Core.ServerSystem and Core.ServerSystem.instance
+    if sys then
+        for i = 1, sys:getLuaObjectCount() do
+            local obj = sys:getLuaObjectByIndex(i)
+            if obj then
+                obj:updateSprite()
+            end
+        end
+    end
 end)
 
 Events.OnZombieDead.Add(function(character)
