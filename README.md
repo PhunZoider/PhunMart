@@ -1,7 +1,12 @@
 # PhunMart
 
-A Project Zomboid (B42) server mod that replaces vanilla vending machines with a network of
-themed automated shops - each with its own identity, rotating stock, and economy.
+A Project Zomboid (B42) that adds 15 themed automated shops to the world - dispensing food, gear, weapons,
+vehicles, skill books, and things you won't find anywhere else. **Traits. XP boosts. Vehicles
+delivered to order.** Stock rotates. Coins come from scavenging. Tokens come from surviving or trading rare items.
+
+Shops source from the game's item catalogue by category, so even **modded items can show up
+automatically** - if a mod adds something to the Tool or Clothing category, it's eligible for
+the relevant machine. No config needed.
 
 > **Requires:** Project Zomboid Build 42.15+ (multiplayer or singleplayer)
 > **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) — enables zone-difficulty filtering on shop pools
@@ -27,20 +32,6 @@ the admin menu) and configure every aspect of the system through override Lua fi
 ## Screenshots
 
 ![Shop in the apocolypse](Docs/images/shopping.png)
-
----
-
-## For Players
-
-Somewhere out there, the vending machines still work.
-
-PhunMart adds 15 themed automated shops to the world - dispensing food, gear, weapons,
-vehicles, skill books, and things you won't find anywhere else. **Traits. XP boosts. Vehicles
-delivered to order.** Stock rotates. Coins come from scavenging. Tokens come from surviving.
-
-Shops source from the game's item catalogue by category, so **modded items show up
-automatically** - if a mod adds something to the Tool or Clothing category, it's eligible for
-the relevant machine. No config needed.
 
 ---
 

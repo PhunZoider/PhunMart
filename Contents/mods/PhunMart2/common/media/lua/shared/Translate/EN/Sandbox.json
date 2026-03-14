@@ -1,6 +1,16 @@
 {
   "Sandbox_PhunMart": "PhunMart",
-  "Sandbox_PhunMartSettings": "PhunMart Global Settings",
+  "Sandbox_PhunMart_Debug": "Debug",
+  "Sandbox_PhunMart_Debug_tooltip": "Adds more verbose logging for debugging purposes. Only use if you know what you're doing.",
+
+  "Sandbox_PhunMart_DropOnDeath": "Drop wallet on death",
+  "Sandbox_PhunMart_DropOnDeath_tooltip": "If enabled, players will drop their wallet upon death",
+
+  "Sandbox_PhunMart_OnlyPickupOwn": "Wallets only pickupable by owner",
+  "Sandbox_PhunMart_OnlyPickupOwn_tooltip": "If enabled, only the owner of a wallet can pick it up.",
+
+  "Sandbox_PhunMart_ReturnRate": "Wallets return rate",
+  "Sandbox_PhunMart_ReturnRate_tooltip": "The percentage of money that is returned to the player on death. 0 means no money is returned, 100 means all money is returned.",
 
   "Sandbox_PhunMart_ChangeCapCents": "Change Balance Cap (cents)",
   "Sandbox_PhunMart_ChangeCapCents_tooltip": "Maximum cents a player can carry (9999 = $99.99). At cap, coins left on the ground will not be consumed.",

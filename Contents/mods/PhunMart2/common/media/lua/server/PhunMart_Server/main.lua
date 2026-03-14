@@ -217,11 +217,15 @@ function Core:grantConfigReward(player, reward, reason)
     end
 end
 
+local function instanceId(instance)
+    return tostring(instance.x) .. "_" .. tostring(instance.y) .. "_" .. tostring(instance.z or 0)
+end
+
 function Core:addInstance(instance)
-    self.instances[instance.key] = instance
+    self.instances[instanceId(instance)] = instance
 end
 function Core:removeInstance(instance)
-    self.instances[instance.key] = nil
+    self.instances[instanceId(instance)] = nil
 end
 
 function Core:getInstanceDistancesFrom(x, y)
@@ -233,16 +237,16 @@ function Core:getInstanceDistancesFrom(x, y)
     end
 
     for k, v in pairs(self.instances) do
-        if results[v.key] then
-
+        local shopType = v.type
+        if results[shopType] then
             local dx = x - v.x
             local dy = y - v.y
             local distance = math.sqrt(dx * dx + dy * dy)
-            if distance < results[v.key] then
-                results[v.key] = distance
+            if distance < results[shopType] then
+                results[shopType] = distance
             end
         else
-            print("PhunMart Error: No shop with key " .. k)
+            print("PhunMart Error: No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
         end
     end
 

@@ -250,9 +250,8 @@ function ServerSystem:closestShopKeysTo(x, y)
             local dx = x - obj.x
             local dy = y - obj.y
             local distance = math.sqrt(dx * dx + dy * dy)
-            local shop = Core.shops[data.key]
-            if distance < shops[data.key] then
-                shops[data.key] = distance
+            if distance < shops[data.type] then
+                shops[data.type] = distance
             end
         end
     end
