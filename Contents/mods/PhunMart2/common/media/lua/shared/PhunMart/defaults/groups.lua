@@ -194,28 +194,49 @@ return {
     },
 
     -- =========================================================
-    -- CSVPharmacy  (medical)
+    -- CSVPharmacy  (medical — 3 tiers)
+    -- cheap:    common wound care      $0.50-$1.50  (coin_xlow)
+    -- standard: tools/boxes/pills      $2.50-$6.00  (coin_low)
+    -- rare:     prescription drugs     $10-$12      (coin_mid, zone 2+)
     -- =========================================================
 
-    -- Common first aid supplies: bandages, antiseptic, sutures, painkillers, etc.
-    -- Rare prescription drugs (Antibiotics, Antidepressants, etc.) are blacklisted
-    -- here and handled separately in medical_rare at a higher price tier.
-    medical_basic = {
+    -- Tier 1: widely available wound care items (high spawn weight in PZ loot)
+    medical_cheap = {
+        defaults = {
+            price = "coin_xlow",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {
+                "Bandage", "Bandaid", "BandageDirty",
+                "AlcoholBandage", "AlcoholRippedSheets",
+                "AlcoholWipes", "AlcoholedCottonBalls", "CottonBalls",
+                "Coldpack", "Disinfectant",
+            }
+        }
+    },
+
+    -- Tier 2: boxed supplies, tools, and general pills (medium spawn weight)
+    medical_standard = {
         defaults = {
             price = "coin_low",
             offer = { weight = 1.0 }
         },
         include = {
-            categories = {"FirstAid", "FirstAidWeapon"}
-        },
-        blacklist = {
-            "Antibiotics", "Antidepressants", "BetaBlockers", "SleepingTablets",
-            "Morphine", "Heroin",
+            items = {
+                "BandageBox", "AdhesiveBandageBox",
+                "SutureNeedle", "SutureNeedleBox", "SutureNeedleHolder",
+                "CottonBallsBox", "ColdpackBox",
+                "Tweezers", "Forceps_Forged", "ScissorsBluntMedical",
+                "Splint",
+                "Pills", "PillsVitamins",
+                "Stethoscope",
+            }
         }
     },
 
-    -- Prescription/controlled drugs — genuinely rare in PZ loot.
-    -- Zone-gated to zones 2+ (see pool def); price is coin_mid.
+    -- Tier 3: prescription/controlled drugs — rare in PZ loot, zone-gated to 2+.
+    -- B42 script names: PillsAntiDep / PillsBeta / PillsSleepingTablets (NOT Antidepressants etc.)
     medical_rare = {
         defaults = {
             price = "coin_mid",
@@ -223,9 +244,38 @@ return {
         },
         include = {
             items = {
-                "Antibiotics", "Antidepressants", "BetaBlockers", "SleepingTablets",
-                "Morphine", "Heroin",
+                "Antibiotics", "AntibioticsBox",
+                "PillsAntiDep", "PillsBeta", "PillsSleepingTablets",
             }
+        }
+    },
+
+    -- =========================================================
+    -- HardWear  (clothing + protective gear — 2 tiers)
+    -- clothing:   casual/work clothing         $2.50-$6.00  (coin_low)
+    -- protective: helmets/vests/tactical gear  $10-$12      (coin_mid, zone 2+)
+    -- =========================================================
+
+    -- Tier 1: all civilian and work clothing (DisplayCategory = Clothing, ~481 items in B42)
+    hardwear_clothing = {
+        defaults = {
+            price = "coin_low",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            categories = {"Clothing"}
+        }
+    },
+
+    -- Tier 2: helmets, vests, pads, and tactical equipment (DisplayCategory = ProtectiveGear, ~290 items in B42)
+    -- Zone-gated to zones 2+ at the pool level so military/SWAT gear only appears in harder areas.
+    hardwear_protective = {
+        defaults = {
+            price = "coin_mid",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            categories = {"ProtectiveGear"}
         }
     },
 

@@ -154,8 +154,14 @@ function Core.debugLn(str)
 end
 
 function Core.debug(...)
-    if Core.consts.debug then
-        print("[PhunMart]", ...)
+    if Core.settings.Debug then
+        for _, v in ipairs({...}) do
+            if type(v) == "table" then
+                Core.utils.printTable(v)
+            else
+                print("[PhunMart] " .. tostring(v))
+            end
+        end
     end
 end
 

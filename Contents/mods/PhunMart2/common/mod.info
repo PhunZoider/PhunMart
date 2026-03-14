@@ -1,8 +1,8 @@
-title=PhunMart2
-name=PhunMart2
+title=PhunMart 2
+name=PhunMart 2
 id=phunmart2
 authors=UburGeek
-description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
+description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 poster=poster.png
 pack=phunmart
 tiledef=phunmart 1420

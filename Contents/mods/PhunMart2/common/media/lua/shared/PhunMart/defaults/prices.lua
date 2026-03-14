@@ -192,13 +192,21 @@ return {
         pool = "change",
         amount = 500 -- $5.00  (superior boost, luxury shop)
     },
+    coin_xlow = {
+        kind = "currency",
+        pool = "change",
+        amount = {
+            min = 50,
+            max = 150
+        } -- $0.50-$1.50
+    },
     coin_low = {
         kind = "currency",
         pool = "change",
         amount = {
             min = 250,
             max = 600
-        } -- $5.00
+        } -- $2.50-$6.00
     },
     coin_mid = {
         kind = "currency",

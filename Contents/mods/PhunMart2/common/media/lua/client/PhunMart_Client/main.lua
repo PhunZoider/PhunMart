@@ -3,4 +3,3 @@ if isServer() then
 end
 
 local Core = PhunMart
--- wallet drop and reset on death are handled server-side in server_events.lua

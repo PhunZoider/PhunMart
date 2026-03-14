@@ -223,7 +223,7 @@ Commands[Core.commands.requestItemDefs] = function(playerObj, args)
             })
             firstSend = false
             data = {}
-            print("Sent " .. chunkIteration .. " item defs")
+            Core.debugLn("Sent chunk " .. chunkIteration .. " of item defs")
         end
 
     end
@@ -236,7 +236,7 @@ Commands[Core.commands.requestItemDefs] = function(playerObj, args)
         firstSend = firstSend,
         completed = true
     })
-    print("Sent " .. totalRows .. " item defs")
+    Core.debugLn("Sent " .. totalRows .. " item defs total")
 end
 
 Commands[Core.commands.reroll] = function(playerObj, args)
@@ -322,7 +322,7 @@ Commands[Core.commands.claimVehicle] = function(playerObj, args)
     end
 
     if not keyItem then
-        print("[PhunMart] claimVehicle: no matching key for '" .. scriptName .. "' in inventory")
+        Core.debugLn("claimVehicle: no matching key for '" .. scriptName .. "' in inventory")
         return
     end
 
@@ -412,7 +412,7 @@ Commands[Core.commands.addToWallet] = function(_, args)
 end
 
 Commands[Core.commands.resetWallet] = function(playerObj, args)
-    print("Resetting wallet for ", playerObj:getUsername())
+    Core.debugLn("Resetting wallet for " .. playerObj:getUsername())
     Core.wallet:reset(playerObj)
 end
 

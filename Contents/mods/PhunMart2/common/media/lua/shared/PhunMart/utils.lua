@@ -2,17 +2,6 @@ local utils = {}
 
 utils.isLocal = not isClient() and not isServer() and not isCoopHost()
 
-function utils.debug(...)
-    local args = {...}
-    for i, v in ipairs(args) do
-        if type(v) == "table" then
-            utils.printTable(v)
-        else
-            print(tostring(v))
-        end
-    end
-end
-
 function utils.printTable(t, indent)
     indent = indent or ""
     for key, value in pairs(t or {}) do

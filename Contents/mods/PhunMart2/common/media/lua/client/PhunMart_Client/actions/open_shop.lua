@@ -105,7 +105,7 @@ function action:update()
     if self.animDone then
         self.waitTicks = (self.waitTicks or 0) + 1
         if self.waitTicks > 200 then
-            print("[PhunMart] openShop timed out waiting for server response")
+            Core.debugLn("openShop timed out waiting for server response")
             self:forceStop()
             return
         end

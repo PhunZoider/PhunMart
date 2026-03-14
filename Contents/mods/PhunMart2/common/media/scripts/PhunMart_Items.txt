@@ -74,6 +74,13 @@ module PhunMart
         Weight            = 250,
         DisplayName       = Good Phoods Vending Machine,
         WorldObjectSprite = phunmart_01_8,
+        isLight = true,
+        lightB = 0,
+        lightG = 255,
+        lightR = 255,
+        LightRadius = 24,
+        MaterialType = Glass_Light,
+        
     }
 
     item PhatPhoods
@@ -154,6 +161,11 @@ module PhunMart
         Weight            = 250,
         DisplayName       = CSV Pharmacy Vending Machine,
         WorldObjectSprite = phunmart_02_8,
+        lightB = 80,
+        lightG = 80,
+        lightR = 80,
+        LightRadius = 2,
+        MaterialType = Glass_Light,
     }
 
     item RadioHacks

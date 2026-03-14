@@ -93,7 +93,7 @@ end
 local function applyTrait(player, traitKey, add)
     local def = findTraitDef(traitKey)
     if not def then
-        print("[PhunMart] applyTrait: no definition found for '" .. tostring(traitKey) .. "'")
+        Core.debugLn("applyTrait: no definition found for '" .. tostring(traitKey) .. "'")
         return
     end
     local traitType = def:getType()
@@ -116,7 +116,7 @@ Commands[Core.commands.applyTraitReward] = function(arguments)
     end
     local ok, err = pcall(applyTrait, player, arguments.trait, arguments.add)
     if not ok then
-        print("[PhunMart] applyTraitReward error: " .. tostring(err))
+        Core.debugLn("applyTraitReward error: " .. tostring(err))
     end
 end
 
@@ -127,7 +127,7 @@ Events[Core.events.OnApplyTraitReward].Add(function(args)
     end
     local ok, err = pcall(applyTrait, args.player, args.trait, args.add)
     if not ok then
-        print("[PhunMart] OnApplyTraitReward error: " .. tostring(err))
+        Core.debugLn("OnApplyTraitReward error: " .. tostring(err))
     end
 end)
 
@@ -148,8 +148,7 @@ Commands[Core.commands.onShopChange] = function(args)
 end
 
 Commands[Core.commands.syncPurchases] = function(arguments)
-    print("-------------------- SYNC PURCHASES")
-    Core.debug(arguments)
+    Core.debug("syncPurchases", arguments)
 
     Core.purchases.histories = Core.purchases.histories or {}
     Core.purchases.histories[arguments.username] = arguments.history
@@ -185,7 +184,7 @@ end
 
 Commands[Core.commands.requestItemDefs] = function(arguments)
 
-    print("Receiving ", arguments.row, " of ", arguments.totalRows)
+    Core.debugLn("requestItemDefs: receiving chunk " .. arguments.row .. " of " .. arguments.totalRows)
 
     if arguments.firstSend then
         Core.defs.items = arguments.items
@@ -197,7 +196,7 @@ Commands[Core.commands.requestItemDefs] = function(arguments)
 
     if arguments.completed then
         triggerEvent(Core.events.OnShopItemDefsReloaded, Core.defs.items)
-        print("Received all item defs")
+        Core.debugLn("requestItemDefs: received all " .. arguments.totalRows .. " defs")
     end
 end
 

@@ -22,21 +22,21 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
 
         PZ.fields.coinchance = {
             label = "IGUI_PhunMart_CoinDropChance",
-            type = "string",
+            type = "int",
             tooltip = "IGUI_PhunMart_CoinDropChance_tooltip",
             group = "PhunMart",
             order = 200
         }
         PZ.fields.coinmin = {
             label = "IGUI_PhunMart_CoinMinCents",
-            type = "string",
+            type = "int",
             tooltip = "IGUI_PhunMart_CoinMinCents_tooltip",
             group = "PhunMart",
             order = 200
         }
         PZ.fields.coinmax = {
             label = "IGUI_PhunMart_CoinMaxCents",
-            type = "string",
+            type = "int",
             tooltip = "IGUI_PhunMart_CoinMaxCents_tooltip",
             group = "PhunMart",
             order = 200
@@ -46,21 +46,21 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
             checkSprinters = true
             PZ.fields.coinsprinterchance = {
                 label = "IGUI_PhunMart_CoinSprinterDropChance",
-                type = "string",
+                type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterDropChance_tooltip",
                 group = "PhunMart",
                 order = 200
             }
             PZ.fields.coinsprintermin = {
                 label = "IGUI_PhunMart_CoinSprinterMinCents",
-                type = "string",
+                type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterMinCents_tooltip",
                 group = "PhunMart",
                 order = 200
             }
             PZ.fields.coinsprintermax = {
                 label = "IGUI_PhunMart_CoinSprinterMaxCents",
-                type = "string",
+                type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterMaxCents_tooltip",
                 group = "PhunMart",
                 order = 200
@@ -73,7 +73,7 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
             local isSprinter = false
 
             local loot = Core.loot or {
-                chance = location.coinchance or 0.30, -- probability a zombie carries change
+                chance = location.coinchance or 30, -- probability a zombie carries change
                 minCents = location.coinmin or 5,
                 maxCents = location.coinmax or 75
             }
@@ -90,7 +90,7 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
                 end
             end
 
-            return tonumber(chance), tonumber(minCents), tonumber(maxCents)
+            return tonumber(chance * 0.01), tonumber(minCents), tonumber(maxCents)
         end
     end
 end

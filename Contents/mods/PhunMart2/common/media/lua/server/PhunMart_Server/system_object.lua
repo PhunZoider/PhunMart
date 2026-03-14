@@ -204,14 +204,14 @@ Core.poolPassesZoneFilter = poolPassesZoneFilter
 function ServerObject:buildOffers()
     local offers = {}
     if not Core.runtime then
-        print("[PhunMart] buildOffers: no compiled runtime, call Core.compile() first")
+        Core.debugLn("buildOffers: no compiled runtime, call Core.compile() first")
         self.offers = offers
         return
     end
     local c = Core
     local shopDef = Core.runtime.shops and Core.runtime.shops[self.type]
     if not shopDef then
-        print("[PhunMart] buildOffers: no runtime shop def for type '" .. tostring(self.type) .. "'")
+        Core.debugLn("buildOffers: no runtime shop def for type '" .. tostring(self.type) .. "'")
         self.offers = offers
         return
     end
@@ -221,7 +221,7 @@ function ServerObject:buildOffers()
             local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
             local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
             if not pool then
-                print("[PhunMart] buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
+                Core.debugLn("buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
             elseif not poolPassesZoneFilter(pool, self.x, self.y) then
                 -- pool excluded by zone difficulty at this location; skip silently
             else
@@ -352,8 +352,8 @@ function ServerObject:stateFromIsoObject(isoObject)
 
     Core:addInstance(data)
 
-    -- update sprite if needed
-    self:updateSprite()
+    -- update sprite, forcing re-evaluation so power state and self.powered are synced on load
+    self:updateSprite(true)
 
     -- send data to clients (includes offers)
     isoObject:transmitModData()
@@ -372,7 +372,6 @@ function ServerObject:getSpriteIndex()
 end
 
 function ServerObject:updateSprite(force)
-
     local isoObject = self:getIsoObject()
     if not isoObject then
         return
@@ -381,33 +380,34 @@ function ServerObject:updateSprite(force)
     if not def then
         return
     end
-    local sprite = isoObject:getSprite():getName()
-
-    -- Build lookup sets so we can check membership by sprite name (the arrays are 1-indexed)
-    local poweredSet, unpoweredSet = {}, {}
-    for _, s in ipairs(def.sprites or {}) do
-        poweredSet[s] = true
-    end
-    for _, s in ipairs(def.unpoweredSprites or {}) do
-        unpoweredSet[s] = true
-    end
 
     if def.powered == true then
         local hasPower = self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
                              GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
-        if hasPower and unpoweredSet[sprite] then
-            -- currently showing unpowered sprite but has power → switch to powered
+        -- skip if power state unchanged — avoids redundant setSprite + network transmit on every tick
+        if not force and hasPower == self.powered then
+            return
+        end
+        local idx = self:getSpriteIndex()
+        if hasPower then
+            isoObject:setSprite(def.sprites[idx])
+        else
+            isoObject:setSprite((def.unpoweredSprites or {})[idx] or def.sprites[idx])
+        end
+        isoObject:transmitUpdatedSpriteToClients()
+        self.powered = hasPower
+        self:saveData()
+    else
+        -- non-powered shop: ensure powered sprite is showing (recovery from bad state)
+        local sprite = isoObject:getSprite():getName()
+        local unpoweredSet = {}
+        for _, s in ipairs(def.unpoweredSprites or {}) do
+            unpoweredSet[s] = true
+        end
+        if unpoweredSet[sprite] then
             isoObject:setSprite(def.sprites[self:getSpriteIndex()])
             isoObject:transmitUpdatedSpriteToClients()
-        elseif not hasPower and poweredSet[sprite] then
-            -- currently showing powered sprite but no power → switch to unpowered
-            isoObject:setSprite(def.unpoweredSprites[self:getSpriteIndex()])
-            isoObject:transmitUpdatedSpriteToClients()
         end
-    elseif unpoweredSet[sprite] then
-        -- powered not required but showing unpowered sprite → switch to powered
-        isoObject:setSprite(def.sprites[self:getSpriteIndex()])
-        isoObject:transmitUpdatedSpriteToClients()
     end
 end
 

@@ -37,7 +37,7 @@ function ServerSystem:removeInvalidInstanceData()
         Core.instances[k] = nil
         removed = removed + 1
     end
-    print("Removed " .. tostring(removed) .. " invalid instances")
+    Core.debugLn("Removed " .. tostring(removed) .. " invalid instances")
 
 end
 
@@ -159,7 +159,7 @@ function ServerSystem:openShop(player, args, forceRestock)
     local shop = self:getLuaObjectAt(args.x, args.y, args.z)
 
     if not shop then
-        print("[PhunMart] openShop: no shop at " .. args.x .. "," .. args.y .. "," .. args.z)
+        Core.debugLn("openShop: no shop at " .. args.x .. "," .. args.y .. "," .. args.z)
         return
     end
 
@@ -176,7 +176,7 @@ function ServerSystem:openShop(player, args, forceRestock)
                 message = "requiresPower"
             })
         end
-        print("[PhunMart] openShop: shop requires power")
+        Core.debugLn("openShop: shop requires power")
         return
     end
 
@@ -403,7 +403,7 @@ end
 
 function ServerSystem:recompileShops()
     Core.compile()
-    print("PhunMart: Recompiled shop definitions")
+    Core.debugLn("Recompiled shop definitions")
     -- Push updated shop defs to all connected clients.
     if Core.runtime and Core.runtime.shops then
         sendServerCommand(Core.name, Core.commands.requestShopDefs, {

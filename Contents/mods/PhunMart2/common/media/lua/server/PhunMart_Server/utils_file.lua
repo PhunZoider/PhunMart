@@ -117,7 +117,7 @@ function file_utils.loadTable(filename, createIfNotExists)
 
     local result, err = tableOfStringsToTable(lines)
     if err then
-        print("PhunMart file_utils: error loading '" .. filename .. "': " .. err)
+        Core.debugLn("file_utils: error loading '" .. filename .. "': " .. err)
         return nil
     end
 

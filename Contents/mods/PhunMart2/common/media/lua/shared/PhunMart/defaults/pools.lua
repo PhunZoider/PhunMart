@@ -233,13 +233,13 @@ return {
     },
 
     -- =========================================================
-    -- CSVPharmacy  (medical supplies — basic + rare tiers)
-    -- basic: common first aid, all zones, coin_low
-    -- rare:  prescription/controlled drugs, zones 2+, coin_mid
+    -- CSVPharmacy  (medical supplies — 3 tiers across 2 pools)
+    -- basic pool: medical_cheap + medical_standard, all zones, 4-7 items
+    -- rare pool:  medical_rare (prescription drugs), zones 2+, 1-3 items
     -- =========================================================
     pool_csvpharmacy_basic = {
         sources = {
-            groups = {"medical_basic"}
+            groups = {"medical_cheap", "medical_standard"}
         },
         roll = {
             mode = "weighted",
@@ -261,6 +261,39 @@ return {
             count = {
                 min = 1,
                 max = 3
+            }
+        }
+    },
+
+    -- =========================================================
+    -- HardWear  (clothing + protective gear — 2 pools)
+    -- clothing pool:   casual/work clothing, all zones, 4-7 items
+    -- protective pool: helmets/vests/tactical, zones 2+, 2-4 items
+    -- =========================================================
+    pool_hardwear_clothing = {
+        sources = {
+            groups = {"hardwear_clothing"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 4,
+                max = 7
+            }
+        }
+    },
+    pool_hardwear_protective = {
+        zones = {
+            difficulty = {2, 3, 4, 5}
+        },
+        sources = {
+            groups = {"hardwear_protective"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 4
             }
         }
     },
@@ -454,39 +487,6 @@ return {
         }
     },
 
-    -- =========================================================
-    -- HardWear  (clothing — civilian + protective, split by rarity)
-    -- clothing:   all zones, coin_low  ($2.50–$6)
-    -- protective: zones 2+, coin_mid  ($10–$12)  — police/military gear
-    --   (zone 1 exclusion: protective gear not found in the safest areas)
-    -- =========================================================
-    pool_hardwear_clothing = {
-        sources = {
-            groups = {"clothing_all"}
-        },
-        roll = {
-            mode = "weighted",
-            count = {
-                min = 4,
-                max = 7
-            }
-        }
-    },
-    pool_hardwear_protective = {
-        zones = {
-            difficulty = {2, 3, 4}
-        },
-        sources = {
-            groups = {"protective_gear"}
-        },
-        roll = {
-            mode = "weighted",
-            count = {
-                min = 2,
-                max = 4
-            }
-        }
-    },
 
     -- =========================================================
     -- ShedsAndCommoners  (skill books by volume tier + misc literature)

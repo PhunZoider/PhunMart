@@ -10,48 +10,14 @@ Events.OnServerStarted.Add(function()
     Core:ini()
 end)
 
-Events.OnIsoThumpableLoad.Add(function()
-    print("PhunMart (server): OnIsoThumpableLoad")
-end)
-
-Events.OnIsoThumpableLoad.Add(function()
-    print("PhunMart (server): OnIsoThumpableLoad")
-end)
-
-Events.OnDoTileBuilding.Add(function()
-    print("PhunMart (server): OnDoTileBuilding")
-end)
-
 Events.OnDoTileBuilding2.Add(function(cursor, bRender, x, y, z, square)
     if cursor and cursor.tryInitialInvItem and
         luautils.stringStarts(cursor.tryInitialInvItem.worldSprite or "", "phunmart_") then
-
     end
-
-end)
-
-Events.OnDoTileBuilding3.Add(function()
-    print("PhunMart (server): OnDoTileBuilding3")
-end)
-
-Events.OnDestroyIsoThumpable.Add(function()
-    print("PhunMart (server): OnDestroyIsoThumpable")
 end)
 
 Events.LoadGridsquare.Add(function(square)
     Core.ServerSystem.instance:loadGridsquare(square)
-end)
-
-Events.OnTileRemoved.Add(function()
-    print("PhunMart (server): OnTileRemoved")
-end)
-
-Events.OnRainStart.Add(function()
-    print("PhunMart (server): OnRainStart")
-end)
-
-Events.OnRainStop.Add(function()
-    print("PhunMart (server): OnRainStop")
 end)
 
 Events.OnCharacterDeath.Add(function(character)
@@ -110,7 +76,7 @@ Events.OnCharacterDeath.Add(function(character)
                 end
             end)
             if not ok then
-                print("[PhunMart] OnCharacterDeath: failed to drop wallet: " .. tostring(err))
+                Core.debugLn("OnCharacterDeath: failed to drop wallet: " .. tostring(err))
             end
         end
     end
@@ -121,15 +87,20 @@ end)
 
 Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
-    -- Refresh sprites on all loaded powered shops so they switch
-    -- to the unpowered sprite when electricity goes out (and back).
+end)
+
+-- Check power state every minute so sprite swaps within ~1 minute of electricity changing.
+-- updateSprite() compares hasPower against self.powered and no-ops when unchanged,
+-- so this loop is near-zero cost during steady state.
+Events.EveryOneMinute.Add(function()
     local sys = Core.ServerSystem and Core.ServerSystem.instance
-    if sys then
-        for i = 1, sys:getLuaObjectCount() do
-            local obj = sys:getLuaObjectByIndex(i)
-            if obj then
-                obj:updateSprite()
-            end
+    if not sys then
+        return
+    end
+    for i = 1, sys:getLuaObjectCount() do
+        local obj = sys:getLuaObjectByIndex(i)
+        if obj then
+            obj:updateSprite()
         end
     end
 end)
@@ -170,7 +141,6 @@ Events.OnZombieDead.Add(function(character)
 end)
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
-    print("PhunMart (server): OnClientCommand " .. module .. " " .. command)
     if module == Core.name then
         if Commands[command] then
             Commands[command](playerObj, arguments)
@@ -179,6 +149,5 @@ Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
 end)
 
 Events.OnObjectAdded.Add(function(object)
-    print("PhunMart (server): OnObjectAdded")
     Core.ServerSystem.instance:checkObjectAdded(object)
 end)

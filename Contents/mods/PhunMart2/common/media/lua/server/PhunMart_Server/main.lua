@@ -35,7 +35,7 @@ end
 local function loadDefaults(path)
     local ok, result = pcall(require, path)
     if not ok then
-        print("PhunMart: Warning: could not load defaults '" .. path .. "': " .. tostring(result))
+        Core.debugLn("Warning: could not load defaults '" .. path .. "': " .. tostring(result))
         return {}
     end
     return result or {}
@@ -83,7 +83,7 @@ function Core.compile()
     Core.runtime = runtime
     Core.shops = runtime.shops -- alias: all Core.shops readers now use compiled data
     Core:reloadShopDefinitions() -- rebuild spriteToShop from compiled sprites
-    Core.utils.debug("Warn", log.warnings, "Errors", log.errors)
+    Core.debug("Warn", log.warnings, "Errors", log.errors)
     return runtime, log
 
 end
@@ -97,7 +97,7 @@ function Core:grantReward(player, action, qty, context)
         for i = 1, qty do
             local item = player:getInventory():AddItem(action.item)
             if not item then
-                print("[PhunMart] grantReward: AddItem failed for '" .. tostring(action.item) .. "'")
+                Core.debugLn("grantReward: AddItem failed for '" .. tostring(action.item) .. "'")
             end
         end
 
@@ -123,7 +123,7 @@ function Core:grantReward(player, action, qty, context)
         if perk then
             addXp(player, perk, (action.amount or 0) * qty)
         else
-            print("[PhunMart] grantReward: unknown perk '" .. tostring(action.skill) .. "'")
+            Core.debugLn("grantReward: unknown perk '" .. tostring(action.skill) .. "'")
         end
 
     elseif t == "spawnVehicle" then
@@ -146,7 +146,7 @@ function Core:grantReward(player, action, qty, context)
                     condition = condition
                 })
             else
-                print("[PhunMart] grantReward: failed to add VehicleKeySpawner for '" .. scriptName .. "'")
+                Core.debugLn("grantReward: failed to add VehicleKeySpawner for '" .. scriptName .. "'")
             end
         end
 
@@ -161,7 +161,7 @@ function Core:grantReward(player, action, qty, context)
             SyncXp(player)
         end)
         if not ok then
-            print("[PhunMart] grantReward: applyBoost failed for '" .. tostring(action.skill) .. "': " .. tostring(err))
+            Core.debugLn("grantReward: applyBoost failed for '" .. tostring(action.skill) .. "': " .. tostring(err))
         end
 
     elseif t == "grantBoundTokens" then
@@ -171,7 +171,7 @@ function Core:grantReward(player, action, qty, context)
         Core.wallet:adjustByPool(player, "bound", "tokens", amt)
 
     else
-        print("[PhunMart] grantReward: unknown action type '" .. tostring(t) .. "'")
+        Core.debugLn("grantReward: unknown action type '" .. tostring(t) .. "'")
     end
 end
 
@@ -246,7 +246,7 @@ function Core:getInstanceDistancesFrom(x, y)
                 results[shopType] = distance
             end
         else
-            print("PhunMart Error: No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
+            Core.debugLn("No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
         end
     end
 

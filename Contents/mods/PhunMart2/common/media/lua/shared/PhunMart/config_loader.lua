@@ -87,8 +87,7 @@ local function getShopPools(data)
             table.insert(results, getShopPool(entry or {}))
         end)
         if not status then
-            print("Error caught formatting pool " .. tostring(i) .. " of " .. tostring(data.key) .. ": " ..
-                      tostring(err))
+            Core.debugLn("Error formatting pool " .. tostring(i) .. " of " .. tostring(data.key) .. ": " .. tostring(err))
         end
     end
     return results
@@ -146,7 +145,7 @@ local function getCoreShops()
             results[key] = formatShop(entry)
         end)
         if not status then
-            print("Error caught in " .. key .. ": " .. tostring(err))
+            Core.debugLn("Error in shop '" .. key .. "': " .. tostring(err))
         end
 
     end
@@ -160,11 +159,10 @@ local function getModifications()
         -- this is a server or local game
         local data = Core.fileUtils.loadTable(Core.consts.shopsLuaFile)
         if not data then
-            print("PhunMart: missing ./lua/" .. Core.consts.shopsLuaFile ..
-                      ", this is normal if you haven't modified any shops")
+            Core.debugLn("missing ./lua/" .. Core.consts.shopsLuaFile .. ", this is normal if you haven't modified any shops")
         else
             ModData.add(Core.consts.shops, data)
-            print("PhunMart: loaded customisations from ./lua/" .. Core.consts.shopsLuaFile)
+            Core.debugLn("loaded customisations from ./lua/" .. Core.consts.shopsLuaFile)
         end
     end
     data = ModData.get(Core.consts.shops)
@@ -178,7 +176,7 @@ local function getModifications()
             results[key] = formatShop(entry)
         end)
         if not status then
-            print("Error caught in " .. key .. ": " .. tostring(err))
+            Core.debugLn("Error in modification '" .. key .. "': " .. tostring(err))
         end
     end
     return results

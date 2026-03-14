@@ -14,7 +14,7 @@ local function getAdapter(player)
         if perk then
             return self.player:getPerkLevel(perk)
         else
-            print("PhunMart Error: No perk with name " .. perkName)
+            Core.debugLn("No perk with name '" .. perkName .. "'")
             return 0
         end
     end
@@ -24,7 +24,7 @@ local function getAdapter(player)
         if perk then
             return self.player:getXp():getPerkBoost(perk)
         else
-            print("PhunMart Error: No perk with name " .. perkName)
+            Core.debugLn("No perk with name '" .. perkName .. "'")
             return 0
         end
     end

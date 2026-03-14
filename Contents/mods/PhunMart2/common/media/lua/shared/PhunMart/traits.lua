@@ -51,7 +51,7 @@ local function build()
         end
     end)
     if not ok then
-        print("[PhunMart] Traits cache build error: " .. tostring(err))
+        Core.debugLn("Traits cache build error: " .. tostring(err))
     end
 end
 
@@ -119,7 +119,7 @@ function Traits.playerHas(player, traitKey)
     if ok then
         return result == true
     end
-    print("[PhunMart] Traits.playerHas: getCharacterTraits() failed for '" .. traitKey .. "'")
+    Core.debugLn("Traits.playerHas: getCharacterTraits() failed for '" .. traitKey .. "'")
     return false
 end
 

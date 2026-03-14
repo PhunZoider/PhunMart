@@ -128,49 +128,30 @@ end
 -- Maps a failure object from R.evaluate (has textKey + args) to a player-readable string.
 local function failureLabel(failure)
     local tk = failure.textKey or ""
-    local a = failure.args or {}
+    local a  = failure.args or {}
 
-    if tk == "IGUI_PhunMart_Cond_WorldAgeMin" then
-        return "World too young (need " .. (a[1] or "?") .. "h)"
-    elseif tk == "IGUI_PhunMart_Cond_WorldAgeMax" then
-        return "World too old (max " .. (a[1] or "?") .. "h)"
-    elseif tk == "IGUI_PhunMart_Cond_PerkLevelMin" then
-        return (a[1] or "Perk") .. " lv." .. (a[2] or "?") .. "+ (have " .. (a[3] or "0") .. ")"
-    elseif tk == "IGUI_PhunMart_Cond_PerkLevelMax" then
-        return (a[1] or "Perk") .. " lv." .. (a[2] or "?") .. " or less"
-    elseif tk == "IGUI_PhunMart_Cond_PerkBoostMin" then
-        return (a[1] or "Perk") .. " boost lv." .. (a[2] or "?") .. "+"
-    elseif tk == "IGUI_PhunMart_Cond_PerkBoostMax" then
-        return (a[1] or "Perk") .. " trait boost too high"
-    elseif tk == "IGUI_PhunMart_Cond_ProfessionIn" then
-        return "Wrong profession"
-    elseif tk == "IGUI_PhunMart_Cond_HasItem" then
-        local itemShort = tostring(a[1] or "?"):match("%.(.+)$") or tostring(a[1] or "?")
-        return "Need " .. itemShort .. " x" .. (a[2] or 1)
+    if tk == "IGUI_PhunMart_Cond_HasItem" then
+        local short = tostring(a[1] or "?"):match("%.(.+)$") or tostring(a[1] or "?")
+        return getText(tk, short, tostring(a[2] or 1))
     elseif tk == "IGUI_PhunMart_Cond_PurchaseMax" then
-        local max = a[3]
-        if max == 1 then
-            return "Already purchased"
-        else
-            return "Limit reached (" .. (a[2] or "?") .. "/" .. (max or "?") .. ")"
-        end
+        if (a[3] or 0) == 1 then return getText("IGUI_PhunMart_Cond_PurchaseMaxOnce") end
+        return getText(tk, tostring(a[2] or "?"), tostring(a[3] or "?"))
     elseif tk == "IGUI_PhunMart_Cond_PurchaseCooldown" then
-        return "Cooldown: " .. math.ceil(a[2] or 0) .. "s remaining"
-    elseif tk == "IGUI_PhunMart_Cond_AlreadyHasTrait" then
-        return "Already have: " .. Traits.getLabel(tostring(a[1] or "?"))
-    elseif tk == "IGUI_PhunMart_Cond_DoesNotHaveTrait" then
-        return "Missing: " .. Traits.getLabel(tostring(a[1] or "?"))
+        return getText(tk, tostring(math.ceil(a[2] or 0)))
+    elseif tk == "IGUI_PhunMart_Cond_AlreadyHasTrait"
+        or tk == "IGUI_PhunMart_Cond_DoesNotHaveTrait" then
+        return getText(tk, Traits.getLabel(tostring(a[1] or "?")))
     elseif tk == "IGUI_PhunMart_Cond_TraitMutex" then
-        return "Conflicts with: " .. Traits.getLabel(tostring(a[2] or "?"))
-    elseif tk == "IGUI_PhunMart_Cond_TraitDisabledMP" then
-        return "Not available in multiplayer"
+        return getText(tk, Traits.getLabel(tostring(a[2] or "?")))
+    elseif tk == "IGUI_PhunMart_Cond_TraitKeyMissing"
+        or tk == "IGUI_PhunMart_Cond_TraitDisabledMP" then
+        return getText(tk)
     elseif tk == "IGUI_PhunMart_Cond_BoundTokensBelowMax" then
-        return "Token storage full (" .. (a[2] or "?") .. "/" .. (a[1] or "?") .. ")"
-    elseif tk == "IGUI_PhunMart_Cond_AnyGroupFail" then
-        return "No valid options"
-    else
-        return failure.condKey or tk or "Condition failed"
+        return getText(tk, tostring(a[2] or "?"), tostring(a[1] or "?"))
+    elseif tk ~= "" then
+        return getText(tk, tostring(a[1] or ""), tostring(a[2] or ""), tostring(a[3] or ""))
     end
+    return getText("IGUI_PhunMart_Cond_Failed", failure.condKey or "?")
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
