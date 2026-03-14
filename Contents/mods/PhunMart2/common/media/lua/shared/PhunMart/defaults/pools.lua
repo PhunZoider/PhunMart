@@ -5,7 +5,7 @@ return {
     -- =========================================================
     pool_goodphoods = {
         defaults = {
-            price = "coin_5"
+            price = "coin_25"
         },
         sources = {
             groups = {"food_fresh", "food_cooking_utensils"}
@@ -24,8 +24,7 @@ return {
     -- =========================================================
     pool_phatphoods = {
         defaults = {
-            price = "coin_5",
-            conditions = "oneTimePurchase"
+            price = "coin_10"
         },
         sources = {
             groups = {"food_junk", "food_alcohol"}
@@ -111,7 +110,9 @@ return {
     -- WrentAWreck  (vehicles - one pool per tier)
     -- =========================================================
     pool_vehicles_budget = {
-        zones = { difficulty = {1, 2} },
+        zones = {
+            difficulty = {1, 2}
+        },
         sources = {
             groups = {"vehicles_small", "vehicles_vans"}
         },
@@ -124,7 +125,9 @@ return {
         }
     },
     pool_vehicles_standard = {
-        zones = { difficulty = {2, 3} },
+        zones = {
+            difficulty = {2, 3}
+        },
         sources = {
             groups = {"vehicles_normal", "vehicles_trucks", "vehicles_4x4"}
         },
@@ -137,7 +140,9 @@ return {
         }
     },
     pool_vehicles_premium = {
-        zones = { difficulty = {4, 5} },
+        zones = {
+            difficulty = {4}
+        },
         sources = {
             groups = {"vehicles_luxury"}
         },
@@ -228,20 +233,34 @@ return {
     },
 
     -- =========================================================
-    -- CSVPharmacy  (medical supplies)
+    -- CSVPharmacy  (medical supplies — basic + rare tiers)
+    -- basic: common first aid, all zones, coin_low
+    -- rare:  prescription/controlled drugs, zones 2+, coin_mid
     -- =========================================================
-    pool_csvpharmacy = {
-        defaults = {
-            price = "coin_mid"
-        },
+    pool_csvpharmacy_basic = {
         sources = {
-            groups = {"medical_all"}
+            groups = {"medical_basic"}
         },
         roll = {
             mode = "weighted",
             count = {
-                min = 5,
-                max = 8
+                min = 4,
+                max = 7
+            }
+        }
+    },
+    pool_csvpharmacy_rare = {
+        zones = {
+            difficulty = {2, 3, 4}
+        },
+        sources = {
+            groups = {"medical_rare"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 1,
+                max = 3
             }
         }
     },
@@ -305,19 +324,18 @@ return {
 
     -- =========================================================
     -- Collectors  (buyback machine: items → bound tokens)
-    -- Players bring scrap/valuables; the machine pays out bound tokens.
-    -- boundTokensBelowMax condition is set per-group via reward defaults
-    -- (see token_collector_* reward templates in rewards.lua).
+    -- 4 tiers weighted by in-world rarity. Higher tiers appear less often
+    -- on the grid and pay more bound tokens per transaction.
     -- =========================================================
     pool_collectors = {
         sources = {
-            groups = {"collectors_scrap", "collectors_valuables"}
+            groups = {"collectors_junk", "collectors_curios", "collectors_rare", "collectors_legendary"}
         },
         roll = {
             mode = "weighted",
             count = {
-                min = 6,
-                max = 10
+                min = 1,
+                max = 3
             }
         }
     },
@@ -325,8 +343,18 @@ return {
     -- =========================================================
     -- XPerience  (XP grants - one pool per tier, sources use reward category)
     -- Defined in PhunMart_XP_Items.lua and PhunMart_XP_Conditions.lua
+    --
+    -- Zone difficulty gating (requires PhunZones):
+    --   Zone 1       → budget only          (+1 level grants)
+    --   Zone 2       → budget + gifted mix  (+1/+2)
+    --   Zone 3       → gifted + luxury mix  (+2/+3)
+    --   Zone 4     → luxury only          (+3 level grants)
+    -- Unzoned locations get all tiers (permissive fallback).
     -- =========================================================
     pool_xp_budget = {
+        zones = {
+            difficulty = {1, 2}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
@@ -341,6 +369,9 @@ return {
         }
     },
     pool_xp_gifted = {
+        zones = {
+            difficulty = {2, 3}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
@@ -355,6 +386,9 @@ return {
         }
     },
     pool_xp_luxury = {
+        zones = {
+            difficulty = {3, 4}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
@@ -369,6 +403,9 @@ return {
         }
     },
     pool_boost_budget = {
+        zones = {
+            difficulty = {1, 2}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
@@ -383,6 +420,9 @@ return {
         }
     },
     pool_boost_gifted = {
+        zones = {
+            difficulty = {2, 3}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
@@ -397,6 +437,9 @@ return {
         }
     },
     pool_boost_luxury = {
+        zones = {
+            difficulty = {3, 4}
+        },
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
@@ -412,39 +455,118 @@ return {
     },
 
     -- =========================================================
-    -- HardWear  (clothing, protective gear)
+    -- HardWear  (clothing — civilian + protective, split by rarity)
+    -- clothing:   all zones, coin_low  ($2.50–$6)
+    -- protective: zones 2+, coin_mid  ($10–$12)  — police/military gear
+    --   (zone 1 exclusion: protective gear not found in the safest areas)
     -- =========================================================
-    pool_hardwear = {
-        defaults = {
-            price = "coin_low"
-        },
+    pool_hardwear_clothing = {
         sources = {
-            groups = {"clothing_all", "protective_gear"}
-        },
-        roll = {
-            mode = "weighted",
-            count = {
-                min = 5,
-                max = 8
-            }
-        }
-    },
-
-    -- =========================================================
-    -- ShedsAndCommoners  (skill books, magazines)
-    -- =========================================================
-    pool_shedsandcommoners = {
-        defaults = {
-            price = "coin_mid"
-        },
-        sources = {
-            groups = {"skill_books_all"}
+            groups = {"clothing_all"}
         },
         roll = {
             mode = "weighted",
             count = {
                 min = 4,
                 max = 7
+            }
+        }
+    },
+    pool_hardwear_protective = {
+        zones = {
+            difficulty = {2, 3, 4}
+        },
+        sources = {
+            groups = {"protective_gear"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 4
+            }
+        }
+    },
+
+    -- =========================================================
+    -- ShedsAndCommoners  (skill books by volume tier + misc literature)
+    -- Zone difficulty gating mirrors BudgetXPerience pattern:
+    --   Zone 1       → t1 only          (Vol 1, levels 1-2)
+    --   Zone 2       → t1 + t2 mix      (Vol 1-2, levels 1-4)
+    --   Zone 3       → t2 + t3 mix      (Vol 2-3, levels 3-6)
+    --   Zone 4       → t3 + t4 mix      (Vol 3-5, levels 5-10)
+    --   Zone 5       → t4 only          (Vol 4-5, levels 7-10)
+    -- Misc (Literature, RecipeResource) available in all zones.
+    -- =========================================================
+    pool_shedsandcommoners_t1 = {
+        zones = {
+            difficulty = {1, 2}
+        },
+        sources = {
+            groups = {"skill_books_t1"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 4
+            }
+        }
+    },
+    pool_shedsandcommoners_t2 = {
+        zones = {
+            difficulty = {2, 3}
+        },
+        sources = {
+            groups = {"skill_books_t2"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 4
+            }
+        }
+    },
+    pool_shedsandcommoners_t3 = {
+        zones = {
+            difficulty = {3, 4}
+        },
+        sources = {
+            groups = {"skill_books_t3"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 3
+            }
+        }
+    },
+    pool_shedsandcommoners_t4 = {
+        zones = {
+            difficulty = {4}
+        },
+        sources = {
+            groups = {"skill_books_t4"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 1,
+                max = 3
+            }
+        }
+    },
+    pool_shedsandcommoners_misc = {
+        sources = {
+            groups = {"skill_books_misc"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 3
             }
         }
     }

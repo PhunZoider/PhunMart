@@ -6,7 +6,7 @@ return {
 
     food_fresh = {
         defaults = {
-            price = "coin_5",
+            price = "coin_25",
             offer = {
                 weight = 1.0
             }
@@ -49,7 +49,7 @@ return {
 
     food_cooking_utensils = {
         defaults = {
-            price = "coin_10",
+            price = "coin_50",
             offer = {
                 weight = 0.5
             }
@@ -65,7 +65,7 @@ return {
 
     food_junk = {
         defaults = {
-            price = "coin_5",
+            price = "coin_10",
             offer = {
                 weight = 1.0
             }
@@ -197,15 +197,35 @@ return {
     -- CSVPharmacy  (medical)
     -- =========================================================
 
-    medical_all = {
+    -- Common first aid supplies: bandages, antiseptic, sutures, painkillers, etc.
+    -- Rare prescription drugs (Antibiotics, Antidepressants, etc.) are blacklisted
+    -- here and handled separately in medical_rare at a higher price tier.
+    medical_basic = {
         defaults = {
-            price = "coin_mid",
-            offer = {
-                weight = 1.0
-            }
+            price = "coin_low",
+            offer = { weight = 1.0 }
         },
         include = {
             categories = {"FirstAid", "FirstAidWeapon"}
+        },
+        blacklist = {
+            "Antibiotics", "Antidepressants", "BetaBlockers", "SleepingTablets",
+            "Morphine", "Heroin",
+        }
+    },
+
+    -- Prescription/controlled drugs — genuinely rare in PZ loot.
+    -- Zone-gated to zones 2+ (see pool def); price is coin_mid.
+    medical_rare = {
+        defaults = {
+            price = "coin_mid",
+            offer = { weight = 0.7 }
+        },
+        include = {
+            items = {
+                "Antibiotics", "Antidepressants", "BetaBlockers", "SleepingTablets",
+                "Morphine", "Heroin",
+            }
         }
     },
 
@@ -337,16 +357,66 @@ return {
     -- ShedsAndCommoners  (books, literature, recipe magazines)
     -- =========================================================
 
-    skill_books_all = {
-        defaults = {
-            price = "coin_mid",
-            offer = {
-                weight = 1.0
-            }
-        },
-        include = {
-            categories = {"SkillBook", "Literature", "RecipeResource"}
-        }
+    -- =========================================================
+    -- ShedsAndCommoners  (skill books by volume tier + misc literature)
+    -- Skill books: 25 skills × 5 volumes (Vol 1=lvl1-2, 2=3-4, 3=5-6, 4=7-8, 5=9-10)
+    -- Zone-gated via pool defs: t1 in easy zones, t4 in hard zones.
+    -- =========================================================
+
+    skill_books_t1 = {
+        defaults = { price = "change_50",  offer = { weight = 1.0 } },
+        include = { items = {
+            "BookAiming1", "BookBlacksmith1", "BookButchering1", "BookCarpentry1", "BookCarving1",
+            "BookCooking1", "BookElectrician1", "BookFancy1", "BookFarming1", "BookFirstAid1",
+            "BookFishing1", "BookFlintKnapping1", "BookForaging1", "BookGlassmaking1", "BookHusbandry1",
+            "BookLongBlade1", "BookMaintenance1", "BookMasonry1", "BookMechanic1", "BookMetalWelding1",
+            "BookPottery1", "BookReloading1", "BookTailoring1", "BookTracking1", "BookTrapping1",
+        }}
+    },
+
+    skill_books_t2 = {
+        defaults = { price = "change_100", offer = { weight = 1.0 } },
+        include = { items = {
+            "BookAiming2", "BookBlacksmith2", "BookButchering2", "BookCarpentry2", "BookCarving2",
+            "BookCooking2", "BookElectrician2", "BookFancy2", "BookFarming2", "BookFirstAid2",
+            "BookFishing2", "BookFlintKnapping2", "BookForaging2", "BookGlassmaking2", "BookHusbandry2",
+            "BookLongBlade2", "BookMaintenance2", "BookMasonry2", "BookMechanic2", "BookMetalWelding2",
+            "BookPottery2", "BookReloading2", "BookTailoring2", "BookTracking2", "BookTrapping2",
+        }}
+    },
+
+    skill_books_t3 = {
+        defaults = { price = "change_200", offer = { weight = 1.0 } },
+        include = { items = {
+            "BookAiming3", "BookBlacksmith3", "BookButchering3", "BookCarpentry3", "BookCarving3",
+            "BookCooking3", "BookElectrician3", "BookFancy3", "BookFarming3", "BookFirstAid3",
+            "BookFishing3", "BookFlintKnapping3", "BookForaging3", "BookGlassmaking3", "BookHusbandry3",
+            "BookLongBlade3", "BookMaintenance3", "BookMasonry3", "BookMechanic3", "BookMetalWelding3",
+            "BookPottery3", "BookReloading3", "BookTailoring3", "BookTracking3", "BookTrapping3",
+        }}
+    },
+
+    skill_books_t4 = {
+        defaults = { price = "change_500", offer = { weight = 1.0 } },
+        include = { items = {
+            -- Vol 4 (levels 7-8)
+            "BookAiming4", "BookBlacksmith4", "BookButchering4", "BookCarpentry4", "BookCarving4",
+            "BookCooking4", "BookElectrician4", "BookFancy4", "BookFarming4", "BookFirstAid4",
+            "BookFishing4", "BookFlintKnapping4", "BookForaging4", "BookGlassmaking4", "BookHusbandry4",
+            "BookLongBlade4", "BookMaintenance4", "BookMasonry4", "BookMechanic4", "BookMetalWelding4",
+            "BookPottery4", "BookReloading4", "BookTailoring4", "BookTracking4", "BookTrapping4",
+            -- Vol 5 (levels 9-10)
+            "BookAiming5", "BookBlacksmith5", "BookButchering5", "BookCarpentry5", "BookCarving5",
+            "BookCooking5", "BookElectrician5", "BookFancy5", "BookFarming5", "BookFirstAid5",
+            "BookFishing5", "BookFlintKnapping5", "BookForaging5", "BookGlassmaking5", "BookHusbandry5",
+            "BookLongBlade5", "BookMaintenance5", "BookMasonry5", "BookMechanic5", "BookMetalWelding5",
+            "BookPottery5", "BookReloading5", "BookTailoring5", "BookTracking5", "BookTrapping5",
+        }}
+    },
+
+    skill_books_misc = {
+        defaults = { price = "change_25", offer = { weight = 0.7 } },
+        include = { categories = {"Literature", "RecipeResource"} }
     },
 
     -- =========================================================
@@ -510,34 +580,110 @@ return {
 
     -- =========================================================
     -- Collectors  (items the machine buys from players → bound tokens)
-    -- Each entry here becomes one offer slot: bring N of this item, receive tokens.
-    -- Add items players commonly loot that have trade value. Keep the list
-    -- manageable — too many slots makes the grid feel sparse on restock.
+    -- Tiered by in-world spawn rarity (from ProceduralDistributions + Distributions).
+    -- t1 = junk/curios (1 token), t2 = rare (2 tokens), t3 = legendary (3 tokens)
     -- =========================================================
 
-    collectors_scrap = {
+    -- Tier 1a: Junk — abundant toys/games (weight >100). Bring 3 → 1 token.
+    collectors_junk = {
         defaults = {
-            price = "self_5",
-            reward = "token_collector_common",
-            offer = {
-                weight = 1.0
-            }
+            price = "self_3",
+            reward = "token_collector_t1",
+            offer = { weight = 1.0 }
         },
         include = {
-            categories = {"Memento"}
+            items = {
+                "Dice_00", "Dice_4", "Dice_6", "Dice_8", "Dice_10", "Dice_12", "Dice_20",
+                "ToyCar", "ToyPlane", "Doll", "Yoyo", "Bricktoys", "Cube",
+                "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox",
+            }
         }
     },
 
-    collectors_valuables = {
+    -- Tier 1b: Curios — common collectibles and antiques (weight 5-100). Bring 2 → 1 token.
+    collectors_curios = {
         defaults = {
-            price = "self_1",
-            reward = "token_collector_rare",
-            offer = {
-                weight = 0.6
-            }
+            price = "self_2",
+            reward = "token_collector_t1",
+            offer = { weight = 0.8 }
         },
         include = {
-            categories = {"Memento"}
+            items = {
+                -- Gemstones (thematically valuable despite common spawn)
+                "Ruby", "Sapphire", "Emerald", "Diamond",
+                -- Vessels and antiques
+                "Goblet", "Goblet_Wood", "Locket", "Pocketwatch", "Crystal_Large",
+                -- Trophies and medals
+                "TrophyBronze", "TrophySilver", "TrophyGold",
+                "Medal_Bronze", "Medal_Silver", "Medal_Gold",
+                -- Curiosities
+                "SnowGlobe", "TarotCardDeck", "OujaBoard", "MilitaryMedal", "SuspiciousPackage",
+                "Katana_Handle",
+                -- Specimen jars
+                "Specimen_Minerals", "Specimen_Brain", "Specimen_Tapeworm",
+                "Specimen_MonkeyHead", "Specimen_FetalPiglet", "Specimen_FetalLamb",
+                "Specimen_FetalCalf", "Specimen_Octopus",
+                -- Skulls
+                "Hominid_Skull", "Hominid_Skull_Partial", "Hominid_Skull_Fragment",
+            }
+        }
+    },
+
+    -- Tier 2: Rare — scarce items (weight <5, naturally spawnable). Bring 1 → 2 tokens.
+    collectors_rare = {
+        defaults = {
+            price = "self_1",
+            reward = "token_collector_t2",
+            offer = { weight = 0.5 }
+        },
+        include = {
+            items = {
+                -- Fine vessels
+                "Crystal", "Goblet_Silver", "Goblet_Gold",
+                -- Character portraits (weight ~0.23 each)
+                "BobPic", "CaseyPic", "ChrisPic", "HankPic",
+                "JamesPic", "KatePic", "MariannePic", "CortmanPic",
+                -- Rare wearables
+                "Hat_ArmyWWII", "Hat_Stovepipe_UncleSam",
+                "Glasses_MonocleLeft", "Glasses_Cosmetic_MonocleLeft",
+                -- Novelties
+                "Necklace_Teeth", "KeyRing_Spiffos", "Lunchbox2",
+                -- Halloween masks (weight ~2.4 each, seasonal)
+                "Hat_HalloweenMaskWitch", "Hat_HalloweenMaskVampire",
+                "Hat_HalloweenMaskSkeleton", "Hat_HalloweenMaskPumpkin",
+                "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil",
+                "Hat_Witch",
+            }
+        }
+    },
+
+    -- Tier 3: Legendary — near-zero or zero spawn weight; event/admin drops. Bring 1 → 3 tokens.
+    collectors_legendary = {
+        defaults = {
+            price = "self_1",
+            reward = "token_collector_t3",
+            offer = { weight = 0.2 }
+        },
+        include = {
+            items = {
+                -- Band merchandise (weight ~0.03)
+                "Jacket_LeatherWildRacoons", "Jacket_LeatherIronRodent", "Jacket_LeatherBarrelDogs",
+                "Vest_Leather_WildRaccoons", "Vest_Leather_IronRodents", "Vest_Leather_BarrelDogs",
+                "Vest_Leather_Biker", "Vest_Leather_Veteran",
+                -- Ultra-rare event / loot (weight <0.01 or not in tables)
+                "HalloweenCandyBucket", "KeyRing_StinkyFace",
+                "Amethyst", "SilverCoin", "GoldCoin",
+                "RatKing", "LargeMeteorite",
+                -- Spiffo collectibles (zero spawn — admin/event only)
+                "SpiffoSuit", "Hat_Spiffo", "Hat_Jay", "Hat_GoldStar", "HobbyHorse",
+                "Hat_Cowboy_Plastic",
+                "Hat_BaseballCap_Spiffos", "Hat_BaseballCap_Spiffos_Reverse",
+                "Hat_BaseballCap_SpiffosLogo", "Hat_BaseballCap_SpiffosLogo_Reverse",
+                -- Racing keyrings (zero spawn — admin/event only)
+                "KeyRing_Racing12", "KeyRing_Racing34", "KeyRing_Racing58",
+                -- Dog tags (zero spawn variants)
+                "Necklace_DogTag_Male", "Necklace_DogTag_Female",
+            }
         }
     },
 

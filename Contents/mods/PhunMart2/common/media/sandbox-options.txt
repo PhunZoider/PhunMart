@@ -67,7 +67,7 @@ option PhunMart.ChangeCapCents
 option PhunMart.TokenCap
 {
     type = integer,
-    default = 99,
+    default = 60,
     min = 0,
     max = 9999,
     page = PhunMart,

@@ -1028,8 +1028,9 @@ return {
     -- ── Collector rewards (grantBoundTokens) ─────────────────────────────────
     -- Used by collector pools. The displayed item IS the price; the reward is
     -- bound tokens credited to the player's wallet (survives death).
+    -- t1 = junk/curios (1 token), t2 = rare (2 tokens), t3 = legendary (3 tokens)
 
-    token_collector_common = {
+    token_collector_t1 = {
         kind = "collector",
         display = {
             texture = "media/textures/icons/token.png"
@@ -1040,14 +1041,25 @@ return {
         }}
     },
 
-    token_collector_rare = {
+    token_collector_t2 = {
         kind = "collector",
         display = {
             texture = "media/textures/icons/token.png"
         },
         actions = {{
             type = "grantBoundTokens",
-            amount = 1
+            amount = 2
+        }}
+    },
+
+    token_collector_t3 = {
+        kind = "collector",
+        display = {
+            texture = "media/textures/icons/token.png"
+        },
+        actions = {{
+            type = "grantBoundTokens",
+            amount = 3
         }}
     }
 

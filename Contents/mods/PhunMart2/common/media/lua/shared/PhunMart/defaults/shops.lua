@@ -133,8 +133,11 @@ return {
         unpoweredSprites = {"phunmart_02_12", "phunmart_02_13", "phunmart_02_14", "phunmart_02_15"},
         poolSets = {{
             keys = {{
-                key = "pool_csvpharmacy",
+                key = "pool_csvpharmacy_basic",
                 weight = 1.0
+            }, {
+                key = "pool_csvpharmacy_rare",
+                weight = 0.8
             }}
         }}
     },
@@ -220,8 +223,11 @@ return {
         unpoweredSprites = {"phunmart_03_4", "phunmart_03_5", "phunmart_03_6", "phunmart_03_7"},
         poolSets = {{
             keys = {{
-                key = "pool_hardwear",
+                key = "pool_hardwear_clothing",
                 weight = 1.0
+            }, {
+                key = "pool_hardwear_protective",
+                weight = 0.8
             }}
         }}
     },
@@ -234,8 +240,20 @@ return {
         unpoweredSprites = {"phunmart_03_28", "phunmart_03_29", "phunmart_03_30", "phunmart_03_31"},
         poolSets = {{
             keys = {{
-                key = "pool_shedsandcommoners",
+                key = "pool_shedsandcommoners_t1",
                 weight = 1.0
+            }, {
+                key = "pool_shedsandcommoners_t2",
+                weight = 1.0
+            }, {
+                key = "pool_shedsandcommoners_t3",
+                weight = 1.0
+            }, {
+                key = "pool_shedsandcommoners_t4",
+                weight = 1.0
+            }, {
+                key = "pool_shedsandcommoners_misc",
+                weight = 0.8
             }}
         }}
     },

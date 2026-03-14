@@ -19,8 +19,9 @@ that you can override without touching the mod itself.
 9. [Pools](#9-pools)
 10. [Shops](#10-shops)
 11. [Token Rewards](#11-token-rewards)
-12. [Reference: condition tests](#12-reference-condition-tests)
-13. [Reference: reward kinds](#13-reference-reward-kinds)
+12. [Item Blacklist](#12-item-blacklist)
+13. [Reference: condition tests](#13-reference-condition-tests)
+14. [Reference: reward kinds](#14-reference-reward-kinds)
 
 ---
 
@@ -358,7 +359,7 @@ Only one level of inheritance is supported.
 | `boost`   | Applies a temporary XP multiplier. Uses `type = "applyBoost"`.      |
 | `vehicle` | Spawns a vehicle nearby. Uses `type = "spawnVehicle"`.              |
 
-See [Reference: reward kinds](#13-reference-reward-kinds) for full action schemas.
+See [Reference: reward kinds](#14-reference-reward-kinds) for full action schemas.
 
 ### Display overrides
 
@@ -417,7 +418,7 @@ return {
 }
 ```
 
-See [Reference: condition tests](#12-reference-condition-tests) for all available tests.
+See [Reference: condition tests](#13-reference-condition-tests) for all available tests.
 
 ---
 
@@ -619,6 +620,27 @@ return {
 | `roll.count.max`     | Maximum number of offers to show                      |
 | `fallbackTexture`    | Icon to use when an offer has no icon                 |
 | `fallbackCategory`   | Category label shown in the shop details panel        |
+| `zones.difficulty`   | Optional array of allowed zone difficulty values (1–5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). If omitted the pool is always eligible. Machines in unzoned areas also pass the filter. |
+
+#### Zone difficulty filtering
+
+If PhunZones is installed, you can restrict a pool to specific difficulty tiers:
+
+```lua
+pool_weapons_advanced = {
+    zones = {
+        difficulty = { 3, 4, 5 }   -- only eligible in mid-to-hard zones
+    },
+    sources = { ... },
+    roll    = { ... }
+}
+```
+
+The filter applies at two points:
+1. **Placement time** — a shop will only be placed at a location if at least one of its pools passes the zone filter for that position.
+2. **Restock time** — only pools that pass the zone filter for the machine's position are included in that restock's offer build.
+
+Pools without a `zones` field, machines in unzoned areas, and servers without PhunZones installed all behave permissively — every pool is eligible.
 
 ---
 
@@ -686,6 +708,9 @@ return {
 | `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered            |
 | `defaultView`      | `"grid"` (default) or `"list"` — layout mode for the shop UI               |
 | `poolSets`         | Array of pool sets. Each set has a `keys` array of `{key, weight}` entries |
+| `probability`      | Relative weight in the placement lottery (default `1`). Set to `0` to disable automatic placement. Higher values make the shop appear more often. |
+| `minDistance`      | Minimum tile distance from any other machine of the same shop type (overrides `DefaultDistance` sandbox setting). Useful for keeping rare shops spread across the map. |
+| `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only — e.g. `168` for weekly. |
 
 **Pool sets vs pool keys:**
 A shop selects one pool _set_ at runtime (first set is always used currently; zone gating
@@ -743,7 +768,37 @@ return {
 
 ---
 
-## 12. Reference: condition tests
+## 12. Item Blacklist
+
+The blacklist lets admins exclude specific items from all shop pools without editing any config
+file. Blacklisted items are filtered out at restock time — they will not appear as offers in
+any pool, regardless of which group sourced them.
+
+### Via the in-game UI
+
+Open any shop as an admin. Click the gear icon (admin panel) → **Pool Viewer**. Right-click any
+item row → **Add to blacklist**. The row greys out immediately and the exclusion takes effect on
+the next restock.
+
+### Via override file
+
+`PhunMart2_Items.lua` — set the item's `blacklisted` field to `true`:
+
+```lua
+return {
+    -- Prevent katanas from appearing in any shop
+    ["Base.Katana"] = {
+        blacklisted = true
+    },
+}
+```
+
+The blacklist is stored server-side and persists across restarts. Removing an entry from the
+override file (or setting `blacklisted = false`) re-enables the item on next restock.
+
+---
+
+## 13. Reference: condition tests
 
 | `test`                 | Args                                | Description                         |
 | ---------------------- | ----------------------------------- | ----------------------------------- |
@@ -753,6 +808,7 @@ return {
 | `professionIn`         | `professions` (array of strings)    | Player's starting profession key    |
 | `purchaseCountMax`     | `max`, `scope`                      | Limits repeat purchases             |
 | `hasItems`             | `items` (array of `{item, amount}`) | Player must have items in inventory |
+| `boundTokensBelowMax`  | _(none)_                            | Passes only if the player's bound token balance is below the server cap. Used to gate token-granting offers so players can't earn tokens they can't hold. |
 
 ### purchaseCountMax scopes
 
@@ -775,7 +831,7 @@ Use `/dumppz perks` (admin command) to get the full list for your server.
 
 ---
 
-## 13. Reference: reward kinds
+## 14. Reference: reward kinds
 
 ### `kind = "item"` — spawn an item
 

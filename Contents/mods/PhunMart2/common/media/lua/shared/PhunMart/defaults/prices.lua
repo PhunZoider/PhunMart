@@ -225,6 +225,10 @@ return {
         kind = "self",
         amount = 1
     },
+    self_2 = {
+        kind = "self",
+        amount = 2
+    },
     self_3 = {
         kind = "self",
         amount = 3
