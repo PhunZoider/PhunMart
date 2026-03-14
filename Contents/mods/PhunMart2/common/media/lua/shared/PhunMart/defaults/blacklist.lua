@@ -1,7 +1,9 @@
 return {
     items = {
         exclude = {
-            xp_FlintKnapping_t1 = true
+            ["Base.xp_FlintKnapping_t1"] = true,
+            ["Base.BandageDirty"] = true,
+            ["Base.AntibioticsBox"] = true
         }
     }
 }

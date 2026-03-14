@@ -75,8 +75,10 @@ function UI:createChildren()
     local padding = 10
     local x = 0
     local y = 0
+
     self.controls = {}
-    local filtersPanel = ISPanel:new(0, self.height - 100, self.width, 100);
+    local filtersPanelH = LABEL_HGT + BUTTON_HGT + padding * 3
+    local filtersPanel = ISPanel:new(0, self.height - filtersPanelH, self.width, filtersPanelH);
     filtersPanel.drawBorder = false
     filtersPanel:initialise();
     filtersPanel:instantiate();
@@ -96,13 +98,15 @@ function UI:createChildren()
         rightClick = self.rightClick
     })
 
+    list.drawBorder = false
     self.controls.list = list
     self:addChild(list)
 
     local lblFilter = tools.getLabel("Filter", padding, padding)
     filtersPanel:addChild(lblFilter)
 
-    local filter = ISTextEntryBox:new("", padding, y, filtersPanel.width - 200, BUTTON_HGT);
+    local inputY = padding + FONT_HGT_SMALL + padding
+    local filter = ISTextEntryBox:new("", padding, inputY, filtersPanel.width - 200, BUTTON_HGT);
     filter.onTextChange = function()
         self:refreshData()
     end
@@ -116,7 +120,7 @@ function UI:createChildren()
     local lblFilterCategory = tools.getLabel("Category", filtersPanel.width - x - left, padding)
     filtersPanel:addChild(lblFilterCategory)
     self.controls.lblFilterCategory = lblFilterCategory
-    local filterCategory = ISComboBox:new(left, y, filtersPanel.width - x - left, FONT_HGT_MEDIUM, self, function()
+    local filterCategory = ISComboBox:new(left, inputY, filtersPanel.width - x - left, FONT_HGT_MEDIUM, self, function()
         self:refreshData()
     end);
     filterCategory:initialise();
