@@ -527,7 +527,7 @@ return {
     -- Broad category with unwanted items removed
     food_fresh = {
         defaults = {
-            price = "coin_5",
+            price = "coin_xlow",
             offer = { weight = 1.0 }
         },
         include = {
@@ -610,16 +610,16 @@ return {
 
 ### Pool fields
 
-| Field                | Description                                           |
-| -------------------- | ----------------------------------------------------- |
-| `defaults.price`     | Price key applied to every item drawn from this pool  |
-| `sources.groups`     | Array of Group keys to pull items from                |
-| `sources.categories` | Array of reward category strings to pull rewards from |
-| `roll.mode`          | `"weighted"` (only mode currently supported)          |
-| `roll.count.min`     | Minimum number of offers to show                      |
-| `roll.count.max`     | Maximum number of offers to show                      |
-| `fallbackTexture`    | Icon to use when an offer has no icon                 |
-| `fallbackCategory`   | Category label shown in the shop details panel        |
+| Field                | Description                                                                                                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaults.price`     | Price key applied to every item drawn from this pool                                                                                                                                                           |
+| `sources.groups`     | Array of Group keys to pull items from                                                                                                                                                                         |
+| `sources.categories` | Array of reward category strings to pull rewards from                                                                                                                                                          |
+| `roll.mode`          | `"weighted"` (only mode currently supported)                                                                                                                                                                   |
+| `roll.count.min`     | Minimum number of offers to show                                                                                                                                                                               |
+| `roll.count.max`     | Maximum number of offers to show                                                                                                                                                                               |
+| `fallbackTexture`    | Icon to use when an offer has no icon                                                                                                                                                                          |
+| `fallbackCategory`   | Category label shown in the shop details panel                                                                                                                                                                 |
 | `zones.difficulty`   | Optional array of allowed zone difficulty values (1–5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). If omitted the pool is always eligible. Machines in unzoned areas also pass the filter. |
 
 #### Zone difficulty filtering
@@ -637,6 +637,7 @@ pool_weapons_advanced = {
 ```
 
 The filter applies at two points:
+
 1. **Placement time** — a shop will only be placed at a location if at least one of its pools passes the zone filter for that position.
 2. **Restock time** — only pools that pass the zone filter for the machine's position are included in that restock's offer build.
 
@@ -700,17 +701,17 @@ return {
 
 ### Shop fields
 
-| Field              | Description                                                                |
-| ------------------ | -------------------------------------------------------------------------- |
-| `category`         | Display category shown in admin tools                                      |
-| `background`       | PNG file name from `media/textures/` (no path prefix)                      |
-| `sprites`          | 4-element array of tile sprite names (N/E/S/W facing)                      |
-| `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered            |
-| `defaultView`      | `"grid"` (default) or `"list"` — layout mode for the shop UI               |
-| `poolSets`         | Array of pool sets. Each set has a `keys` array of `{key, weight}` entries |
-| `probability`      | Relative weight in the placement lottery (default `1`). Set to `0` to disable automatic placement. Higher values make the shop appear more often. |
+| Field              | Description                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `category`         | Display category shown in admin tools                                                                                                                                  |
+| `background`       | PNG file name from `media/textures/` (no path prefix)                                                                                                                  |
+| `sprites`          | 4-element array of tile sprite names (N/E/S/W facing)                                                                                                                  |
+| `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered                                                                                                        |
+| `defaultView`      | `"grid"` (default) or `"list"` — layout mode for the shop UI                                                                                                           |
+| `poolSets`         | Array of pool sets. Each set has a `keys` array of `{key, weight}` entries                                                                                             |
+| `probability`      | Relative weight in the placement lottery (default `1`). Set to `0` to disable automatic placement. Higher values make the shop appear more often.                      |
 | `minDistance`      | Minimum tile distance from any other machine of the same shop type (overrides `DefaultDistance` sandbox setting). Useful for keeping rare shops spread across the map. |
-| `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only — e.g. `168` for weekly. |
+| `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only — e.g. `168` for weekly.                |
 
 **Pool sets vs pool keys:**
 A shop selects one pool _set_ at runtime (first set is always used currently; zone gating
@@ -800,14 +801,14 @@ override file (or setting `blacklisted = false`) re-enables the item on next res
 
 ## 13. Reference: condition tests
 
-| `test`                 | Args                                | Description                         |
-| ---------------------- | ----------------------------------- | ----------------------------------- |
-| `worldAgeHoursBetween` | `min`, `max` (optional)             | World age in in-game hours          |
-| `perkLevelBetween`     | `perk`, `min`, `max` (optional)     | Player's current level in a skill   |
-| `perkBoostBetween`     | `perk`, `min`, `max`                | Active XP boost level for a skill   |
-| `professionIn`         | `professions` (array of strings)    | Player's starting profession key    |
-| `purchaseCountMax`     | `max`, `scope`                      | Limits repeat purchases             |
-| `hasItems`             | `items` (array of `{item, amount}`) | Player must have items in inventory |
+| `test`                 | Args                                | Description                                                                                                                                               |
+| ---------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `worldAgeHoursBetween` | `min`, `max` (optional)             | World age in in-game hours                                                                                                                                |
+| `perkLevelBetween`     | `perk`, `min`, `max` (optional)     | Player's current level in a skill                                                                                                                         |
+| `perkBoostBetween`     | `perk`, `min`, `max`                | Active XP boost level for a skill                                                                                                                         |
+| `professionIn`         | `professions` (array of strings)    | Player's starting profession key                                                                                                                          |
+| `purchaseCountMax`     | `max`, `scope`                      | Limits repeat purchases                                                                                                                                   |
+| `hasItems`             | `items` (array of `{item, amount}`) | Player must have items in inventory                                                                                                                       |
 | `boundTokensBelowMax`  | _(none)_                            | Passes only if the player's bound token balance is below the server cap. Used to gate token-granting offers so players can't earn tokens they can't hold. |
 
 ### purchaseCountMax scopes

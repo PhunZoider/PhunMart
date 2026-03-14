@@ -5,87 +5,38 @@ local Core = PhunMart
 Core.fileUtils = require "PhunMart_Server/utils_file"
 Core.instances = {}
 
--- Deep merge: maps are merged recursively; arrays and primitives are replaced by patch.
-local function deepMerge(base, patch)
-    if type(patch) ~= "table" then
-        return patch
-    end
-    if type(base) ~= "table" then
-        return patch
-    end
-    if patch[1] ~= nil then
-        return patch
-    end -- array: replace entirely
-    local result = {}
-    for k, v in pairs(base) do
-        result[k] = v
-    end
-    for k, v in pairs(patch) do
-        if type(v) == "table" and type(result[k]) == "table" and v[1] == nil then
-            result[k] = deepMerge(result[k], v)
-        else
-            result[k] = v
-        end
-    end
-    return result
-end
-
--- Load a baked-in default file from the mod via require.
--- Defaults only change when the mod is updated (restart required), so caching is fine.
-local function loadDefaults(path)
-    local ok, result = pcall(require, path)
-    if not ok then
-        Core.debugLn("Warning: could not load defaults '" .. path .. "': " .. tostring(result))
-        return {}
-    end
-    return result or {}
-end
-
--- Load an optional server-side override file. Returns {} if not present.
+-- Load an optional server-side override file from disk. Returns {} if absent.
+-- Only called server-side; clients never read the filesystem.
 local function loadOverride(filename)
     return Core.fileUtils.loadTable(filename) or {}
 end
 
--- Merge multiple default files (key union, no conflicts expected), then apply
--- multiple override files on top via deep merge.
-local function buildCtx(defaultPaths, overrideNames)
-    local base = {}
-    for _, path in ipairs(defaultPaths) do
-        for k, v in pairs(loadDefaults(path)) do
-            base[k] = v
-        end
-    end
+-- Merge multiple server override files for one category into a single patch table.
+local function overridePatch(filenames)
     local patch = {}
-    for _, name in ipairs(overrideNames) do
+    for _, name in ipairs(filenames) do
         for k, v in pairs(loadOverride(name)) do
             patch[k] = v
         end
     end
-    return deepMerge(base, patch)
+    return patch
 end
 
 function Core.compile()
-
-    local ctx = {
-        prices = buildCtx({"PhunMart/defaults/prices"}, {"PhunMart_Prices.lua"}),
-        rewards = buildCtx({"PhunMart/defaults/rewards", "PhunMart/defaults/xp_rewards"},
-            {"PhunMart_Rewards.lua", "PhunMart_XP_Rewards.lua"}),
-        conditionsDefs = buildCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"},
-            {"PhunMart_Conditions.lua", "PhunMart_XP_Conditions.lua"}),
-        items = buildCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"},
-            {"PhunMart_Items.lua", "PhunMart_XP_Items.lua"}),
-        groups = buildCtx({"PhunMart/defaults/groups"}, {"PhunMart_Groups.lua"}),
-        pools = buildCtx({"PhunMart/defaults/pools"}, {"PhunMart_Pools.lua"}),
-        shops = buildCtx({"PhunMart/defaults/shops"}, {"PhunMart_Shops.lua"})
+    -- Read server override files and store the patch tables.
+    -- These are sent to clients via requestShopDefs so they can recompile locally
+    -- using their own shared defaults + these overrides (no FS access on clients).
+    local overrides = {
+        prices         = overridePatch({"PhunMart_Prices.lua"}),
+        rewards        = overridePatch({"PhunMart_Rewards.lua", "PhunMart_XP_Rewards.lua"}),
+        conditionsDefs = overridePatch({"PhunMart_Conditions.lua", "PhunMart_XP_Conditions.lua"}),
+        items          = overridePatch({"PhunMart_Items.lua", "PhunMart_XP_Items.lua"}),
+        groups         = overridePatch({"PhunMart_Groups.lua"}),
+        pools          = overridePatch({"PhunMart_Pools.lua"}),
+        shops          = overridePatch({"PhunMart_Shops.lua"}),
     }
-
-    local runtime, log = Core.compiler.compileAll(ctx)
-    Core.runtime = runtime
-    Core.shops = runtime.shops -- alias: all Core.shops readers now use compiled data
-    Core:reloadShopDefinitions() -- rebuild spriteToShop from compiled sprites
-    Core.debug("Warn", log.warnings, "Errors", log.errors)
-    return runtime, log
-
+    Core._lastOverrides = overrides
+    return Core.compileWith(overrides)
 end
 
 -- Dispatch a single reward action onto a player. Called once per action after deduction.

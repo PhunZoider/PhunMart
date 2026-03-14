@@ -146,37 +146,6 @@ return {
     },
 
     -- ── Named tiers (used by pool defaults) ──────────────────────────────────
-
-    coin_5 = {
-        kind = "currency",
-        pool = "change",
-        amount = 5 -- $0.05
-    },
-    coin_10 = {
-        kind = "currency",
-        pool = "change",
-        amount = 10 -- $0.10
-    },
-    coin_25 = {
-        kind = "currency",
-        pool = "change",
-        amount = 25 -- $0.25
-    },
-    coin_40 = {
-        kind = "currency",
-        pool = "change",
-        amount = 40 -- $0.40
-    },
-    coin_50 = {
-        kind = "currency",
-        pool = "change",
-        amount = 50 -- $0.50
-    },
-    coin_75 = {
-        kind = "currency",
-        pool = "change",
-        amount = 75 -- $0.75
-    },
     coin_boost = {
         kind = "currency",
         pool = "change",

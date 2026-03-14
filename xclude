@@ -4,4 +4,7 @@ README.txt
 ServerFiles
 Docs
 xclude
+.xcf
+CLAUDE.md
 .claude
+.gitignore

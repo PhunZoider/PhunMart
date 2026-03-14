@@ -2,8 +2,79 @@ version=1
 title=PhunMart 2 [DEV]
 description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
 description=
-description=description=⚠️ DEV BRANCH — Preview build for testing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
+description=description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
 description=playtesting and balancing on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
+description=
+description=[h1]PhunMart[/h1]
+description=
+description=[b]Shop Smart. Shop PhunMart.[/b]
+description=Transform your vending machines into a turnkey server economy for items, skills, traits, vehicles, and more.
+description=
+description=With PhunMart, vending machines become fully configurable shops that server admins can use to create economies, progression systems, perks, events, and entirely new gameplay loops.
+description=
+description=Sell weapons.
+description=Sell skills.
+description=Sell traits.
+description=Sell vehicles.
+description=Sell rewards for rare items.
+description=Sell whatever your server dreams up.
+description=
+description=PhunMart transforms simple vending machines into [b]powerful gameplay systems[/b].
+description=
+description=[h2]Key Features[/h2]
+description=[list]
+description=[*]Sell items, skills, traits, vehicles and more
+description=[*]Supports server currencies and item-based payment
+description=[*]Deep configuration capability, but also works great out of the box
+description=[*]Works in Single Player but designed for multiplayer servers
+description=[*]Works with modded items
+description=[*]Optional integration with PhunZones
+description=[/list]
+description=
+description=[h2]For Players[/h2]
+description=Explore the world and discover machines offering:
+description=[list]
+description=[*]Rare gear and supplies
+description=[*]Skill boosts and XP
+description=[*]Traits and perks
+description=[*]Vehicles
+description=[*]Server currencies and tokens
+description=[*]Fast travel terminals
+description=[/list]
+description=
+description=Each machine can have its own inventory, theme, pricing, and rules.
+description=
+description=What you find in Louisville might be very different from what you find in Riverside.
+description=
+description=[h2]For Server Admins[/h2]
+description=PhunMart lets server operators build deep gameplay systems without writing new mods.
+description=
+description=Create systems such as:
+description=[list]
+description=[*]Custom shops
+description=[*]Server-wide economies
+description=[*]Skill training terminals
+description=[*]Trait trading machines
+description=[*]Vehicle dealerships
+description=[*]Starter hubs and late-game vendors
+description=[*]Seasonal or event shops
+description=[/list]
+description=
+description=Gate purchases behind skills, traits, professions, items, or server progression and design entire economy ecosystems around vending machines.
+description=
+description=[h2]Customisation[/h2]
+description=PhunMart is extremely configurable, but to keep this page readable the full setup and customisation guide lives here:
+description=
+description=[url=https://github.com/PhunZoider/PhunMart]PhunMart Customisation Guide[/url]
+description=
+description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
+description=
+description=[h2]More Phun Mods[/h2]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252660][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url] 
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] 
+description=
+description=Coded with love for the awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
+description=
 tags=Build 42;Items;Multiplayer
 visibility=public

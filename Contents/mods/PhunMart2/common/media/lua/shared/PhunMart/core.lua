@@ -39,6 +39,7 @@ PhunMart = {
         upsertShopDefinition = "PhunMartUpsertShopDefinition",
         getShopDefinition = "PhunMartGetShopDefinition",
         getShopList = "PhunMartGetShopList",
+        getInstanceList = "PhunMartGetInstanceList",
         getShopData = "PhunMartGetShopData",
         requestShopDefs = "PhunMartRequestShopDefs",
         requestLocations = "PhunMartRequestLocations",
@@ -561,5 +562,68 @@ function Core.getAllProfessions(refresh)
         return (a.label or a.type):lower() < (b.label or b.type):lower()
     end)
     return Core.ProfessionsAll
+end
+
+-- ─── Shared compile ───────────────────────────────────────────────────────────
+-- Core.compileWith(overrides) is callable from both server and client.
+-- On the server, Core.compile() in server/main.lua reads override files from
+-- disk and calls this. On the client, the requestShopDefs handler receives the
+-- override tables from the server and calls this — client never touches the FS.
+
+local function _deepMerge(base, patch)
+    if type(patch) ~= "table" then return patch end
+    if type(base) ~= "table" then return patch end
+    if patch[1] ~= nil then return patch end -- array: replace entirely
+    local result = {}
+    for k, v in pairs(base) do result[k] = v end
+    for k, v in pairs(patch) do
+        if type(v) == "table" and type(result[k]) == "table" and v[1] == nil then
+            result[k] = _deepMerge(result[k], v)
+        else
+            result[k] = v
+        end
+    end
+    return result
+end
+
+local function _loadDefaults(path)
+    local ok, result = pcall(require, path)
+    if not ok then
+        Core.debugLn("Warning: could not load defaults '" .. path .. "': " .. tostring(result))
+        return {}
+    end
+    return result or {}
+end
+
+function Core.compileWith(overrides)
+    overrides = overrides or {}
+    Core.compiler = Core.compiler or require "PhunMart/compiler"
+
+    local function mergeCtx(defaultPaths, override)
+        local base = {}
+        for _, path in ipairs(defaultPaths) do
+            for k, v in pairs(_loadDefaults(path)) do
+                base[k] = v
+            end
+        end
+        return _deepMerge(base, override or {})
+    end
+
+    local ctx = {
+        prices         = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
+        rewards        = mergeCtx({"PhunMart/defaults/rewards", "PhunMart/defaults/xp_rewards"}, overrides.rewards),
+        conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"}, overrides.conditionsDefs),
+        items          = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),
+        groups         = mergeCtx({"PhunMart/defaults/groups"}, overrides.groups),
+        pools          = mergeCtx({"PhunMart/defaults/pools"}, overrides.pools),
+        shops          = mergeCtx({"PhunMart/defaults/shops"}, overrides.shops),
+    }
+
+    local runtime, log = Core.compiler.compileAll(ctx)
+    Core.runtime = runtime
+    Core.shops = runtime.shops
+    Core:reloadShopDefinitions()
+    Core.debug("Warn", log.warnings, "Errors", log.errors)
+    return runtime, log
 end
 

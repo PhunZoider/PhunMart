@@ -21,7 +21,6 @@ function UI:refreshAll()
     self.controls.pools:setData(data)
     local title = getTextOrNull("IGUI_PhunMart_Shop_" .. data.type) or data.type or "Locations"
     self:setTitle(title)
-    Core.debug("-----", self.shopType, "----", data, "-----")
 
 end
 
@@ -167,6 +166,37 @@ function UI:createChildren()
     pools:initialise()
     self.controls.pools = pools
     self.controls.tabPanel:addView("Pool Sets", self.controls.pools)
+
+    -- Disable Pool Sets tab (not yet implemented)
+    local tp = self.controls.tabPanel
+    tp.viewList[#tp.viewList].disabled = true
+
+    local _origRender = tp.render
+    tp.render = function(self2)
+        _origRender(self2)
+        for idx, vo in ipairs(self2.viewList) do
+            if vo.disabled then
+                local tx = self2:getTabX(idx, self2.scrollX)
+                local tw = self2.equalTabWidth and self2.maxLength or vo.tabWidth
+                self2:drawRect(tx, 0, tw, self2.tabHeight - 1, 0.55, 0, 0, 0)
+                if self2:getMouseY() >= 0 and self2:getMouseY() < self2.tabHeight and self2:isMouseOver() and
+                    self2:getTabIndexAtX(self2:getMouseX()) == idx then
+                    self2:drawTextCentre("Coming Soon", tx + tw / 2, 3, 0.95, 0.8, 0.4, 1, UIFont.Small)
+                end
+            end
+        end
+    end
+
+    local _origOnMouseDown = tp.onMouseDown
+    tp.onMouseDown = function(self2, x, y)
+        if self2:getMouseY() >= 0 and self2:getMouseY() < self2.tabHeight then
+            local idx = self2:getTabIndexAtX(self2:getMouseX())
+            if idx >= 1 and idx <= #self2.viewList and self2.viewList[idx].disabled then
+                return
+            end
+        end
+        _origOnMouseDown(self2, x, y)
+    end
 
     local btnCancel = ISButton:new(0, 0, tools.BUTTON_WID, tools.BUTTON_HGT, getText("UI_btn_cancel"), self, UI.close)
     btnCancel:initialise()

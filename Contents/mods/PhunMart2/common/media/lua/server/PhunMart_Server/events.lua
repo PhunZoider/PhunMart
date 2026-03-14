@@ -142,8 +142,15 @@ end)
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == Core.name then
+        print("Received command " .. tostring(command) .. " from " .. playerObj:getUsername() .. ": " ..
+                  tostring(command))
+
         if Commands[command] then
+            print("Dispatching command " .. tostring(command) .. " from " .. playerObj:getUsername())
             Commands[command](playerObj, arguments)
+            print("Finished command " .. tostring(command) .. " from " .. playerObj:getUsername())
+        else
+            print("Unknown command " .. tostring(command) .. " from " .. playerObj:getUsername())
         end
     end
 end)

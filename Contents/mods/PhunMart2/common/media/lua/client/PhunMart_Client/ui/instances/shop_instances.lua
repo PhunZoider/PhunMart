@@ -20,40 +20,49 @@ local instances = {}
 
 local pz = nil
 
-function UI:refreshAll()
-
+function UI.setData(player, list)
     if pz == nil then
         pz = PhunZones or false
     end
-    self.controls.list:clear()
 
-    local px, py = self.player:getX(), self.player:getY()
+    local playerIndex = player:getPlayerNum()
+    -- find any open instance for this player
+    local inst = nil
+    for _, v in pairs(instances) do
+        if v.playerIndex == playerIndex then
+            inst = v
+            break
+        end
+    end
+    if not inst then
+        return
+    end
+
+    local px, py = player:getX(), player:getY()
     local data = {}
-    for k, v in pairs(Core.instances or {}) do
-
-        if self.shopKey == nil or self.shopKey == v.key then
+    for _, v in ipairs(list) do
+        if inst.shopKey == nil or inst.shopKey == v.type then
+            local x, y, z = v.x, v.y, v.z or 0
             table.insert(data, {
-                key = k,
-                group = ((Core.defs and Core.defs.shops or Core.shops)[v.key] or {}).category or "NONE",
-                -- texture = v.sprites and v.sprites[1] or nil,
+                key = v.key,
                 location = {
-                    x = v.x,
-                    y = v.y,
-                    z = v.z
+                    x = x,
+                    y = y,
+                    z = z
                 },
-                label = (pz and (pz:getLocation(v.x, v.y).title .. " ") or "") .. "(" .. v.x .. ", " .. v.y .. ")",
-                distance = math.sqrt((v.x - px) ^ 2 + (v.y - py) ^ 2)
+                label = (pz and (pz.getLocation(x, y).title .. " ") or "") .. "(" .. x .. ", " .. y .. ")",
+                distance = math.sqrt((x - px) ^ 2 + (y - py) ^ 2)
             })
         end
-
     end
 
     table.sort(data, function(a, b)
         return a.distance < b.distance
     end)
 
+    inst.controls.list:clear()
     for _, v in ipairs(data) do
-        self.controls.list:addItem(v.label, v)
+        inst.controls.list:addItem(v.label, v)
     end
 end
 
@@ -73,11 +82,14 @@ function UI.open(player, shopKey)
 
     ISLayoutManager.RegisterWindow(profileName, UI, instance)
 
+    instances[playerIndex] = instance
     instance.shopKey = shopKey or nil
     instance:addToUIManager();
     instance:setVisible(true);
     instance:ensureVisible()
-    instance:refreshAll()
+
+    sendClientCommand(Core.name, Core.commands.getInstanceList, {})
+
     return instance;
 end
 
@@ -117,7 +129,7 @@ function UI:new(x, y, width, height, player, playerIndex, shopKey)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    local title = getTextOrNull("IGUI_PhunMart_Shop_" .. shopKey) or shopKey or "Locations"
+    local title = (shopKey and (getTextOrNull("IGUI_PhunMart_Shop_" .. shopKey) or shopKey)) or "Locations"
     o:setTitle(title)
     return o;
 end
@@ -245,8 +257,6 @@ function UI:createChildren()
     btnPort:setEnable(false);
     self.controls.btnPort = btnPort;
     self.controls._controlPanel:addChild(btnPort);
-
-    self:refreshAll()
 end
 
 function UI:prerender()

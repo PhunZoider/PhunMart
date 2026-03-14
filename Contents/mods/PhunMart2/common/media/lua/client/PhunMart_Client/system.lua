@@ -143,11 +143,11 @@ function ClientSystem:checkLocals()
 end
 
 function ClientSystem:prepareShopList(player)
-    self:sendCommand(player or getSpecificPlayer(0), Core.commands.getShopList, {})
+    Core.ui.shop_selector.open(player or getSpecificPlayer(0))
 end
 
-function ClientSystem:openShopList(player, data)
-    Core.ui.shop_selector.open(player or getSpecificPlayer(0), data)
+function ClientSystem:openShopList(player)
+    Core.ui.shop_selector.open(player or getSpecificPlayer(0))
 end
 
 function ClientSystem:prepareOpenShopConfig(player, shopType)

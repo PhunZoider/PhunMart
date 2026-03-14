@@ -21,22 +21,23 @@ local instances = {}
 
 function UI:refreshAll()
     self.controls.list:clear()
-    for _, v in ipairs(self.data or {}) do
-        self.controls.list:addItem(getTextOrNull("IGUI_PhunMart_Shop_" .. v.type) or v.type, {
-            type = v.type,
-            category = v.category or "NONE"
-            -- texture = v.sprites and v.sprites[1] or nil
+    local shops = Core.runtime and Core.runtime.shops or {}
+    for shopType, shopDef in pairs(shops) do
+        self.controls.list:addItem(getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType, {
+            type = shopType,
+            group = shopDef.group or "NONE",
+            enabled = shopDef.enabled ~= false
         })
     end
 end
 
-function UI.open(player, data)
+function UI.open(player)
     local playerIndex = player:getPlayerNum()
     local instance = instances[playerIndex]
 
     if not instance then
         local core = getCore()
-        local width = 300 * FONT_SCALE
+        local width = 600 * FONT_SCALE
         local height = 300 * FONT_SCALE
 
         local x = (core:getScreenWidth() - width) / 2
@@ -48,7 +49,6 @@ function UI.open(player, data)
 
         ISLayoutManager.RegisterWindow(profileName, UI, instance)
     end
-    instance.data = data
     instance:addToUIManager();
     instance:setVisible(true);
     instance:ensureVisible()
@@ -195,11 +195,11 @@ function UI:createChildren()
     list.onMouseMoveOutside = self.doOnMouseMoveOutside
 
     list:addColumn("Shop", 0);
-    list:addColumn("Category", 150);
+    list:addColumn("Group", 150);
     self.controls.list = list;
     self.controls._listPanel:addChild(list);
 
-    local btnClose = ISButton:new(0, 10, 100, BUTTON_HGT, "Close", self, self.close);
+    local btnClose = ISButton:new(0, 10, 80, BUTTON_HGT, "Close", self, self.close);
     btnClose.internal = "CLOSE";
     btnClose:initialise();
     btnClose:instantiate();
@@ -209,7 +209,7 @@ function UI:createChildren()
     self.controls.btnClose = btnClose;
     self.controls._controlPanel:addChild(btnClose);
 
-    local btnConfig = ISButton:new(0, 10, 100, BUTTON_HGT, "Config", self, self.onEdit);
+    local btnConfig = ISButton:new(0, 10, 80, BUTTON_HGT, "Config", self, self.onEdit);
     btnConfig.internal = "EDIT";
     btnConfig:initialise();
     btnConfig:instantiate();
@@ -217,10 +217,10 @@ function UI:createChildren()
     self.controls.btnConfig = btnConfig;
     self.controls._controlPanel:addChild(btnConfig);
 
-    local btnInstances = ISButton:new(0, 10, 100, BUTTON_HGT, "Locations", self, function()
+    local btnInstances = ISButton:new(0, 10, 80, BUTTON_HGT, "Locations", self, function()
         local shop = self.controls.list.items[self.controls.list.selected].item
-        if shop and shop.key then
-            Core.ui.shop_instances.open(self.player, shop.key)
+        if shop and shop.type then
+            Core.ui.shop_instances.open(self.player, shop.type)
         end
     end);
     btnInstances.internal = "INSTANCES";
@@ -229,6 +229,37 @@ function UI:createChildren()
     btnInstances:setEnable(false);
     self.controls.btnInstances = btnInstances;
     self.controls._controlPanel:addChild(btnInstances);
+
+    local btnWallet = ISButton:new(0, 10, 80, BUTTON_HGT, "Wallet", self, function()
+        Core.ui.admin.OnOpenPanel(self.player)
+    end);
+    btnWallet.internal = "WALLET";
+    btnWallet:initialise();
+    btnWallet:instantiate();
+    self.controls.btnWallet = btnWallet;
+    self.controls._controlPanel:addChild(btnWallet);
+
+    local btnCompile = ISButton:new(0, 10, 80, BUTTON_HGT, "Recompile", self, function()
+        sendClientCommand(Core.name, Core.commands.compile, {})
+    end);
+    btnCompile.internal = "COMPILE";
+    btnCompile:initialise();
+    btnCompile:instantiate();
+    self.controls.btnCompile = btnCompile;
+    self.controls._controlPanel:addChild(btnCompile);
+
+    local btnBlacklist = ISButton:new(0, 10, 80, BUTTON_HGT, "Blacklist", self, function()
+        if Core.isLocal then
+            Core.ui.pools_blacklist_main.OnOpenPanel(self.player, Core.getBlacklist())
+        else
+            sendClientCommand(Core.name, Core.commands.getBlackList, {})
+        end
+    end);
+    btnBlacklist.internal = "BLACKLIST";
+    btnBlacklist:initialise();
+    btnBlacklist:instantiate();
+    self.controls.btnBlacklist = btnBlacklist;
+    self.controls._controlPanel:addChild(btnBlacklist);
 
     self:refreshAll()
 end
@@ -286,6 +317,17 @@ function UI:prerender()
     self.controls.btnInstances:setX(self.controls.btnConfig.x - self.controls.btnInstances.width - 10)
     self.controls.btnInstances:setEnable(self.controls.list.selected > 0)
 
+    -- admin buttons (left side, visible only for admins)
+    local isAdminUser = isAdmin() or isDebugEnabled()
+    self.controls.btnWallet:setVisible(isAdminUser)
+    self.controls.btnCompile:setVisible(isAdminUser)
+    self.controls.btnBlacklist:setVisible(isAdminUser)
+    if isAdminUser then
+        self.controls.btnBlacklist:setX(10)
+        self.controls.btnCompile:setX(self.controls.btnBlacklist.x + self.controls.btnBlacklist.width + 10)
+        self.controls.btnWallet:setX(self.controls.btnCompile.x + self.controls.btnCompile.width + 10)
+    end
+
 end
 
 function UI:drawDatas(y, item, alt)
@@ -326,7 +368,7 @@ function UI:drawDatas(y, item, alt)
     self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
-    local value = item.item.category
+    local value = item.item.group or ""
     local cw = self.columns[2].size
     self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
     self.itemsHeight = y + self.itemheight;

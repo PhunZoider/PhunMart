@@ -163,9 +163,18 @@ Commands[Core.commands.requestShop] = function(arguments)
 end
 
 Commands[Core.commands.getShopList] = function(args)
+    -- Shop list is now built from Core.runtime.shops compiled locally.
+    -- This handler is kept for compatibility but the round-trip is no longer initiated.
     local player = Core.utils.getPlayerByUsername(args.username)
     if player then
-        Core.ClientSystem.instance:openShopList(player, args.data)
+        Core.ClientSystem.instance:openShopList(player)
+    end
+end
+
+Commands[Core.commands.getInstanceList] = function(args)
+    local player = Core.utils.getPlayerByUsername(args.username)
+    if player then
+        Core.ui.shop_instances.setData(player, args.data)
     end
 end
 
@@ -178,8 +187,7 @@ Commands[Core.commands.getShopDefinition] = function(args)
 end
 
 Commands[Core.commands.requestShopDefs] = function(arguments)
-    Core.defs.shops = arguments.shops
-    triggerEvent(Core.events.OnShopDefsReloaded, arguments.shops)
+    Core.compileWith(arguments.overrides)
 end
 
 Commands[Core.commands.requestItemDefs] = function(arguments)

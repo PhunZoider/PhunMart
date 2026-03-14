@@ -5,7 +5,7 @@ return {
     -- =========================================================
     pool_goodphoods = {
         defaults = {
-            price = "coin_25"
+            price = "coin_low"
         },
         sources = {
             groups = {"food_fresh", "food_cooking_utensils"}
@@ -24,7 +24,7 @@ return {
     -- =========================================================
     pool_phatphoods = {
         defaults = {
-            price = "coin_10"
+            price = "coin_low"
         },
         sources = {
             groups = {"food_junk", "food_alcohol"}
@@ -486,7 +486,6 @@ return {
             }
         }
     },
-
 
     -- =========================================================
     -- ShedsAndCommoners  (skill books by volume tier + misc literature)

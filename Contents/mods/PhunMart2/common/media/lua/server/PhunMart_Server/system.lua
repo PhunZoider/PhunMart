@@ -404,10 +404,10 @@ end
 function ServerSystem:recompileShops()
     Core.compile()
     Core.debugLn("Recompiled shop definitions")
-    -- Push updated shop defs to all connected clients.
-    if Core.runtime and Core.runtime.shops then
+    -- Broadcast updated override tables to all connected clients so they recompile.
+    if Core._lastOverrides then
         sendServerCommand(Core.name, Core.commands.requestShopDefs, {
-            shops = Core.runtime.shops
+            overrides = Core._lastOverrides
         })
     end
 end

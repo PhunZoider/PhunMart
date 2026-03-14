@@ -11,9 +11,9 @@ Commands[Core.commands.compile] = function(playerObj, args)
 
 end
 
-Commands[Core.commands.getBlacklist] = function(playerObj, args)
-    local list = Core.getBlacklist()
-    sendServerCommand(Core.name, Core.commands.getBlackList, {
+Commands[Core.commands.getBlackList] = function(playerObj, args)
+    local list = Core.getBlacklist() or {}
+    sendServerCommand(playerObj, Core.name, Core.commands.getBlackList, {
         username = playerObj:getUsername(),
         data = list
     })
@@ -381,6 +381,27 @@ Commands[Core.commands.getShopList] = function(playerObj, args)
 
 end
 
+Commands[Core.commands.getInstanceList] = function(playerObj, args)
+    local list = {}
+    for k, v in pairs(Core.instances or {}) do
+        table.insert(list, {
+            key = k,
+            type = v.type,
+            x = v.x,
+            y = v.y,
+            z = v.z
+        })
+    end
+    if Core.isLocal then
+        Core.ui.shop_instances.setData(playerObj, list)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.getInstanceList, {
+            username = playerObj:getUsername(),
+            data = list
+        })
+    end
+end
+
 Commands[Core.commands.getShopDefinition] = function(playerObj, args)
     local shop = Core.ServerSystem.instance:getShopDefinition(args.type)
     if shop then
@@ -423,10 +444,11 @@ Commands[Core.commands.playerSetup] = function(playerObj, args)
         username = playerObj:getUsername(),
         wallet = wallet
     })
-    -- Send compiled shop defs so the client has them for admin menus from the start.
-    if Core.runtime and Core.runtime.shops then
+    -- Send server override tables so the client can compile locally against its
+    -- own shared defaults. Client never reads the filesystem.
+    if Core._lastOverrides then
         sendServerCommand(playerObj, Core.name, Core.commands.requestShopDefs, {
-            shops = Core.runtime.shops
+            overrides = Core._lastOverrides
         })
     end
     -- Send this player's purchase history so the client can evaluate

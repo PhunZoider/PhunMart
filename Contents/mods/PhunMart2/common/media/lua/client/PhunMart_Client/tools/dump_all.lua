@@ -10,15 +10,46 @@
 --]] PhunDump = {} -- global so Lua console can call it directly
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
+if isServer() then
+    return
+end
+require "PhunMart/core"
+local Core = PhunMart
 
-local function print_chat(msg)
+local function print_chat(txt)
     if getSoundManager then -- client-side guard
         local chat = ISChat.instance
         if chat then
-            chat:addLineInChat(ISChat.addLineInChat, "[PhunDump] " .. msg, 0)
+
+            local msg = {
+                getText = function(_)
+                    return txt;
+                end,
+                getTextWithPrefix = function(_)
+                    return txt;
+                end,
+                isServerAlert = function(_)
+                    return options.serverAlert;
+                end,
+                isShowAuthor = function(_)
+                    return options.showAuthor;
+                end,
+                getAuthor = function(_)
+                    return tostring(getPlayer():getDisplayName());
+                end,
+                setShouldAttractZombies = function(_)
+                    return false
+                end,
+                setOverHeadSpeech = function(_)
+                    return false
+                end
+            };
+
+            ISChat.addLineInChat(msg, 0)
+            -- chat:addLineInChat(ISChat.addLineInChat, "[PhunDump] " .. msg, 0)
         end
     end
-    print("[PhunDump] " .. msg)
+    print("[PhunDump] " .. txt)
 end
 
 local function writeFile(name, lines)
@@ -33,18 +64,6 @@ local function writeFile(name, lines)
     else
         print_chat("FAILED: " .. filename .. " — " .. tostring(err))
     end
-end
-
-local function isAdmin()
-    if not isClient() then
-        return true
-    end -- singleplayer or server console = always ok
-    local player = getSpecificPlayer(0)
-    if not player then
-        return false
-    end
-    local level = player:getAccessLevel()
-    return level == "admin" or level == "moderator"
 end
 
 -- ─── Dump routines ───────────────────────────────────────────────────────────
@@ -201,7 +220,7 @@ local COMMANDS = {
 
 -- PhunDump.run("all") — callable from Lua console in SP/debug mode
 function PhunDump.run(arg)
-    if not isAdmin() then
+    if not Core.utils.isAdmin(getPlayer()) then
         print_chat("Admin access required.")
         return
     end
@@ -225,21 +244,21 @@ function PhunDump.run(arg)
     end
 end
 
--- ─── Chat command hook ────────────────────────────────────────────────────────
+local orig = ISChat["onCommandEntered"]
+ISChat["onCommandEntered"] = function(self)
 
-local function hookChat()
-    local orig = ISChat.onCommandEntered
-    ISChat.onCommandEntered = function(self)
-        local text = self.chatText.internal or ""
-        local cmd, arg = text:match("^(/dumppz)%s*(.*)")
-        if cmd then
-            runDump(arg)
-            -- clear the input without sending to server
+    local commandText = ISChat.instance.textEntry:getText()
+    ISChat.instance:logChatCommand(commandText)
+    local arg = commandText:match("^/?dumppz%s*(.*)")
+    if arg and Core.utils.isAdmin(getPlayer()) then
+        PhunDump.run(arg)
+        -- prevent the command from being sent to the server
+        if self.textEntry then
+            self.textEntry:setText("")
+        elseif self.chatText then
             self.chatText:setText("")
-            return
         end
-        orig(self)
+        return
     end
+    orig(self)
 end
-
-Events.OnGameStart.Add(hookChat)
