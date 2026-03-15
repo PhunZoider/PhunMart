@@ -63,6 +63,11 @@ function ClientObject:stateFromIsoObject(isoObject)
     self:fromModData(isoObject:getModData())
 end
 
+function ClientObject:stateToIsoObject(isoObject)
+    -- Client is always receiving from server; just read the iso data.
+    self:stateFromIsoObject(isoObject)
+end
+
 -- Manual sync — call when you know the underlying IsoObject's modData may have changed.
 function ClientObject:updateFromIsoObject()
     local iso = self:getIsoObject()

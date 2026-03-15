@@ -359,6 +359,19 @@ function ServerObject:stateFromIsoObject(isoObject)
     isoObject:transmitModData()
 end
 
+function ServerObject:stateToIsoObject(isoObject)
+    -- For newly created objects the iso object holds the authoritative data
+    -- (set by initializeShopObject / the moveable system).  Read it first
+    -- so we don't overwrite good data with initNew defaults.
+    if not self.type or self.type == "default" then
+        self:stateFromIsoObject(isoObject)
+        return
+    end
+    self:toModData(isoObject:getModData())
+    self:updateSprite(true)
+    isoObject:transmitModData()
+end
+
 function ServerObject:getSpriteIndex()
     if self.facing == "E" or self.facing == IsoDirections.E then
         return 1
