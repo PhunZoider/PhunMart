@@ -47,6 +47,7 @@ PhunMart = {
         requestPool = "PhunMartRequestPool",
         quickBlacklist = "PhunMartQuickBlacklist",
         updateOfferWeight = "PhunMartUpdateOfferWeight",
+        moveOffers = "PhunMartMoveOffers",
         -- Shop player flow
         playerSetup = "PhunMartPlayerSetup",
         openShop = "PhunMartOpenShop",

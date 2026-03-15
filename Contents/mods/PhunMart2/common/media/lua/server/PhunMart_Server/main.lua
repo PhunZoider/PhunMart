@@ -45,9 +45,12 @@ function Core:grantReward(player, action, qty, context)
     local t = action.type
 
     if t == "giveItem" then
+        local inv = player:getInventory()
         for i = 1, qty do
-            local item = player:getInventory():AddItem(action.item)
-            if not item then
+            local item = inv:AddItem(action.item)
+            if item then
+                sendAddItemToContainer(inv, item)
+            else
                 Core.debugLn("grantReward: AddItem failed for '" .. tostring(action.item) .. "'")
             end
         end

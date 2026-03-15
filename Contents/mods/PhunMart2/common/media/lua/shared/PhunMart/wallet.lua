@@ -104,24 +104,25 @@ end
 function Core.wallet:reset(player)
     local name = type(player) == "string" and player or player:getUsername()
 
-    if isClient() then
+    if isClient() and not Core.isLocal then
         sendClientCommand(Core.name, Core.commands.resetWallet, {
             username = name
         })
+        return
     end
 
     local w = self:get(name)
     for pool, def in pairs(self.pools) do
         local cur = w.current[pool] or 0
         if cur > 0 then
-            Core.fileUtils.logTo(self.log, name, pool, -cur)
+            if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool, -cur) end
             w.current[pool] = 0
         end
         if def.bound then
             local boundAmt = w.bound[pool] or 0
             if boundAmt > 0 then
                 w.current[pool] = boundAmt
-                Core.fileUtils.logTo(self.log, name, pool, boundAmt)
+                if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool, boundAmt) end
             end
         end
     end
@@ -134,7 +135,7 @@ function Core.wallet:adjustByPool(player, walletType, pool, amount)
     local w = self:get(name)
     if w then
         w[walletType][pool] = (w[walletType][pool] or 0) + amount
-        Core.fileUtils.logTo(self.log, name, pool .. "(" .. walletType .. ")", amount)
+        if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool .. "(" .. walletType .. ")", amount) end
     end
 end
 
@@ -173,7 +174,7 @@ function Core.wallet:adjust(player, item, amount)
         w.bound[pool] = (w.bound[pool] or 0) + toAdd
     end
 
-    Core.fileUtils.logTo(self.log, name, item, toAdd)
+    if Core.fileUtils then Core.fileUtils.logTo(self.log, name, item, toAdd) end
 
     local atCap = cap ~= nil and (w.current[pool] >= cap)
     return true, atCap

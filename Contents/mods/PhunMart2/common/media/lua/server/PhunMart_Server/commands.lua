@@ -498,4 +498,30 @@ Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
     offer.offer.weight = weight
 end
 
+Commands[Core.commands.moveOffers] = function(playerObj, args)
+    local fromPool = args and args.fromPool
+    local toPool = args and args.toPool
+    local offerIds = args and args.offerIds
+    if not (fromPool and toPool and offerIds and fromPool ~= toPool) then
+        return
+    end
+    local pools = Core.runtime and Core.runtime.pools
+    if not pools then
+        return
+    end
+    local src = pools[fromPool]
+    local dst = pools[toPool]
+    if not (src and src.offers and dst) then
+        return
+    end
+    dst.offers = dst.offers or {}
+    for _, offerId in ipairs(offerIds) do
+        local offer = src.offers[offerId]
+        if offer then
+            dst.offers[offerId] = offer
+            src.offers[offerId] = nil
+        end
+    end
+end
+
 return Commands

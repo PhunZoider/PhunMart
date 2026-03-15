@@ -98,23 +98,23 @@ local truncate = tools.truncate
 -- Maps a failure object from R.evaluate (has textKey + args) to a player-readable string.
 local function failureLabel(failure)
     local tk = failure.textKey or ""
-    local a  = failure.args or {}
+    local a = failure.args or {}
 
     if tk == "IGUI_PhunMart_Cond_HasItem" then
         local short = tostring(a[1] or "?"):match("%.(.+)$") or tostring(a[1] or "?")
         return getText(tk, short, tostring(a[2] or 1))
     elseif tk == "IGUI_PhunMart_Cond_PurchaseMax" then
-        if (a[3] or 0) == 1 then return getText("IGUI_PhunMart_Cond_PurchaseMaxOnce") end
+        if (a[3] or 0) == 1 then
+            return getText("IGUI_PhunMart_Cond_PurchaseMaxOnce")
+        end
         return getText(tk, tostring(a[2] or "?"), tostring(a[3] or "?"))
     elseif tk == "IGUI_PhunMart_Cond_PurchaseCooldown" then
         return getText(tk, tostring(math.ceil(a[2] or 0)))
-    elseif tk == "IGUI_PhunMart_Cond_AlreadyHasTrait"
-        or tk == "IGUI_PhunMart_Cond_DoesNotHaveTrait" then
+    elseif tk == "IGUI_PhunMart_Cond_AlreadyHasTrait" or tk == "IGUI_PhunMart_Cond_DoesNotHaveTrait" then
         return getText(tk, Traits.getLabel(tostring(a[1] or "?")))
     elseif tk == "IGUI_PhunMart_Cond_TraitMutex" then
         return getText(tk, Traits.getLabel(tostring(a[2] or "?")))
-    elseif tk == "IGUI_PhunMart_Cond_TraitKeyMissing"
-        or tk == "IGUI_PhunMart_Cond_TraitDisabledMP" then
+    elseif tk == "IGUI_PhunMart_Cond_TraitKeyMissing" or tk == "IGUI_PhunMart_Cond_TraitDisabledMP" then
         return getText(tk)
     elseif tk == "IGUI_PhunMart_Cond_BoundTokensBelowMax" then
         return getText(tk, tostring(a[2] or "?"), tostring(a[1] or "?"))
