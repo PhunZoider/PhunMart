@@ -81,7 +81,7 @@ PhunMart = {
     },
     events = {
         OnReady = "OnPhunMartOnReady",
-        recievedInventory = "OnPhunMartRecievedInventory",
+        receivedInventory = "OnPhunMartReceivedInventory",
         OnShopChange = "OnPhunMartShopChange",
         OnPurchaseComplete = "OnPhunMartPurchaseComplete",
         OnApplyTraitReward = "OnPhunMartApplyTraitReward",
@@ -89,7 +89,8 @@ PhunMart = {
     },
     utils = require "PhunMart/utils",
     settings = {},
-    shops = {}, -- populated after Core.compile() on the server; Core.defs.shops on the client
+    defs = {}, -- legacy: populated by requestItemDefs chunked transfer
+    shops = {}, -- populated after Core.compile() on the server
     spriteToShop = {},
     opensquares = {},
     actions = {},
@@ -425,22 +426,21 @@ function Core.getAllXp(refresh)
         return Core.xpAll
     end
     Core.xpAll = {}
-    local result = {}
     for i = 0, Perks.getMaxIndex() - 1 do
         local perk = PerkFactory.getPerk(Perks.fromIndex(i))
         local name = perk:getName()
         if name ~= "None" then
 
-            for i = 1, 10 do
+            for lvl = 1, 10 do
                 table.insert(Core.xpAll, {
-                    type = i,
+                    type = lvl,
                     label = name,
-                    level = i,
-                    xpForLevel = perk:getXpForLevel(i),
+                    level = lvl,
+                    xpForLevel = perk:getXpForLevel(lvl),
                     tooltip = {
                         description = ""
                     },
-                    category = "Level " .. tostring(i)
+                    category = "Level " .. tostring(lvl)
                 })
             end
         end
@@ -480,20 +480,19 @@ function Core.getAllBoosts(refresh)
     Core.boostsCategories = {}
     local catMap = {}
 
-    local result = {}
     for i = 0, Perks.getMaxIndex() - 1 do
         local perk = PerkFactory.getPerk(Perks.fromIndex(i))
         local name = perk:getName()
         if name ~= "None" then
-            for i = 1, 3 do
+            for lvl = 1, 3 do
                 table.insert(Core.boostsAll, {
-                    type = i,
+                    type = lvl,
                     label = name,
-                    level = i,
+                    level = lvl,
                     tooltip = {
                         description = ""
                     },
-                    category = "Level " .. tostring(i)
+                    category = "Level " .. tostring(lvl)
                 })
             end
         end
@@ -539,16 +538,16 @@ end
 
 function Core.getAllProfessions(refresh)
 
-    if Core.ProfessionsAll ~= nil and not refresh then
-        return Core.ProfessionsAll
+    if Core.professionsAll ~= nil and not refresh then
+        return Core.professionsAll
     end
-    Core.ProfessionsAll = {}
+    Core.professionsAll = {}
     local checked = {}
 
     local professionList = ProfessionFactory.getProfessions();
     for i = 0, professionList:size() - 1 do
         local prof = professionList:get(i)
-        table.insert(Core.ProfessionsAll, {
+        table.insert(Core.professionsAll, {
             type = prof:getType(),
             label = prof:getLabel(),
             texture = prof:getTexture(),
@@ -558,10 +557,10 @@ function Core.getAllProfessions(refresh)
         })
 
     end
-    table.sort(Core.ProfessionsAll, function(a, b)
+    table.sort(Core.professionsAll, function(a, b)
         return (a.label or a.type):lower() < (b.label or b.type):lower()
     end)
-    return Core.ProfessionsAll
+    return Core.professionsAll
 end
 
 -- ─── Shared compile ───────────────────────────────────────────────────────────
@@ -570,21 +569,7 @@ end
 -- disk and calls this. On the client, the requestShopDefs handler receives the
 -- override tables from the server and calls this — client never touches the FS.
 
-local function _deepMerge(base, patch)
-    if type(patch) ~= "table" then return patch end
-    if type(base) ~= "table" then return patch end
-    if patch[1] ~= nil then return patch end -- array: replace entirely
-    local result = {}
-    for k, v in pairs(base) do result[k] = v end
-    for k, v in pairs(patch) do
-        if type(v) == "table" and type(result[k]) == "table" and v[1] == nil then
-            result[k] = _deepMerge(result[k], v)
-        else
-            result[k] = v
-        end
-    end
-    return result
-end
+local _deepMerge = Core.utils.deepMerge
 
 local function _loadDefaults(path)
     local ok, result = pcall(require, path)

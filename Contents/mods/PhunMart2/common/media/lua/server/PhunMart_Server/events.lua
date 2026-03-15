@@ -10,12 +10,6 @@ Events.OnServerStarted.Add(function()
     Core:ini()
 end)
 
-Events.OnDoTileBuilding2.Add(function(cursor, bRender, x, y, z, square)
-    if cursor and cursor.tryInitialInvItem and
-        luautils.stringStarts(cursor.tryInitialInvItem.worldSprite or "", "phunmart_") then
-    end
-end)
-
 Events.LoadGridsquare.Add(function(square)
     Core.ServerSystem.instance:loadGridsquare(square)
 end)
@@ -142,15 +136,11 @@ end)
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == Core.name then
-        print("Received command " .. tostring(command) .. " from " .. playerObj:getUsername() .. ": " ..
-                  tostring(command))
-
         if Commands[command] then
-            print("Dispatching command " .. tostring(command) .. " from " .. playerObj:getUsername())
+            Core.debugLn("Command " .. tostring(command) .. " from " .. playerObj:getUsername())
             Commands[command](playerObj, arguments)
-            print("Finished command " .. tostring(command) .. " from " .. playerObj:getUsername())
         else
-            print("Unknown command " .. tostring(command) .. " from " .. playerObj:getUsername())
+            Core.debugLn("Unknown command " .. tostring(command) .. " from " .. playerObj:getUsername())
         end
     end
 end)

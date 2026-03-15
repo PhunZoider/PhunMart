@@ -520,7 +520,7 @@ return {
             offer = { weight = 0.8 }
         },
         include = {
-            items = { "Base.Scissors", "Base.NeedleThread", "Base.Thread" }
+            items = { "Base.Scissors", "Base.Thread" }
         }
     },
 

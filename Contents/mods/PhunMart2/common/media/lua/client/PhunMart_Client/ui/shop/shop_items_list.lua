@@ -7,6 +7,7 @@ require "ISUI/ISToolTipInv"
 require "ISUI/ISToolTip"
 local Core = PhunMart
 local Traits = require "PhunMart/traits"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_SM = getTextManager():getFontHeight(UIFont.Small)
 local FONT_TINY = getTextManager():getFontHeight(UIFont.Tiny)
@@ -69,47 +70,8 @@ local SKILL_BOOK = {
     Doctor          = "Base.BookFirstAid1",
 }
 
-local function formatPrice(offer)
-    local price = offer and offer.price
-    if not price then
-        return nil
-    end
-    if price.kind == "free" then
-        return "FREE"
-    end
-    if price.kind == "currency" then
-        local amt = price.amount
-        if type(amt) == "table" then
-            amt = amt.min
-        end
-        if price.pool == "tokens" then
-            return tostring(amt) .. "t"
-        else
-            if amt % 100 == 0 then
-                return "$" .. tostring(amt / 100)
-            else
-                return string.format("$%.2f", amt / 100)
-            end
-        end
-    end
-    if price.kind == "items" and price.items and price.items[1] then
-        local pi = price.items[1]
-        local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-        return tostring(amt) .. "x"
-    end
-    return nil
-end
-
-local function truncate(text, maxWidth, font)
-    if getTextManager():MeasureStringX(font, text) <= maxWidth then
-        return text
-    end
-    local t = text
-    while #t > 0 and getTextManager():MeasureStringX(font, t .. "...") > maxWidth do
-        t = t:sub(1, -2)
-    end
-    return t .. "..."
-end
+local formatPrice = tools.formatPriceShort
+local truncate = tools.truncate
 
 function UI:new(x, y, w, h, opts)
     local o = ISPanel:new(x, y, w, h)
@@ -249,24 +211,12 @@ function UI:setData(data)
     local order = {}
     for id, offer in pairs(data.offers) do
         local scriptItem = getScriptManager():getItem(offer.item)
-        local displayName
+        local displayName = tools.resolveOfferDisplayName(offer)
         local texture
-        -- Resolve display name and texture from reward trait action if present
+        -- Resolve texture from trait action if present
         local traitKey = Traits.getOfferTraitKey(offer)
         if traitKey then
-            displayName = Traits.getLabel(traitKey)
             texture = Traits.getTexture(traitKey)
-        end
-        if not displayName then
-            if scriptItem then
-                displayName = scriptItem:getDisplayName()
-            elseif Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
-                displayName = Core.getVehicleLabel(offer.item)
-            elseif offer.reward and offer.reward.display and offer.reward.display.text then
-                displayName = offer.reward.display.text
-            else
-                displayName = Traits.getLabel(offer.item)
-            end
         end
         if not texture then
             texture = scriptItem and scriptItem:getNormalTexture()

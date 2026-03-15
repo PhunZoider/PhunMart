@@ -111,39 +111,48 @@ function ServerSystem:generateRandomShopOnSquare(square, direction)
     end
 end
 
-function ServerSystem:reroll(location, ignoreDistance)
+-- Resolve a shop object's facing string/enum to an IsoDirections constant.
+local function resolveFacing(shopObj)
+    local f = shopObj.facing
+    if f == "E" or f == IsoDirections.E then return IsoDirections.E end
+    if f == "S" or f == IsoDirections.S then return IsoDirections.S end
+    if f == "W" or f == IsoDirections.W then return IsoDirections.W end
+    return IsoDirections.N
+end
 
+-- Build a shop payload table suitable for sending to clients or triggering events.
+function ServerSystem.buildShopPayload(shopObj)
+    local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shopObj.type]
+    local shopCfg = Core.shops and Core.shops[shopObj.type]
+    return {
+        key = shopObj:getKey(),
+        shopType = shopObj.type,
+        location = { x = shopObj.x, y = shopObj.y, z = shopObj.z },
+        offers = shopObj.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        background = shopDef and shopDef.background,
+        defaultView = shopDef and shopDef.defaultView,
+        poolSets = shopDef and shopDef.poolSets,
+        lastRestock = shopObj.lastRestock,
+        restockFrequency = (shopCfg and shopCfg.restock) or 24
+    }
+end
+
+function ServerSystem:reroll(location, ignoreDistance)
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
     local square = shopObj:getIsoObject():getSquare()
-    local facing = IsoDirections.N
-    if shopObj.facing == "E" or shopObj.facing == IsoDirections.E then
-        facing = IsoDirections.E
-    elseif shopObj.facing == "S" or shopObj.facing == IsoDirections.S then
-        facing = IsoDirections.S
-    elseif shopObj.facing == "W" or shopObj.facing == IsoDirections.W then
-        facing = IsoDirections.W
-    end
+    local facing = resolveFacing(shopObj)
     local shopname = self:getRandomShop(square:getX(), square:getY())
     square:transmitRemoveItemFromSquare(shopObj:getIsoObject())
     self.addToWorld(square, shopname, facing)
-
 end
 
 function ServerSystem:changeTo(shopName, location)
-
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
     local square = shopObj:getIsoObject():getSquare()
-    local facing = IsoDirections.N
-    if shopObj.facing == "E" or shopObj.facing == IsoDirections.E then
-        facing = IsoDirections.E
-    elseif shopObj.facing == "S" or shopObj.facing == IsoDirections.S then
-        facing = IsoDirections.S
-    elseif shopObj.facing == "W" or shopObj.facing == IsoDirections.W then
-        facing = IsoDirections.W
-    end
+    local facing = resolveFacing(shopObj)
     square:transmitRemoveItemFromSquare(shopObj:getIsoObject())
     self.addToWorld(square, shopName, facing)
-
 end
 
 function ServerSystem:rerollAll()
@@ -185,31 +194,9 @@ function ServerSystem:openShop(player, args, forceRestock)
         shop:restock()
     end
 
-    -- offers live on the shop object (synced via modData); send them alongside
-    -- conditionsDefs (shared runtime data, not stored per-object)
-    local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shop.type]
-    local shopCfg = Core.shops and Core.shops[shop.type]
-
-    local inventoryData = {
-        key = shop:getKey(),
-        shopType = shop.type,
-        location = {
-            x = shop.x,
-            y = shop.y,
-            z = shop.z
-        },
-        offers = shop.offers or {},
-        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-        background = shopDef and shopDef.background,
-        defaultView = shopDef and shopDef.defaultView,
-        poolSets = shopDef and shopDef.poolSets,
-        lastRestock = shop.lastRestock,
-        restockFrequency = (shopCfg and shopCfg.restock) or 24
-    }
+    local inventoryData = ServerSystem.buildShopPayload(shop)
 
     if Core.isLocal then
-        -- In singleplayer the server and client share the same Lua state, so
-        -- we can write directly into the slot the open_shop action polls.
         Core.pendingShopData = Core.pendingShopData or {}
         Core.pendingShopData[inventoryData.key] = inventoryData
     else

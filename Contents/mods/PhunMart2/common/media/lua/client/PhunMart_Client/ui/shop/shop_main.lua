@@ -32,7 +32,7 @@ local UI = Core.ui.client.shop
 local instances = {}
 
 require "PhunMart/conditions"
-require "PhunMart/playerAdapter"
+require "PhunMart/player_adapter"
 local Traits = require "PhunMart/traits"
 
 local FS = tools.FONT_SCALE
@@ -91,38 +91,8 @@ local L = {
 -- text helpers
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- Returns a table of lines fitting within maxWidth.  Splits on spaces.
-local function wrapText(text, maxWidth, font)
-    local lines = {}
-    local current = ""
-    for word in text:gmatch("%S+") do
-        local test = current == "" and word or (current .. " " .. word)
-        if getTextManager():MeasureStringX(font, test) <= maxWidth then
-            current = test
-        else
-            if current ~= "" then
-                table.insert(lines, current)
-            end
-            current = word
-        end
-    end
-    if current ~= "" then
-        table.insert(lines, current)
-    end
-    return lines
-end
-
--- Truncates text with "…" if it exceeds maxWidth.
-local function truncate(text, maxWidth, font)
-    if getTextManager():MeasureStringX(font, text) <= maxWidth then
-        return text
-    end
-    local t = text
-    while #t > 0 and getTextManager():MeasureStringX(font, t .. "...") > maxWidth do
-        t = t:sub(1, -2)
-    end
-    return t .. "..."
-end
+local wrapText = tools.wrapText
+local truncate = tools.truncate
 
 -- Human-readable label for a condition key, using the compiled def when available.
 -- Maps a failure object from R.evaluate (has textKey + args) to a player-readable string.
@@ -932,11 +902,7 @@ function UI:render()
         local function fmtBalance(pool, amount)
             local fmt = Core.wallet.pools[pool] and Core.wallet.pools[pool].format
             if fmt == "cents" then
-                if amount % 100 == 0 then
-                    return "$" .. tostring(amount / 100)
-                else
-                    return string.format("$%.2f", amount / 100)
-                end
+                return tools.formatCents(amount)
             else
                 return tostring(amount)
             end
@@ -1029,21 +995,7 @@ function UI:renderDetails(z)
     local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
 
     -- item name (word-wrapped, max 2 lines)
-    local scriptItem = getScriptManager():getItem(offer.item)
-    local name
-    local traitKey = Traits.getOfferTraitKey(offer)
-    if traitKey then
-        name = Traits.getLabel(traitKey)
-    elseif scriptItem then
-        name = scriptItem:getDisplayName()
-    elseif Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
-        name = Core.getVehicleLabel(offer.item)
-    elseif offer.reward and offer.reward.display and offer.reward.display.text then
-        name = offer.reward.display.text
-    else
-        -- Last resort: try the item key directly as a trait/display label (covers boost/xp offer types)
-        name = Traits.getLabel(offer.item) or offer.item
-    end
+    local name = tools.resolveOfferDisplayName(offer)
     local nameLines = wrapText(name, maxW, UIFont.Small)
     for i = 1, math.min(2, #nameLines) do
         local line = (i == 2 and #nameLines > 2) and truncate(nameLines[i], maxW, UIFont.Small) or nameLines[i]
@@ -1058,13 +1010,7 @@ function UI:renderDetails(z)
 
     -- price
     local price = offer.price
-    local function fmtCents(n)
-        if n % 100 == 0 then
-            return "$" .. tostring(n / 100)
-        else
-            return string.format("$%.2f", n / 100)
-        end
-    end
+    local fmtCents = tools.formatCents
     local priceText
     local isCollector = price and price.selfPay == true
     if not price then

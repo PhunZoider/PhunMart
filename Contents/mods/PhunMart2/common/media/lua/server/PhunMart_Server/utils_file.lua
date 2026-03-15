@@ -1,6 +1,7 @@
 -- loadstring was removed in Lua 5.2+; PZ B42 may only have load()
 local loadstring = loadstring or load
 local file_utils = {}
+local Core = PhunMart
 
 local function tableOfStringsToTable(lines)
     if not lines or type(lines) ~= "table" or #lines == 0 then

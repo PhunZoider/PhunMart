@@ -33,24 +33,7 @@ Commands[Core.commands.restock] = function(playerObj, args)
         return
     end
     obj:restock()
-    local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[obj.type]
-    local shopCfg = Core.shops and Core.shops[obj.type]
-    local payload = {
-        key = obj:getKey(),
-        shopType = obj.type,
-        location = {
-            x = obj.x,
-            y = obj.y,
-            z = obj.z
-        },
-        offers = obj.offers or {},
-        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-        background = shopDef and shopDef.background,
-        defaultView = shopDef and shopDef.defaultView,
-        poolSets = shopDef and shopDef.poolSets,
-        lastRestock = obj.lastRestock,
-        restockFrequency = (shopCfg and shopCfg.restock) or 24
-    }
+    local payload = Core.ServerSystem.buildShopPayload(obj)
     if Core.isLocal then
         triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
     else
@@ -66,23 +49,9 @@ Commands[Core.commands.changeTo] = function(playerObj, args)
     local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
     local oldKey = oldObj and oldObj:getKey()
     Core.ServerSystem.instance:changeTo(args.to, loc)
-    -- Send back new shop data under the OLD key so the open window can update itself.
     local newObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
-    local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
-    local shopCfg = newObj and Core.shops and Core.shops[newObj.type]
-    local payload = newObj and oldKey and {
-        key = newObj:getKey(),
-        shopType = newObj.type,
-        location = loc,
-        offers = newObj.offers or {},
-        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-        background = shopDef and shopDef.background,
-        defaultView = shopDef and shopDef.defaultView,
-        poolSets = shopDef and shopDef.poolSets,
-        lastRestock = newObj.lastRestock,
-        restockFrequency = (shopCfg and shopCfg.restock) or 24
-    }
-    if payload then
+    if newObj and oldKey then
+        local payload = Core.ServerSystem.buildShopPayload(newObj)
         if Core.isLocal then
             triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
         else
@@ -246,32 +215,17 @@ Commands[Core.commands.reroll] = function(playerObj, args)
     Core.ServerSystem.instance:reroll(loc, args.ignoreDistance == true)
     if oldKey then
         local newObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
-        local shopDef = newObj and Core.runtime and Core.runtime.shops and Core.runtime.shops[newObj.type]
-        local shopCfg = newObj and Core.shops and Core.shops[newObj.type]
-        local payload = newObj and {
-            key = newObj:getKey(),
-            shopType = newObj.type,
-            location = {
-                x = newObj.x,
-                y = newObj.y,
-                z = newObj.z
-            },
-            offers = newObj.offers or {},
-            conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-            background = shopDef and shopDef.background,
-            defaultView = shopDef and shopDef.defaultView,
-            poolSets = shopDef and shopDef.poolSets,
-            lastRestock = newObj.lastRestock,
-            restockFrequency = (shopCfg and shopCfg.restock) or 24
-        }
-        if Core.isLocal then
-            triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
-        else
-            sendServerCommand(playerObj, Core.name, Core.commands.onShopChange, {
-                key = oldKey,
-                data = payload,
-                replaced = true
-            })
+        if newObj then
+            local payload = Core.ServerSystem.buildShopPayload(newObj)
+            if Core.isLocal then
+                triggerEvent(Core.events.OnShopChange, oldKey, payload, true)
+            else
+                sendServerCommand(playerObj, Core.name, Core.commands.onShopChange, {
+                    key = oldKey,
+                    data = payload,
+                    replaced = true
+                })
+            end
         end
     end
 end

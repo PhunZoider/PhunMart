@@ -124,4 +124,94 @@ function tools.getListbox(x, y, w, h, columns, fns)
     return box;
 end
 
+-- ── Shared display helpers ──────────────────────────────────────────────────
+
+local Traits = require "PhunMart/traits"
+
+-- Resolve a human-readable display name for an offer.
+-- Returns the best available label: trait name > script item name > vehicle label > reward text > raw key.
+function tools.resolveOfferDisplayName(offer)
+    if not offer then return "?" end
+    local traitKey = Traits.getOfferTraitKey(offer)
+    if traitKey then
+        return Traits.getLabel(traitKey)
+    end
+    local scriptItem = getScriptManager():getItem(offer.item)
+    if scriptItem then
+        return scriptItem:getDisplayName()
+    end
+    if Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
+        return Core.getVehicleLabel(offer.item)
+    end
+    if offer.reward and offer.reward.display and offer.reward.display.text then
+        return offer.reward.display.text
+    end
+    return Traits.getLabel(offer.item) or offer.item
+end
+
+-- Format a price for compact display (grid badges, list rows).
+-- Returns a short string like "FREE", "$1.50", "3t", "2x", or nil.
+function tools.formatPriceShort(offer)
+    local price = offer and offer.price
+    if not price then return nil end
+    if price.kind == "free" then return "FREE" end
+    if price.kind == "currency" then
+        local amt = price.amount
+        if type(amt) == "table" then amt = amt.min end
+        if price.pool == "tokens" then
+            return tostring(amt) .. "t"
+        else
+            if amt % 100 == 0 then
+                return "$" .. tostring(amt / 100)
+            else
+                return string.format("$%.2f", amt / 100)
+            end
+        end
+    end
+    if price.kind == "items" and price.items and price.items[1] then
+        local pi = price.items[1]
+        local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+        return tostring(amt) .. "x"
+    end
+    return nil
+end
+
+-- Format cents as a currency string ("$1.50" or "$2").
+function tools.formatCents(n)
+    if n % 100 == 0 then
+        return "$" .. tostring(n / 100)
+    else
+        return string.format("$%.2f", n / 100)
+    end
+end
+
+-- Truncate text with "..." if it exceeds maxWidth.
+function tools.truncate(text, maxWidth, font)
+    if getTextManager():MeasureStringX(font, text) <= maxWidth then
+        return text
+    end
+    local t = text
+    while #t > 0 and getTextManager():MeasureStringX(font, t .. "...") > maxWidth do
+        t = t:sub(1, -2)
+    end
+    return t .. "..."
+end
+
+-- Word-wrap text into lines fitting within maxWidth.
+function tools.wrapText(text, maxWidth, font)
+    local lines = {}
+    local current = ""
+    for word in text:gmatch("%S+") do
+        local test = current == "" and word or (current .. " " .. word)
+        if getTextManager():MeasureStringX(font, test) <= maxWidth then
+            current = test
+        else
+            if current ~= "" then table.insert(lines, current) end
+            current = word
+        end
+    end
+    if current ~= "" then table.insert(lines, current) end
+    return lines
+end
+
 return tools

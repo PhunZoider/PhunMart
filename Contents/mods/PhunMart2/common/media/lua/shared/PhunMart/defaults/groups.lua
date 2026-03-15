@@ -21,8 +21,7 @@ return {
         "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses", "Base.CandyNovapops", "Base.Candycane",
         "Base.CandyPackage", "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes", "Base.HardCandies",
         "Base.LicoriceBlack", "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy", "Base.Peppermint",
-        "Base.RockCandy", "Base.AllSorts", "Base.CandyFruitSlices", "Base.CandyCaramels", "Base.Modjeska",
-        -- Chocolate bars
+        "Base.RockCandy", "Base.CandyFruitSlices", "Base.CandyCaramels", "Base.Modjeska", -- Chocolate bars
         "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy", "Base.Chocolate_Crackle", "Base.Chocolate_Deux",
         "Base.Chocolate_GalacticDairy", "Base.Chocolate_HeartBox", "Base.Chocolate_Smirkers", "Base.Chocolate_SnikSnak",
         "Base.Chocolate_RoysPBPucks", "Base.ChocoCakes", -- Donuts & junk pastries
@@ -51,10 +50,9 @@ return {
         "Base.Macandcheese_Box", "Base.CannedMilk_Box", "Base.CannedCorn_Box", "Base.CannedFruitCocktail_Box",
         "Base.CannedMushroomSoup_Box", "Base.CannedPineapple_Box", "Base.CannedFruitBeverage_Box",
         "Base.CannedSardines_Box", "Base.MysteryCan_Box", "Base.CannedChili_Box", "Base.CannedPeaches_Box",
-        "Base.TinnedSoup_Box", "Base.CannedTomato_Box", "Base.CannedPotato_Box",
-        -- Produce boxes
-        "Base.ProduceBox_ExtraLarge", "Base.ProduceBox_ExtraSmall", "Base.ProduceBox_Large",
-        "Base.ProduceBox_Medium", "Base.ProduceBox_Small"}
+        "Base.TinnedSoup_Box", "Base.CannedTomato_Box", "Base.CannedPotato_Box", -- Produce boxes
+        "Base.ProduceBox_ExtraLarge", "Base.ProduceBox_ExtraSmall", "Base.ProduceBox_Large", "Base.ProduceBox_Medium",
+        "Base.ProduceBox_Small"}
     },
 
     food_cooking_utensils = {
@@ -86,19 +84,18 @@ return {
                      "Base.PorkRinds", "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses",
                      "Base.CandyNovapops", "Base.Candycane", "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes",
                      "Base.HardCandies", "Base.LicoriceBlack", "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy",
-                     "Base.Peppermint", "Base.RockCandy", "Base.AllSorts", "Base.CandyFruitSlices",
-                     "Base.CandyCaramels", "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy",
-                     "Base.Chocolate_Crackle", "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy",
-                     "Base.Chocolate_Smirkers", "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks",
-                     "Base.Chocolate_HeartBox", "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted",
-                     "Base.DoughnutJelly", "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle",
-                     "Base.SodaCan", "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza",
-                     "Base.PizzaWhole", "Base.TVDinner", "Base.Corndog", "Base.FrenchFries", "Base.Fries",
-                     "Base.Frozen_FrenchFries", "Base.TatoDots", "Base.Frozen_TatoDots", "Base.Crackers",
-                     "Base.GrahamCrackers", "Base.Popcorn", "Base.Popsicle", "Base.Icecream", "Base.IcecreamSandwich",
-                     "Base.FudgeePop", "Base.GranolaBar", "Base.CrispyRiceSquare", "Base.QuaggaCakes",
-                     "Base.ScoutCookies", "Base.CookieChocolateChip", "Base.CookiesChocolate", "Base.CookiesOatmeal",
-                     "Base.CookiesShortbread", "Base.CookiesSugar"}
+                     "Base.Peppermint", "Base.RockCandy", "Base.CandyFruitSlices", "Base.CandyCaramels",
+                     "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy", "Base.Chocolate_Crackle",
+                     "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy", "Base.Chocolate_Smirkers",
+                     "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks", "Base.Chocolate_HeartBox",
+                     "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted", "Base.DoughnutJelly",
+                     "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle", "Base.SodaCan",
+                     "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza", "Base.PizzaWhole",
+                     "Base.TVDinner", "Base.Corndog", "Base.FrenchFries", "Base.Fries", "Base.Frozen_FrenchFries",
+                     "Base.TatoDots", "Base.Frozen_TatoDots", "Base.Crackers", "Base.GrahamCrackers", "Base.Popcorn",
+                     "Base.Popsicle", "Base.Icecream", "Base.IcecreamSandwich", "Base.FudgeePop", "Base.GranolaBar",
+                     "Base.CrispyRiceSquare", "Base.QuaggaCakes", "Base.ScoutCookies", "Base.CookieChocolateChip",
+                     "Base.CookiesChocolate", "Base.CookiesOatmeal", "Base.CookiesShortbread", "Base.CookiesSugar"}
         }
     },
 
@@ -146,10 +143,8 @@ return {
         include = {
             categories = {"Ammo"}
         },
-        blacklist = {
-            "Base.Bullets357Box", "Base.ShotgunShellsBox", "Base.Bullets9mmBox", "Base.3030Box",
-            "Base.Bullets44Box", "Base.Bullets38Box", "Base.308Box", "Base.556Box", "Base.Bullets45Box"
-        }
+        blacklist = {"Base.Bullets357Box", "Base.ShotgunShellsBox", "Base.Bullets9mmBox", "Base.3030Box",
+                     "Base.Bullets44Box", "Base.Bullets38Box", "Base.308Box", "Base.556Box", "Base.Bullets45Box"}
     },
 
     weapons_firearms = {
@@ -238,9 +233,8 @@ return {
             }
         },
         include = {
-            items = {"SutureNeedle", "SutureNeedleHolder",
-                     "Tweezers", "Forceps_Forged", "ScissorsBluntMedical", "Splint",
-                     "Pills", "PillsVitamins", "Stethoscope"}
+            items = {"SutureNeedle", "SutureNeedleHolder", "Tweezers", "Forceps_Forged", "ScissorsBluntMedical",
+                     "Splint", "Pills", "PillsVitamins", "Stethoscope"}
         }
     },
 
@@ -537,9 +531,7 @@ return {
         },
         -- Note: Material is large (386 items) and includes leathers, fabrics, clay, metals.
         -- Admins may want to blacklist industrial/weapon components for a purer crafts feel.
-        blacklist = {
-            "Base.NailsBox", "Base.AdhesiveTapeBox", "Base.PaperclipBox", "Base.DuctTapeBox", "Base.ScrewsBox"
-        }
+        blacklist = {"Base.NailsBox", "Base.AdhesiveTapeBox", "Base.PaperclipBox", "Base.DuctTapeBox", "Base.ScrewsBox"}
     },
 
     crafts_sewing = {
@@ -550,8 +542,8 @@ return {
             }
         },
         include = {
-            items = {"Base.Scissors", "Base.NeedleThread", "Base.Needle", "Base.Thread", "Base.SpoolOfThread",
-                     "Base.DenimStrips", "Base.LeatherStrips", "Base.SewingPattern"}
+            items = {"Base.Scissors", "Base.Needle", "Base.Thread", "Base.DenimStrips", "Base.LeatherStrips",
+                     "Base.SewingPattern"}
         }
     },
 

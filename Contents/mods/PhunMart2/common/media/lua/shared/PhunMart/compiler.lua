@@ -15,6 +15,11 @@ local Core = PhunMart
 local Compiler = {}
 Core.compiler = Compiler
 
+-- Canonical merge utilities from shared utils
+local shallowCopy = Core.utils.shallowClone
+local isSequence  = Core.utils.isSequence
+local deepMerge   = Core.utils.deepMerge
+
 -- -----------------------------
 -- Utility: logging
 -- -----------------------------
@@ -35,92 +40,16 @@ local function newLogger()
     }
 end
 
--- -----------------------------
--- Utility: type helpers
--- -----------------------------
+-- isArray: returns true for non-empty tables with only numeric keys (not necessarily contiguous).
+-- Used for conditions normalization where {1="a", 2="b"} should be detected as array-like.
 local function isArray(t)
-    if type(t) ~= "table" then
-        return false
-    end
-
+    if type(t) ~= "table" then return false end
     local hasAnyKey = false
-    for k, _ in pairs(t) do
+    for k in pairs(t) do
         hasAnyKey = true
-        if type(k) ~= "number" then
-            return false
-        end
+        if type(k) ~= "number" then return false end
     end
-
-    -- empty table is NOT an array
-    if not hasAnyKey then
-        return false
-    end
-
-    return true
-end
-
-local function isSequence(t)
-    if type(t) ~= "table" then
-        return false
-    end
-    local n = #t
-    if n == 0 then
-        return false
-    end -- empty not sequence
-    for k, _ in pairs(t) do
-        if type(k) ~= "number" then
-            return false
-        end
-        if k < 1 or k > n or k % 1 ~= 0 then
-            return false
-        end
-    end
-    return true
-end
-
-local function shallowCopy(t)
-    if type(t) ~= "table" then
-        return t
-    end
-    local out = {}
-    for k, v in pairs(t) do
-        out[k] = v
-    end
-    return out
-end
-
--- Deep merge where:
---  - scalars: child overrides parent
---  - tables: merge recursively
---  - arrays: child replaces parent (predictable)
-local function deepMerge(parent, child)
-    if child == nil then
-        return shallowCopy(parent)
-    end
-    if parent == nil then
-        return shallowCopy(child)
-    end
-
-    if type(parent) ~= "table" or type(child) ~= "table" then
-        return shallowCopy(child)
-    end
-
-    -- sequences (arrays) replace
-    if isSequence(parent) or isSequence(child) then
-        return shallowCopy(child)
-    end
-
-    local out = shallowCopy(parent)
-    for k, vChild in pairs(child) do
-        local vParent = out[k]
-        if type(vChild) == "table" and type(vParent) == "table" and (not isSequence(vChild)) and
-            (not isSequence(vParent)) then
-            out[k] = deepMerge(vParent, vChild)
-        else
-            out[k] = shallowCopy(vChild)
-        end
-    end
-    return out
+    return hasAnyKey
 end
 
 -- -----------------------------

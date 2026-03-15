@@ -91,6 +91,49 @@ function utils.shallowCopy(original, excludeKeys)
     return copy
 end
 
+-- Shallow copy a table (one level deep). Non-tables pass through unchanged.
+function utils.shallowClone(t)
+    if type(t) ~= "table" then return t end
+    local out = {}
+    for k, v in pairs(t) do out[k] = v end
+    return out
+end
+
+-- Returns true if t is a non-empty table with only consecutive integer keys.
+function utils.isSequence(t)
+    if type(t) ~= "table" then return false end
+    local n = #t
+    if n == 0 then return false end
+    for k in pairs(t) do
+        if type(k) ~= "number" or k < 1 or k > n or k % 1 ~= 0 then return false end
+    end
+    return true
+end
+
+-- Deep merge: scalars → child wins; sequences → child replaces; maps → recurse.
+-- This is the canonical merge used by both the compiler and core.compileWith.
+function utils.deepMerge(parent, child)
+    if child == nil then return utils.shallowClone(parent) end
+    if parent == nil then return utils.shallowClone(child) end
+    if type(parent) ~= "table" or type(child) ~= "table" then
+        return utils.shallowClone(child)
+    end
+    if utils.isSequence(parent) or utils.isSequence(child) then
+        return utils.shallowClone(child)
+    end
+    local out = utils.shallowClone(parent)
+    for k, vChild in pairs(child) do
+        local vParent = out[k]
+        if type(vChild) == "table" and type(vParent) == "table"
+            and not utils.isSequence(vChild) and not utils.isSequence(vParent) then
+            out[k] = utils.deepMerge(vParent, vChild)
+        else
+            out[k] = utils.shallowClone(vChild)
+        end
+    end
+    return out
+end
+
 function utils.deepCopy(original, excludeKeys)
     local exclude = {}
     for _, k in ipairs(excludeKeys or {}) do
@@ -114,9 +157,20 @@ end
 
 function utils.merge(tableA, tableB, excludeKeys)
     local mergedTable = {}
-    excludeKeys = excludeKeys or ArrayList.new()
+    local exclude = {}
+    if type(excludeKeys) == "table" then
+        -- Support both plain arrays and ArrayList-like objects
+        if excludeKeys.contains then
+            -- Legacy ArrayList — convert to set
+            for i = 0, (excludeKeys.size and excludeKeys:size() - 1 or -1) do
+                exclude[excludeKeys:get(i)] = true
+            end
+        else
+            for _, k in ipairs(excludeKeys) do exclude[k] = true end
+        end
+    end
     for k, v in pairs(tableA or {}) do
-        if not excludeKeys:contains(k) then
+        if not exclude[k] then
             if type(v) == "table" then
                 mergedTable[k] = utils.merge(v, {})
             else
@@ -125,7 +179,7 @@ function utils.merge(tableA, tableB, excludeKeys)
         end
     end
     for k, v in pairs(tableB or {}) do
-        if not excludeKeys:contains(k) then
+        if not exclude[k] then
             if type(v) == "table" then
                 mergedTable[k] = utils.merge(v, mergedTable[k] or {})
             else
