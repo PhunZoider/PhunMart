@@ -114,9 +114,15 @@ end
 -- Resolve a shop object's facing string/enum to an IsoDirections constant.
 local function resolveFacing(shopObj)
     local f = shopObj.facing
-    if f == "E" or f == IsoDirections.E then return IsoDirections.E end
-    if f == "S" or f == IsoDirections.S then return IsoDirections.S end
-    if f == "W" or f == IsoDirections.W then return IsoDirections.W end
+    if f == "E" or f == IsoDirections.E then
+        return IsoDirections.E
+    end
+    if f == "S" or f == IsoDirections.S then
+        return IsoDirections.S
+    end
+    if f == "W" or f == IsoDirections.W then
+        return IsoDirections.W
+    end
     return IsoDirections.N
 end
 
@@ -127,7 +133,11 @@ function ServerSystem.buildShopPayload(shopObj)
     return {
         key = shopObj:getKey(),
         shopType = shopObj.type,
-        location = { x = shopObj.x, y = shopObj.y, z = shopObj.z },
+        location = {
+            x = shopObj.x,
+            y = shopObj.y,
+            z = shopObj.z
+        },
         offers = shopObj.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
         background = shopDef and shopDef.background,
@@ -342,6 +352,15 @@ function ServerSystem:checkObjectAdded(obj)
                 -- is a shop sprite but not an instance?
                 self.initializeShopObject(obj)
             end
+            -- Register with the global object system immediately so the machine
+            -- is live without waiting for a chunk reload.
+            local x, y, z = obj:getX(), obj:getY(), obj:getZ()
+            if not self:getLuaObjectAt(x, y, z) then
+                local luaObj = self:newLuaObjectAt(x, y, z)
+                if luaObj then
+                    luaObj:stateFromIsoObject(obj)
+                end
+            end
         end
     end
 end
@@ -395,6 +414,27 @@ function ServerSystem:recompileShops()
     if Core._lastOverrides then
         sendServerCommand(Core.name, Core.commands.requestShopDefs, {
             overrides = Core._lastOverrides
+        })
+    end
+end
+
+function ServerSystem:checkObjectRemoved(obj)
+    if not obj or not obj.getSprite then
+        return
+    end
+    if not self:isValidIsoObject(obj) then
+        return
+    end
+    local x, y, z = obj:getX(), obj:getY(), obj:getZ()
+    local luaObj = self:getLuaObjectAt(x, y, z)
+    if luaObj then
+        self:removeLuaObject(luaObj)
+    else
+        -- No global object but may still have instance data from initializeShopObject
+        Core:removeInstance({
+            x = x,
+            y = y,
+            z = z
         })
     end
 end

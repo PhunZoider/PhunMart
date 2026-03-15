@@ -131,7 +131,9 @@ local Traits = require "PhunMart/traits"
 -- Resolve a human-readable display name for an offer.
 -- Returns the best available label: trait name > script item name > vehicle label > reward text > raw key.
 function tools.resolveOfferDisplayName(offer)
-    if not offer then return "?" end
+    if not offer then
+        return "?"
+    end
     local traitKey = Traits.getOfferTraitKey(offer)
     if traitKey then
         return Traits.getLabel(traitKey)
@@ -153,11 +155,17 @@ end
 -- Returns a short string like "FREE", "$1.50", "3t", "2x", or nil.
 function tools.formatPriceShort(offer)
     local price = offer and offer.price
-    if not price then return nil end
-    if price.kind == "free" then return "FREE" end
+    if not price then
+        return nil
+    end
+    if price.kind == "free" then
+        return "FREE"
+    end
     if price.kind == "currency" then
         local amt = price.amount
-        if type(amt) == "table" then amt = amt.min end
+        if type(amt) == "table" then
+            amt = amt.min
+        end
         if price.pool == "tokens" then
             return tostring(amt) .. "t"
         else
@@ -206,11 +214,15 @@ function tools.wrapText(text, maxWidth, font)
         if getTextManager():MeasureStringX(font, test) <= maxWidth then
             current = test
         else
-            if current ~= "" then table.insert(lines, current) end
+            if current ~= "" then
+                table.insert(lines, current)
+            end
             current = word
         end
     end
-    if current ~= "" then table.insert(lines, current) end
+    if current ~= "" then
+        table.insert(lines, current)
+    end
     return lines
 end
 

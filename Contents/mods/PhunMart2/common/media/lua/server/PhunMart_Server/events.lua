@@ -148,3 +148,11 @@ end)
 Events.OnObjectAdded.Add(function(object)
     Core.ServerSystem.instance:checkObjectAdded(object)
 end)
+
+Events.OnObjectAboutToBeRemoved.Add(function(object)
+    Core.ServerSystem.instance:checkObjectRemoved(object)
+end)
+
+Events.OnDestroyIsoThumpable.Add(function(object)
+    Core.ServerSystem.instance:checkObjectRemoved(object)
+end)

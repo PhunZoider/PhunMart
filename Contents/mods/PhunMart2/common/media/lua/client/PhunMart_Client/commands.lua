@@ -175,6 +175,7 @@ Commands[Core.commands.getInstanceList] = function(args)
     local player = Core.utils.getPlayerByUsername(args.username)
     if player then
         Core.ui.shop_instances.setData(player, args.data)
+        Core.ui.shop_selector.updateInstanceCounts(args.data)
     end
 end
 
