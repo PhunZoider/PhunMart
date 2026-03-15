@@ -61,8 +61,8 @@ SHOP  (PhunMart2_Shops.lua)
         │     │
         │     └─► game item catalogue  (auto-populated from PZ item scripts)
         │
-        └─► reward CATEGORY  (used by trait/XP/vehicle pools)
-              Pulls all REWARDS whose category field matches
+        └─► REWARDS  (used by trait/XP/vehicle pools)
+              Pulls all rewards whose category field matches
               │
               └─► REWARD  (PhunMart2_Rewards.lua)
                     What the player receives on purchase
@@ -592,13 +592,13 @@ return {
         }
     },
 
-    -- Pool sourcing from reward categories (used for trait/XP/vehicle shops)
-    -- sources.categories pulls all rewards whose `category` field matches
+    -- Pool sourcing from rewards (used for trait/XP/vehicle shops)
+    -- sources.rewards pulls all rewards whose `category` field matches
     pool_traiter_good = {
         fallbackTexture  = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
-            categories = { "trait_add" }
+            rewards = { "trait_add" }
         },
         roll = {
             mode  = "weighted",
@@ -614,7 +614,7 @@ return {
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `defaults.price`     | Price key applied to every item drawn from this pool                                                                                                                                                           |
 | `sources.groups`     | Array of Group keys to pull items from                                                                                                                                                                         |
-| `sources.categories` | Array of reward category strings to pull rewards from                                                                                                                                                          |
+| `sources.rewards`    | Array of reward category strings — pulls all items whose reward has a matching `category` field                                                                                                                    |
 | `roll.mode`          | `"weighted"` (only mode currently supported)                                                                                                                                                                   |
 | `roll.count.min`     | Minimum number of offers to show                                                                                                                                                                               |
 | `roll.count.max`     | Maximum number of offers to show                                                                                                                                                                               |

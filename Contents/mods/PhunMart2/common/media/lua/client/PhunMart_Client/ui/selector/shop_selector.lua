@@ -325,6 +325,15 @@ function UI:createChildren()
     self.controls.btnGroups = btnGroups;
     self.controls._controlPanel:addChild(btnGroups);
 
+    local btnPools = ISButton:new(0, 10, 80, BUTTON_HGT, "Pools", self, function()
+        Core.ui.admin_pools.OnOpenPanel(self.player)
+    end);
+    btnPools.internal = "POOLS";
+    btnPools:initialise();
+    btnPools:instantiate();
+    self.controls.btnPools = btnPools;
+    self.controls._controlPanel:addChild(btnPools);
+
     self:refreshAll()
 end
 
@@ -341,7 +350,7 @@ end
 function UI:onEdit(item)
     local shop = self.controls.list.items[self.controls.list.selected].item
     if shop and shop.type then
-        Core.ClientSystem.instance:prepareOpenShopConfig(self.player, shop.type)
+        Core.ui.admin_shops.OnOpenPanel(self.player, shop.type)
     end
 end
 
@@ -390,6 +399,7 @@ function UI:prerender()
     self.controls.btnItems:setVisible(isAdminUser)
     self.controls.btnRewards:setVisible(isAdminUser)
     self.controls.btnGroups:setVisible(isAdminUser)
+    self.controls.btnPools:setVisible(isAdminUser)
     if isAdminUser then
         self.controls.btnBlacklist:setX(10)
         self.controls.btnCompile:setX(self.controls.btnBlacklist.x + self.controls.btnBlacklist.width + 10)
@@ -398,6 +408,7 @@ function UI:prerender()
         self.controls.btnItems:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
         self.controls.btnRewards:setX(self.controls.btnItems.x + self.controls.btnItems.width + 10)
         self.controls.btnGroups:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
+        self.controls.btnPools:setX(self.controls.btnGroups.x + self.controls.btnGroups.width + 10)
     end
 
 end

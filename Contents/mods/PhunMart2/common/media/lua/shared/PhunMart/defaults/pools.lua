@@ -204,7 +204,7 @@ return {
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
-            categories = {"trait_add"}
+            rewards = {"trait_add"}
         },
         roll = {
             mode = "weighted",
@@ -221,7 +221,7 @@ return {
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Remove Negative Traits",
         sources = {
-            categories = {"trait_remove"}
+            rewards = {"trait_remove"}
         },
         roll = {
             mode = "weighted",
@@ -391,7 +391,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            categories = {"xp_t1"}
+            rewards = {"xp_t1"}
         },
         roll = {
             mode = "weighted",
@@ -408,7 +408,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            categories = {"xp_t2"}
+            rewards = {"xp_t2"}
         },
         roll = {
             mode = "weighted",
@@ -425,7 +425,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            categories = {"xp_t3"}
+            rewards = {"xp_t3"}
         },
         roll = {
             mode = "weighted",
@@ -442,7 +442,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            categories = {"boost_t1"}
+            rewards = {"boost_t1"}
         },
         roll = {
             mode = "weighted",
@@ -459,7 +459,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            categories = {"boost_t2"}
+            rewards = {"boost_t2"}
         },
         roll = {
             mode = "weighted",
@@ -476,7 +476,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            categories = {"boost_t3"}
+            rewards = {"boost_t3"}
         },
         roll = {
             mode = "weighted",

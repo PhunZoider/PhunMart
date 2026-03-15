@@ -721,7 +721,7 @@ function UI:onChangeTo(shopType)
 end
 
 function UI:onEditShop()
-    Core.ClientSystem.instance:prepareOpenShopConfig(self.player, self.data.shopType)
+    Core.ui.admin_shops.OnOpenPanel(self.player, self.data.shopType)
 end
 
 function UI:onViewPool(poolKey)
@@ -731,13 +731,11 @@ function UI:onViewPool(poolKey)
 end
 
 function UI:onEditPool(poolKey)
-    -- TODO: open Pool Editor panel
-    self:showFeedback("Pool Editor: " .. poolKey, 0.7, 0.7, 0.3)
+    Core.ui.admin_pools.OnEditPool(self.player, poolKey)
 end
 
 function UI:onNewPool()
-    -- TODO: open Pool Editor with blank pool
-    self:showFeedback("Add Pool coming soon", 0.7, 0.7, 0.3)
+    Core.ui.admin_pools.OnEditPool(self.player, nil)
 end
 
 function UI:onBlacklistSelected()

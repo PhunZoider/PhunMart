@@ -867,11 +867,11 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- category-based items: include all non-template items whose resolved
+            -- reward-based items: include all non-template items whose resolved
             -- reward has a matching category (inherited from reward templates).
-            if type(sources.categories) == "table" then
+            if type(sources.rewards) == "table" then
                 local catSet = {}
-                for _, cat in ipairs(sources.categories) do
+                for _, cat in ipairs(sources.rewards) do
                     catSet[cat] = true
                 end
 
