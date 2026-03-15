@@ -29,14 +29,14 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
             type = "int",
             tooltip = "IGUI_PhunMart_CoinMinCents_tooltip",
             group = "PhunMart",
-            order = 200
+            order = 201
         }
         PZ.fields.coinmax = {
             label = "IGUI_PhunMart_CoinMaxCents",
             type = "int",
             tooltip = "IGUI_PhunMart_CoinMaxCents_tooltip",
             group = "PhunMart",
-            order = 200
+            order = 202
         }
         if activeMods:contains("phunsprinters2") or activeMods:contains("phunsprinters2test") then
 
@@ -46,21 +46,21 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
                 type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterDropChance_tooltip",
                 group = "PhunMart",
-                order = 200
+                order = 203
             }
             PZ.fields.coinsprintermin = {
                 label = "IGUI_PhunMart_CoinSprinterMinCents",
                 type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterMinCents_tooltip",
                 group = "PhunMart",
-                order = 200
+                order = 204
             }
             PZ.fields.coinsprintermax = {
                 label = "IGUI_PhunMart_CoinSprinterMaxCents",
                 type = "int",
                 tooltip = "IGUI_PhunMart_CoinSprinterMaxCents_tooltip",
                 group = "PhunMart",
-                order = 200
+                order = 205
             }
         end
 
