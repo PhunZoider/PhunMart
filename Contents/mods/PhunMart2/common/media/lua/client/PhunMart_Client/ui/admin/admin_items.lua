@@ -35,8 +35,8 @@ local function formatPrice(itemDef)
     return itemDef.price or ""
 end
 
--- Format the reward column: show the reward key string.
-local function formatReward(itemDef)
+-- Format the special column: show the special key string.
+local function formatSpecial(itemDef)
     return itemDef.reward or ""
 end
 
@@ -110,24 +110,24 @@ function EditModal:createChildren()
     self:addChild(self.priceCombo)
     y = y + ROW_H + PAD
 
-    -- Reward combo
-    self.rewardLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Reward"), 1, 1, 1, 1, UIFont.Small, true)
-    self.rewardLabel:initialise()
-    self:addChild(self.rewardLabel)
+    -- Special combo
+    self.specialLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Special"), 1, 1, 1, 1, UIFont.Small, true)
+    self.specialLabel:initialise()
+    self:addChild(self.specialLabel)
 
-    self.rewardCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.rewardCombo:initialise()
-    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
-    local rewardKeys = getSortedKeys(rewards)
-    local selectedRewardIdx = 1
-    for i, rk in ipairs(rewardKeys) do
-        self.rewardCombo:addOption(rk)
+    self.specialCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
+    self.specialCombo:initialise()
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local specialKeys = getSortedKeys(specials)
+    local selectedSpecialIdx = 1
+    for i, rk in ipairs(specialKeys) do
+        self.specialCombo:addOption(rk)
         if self.itemDef and self.itemDef.reward == rk then
-            selectedRewardIdx = i
+            selectedSpecialIdx = i
         end
     end
-    self.rewardCombo.selected = selectedRewardIdx
-    self:addChild(self.rewardCombo)
+    self.specialCombo.selected = selectedSpecialIdx
+    self:addChild(self.specialCombo)
     y = y + ROW_H + PAD
 
     -- Weight entry
@@ -214,7 +214,7 @@ function EditModal:onApply()
 
     local def = {
         price = self.priceCombo:getSelectedText(),
-        reward = self.rewardCombo:getSelectedText(),
+        reward = self.specialCombo:getSelectedText(),
         offer = {}
     }
 
@@ -344,7 +344,7 @@ function UI:refreshItems()
         self.datas:addItem(key, {
             key = key,
             price = formatPrice(def),
-            reward = formatReward(def),
+            special = formatSpecial(def),
             weight = formatWeight(def),
             enabled = formatEnabled(def),
             def = def
@@ -447,12 +447,12 @@ function UI:createChildren()
     self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
 
     local colPrice = math.floor(w * 0.38)
-    local colReward = math.floor(w * 0.55)
+    local colSpecial = math.floor(w * 0.55)
     local colWeight = math.floor(w * 0.72)
     local colEnabled = math.floor(w * 0.85)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Reward"), colReward)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Special"), colSpecial)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Weight"), colWeight)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Enabled"), colEnabled)
     self.datas:setVisible(false)
@@ -498,9 +498,9 @@ function UI:drawDatas(y, item, alt)
     self:drawText(data.price, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
 
-    -- Reward column
+    -- Special column
     self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
-    self:drawText(data.reward, col3X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
+    self:drawText(data.special, col3X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
 
     -- Weight column

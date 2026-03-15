@@ -45,8 +45,8 @@ local function formatSources(def)
         if def.sources.groups then
             table.insert(parts, getText("IGUI_PhunMart_NGroups", tostring(#def.sources.groups)))
         end
-        if def.sources.rewards then
-            table.insert(parts, getText("IGUI_PhunMart_NRewards", tostring(#def.sources.rewards)))
+        if def.sources.specials then
+            table.insert(parts, getText("IGUI_PhunMart_NSpecials", tostring(#def.sources.specials)))
         end
     end
     if #parts == 0 then
@@ -157,24 +157,24 @@ function EditModal:createChildren()
     self:addChild(self.groupsHint)
     y = y + FONT_HGT_SMALL + PAD
 
-    -- Source Rewards (comma-separated)
-    self.rewardsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Rewards"), 1, 1, 1, 1, UIFont.Small, true)
-    self.rewardsLabel:initialise()
-    self:addChild(self.rewardsLabel)
+    -- Source Specials (comma-separated)
+    self.specialsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Specials"), 1, 1, 1, 1, UIFont.Small, true)
+    self.specialsLabel:initialise()
+    self:addChild(self.specialsLabel)
 
-    local rewardsDefault = ""
-    if self.poolDef and self.poolDef.sources and self.poolDef.sources.rewards then
-        rewardsDefault = table.concat(self.poolDef.sources.rewards, ", ")
+    local specialsDefault = ""
+    if self.poolDef and self.poolDef.sources and self.poolDef.sources.specials then
+        specialsDefault = table.concat(self.poolDef.sources.specials, ", ")
     end
-    self.rewardsEntry = ISTextEntryBox:new(rewardsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.rewardsEntry:initialise()
-    self.rewardsEntry:instantiate()
-    self:addChild(self.rewardsEntry)
+    self.specialsEntry = ISTextEntryBox:new(specialsDefault, x + labelW, y, w - labelW, ROW_H)
+    self.specialsEntry:initialise()
+    self.specialsEntry:instantiate()
+    self:addChild(self.specialsEntry)
     y = y + ROW_H + 2
 
-    self.rewardsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Rewards"), 0.5, 0.5, 0.5, 1,
+    self.specialsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Specials"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
-    self.rewardsHint:initialise()
+    self.specialsHint:initialise()
     self:addChild(self.rewardsHint)
     y = y + FONT_HGT_SMALL + PAD
 
@@ -361,14 +361,14 @@ function EditModal:onApply()
 
     -- Sources
     local groups = parseCSV(self.groupsEntry:getText())
-    local rewards = parseCSV(self.rewardsEntry:getText())
-    if groups or rewards then
+    local specials = parseCSV(self.specialsEntry:getText())
+    if groups or specials then
         def.sources = {}
         if groups then
             def.sources.groups = groups
         end
-        if rewards then
-            def.sources.rewards = rewards
+        if specials then
+            def.sources.specials = specials
         end
     end
 

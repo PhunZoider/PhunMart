@@ -267,6 +267,15 @@ function UI:createChildren()
     self.controls.btnWallet = btnWallet;
     self.controls._controlPanel:addChild(btnWallet);
 
+    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Rewards"), self, function()
+        Core.ui.admin_rewards.OnOpenPanel(self.player)
+    end);
+    btnRewards.internal = "REWARDS";
+    btnRewards:initialise();
+    btnRewards:instantiate();
+    self.controls.btnRewards = btnRewards;
+    self.controls._controlPanel:addChild(btnRewards);
+
     local btnCompile = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Recompile"), self, function()
         sendClientCommand(Core.name, Core.commands.compile, {})
     end);
@@ -295,14 +304,14 @@ function UI:createChildren()
     self.controls.btnItems = btnItems;
     self.controls._controlPanel:addChild(btnItems);
 
-    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Rewards"), self, function()
-        Core.ui.admin_rewards.OnOpenPanel(self.player)
+    local btnSpecials = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Specials"), self, function()
+        Core.ui.admin_specials.OnOpenPanel(self.player)
     end);
-    btnRewards.internal = "REWARDS";
-    btnRewards:initialise();
-    btnRewards:instantiate();
-    self.controls.btnRewards = btnRewards;
-    self.controls._controlPanel:addChild(btnRewards);
+    btnSpecials.internal = "SPECIALS";
+    btnSpecials:initialise();
+    btnSpecials:instantiate();
+    self.controls.btnSpecials = btnSpecials;
+    self.controls._controlPanel:addChild(btnSpecials);
 
     local btnGroups = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Groups"), self, function()
         Core.ui.admin_groups.OnOpenPanel(self.player)
@@ -366,35 +375,35 @@ function UI:prerender()
     self.controls._controlPanel:setHeight(BUTTON_HGT + 20)
     self.controls._controlPanel:setY(self.controls._controlPanel.parent.height - self.controls._controlPanel.height)
 
-    -- close button
+    -- right side: Close, Locations
     self.controls.btnClose:setX(self.controls.btnClose.parent.width - self.controls.btnClose.width - 10)
     self.controls.btnClose:setEnable(self.controls.list.selected > 0)
 
-    -- config button
-    self.controls.btnConfig:setX(self.controls.btnClose.x - self.controls.btnClose.width - 10)
-    self.controls.btnConfig:setEnable(self.controls.list.selected > 0)
-
-    -- instances button
-    self.controls.btnInstances:setX(self.controls.btnConfig.x - self.controls.btnInstances.width - 10)
+    self.controls.btnInstances:setX(self.controls.btnClose.x - self.controls.btnInstances.width - 10)
     self.controls.btnInstances:setEnable(self.controls.list.selected > 0)
 
     -- admin buttons (left side, visible only for admins)
     local isAdminUser = isAdmin() or isDebugEnabled()
-    self.controls.btnWallet:setVisible(isAdminUser)
-    self.controls.btnCompile:setVisible(isAdminUser)
-    self.controls.btnPrices:setVisible(isAdminUser)
-    self.controls.btnItems:setVisible(isAdminUser)
-    self.controls.btnRewards:setVisible(isAdminUser)
-    self.controls.btnGroups:setVisible(isAdminUser)
+    self.controls.btnConfig:setVisible(isAdminUser)
     self.controls.btnPools:setVisible(isAdminUser)
+    self.controls.btnGroups:setVisible(isAdminUser)
+    self.controls.btnSpecials:setVisible(isAdminUser)
+    self.controls.btnItems:setVisible(isAdminUser)
+    self.controls.btnPrices:setVisible(isAdminUser)
+    self.controls.btnWallet:setVisible(isAdminUser)
+    self.controls.btnRewards:setVisible(isAdminUser)
+    self.controls.btnCompile:setVisible(isAdminUser)
     if isAdminUser then
-        self.controls.btnCompile:setX(10)
-        self.controls.btnWallet:setX(self.controls.btnCompile.x + self.controls.btnCompile.width + 10)
-        self.controls.btnPrices:setX(self.controls.btnWallet.x + self.controls.btnWallet.width + 10)
-        self.controls.btnItems:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
-        self.controls.btnRewards:setX(self.controls.btnItems.x + self.controls.btnItems.width + 10)
-        self.controls.btnGroups:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
-        self.controls.btnPools:setX(self.controls.btnGroups.x + self.controls.btnGroups.width + 10)
+        self.controls.btnConfig:setX(10)
+        self.controls.btnConfig:setEnable(self.controls.list.selected > 0)
+        self.controls.btnPools:setX(self.controls.btnConfig.x + self.controls.btnConfig.width + 10)
+        self.controls.btnGroups:setX(self.controls.btnPools.x + self.controls.btnPools.width + 10)
+        self.controls.btnSpecials:setX(self.controls.btnGroups.x + self.controls.btnGroups.width + 10)
+        self.controls.btnItems:setX(self.controls.btnSpecials.x + self.controls.btnSpecials.width + 10)
+        self.controls.btnPrices:setX(self.controls.btnItems.x + self.controls.btnItems.width + 10)
+        self.controls.btnWallet:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
+        self.controls.btnRewards:setX(self.controls.btnWallet.x + self.controls.btnWallet.width + 10)
+        self.controls.btnCompile:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
     end
 
 end

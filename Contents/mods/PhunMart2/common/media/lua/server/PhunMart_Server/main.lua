@@ -28,7 +28,7 @@ function Core.compile()
     -- using their own shared defaults + these overrides (no FS access on clients).
     local overrides = {
         prices         = overridePatch({"PhunMart_Prices.lua"}),
-        rewards        = overridePatch({"PhunMart_Rewards.lua", "PhunMart_XP_Rewards.lua"}),
+        specials       = overridePatch({"PhunMart_Specials.lua", "PhunMart_XP_Rewards.lua"}),
         conditionsDefs = overridePatch({"PhunMart_Conditions.lua", "PhunMart_XP_Conditions.lua"}),
         items          = overridePatch({"PhunMart_Items.lua", "PhunMart_XP_Items.lua"}),
         groups         = overridePatch({"PhunMart_Groups.lua"}),
@@ -225,6 +225,7 @@ function Core:ini()
     Core.playtimeRewards:load()
     Core.killRewards:load()
     Core.purchases:load()
+    Core.wallet:load()
     Core.debug("Server System initialized")
     triggerEvent(self.events.OnReady, self)
 end

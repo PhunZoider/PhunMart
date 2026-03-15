@@ -14,11 +14,11 @@ local PAD = math.max(10, math.floor(10 * FONT_SCALE))
 local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
 local SCROLLBAR_W = 13
 
-local windowName = "PhunRewardsAdminUI"
+local windowName = "PhunSpecialsAdminUI"
 
-Core.ui.admin_rewards = ISPanel:derive(windowName)
-Core.ui.admin_rewards.instances = {}
-local UI = Core.ui.admin_rewards
+Core.ui.admin_specials = ISPanel:derive(windowName)
+Core.ui.admin_specials.instances = {}
+local UI = Core.ui.admin_specials
 
 -- Collect sorted keys from a table.
 local function getSortedKeys(tbl)
@@ -70,7 +70,7 @@ end
 ---------------------------------------------------------------------------
 -- Edit / Add Modal
 ---------------------------------------------------------------------------
-local EditModal = ISPanel:derive("PhunRewardEditModal")
+local EditModal = ISPanel:derive("PhunSpecialEditModal")
 
 local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens"}
 local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector"}
@@ -84,7 +84,8 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Action Arg: ") + 8
 
     -- Title
-    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddReward") or getText("IGUI_PhunMart_Title_EditX", self.rewardKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddSpecial") or
+                          getText("IGUI_PhunMart_Title_EditX", self.specialKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
@@ -95,7 +96,7 @@ function EditModal:createChildren()
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
-    self.keyEntry = ISTextEntryBox:new(self.rewardKey or "", x + labelW, y, w - labelW, ROW_H)
+    self.keyEntry = ISTextEntryBox:new(self.specialKey or "", x + labelW, y, w - labelW, ROW_H)
     self.keyEntry:initialise()
     self.keyEntry:instantiate()
     if not self.isNew then
@@ -109,7 +110,7 @@ function EditModal:createChildren()
     self.templateCheck:initialise()
     self.templateCheck:instantiate()
     self.templateCheck:addOption(getText("IGUI_PhunMart_Lbl_IsTemplate"), nil)
-    self.templateCheck:setSelected(1, self.rewardDef and self.rewardDef.template or false)
+    self.templateCheck:setSelected(1, self.specialDef and self.specialDef.template or false)
     self.templateCheck.changeOptionMethod = EditModal.onTemplateChanged
     self.templateCheck.changeOptionTarget = self
     self:addChild(self.templateCheck)
@@ -127,7 +128,7 @@ function EditModal:createChildren()
     local selectedKind = 1
     for i, k in ipairs(KIND_OPTIONS) do
         self.kindCombo:addOption(k)
-        if self.rewardDef and self.rewardDef.kind == k then
+        if self.specialDef and self.specialDef.kind == k then
             selectedKind = i
         end
     end
@@ -140,7 +141,7 @@ function EditModal:createChildren()
     self.categoryLabel:initialise()
     self:addChild(self.categoryLabel)
 
-    local catDefault = (self.rewardDef and self.rewardDef.category) or ""
+    local catDefault = (self.specialDef and self.specialDef.category) or ""
     self.categoryEntry = ISTextEntryBox:new(catDefault, x + labelW, y, w - labelW, ROW_H)
     self.categoryEntry:initialise()
     self.categoryEntry:instantiate()
@@ -152,7 +153,7 @@ function EditModal:createChildren()
     self.textureLabel:initialise()
     self:addChild(self.textureLabel)
 
-    local texDefault = (self.rewardDef and self.rewardDef.display and self.rewardDef.display.texture) or ""
+    local texDefault = (self.specialDef and self.specialDef.display and self.specialDef.display.texture) or ""
     self.textureEntry = ISTextEntryBox:new(texDefault, x + labelW, y, w - labelW, ROW_H)
     self.textureEntry:initialise()
     self.textureEntry:instantiate()
@@ -164,7 +165,7 @@ function EditModal:createChildren()
     self.overlayLabel:initialise()
     self:addChild(self.overlayLabel)
 
-    local ovlDefault = (self.rewardDef and self.rewardDef.display and self.rewardDef.display.overlay) or ""
+    local ovlDefault = (self.specialDef and self.specialDef.display and self.specialDef.display.overlay) or ""
     self.overlayEntry = ISTextEntryBox:new(ovlDefault, x + labelW, y, w - labelW, ROW_H)
     self.overlayEntry:initialise()
     self.overlayEntry:instantiate()
@@ -181,9 +182,9 @@ function EditModal:createChildren()
     self.inheritCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.inheritCombo:initialise()
     self.inheritCombo:addOption(getText("IGUI_PhunMart_Lbl_None"))
-    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
     local templateKeys = {}
-    for k, v in pairs(rewards) do
+    for k, v in pairs(specials) do
         if v.template then
             table.insert(templateKeys, k)
         end
@@ -192,7 +193,7 @@ function EditModal:createChildren()
     local selectedInherit = 1
     for i, tk in ipairs(templateKeys) do
         self.inheritCombo:addOption(tk)
-        if self.rewardDef and self.rewardDef.inherit == tk then
+        if self.specialDef and self.specialDef.inherit == tk then
             selectedInherit = i + 1 -- +1 for (none)
         end
     end
@@ -205,7 +206,7 @@ function EditModal:createChildren()
     self.displayLabel:initialise()
     self:addChild(self.displayLabel)
 
-    local dispDefault = (self.rewardDef and self.rewardDef.display and self.rewardDef.display.text) or ""
+    local dispDefault = (self.specialDef and self.specialDef.display and self.specialDef.display.text) or ""
     self.displayEntry = ISTextEntryBox:new(dispDefault, x + labelW, y, w - labelW, ROW_H)
     self.displayEntry:initialise()
     self.displayEntry:instantiate()
@@ -220,7 +221,7 @@ function EditModal:createChildren()
     self.actionCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H, self, EditModal.onActionChanged)
     self.actionCombo:initialise()
     local selectedAction = 1
-    local curAction = self.rewardDef and self.rewardDef.actions and self.rewardDef.actions[1]
+    local curAction = self.specialDef and self.specialDef.actions and self.specialDef.actions[1]
     for i, at in ipairs(ACTION_TYPES) do
         self.actionCombo:addOption(at)
         if curAction and curAction.type == at then
@@ -232,7 +233,8 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Action arg entry (trait key, script name, or token amount depending on type)
-    self.actionArgLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_ActionArg"), 1, 1, 1, 1, UIFont.Small, true)
+    self.actionArgLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_ActionArg"), 1, 1, 1, 1, UIFont.Small,
+        true)
     self.actionArgLabel:initialise()
     self:addChild(self.actionArgLabel)
 
@@ -269,7 +271,8 @@ function EditModal:createChildren()
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
+        EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 
@@ -349,13 +352,17 @@ function EditModal:onApply()
         end
         local dispText = self.displayEntry:getText()
         if dispText ~= "" then
-            def.display = {text = dispText}
+            def.display = {
+                text = dispText
+            }
         end
 
         local actionType = self.actionCombo:getSelectedText()
         local argText = self.actionArgEntry:getText()
         if actionType and argText ~= "" then
-            local action = {type = actionType}
+            local action = {
+                type = actionType
+            }
             if actionType == "addTrait" or actionType == "removeTrait" then
                 action.trait = argText
             elseif actionType == "spawnVehicle" then
@@ -399,7 +406,7 @@ function EditModal:close()
     self:removeFromUIManager()
 end
 
-function EditModal:new(rewardKey, rewardDef, isNew, cb)
+function EditModal:new(specialKey, specialDef, isNew, cb)
     local modalW = math.floor(420 * FONT_SCALE)
     -- Tall enough for all fields (template + non-template share vertical space)
     local modalH = PAD * 14 + FONT_HGT_MEDIUM + ROW_H * 11 + FONT_HGT_SMALL + PAD * 2
@@ -410,8 +417,8 @@ function EditModal:new(rewardKey, rewardDef, isNew, cb)
     local o = ISPanel:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
-    o.rewardKey = rewardKey or ""
-    o.rewardDef = rewardDef
+    o.specialKey = specialKey or ""
+    o.specialDef = specialDef
     o.isNew = isNew
     o.cb = cb
     o.backgroundColor = {
@@ -431,7 +438,7 @@ function EditModal:new(rewardKey, rewardDef, isNew, cb)
 end
 
 ---------------------------------------------------------------------------
--- Main Rewards Panel
+-- Main Specials Panel
 ---------------------------------------------------------------------------
 
 function UI.OnOpenPanel(player)
@@ -449,24 +456,24 @@ function UI.OnOpenPanel(player)
     end
     instance:addToUIManager()
     instance:setVisible(true)
-    instance:refreshRewards()
+    instance:refreshSpecials()
     return instance
 end
 
-function UI:refreshRewards()
+function UI:refreshSpecials()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
 
     local keys = {}
-    for k in pairs(rewards) do
+    for k in pairs(specials) do
         table.insert(keys, k)
     end
     table.sort(keys)
 
     for _, key in ipairs(keys) do
-        local def = rewards[key]
+        local def = specials[key]
         self.datas:addItem(key, {
             key = key,
             typeCol = formatType(def),
@@ -478,17 +485,20 @@ function UI:refreshRewards()
     self.datas:setVisible(true)
 end
 
-local function saveRewardDef(self, key, def)
-    sendClientCommand(Core.name, Core.commands.upsertRewardDef, {key = key, def = def})
-    if Core.defs and Core.defs.rewards then
-        Core.defs.rewards[key] = def
+local function saveSpecialDef(self, key, def)
+    sendClientCommand(Core.name, Core.commands.upsertSpecialDef, {
+        key = key,
+        def = def
+    })
+    if Core.defs and Core.defs.specials then
+        Core.defs.specials[key] = def
     end
-    self:refreshRewards()
+    self:refreshSpecials()
 end
 
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        saveRewardDef(self, key, def)
+        saveSpecialDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -505,7 +515,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        saveRewardDef(self, key, def)
+        saveSpecialDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -515,7 +525,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        saveRewardDef(self, key, def)
+        saveSpecialDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -530,7 +540,8 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_RewardDefs"), 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_SpecialDefs"), 1, 1, 1, 1,
+        UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -552,7 +563,8 @@ function UI:createChildren()
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self,
+        UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 

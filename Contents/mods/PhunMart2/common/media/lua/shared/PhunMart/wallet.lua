@@ -188,3 +188,40 @@ function Core.wallet:getBalance(player, pool)
     end
     return 0
 end
+
+-- File-based persistence (server-only, mirrors purchases pattern).
+-- Survives server crashes between game saves.
+function Core.wallet:save()
+    if Core.fileUtils then
+        Core.fileUtils.saveTable("PhunMart_Wallet.lua", self.data or {})
+    end
+end
+
+function Core.wallet:load()
+    if not Core.fileUtils then return end
+    local saved = Core.fileUtils.loadTable("PhunMart_Wallet.lua")
+    if not saved then return end
+    -- Merge file-backed data into ModData, preferring higher balances
+    -- so a crash between file-save and game-save doesn't lose progress.
+    if self.data == nil then
+        self.data = ModData.getOrCreate(self.name)
+    end
+    for key, fileWallet in pairs(saved) do
+        local mdWallet = self.data[key]
+        if not mdWallet then
+            self.data[key] = fileWallet
+        else
+            -- Take the higher of each pool balance
+            for _, wType in ipairs({"current", "bound"}) do
+                if fileWallet[wType] then
+                    mdWallet[wType] = mdWallet[wType] or {}
+                    for pool, val in pairs(fileWallet[wType]) do
+                        if (val or 0) > (mdWallet[wType][pool] or 0) then
+                            mdWallet[wType][pool] = val
+                        end
+                    end
+                end
+            end
+        end
+    end
+end

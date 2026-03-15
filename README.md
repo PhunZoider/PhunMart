@@ -100,7 +100,7 @@ Awarded automatically when thresholds are crossed — no player action required.
 | Zombie kills: 100, 500, 1000 | Tokens (increasing) |
 | Sprinter kills: 50, 200      | Tokens              |
 
-Exact amounts are configurable — see [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards).
+Exact amounts are configurable — see [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards) (player rewards).
 
 ### Collectors machine (repeatable)
 
@@ -167,11 +167,11 @@ Full reference with worked examples: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATIO
 
 Topics covered:
 
-- How prices, rewards, conditions, groups, pools, and shops fit together
+- How prices, specials, conditions, groups, pools, and shops fit together
 - Step-by-step walkthrough: building a new shop from scratch
 - How deep-merge overrides work
 - All condition tests and their arguments
-- All reward kinds (item, trait, skill, boost, vehicle)
+- All special kinds (item, trait, skill, boost, vehicle)
 - Token reward milestone format
 
 ---

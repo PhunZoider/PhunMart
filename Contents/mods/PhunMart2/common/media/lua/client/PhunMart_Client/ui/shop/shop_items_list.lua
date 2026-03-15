@@ -35,39 +35,39 @@ Core.ui.client.shopItemsList = UI
 -- Skills not listed here fall back to the reward's display.texture or no icon.
 local SKILL_BOOK = {
     -- Ranged / combat
-    Aiming          = "Base.BookAiming1",
-    Reloading       = "Base.BookReloading1",
-    Axe             = "Base.BookAxe1",
-    Blunt           = "Base.BookBlunt1",
-    SmallBlade      = "Base.BookSmallBlade1",
-    LongBlade       = "Base.BookLongBlade1",
-    SmallBlunt      = "Base.BookSmallBlunt1",
-    Spear           = "Base.BookSpear1",
+    Aiming = "Base.BookAiming1",
+    Reloading = "Base.BookReloading1",
+    Axe = "Base.BookAxe1",
+    Blunt = "Base.BookBlunt1",
+    SmallBlade = "Base.BookSmallBlade1",
+    LongBlade = "Base.BookLongBlade1",
+    SmallBlunt = "Base.BookSmallBlunt1",
+    Spear = "Base.BookSpear1",
     -- Survival / nature
-    Foraging        = "Base.BasicForaging1",
+    Foraging = "Base.BasicForaging1",
     PlantScavenging = "Base.BasicForaging1",
-    Tracking        = "Base.BasicForaging1",
-    Farming         = "Base.BookFarming1",
-    Fishing         = "Base.BookFishing1",
-    Trapping        = "Base.BookTrapping1",
+    Tracking = "Base.BasicForaging1",
+    Farming = "Base.BookFarming1",
+    Fishing = "Base.BookFishing1",
+    Trapping = "Base.BookTrapping1",
     -- Crafting / trade
-    Cooking         = "Base.BookCooking1",
-    Tailoring       = "Base.BookTailoring1",
-    Woodwork        = "Base.BookCarpentry1",
-    Electricity     = "Base.BookElectricity1",
-    Mechanics       = "Base.BookMechanics1",
-    Maintenance     = "Base.BookMaintenance1",
-    MetalWelding    = "Base.BookMetalWelding1",
-    Blacksmith      = "Base.BookBlacksmith1",
-    Masonry         = "Base.BookMasonry1",
-    Butchering      = "Base.BookButchering1",
-    Husbandry       = "Base.BookHusbandry1",
-    FlintKnapping   = "Base.BookFlintKnapping1",
-    Pottery         = "Base.BookPottery1",
-    Carving         = "Base.BookCarving1",
-    Glassmaking     = "Base.BookGlassmaking1",
+    Cooking = "Base.BookCooking1",
+    Tailoring = "Base.BookTailoring1",
+    Woodwork = "Base.BookCarpentry1",
+    Electricity = "Base.BookElectricity1",
+    Mechanics = "Base.BookMechanics1",
+    Maintenance = "Base.BookMaintenance1",
+    MetalWelding = "Base.BookMetalWelding1",
+    Blacksmith = "Base.BookBlacksmith1",
+    Masonry = "Base.BookMasonry1",
+    Butchering = "Base.BookButchering1",
+    Husbandry = "Base.BookHusbandry1",
+    FlintKnapping = "Base.BookFlintKnapping1",
+    Pottery = "Base.BookPottery1",
+    Carving = "Base.BookCarving1",
+    Glassmaking = "Base.BookGlassmaking1",
     -- Medical
-    Doctor          = "Base.BookFirstAid1",
+    Doctor = "Base.BookFirstAid1"
 }
 
 local formatPrice = tools.formatPriceShort
@@ -230,7 +230,9 @@ function UI:setData(data)
                     local bookKey = SKILL_BOOK[action.skill]
                     if bookKey then
                         local bookItem = getScriptManager():getItem(bookKey)
-                        if bookItem then texture = bookItem:getNormalTexture() end
+                        if bookItem then
+                            texture = bookItem:getNormalTexture()
+                        end
                     end
                 end
             end
@@ -241,7 +243,9 @@ function UI:setData(data)
             if not texture then
                 -- allow display.texture to be a script item name (e.g. "Base.BookButchering1")
                 local si = getScriptManager():getItem(dt)
-                if si then texture = si:getNormalTexture() end
+                if si then
+                    texture = si:getNormalTexture()
+                end
             end
         end
         if not texture and offer.meta and offer.meta.fallbackTexture then

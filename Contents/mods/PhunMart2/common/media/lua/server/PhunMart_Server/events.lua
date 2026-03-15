@@ -77,10 +77,12 @@ Events.OnCharacterDeath.Add(function(character)
 
     -- Reset wallet (zero unbound, restore bound)
     Core.wallet:reset(character)
+    Core.wallet:save()
 end)
 
 Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
+    Core.wallet:save()
 end)
 
 -- Check power state every minute so sprite swaps within ~1 minute of electricity changing.

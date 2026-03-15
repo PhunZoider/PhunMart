@@ -12,7 +12,7 @@ that you can override without touching the mod itself.
 2. [Quick start: a new shop from scratch](#2-quick-start-a-new-shop-from-scratch)
 3. [How overrides work](#3-how-overrides-work)
 4. [Prices](#4-prices)
-5. [Rewards](#5-rewards)
+5. [Specials](#5-specials)
 6. [Conditions](#6-conditions)
 7. [Items (Offers)](#7-items-offers)
 8. [Groups](#8-groups)
@@ -21,14 +21,14 @@ that you can override without touching the mod itself.
 11. [Token Rewards](#11-token-rewards)
 12. [Item Blacklist](#12-item-blacklist)
 13. [Reference: condition tests](#13-reference-condition-tests)
-14. [Reference: reward kinds](#14-reference-reward-kinds)
+14. [Reference: special kinds](#14-reference-special-kinds)
 
 ---
 
 ## 1. How the pieces fit together
 
 A machine sells **offers** — each offer is a thing a player can buy. An offer has a cost
-(coins, tokens, or inventory items) and a reward (a game item, a trait, some XP, a vehicle
+(coins, tokens, or inventory items) and an action (a game item, a trait, some XP, a vehicle
 key). It can also be gated: maybe only carpenters can buy it, maybe it's limited to one
 purchase per player, maybe it only appears once it's back in stock.
 
@@ -40,11 +40,11 @@ A **shop** is a machine with a sprite and a visual identity. It references pools
 **pool sets**. Each pool set picks one pool at random (weighted) on restock, and all pool
 sets contribute. This means separate pool sets always appear together, while multiple pools
 in the same set rotate — only one is chosen each cycle.
-That's the full chain: machine → pool set → pool → offers → reward / cost / conditions.
+That's the full chain: machine → pool set → pool → offers → special / cost / conditions.
 
 The config files exist because each of those concepts is reusable. Prices are named so the
 same `coin_25` applies to a hundred offers without repeating it. Conditions are named so
-`onceOnly` can be shared across pools. Rewards are named so the same "Gain: Brave" definition
+`onceOnly` can be shared across pools. Specials are named so the same "Gain: Brave" definition
 isn't duplicated for every shop that sells traits. The layering is indirection in service of
 reuse.
 
@@ -53,30 +53,30 @@ reuse.
 Reading bottom-up shows how data flows; top-down shows how to design a new shop.
 
 ```
-SHOP  (PhunMart2_Shops.lua)
+SHOP  (PhunMart_Shops.lua)
   Which machine sprite, which pool sets to blend
   │
-  └─► POOL  (PhunMart2_Pools.lua)
+  └─► POOL  (PhunMart_Pools.lua)
         How many offers to show; where to get them from
         │
-        ├─► GROUP  (PhunMart2_Groups.lua)
+        ├─► GROUP  (PhunMart_Groups.lua)
         │     Which game items to include; default price & weight
         │     │
         │     └─► game item catalogue  (auto-populated from PZ item scripts)
         │
-        └─► REWARDS  (used by trait/XP/vehicle pools)
-              Pulls all rewards whose category field matches
+        └─► SPECIALS  (used by trait/XP/vehicle pools)
+              Pulls all specials whose category field matches
               │
-              └─► REWARD  (PhunMart2_Rewards.lua)
+              └─► SPECIAL  (PhunMart_Specials.lua)
                     What the player receives on purchase
               │
-              └─► ITEM / OFFER  (PhunMart2_Items.lua)
+              └─► ITEM / OFFER  (PhunMart_Items.lua)
                     Per-offer overrides: price, weight, stock, conditions
                     │
-                    ├─► PRICE  (PhunMart2_Prices.lua)
+                    ├─► PRICE  (PhunMart_Prices.lua)
                     │     How much it costs (change / tokens / barter items)
                     │
-                    └─► CONDITIONS  (PhunMart2_Conditions.lua)
+                    └─► CONDITIONS  (PhunMart_Conditions.lua)
                           Rules that must pass before a player can buy
 ```
 
@@ -84,17 +84,17 @@ SHOP  (PhunMart2_Shops.lua)
 
 | Layer          | Controls                                       | Lives in                   |
 | -------------- | ---------------------------------------------- | -------------------------- |
-| **Shop**       | Machine sprite, which pool sets to show        | `PhunMart2_Shops.lua`      |
-| **Pool**       | How many offers per restock; sourcing strategy | `PhunMart2_Pools.lua`      |
-| **Group**      | Which game items are eligible; default price   | `PhunMart2_Groups.lua`     |
-| **Reward**     | What the player actually receives              | `PhunMart2_Rewards.lua`    |
-| **Item/Offer** | Per-offer weight, stock, price, conditions     | `PhunMart2_Items.lua`      |
-| **Price**      | Cost in change, tokens, or inventory items     | `PhunMart2_Prices.lua`     |
-| **Condition**  | Who can buy it and how many times              | `PhunMart2_Conditions.lua` |
+| **Shop**       | Machine sprite, which pool sets to show        | `PhunMart_Shops.lua`      |
+| **Pool**       | How many offers per restock; sourcing strategy | `PhunMart_Pools.lua`      |
+| **Group**      | Which game items are eligible; default price   | `PhunMart_Groups.lua`     |
+| **Special**    | What the player actually receives              | `PhunMart_Specials.lua`   |
+| **Item/Offer** | Per-offer weight, stock, price, conditions     | `PhunMart_Items.lua`      |
+| **Price**      | Cost in change, tokens, or inventory items     | `PhunMart_Prices.lua`     |
+| **Condition**  | Who can buy it and how many times              | `PhunMart_Conditions.lua` |
 
 Layers in the middle (Pool, Group) are primarily used for **item-type shops** — things that
 come from the PZ item catalogue. Trait, vehicle, XP, and other non-item shops skip Groups
-entirely and source directly from named Rewards via category.
+entirely and source directly from named Specials via category.
 
 ---
 
@@ -105,7 +105,7 @@ its own pool, a curated item group, prices, and one gated special offer.
 
 ### Step 1 — Define a price (if you need one that doesn't exist yet)
 
-`PhunMart2_Prices.lua`
+`PhunMart_Prices.lua`
 
 ```lua
 return {
@@ -115,12 +115,12 @@ return {
 }
 ```
 
-### Step 2 — Define a reward for the special offer
+### Step 2 — Define a special for the offer
 
-Special offers (non-item rewards like a free item spawn) go in Rewards.
-Regular items sourced from a group don't need a reward entry — the game item itself is the reward.
+Specials (non-item actions like trait grants, XP boosts, vehicle spawns) go in Specials.
+Regular items sourced from a group don't need a special entry — the game item itself is the reward.
 
-`PhunMart2_Rewards.lua`
+`PhunMart_Specials.lua`
 
 ```lua
 return {
@@ -134,7 +134,7 @@ return {
 
 ### Step 3 — Define a condition for the special offer
 
-`PhunMart2_Conditions.lua`
+`PhunMart_Conditions.lua`
 
 ```lua
 return {
@@ -154,7 +154,7 @@ return {
 
 ### Step 4 — Register the special offer as an Item entry
 
-`PhunMart2_Items.lua`
+`PhunMart_Items.lua`
 
 ```lua
 return {
@@ -171,7 +171,7 @@ return {
 
 Groups describe which game items to pull in from the PZ catalogue.
 
-`PhunMart2_Groups.lua`
+`PhunMart_Groups.lua`
 
 ```lua
 return {
@@ -196,7 +196,7 @@ the special offer key directly via `sources.items`. All offers — regular tools
 sledgehammer — enter the same weighted roll; 5–8 are chosen each restock. The sledgehammer's
 lower weight (0.5) means it appears roughly half as often as a weight-1 item.
 
-`PhunMart2_Pools.lua`
+`PhunMart_Pools.lua`
 
 ```lua
 return {
@@ -215,7 +215,7 @@ return {
 
 ### Step 7 — Define the shop
 
-`PhunMart2_Shops.lua`
+`PhunMart_Shops.lua`
 
 ```lua
 return {
@@ -244,16 +244,16 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 
 | Override file                 | Patches                 |
 | ----------------------------- | ----------------------- |
-| `PhunMart2_Prices.lua`        | Prices                  |
-| `PhunMart2_Rewards.lua`       | Rewards                 |
-| `PhunMart2_Conditions.lua`    | Conditions              |
-| `PhunMart2_Items.lua`         | Offer items             |
-| `PhunMart2_XP_Items.lua`      | XP offer items          |
-| `PhunMart2_XP_Conditions.lua` | XP conditions           |
-| `PhunMart2_Groups.lua`        | Item groups             |
-| `PhunMart2_Pools.lua`         | Pools                   |
-| `PhunMart2_Shops.lua`         | Shops                   |
-| `PhunMart2_TokenRewards.lua`  | Token reward milestones |
+| `PhunMart_Prices.lua`        | Prices                  |
+| `PhunMart_Specials.lua`      | Specials                |
+| `PhunMart_Conditions.lua`    | Conditions              |
+| `PhunMart_Items.lua`         | Offer items             |
+| `PhunMart_XP_Items.lua`      | XP offer items          |
+| `PhunMart_XP_Conditions.lua` | XP conditions           |
+| `PhunMart_Groups.lua`        | Item groups             |
+| `PhunMart_Pools.lua`         | Pools                   |
+| `PhunMart_Shops.lua`         | Shops                   |
+| `PhunMart_TokenRewards.lua`  | Token reward milestones |
 
 **Deep merge rules:**
 
@@ -261,7 +261,7 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 - Arrays are replaced entirely (not merged element-by-element).
 - Setting a key to a new value in your override replaces it.
 - You only need to include the keys you want to change — everything else stays as-is.
-- `PhunMart2_TokenRewards.lua` is loaded in full (not merged) — copy the whole file before editing.
+- `PhunMart_TokenRewards.lua` is loaded in full (not merged) — copy the whole file before editing.
 
 Each override file must `return {}` with your changes as a Lua table.
 
@@ -269,7 +269,7 @@ Each override file must `return {}` with your changes as a Lua table.
 
 ## 4. Prices
 
-File: `PhunMart2_Prices.lua`
+File: `PhunMart_Prices.lua`
 
 Named price definitions. Referenced by pools (as `defaults.price`) and individual offers (as `price`).
 
@@ -320,19 +320,20 @@ return {
 
 ---
 
-## 5. Rewards
+## 5. Specials
 
-File: `PhunMart2_Rewards.lua`
+File: `PhunMart_Specials.lua`
 
-Named reward definitions — what the player actually receives. Supports inheritance via `inherit`
-to avoid repetition. Templates (`template = true`) are base definitions not used as offers directly.
+Named special definitions — non-item actions the player receives (traits, XP, boosts, vehicles).
+Supports inheritance via `inherit` to avoid repetition. Templates (`template = true`) are base
+definitions not used as offers directly.
 
 ### Template and inheritance
 
 ```lua
 return {
 
-    -- Base template: all trait-add rewards share these defaults
+    -- Base template: all trait-add specials share these defaults
     trait_add_base = {
         template = true,
         kind     = "trait",
@@ -340,7 +341,7 @@ return {
         display  = { texture = "media/textures/icons/trait_add.png" }
     },
 
-    -- Concrete reward inheriting the template
+    -- Concrete special inheriting the template
     add_brave = {
         inherit  = "trait_add_base",
         display  = { text = "Gain: Brave" },
@@ -352,7 +353,7 @@ return {
 The `inherit` key copies all fields from the named entry, then the local fields override them.
 Only one level of inheritance is supported.
 
-### Reward kinds
+### Special kinds
 
 | `kind`    | What it does                                                        |
 | --------- | ------------------------------------------------------------------- |
@@ -362,11 +363,11 @@ Only one level of inheritance is supported.
 | `boost`   | Applies a temporary XP multiplier. Uses `type = "applyBoost"`.      |
 | `vehicle` | Spawns a vehicle nearby. Uses `type = "spawnVehicle"`.              |
 
-See [Reference: reward kinds](#14-reference-reward-kinds) for full action schemas.
+See [Reference: special kinds](#14-reference-special-kinds) for full action schemas.
 
 ### Display overrides
 
-The `display` block controls what the shop UI shows for a reward:
+The `display` block controls what the shop UI shows for a special:
 
 ```lua
 display = {
@@ -375,13 +376,13 @@ display = {
 }
 ```
 
-If `display.texture` is omitted for an item reward, the game icon for that item is used.
+If `display.texture` is omitted for an item special, the game icon for that item is used.
 
 ---
 
 ## 6. Conditions
 
-File: `PhunMart2_Conditions.lua`
+File: `PhunMart_Conditions.lua`
 
 Named condition definitions. Referenced in offer `conditions` arrays and pool `defaults.conditions`.
 A condition is a named test applied server-side at purchase time and client-side for UI feedback.
@@ -427,10 +428,10 @@ See [Reference: condition tests](#13-reference-condition-tests) for all availabl
 
 ## 7. Items (Offers)
 
-File: `PhunMart2_Items.lua`
+File: `PhunMart_Items.lua`
 
 Named offer definitions. These are the individual purchasable slots in a pool. Each offer
-links a `price`, a `reward`, and optional `conditions` and `offer` behaviour.
+links a `price`, a `reward` (special key), and optional `conditions` and `offer` behaviour.
 
 ```lua
 return {
@@ -438,7 +439,7 @@ return {
     -- Simple item offer
     ["offer:my_pistol"] = {
         price  = "coin_high",         -- key from Prices
-        reward = "reward_pistol",     -- key from Rewards
+        reward = "reward_pistol",     -- key from Specials
         offer  = {
             weight = 1.0              -- relative probability during pool roll
         }
@@ -476,7 +477,7 @@ return {
 | Field                      | Type     | Description                                       |
 | -------------------------- | -------- | ------------------------------------------------- |
 | `price`                    | string   | Price key from Prices config                      |
-| `reward`                   | string   | Reward key from Rewards config                    |
+| `reward`                   | string   | Special key from Specials config                  |
 | `conditions`               | string[] | Array of condition keys; all must pass            |
 | `offer.weight`             | number   | Probability weight during pool roll (default 1.0) |
 | `offer.stock.min`          | int      | Minimum stock on restock (default 1)              |
@@ -489,7 +490,7 @@ Pools can also supply `defaults` that apply to all items sourced from a group �
 
 ## 8. Groups
 
-File: `PhunMart2_Groups.lua`
+File: `PhunMart_Groups.lua`
 
 Groups define which game items are eligible for a pool. The preferred approach is to source
 by **category** rather than listing items individually. A single category line like
@@ -574,9 +575,9 @@ return {
 
 ## 9. Pools
 
-File: `PhunMart2_Pools.lua`
+File: `PhunMart_Pools.lua`
 
-Pools define _what a shop slot shows_ — a set of offers drawn from groups or reward categories,
+Pools define _what a shop slot shows_ — a set of offers drawn from groups or special categories,
 with a roll mode that picks a random subset on restock.
 
 ```lua
@@ -595,13 +596,13 @@ return {
         }
     },
 
-    -- Pool sourcing from rewards (used for trait/XP/vehicle shops)
-    -- sources.rewards pulls all rewards whose `category` field matches
+    -- Pool sourcing from specials (used for trait/XP/vehicle shops)
+    -- sources.specials pulls all specials whose `category` field matches
     pool_traiter_good = {
         fallbackTexture  = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
-            rewards = { "trait_add" }
+            specials = { "trait_add" }
         },
         roll = {
             mode  = "weighted",
@@ -617,7 +618,7 @@ return {
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `defaults.price`     | Price key applied to every item drawn from this pool                                                                                                                                                           |
 | `sources.groups`     | Array of Group keys to pull items from                                                                                                                                                                         |
-| `sources.rewards`    | Array of reward category strings — pulls all items whose reward has a matching `category` field                                                                                                                    |
+| `sources.specials`   | Array of special category strings — pulls all items whose special has a matching `category` field                                                                                                                    |
 | `roll.mode`          | `"weighted"` (only mode currently supported)                                                                                                                                                                   |
 | `roll.count.min`     | Minimum number of offers to show                                                                                                                                                                               |
 | `roll.count.max`     | Maximum number of offers to show                                                                                                                                                                               |
@@ -650,7 +651,7 @@ Pools without a `zones` field, machines in unzoned areas, and servers without Ph
 
 ## 10. Shops
 
-File: `PhunMart2_Shops.lua`
+File: `PhunMart_Shops.lua`
 
 Shops bind a machine sprite to one or more pools. Each shop key is a unique machine type.
 
@@ -756,7 +757,7 @@ multiple keys will always draw from the first two sets and randomly pick from th
 
 ## 11. Token Rewards
 
-File: `PhunMart2_TokenRewards.lua`
+File: `PhunMart_TokenRewards.lua`
 
 Controls when players automatically receive currency. This file is loaded in full — copy the
 entire example file and edit it. It is not merged with defaults; your file replaces them.
@@ -817,7 +818,7 @@ the next restock.
 
 ### Via override file
 
-`PhunMart2_Items.lua` — set the item's `blacklisted` field to `true`:
+`PhunMart_Items.lua` — set the item's `blacklisted` field to `true`:
 
 ```lua
 return {
@@ -866,7 +867,7 @@ Use `/dumppz perks` (admin command) to get the full list for your server.
 
 ---
 
-## 14. Reference: reward kinds
+## 14. Reference: special kinds
 
 ### `kind = "item"` — spawn an item
 

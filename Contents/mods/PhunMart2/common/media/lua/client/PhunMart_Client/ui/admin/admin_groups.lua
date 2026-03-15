@@ -158,30 +158,30 @@ function EditModal:createChildren()
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default Reward combo (optional — used by vehicle groups)
-    self.rewardLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Reward"), 1, 1, 1, 1, UIFont.Small, true)
-    self.rewardLabel:initialise()
-    self:addChild(self.rewardLabel)
+    self.specialLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Special"), 1, 1, 1, 1, UIFont.Small, true)
+    self.specialLabel:initialise()
+    self:addChild(self.specialLabel)
 
-    self.rewardCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.rewardCombo:initialise()
-    self.rewardCombo:addOption("")
-    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
-    local rewardKeys = getSortedKeys(rewards)
-    local selectedRewardIdx = 1
-    for i, rk in ipairs(rewardKeys) do
-        self.rewardCombo:addOption(rk)
+    self.specialCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
+    self.specialCombo:initialise()
+    self.specialCombo:addOption("")
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local specialKeys = getSortedKeys(specials)
+    local selectedSpecialIdx = 1
+    for i, rk in ipairs(specialKeys) do
+        self.specialCombo:addOption(rk)
         if self.groupDef and self.groupDef.defaults and self.groupDef.defaults.reward == rk then
-            selectedRewardIdx = i + 1 -- +1 for blank
+            selectedSpecialIdx = i + 1 -- +1 for blank
         end
     end
-    self.rewardCombo.selected = selectedRewardIdx
-    self:addChild(self.rewardCombo)
+    self.specialCombo.selected = selectedSpecialIdx
+    self:addChild(self.specialCombo)
     y = y + ROW_H + 2
 
-    self.rewardHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_OptionalDefault"), 0.5, 0.5, 0.5, 1,
+    self.specialHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_OptionalDefault"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
-    self.rewardHint:initialise()
-    self:addChild(self.rewardHint)
+    self.specialHint:initialise()
+    self:addChild(self.specialHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default Weight entry
@@ -339,10 +339,10 @@ function EditModal:onApply()
         def.defaults.price = priceText
     end
 
-    -- Reward (optional)
-    local rewardText = self.rewardCombo:getSelectedText()
-    if rewardText ~= "" then
-        def.defaults.reward = rewardText
+    -- Special (optional)
+    local specialText = self.specialCombo:getSelectedText()
+    if specialText ~= "" then
+        def.defaults.reward = specialText
     end
 
     -- Weight

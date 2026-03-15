@@ -83,14 +83,33 @@ Commands[Core.commands.upsertPriceDef] = function(playerObj, args)
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.lua", "prices", args.key, args.def)
 end
 
-Commands[Core.commands.upsertRewardDef] = function(playerObj, args)
+Commands[Core.commands.upsertSpecialDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then return end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Rewards.lua", "rewards", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Specials.lua", "specials", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.lua", "pools", args.key, args.def)
+end
+
+Commands[Core.commands.getTokenRewards] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    sendServerCommand(playerObj, Core.name, Core.commands.getTokenRewards, {
+        cfg = Core.tokenRewardsCfg or {}
+    })
+end
+
+Commands[Core.commands.saveTokenRewards] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.tokenRewardsCfg = args.cfg or {}
+    Core.fileUtils.saveTable("PhunMart_TokenRewards.lua", Core.tokenRewardsCfg)
+    -- Reload the reward modules so they pick up the new config.
+    if Core.playtimeRewards then Core.playtimeRewards:load() end
+    if Core.killRewards then Core.killRewards:load() end
+    sendServerCommand(playerObj, Core.name, Core.commands.getTokenRewards, {
+        cfg = Core.tokenRewardsCfg
+    })
 end
 
 Commands[Core.commands.buy] = function(playerObj, args)
@@ -390,6 +409,46 @@ Commands[Core.commands.getShopData] = function(playerObj, args)
     if data then
         sendServerCommand(playerObj, Core.name, Core.commands.getShopData, data)
     end
+end
+
+-- Player picked up a coin in MP — adjust wallet and sync back.
+-- Item removal is handled client-side via sendRemoveItemFromContainer.
+Commands[Core.commands.consumeCoin] = function(playerObj, args)
+    local itemType = args and args.itemType
+    if not itemType or not Core.wallet:isCurrency(itemType) then return end
+
+    Core.wallet:adjust(playerObj, itemType, 1)
+    Core.wallet:save()
+
+    sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
+        username = playerObj:getUsername(),
+        wallet = Core.wallet:get(playerObj)
+    })
+end
+
+-- Player picked up a DroppedWallet in MP — merge balances and sync back.
+-- Item removal is handled client-side via sendRemoveItemFromContainer.
+Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
+    local walletData = args and args.walletData
+    if not walletData then return end
+
+    for _, entry in ipairs(walletData) do
+        if entry.pool and entry.amount and entry.amount > 0 then
+            local cap = Core.wallet:getCap(entry.pool)
+            local bal = Core.wallet:getBalance(playerObj, entry.pool)
+            local toAdd = cap and math.min(entry.amount, cap - bal) or entry.amount
+            if toAdd > 0 then
+                Core.wallet:adjustByPool(playerObj, "current", entry.pool, toAdd)
+            end
+        end
+    end
+
+    Core.wallet:save()
+
+    sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
+        username = playerObj:getUsername(),
+        wallet = Core.wallet:get(playerObj)
+    })
 end
 
 Commands[Core.commands.addToWallet] = function(_, args)

@@ -69,7 +69,7 @@ Events.OnTick.Add(setup)
 Events[Core.events.OnDefsUpdated].Add(function()
     local panels = {
         {ui = Core.ui.admin_prices, refresh = "refreshPrices"},
-        {ui = Core.ui.admin_rewards, refresh = "refreshRewards"},
+        {ui = Core.ui.admin_specials, refresh = "refreshSpecials"},
         {ui = Core.ui.admin_items, refresh = "refreshItems"},
         {ui = Core.ui.admin_groups, refresh = "refreshGroups"},
         {ui = Core.ui.admin_pools, refresh = "refreshPools"},

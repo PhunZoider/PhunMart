@@ -30,7 +30,10 @@ function R:save()
 end
 
 -- Returns the persistent data record for a player, creating it if absent.
+-- In SP, getUsername() returns the character name which changes per playthrough,
+-- so we key on a constant to preserve progress across characters.
 function R:getPlayerData(username)
+    if Core.isLocal then username = 0 end
     if not self.data[username] then
         self.data[username] = {
             zombieKills = 0,

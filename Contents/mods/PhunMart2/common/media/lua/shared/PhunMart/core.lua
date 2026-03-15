@@ -39,7 +39,7 @@ PhunMart = {
         upsertGroupDef = "PhunMartUpsertGroupDef",
         upsertItemDef = "PhunMartUpsertItemDef",
         upsertPriceDef = "PhunMartUpsertPriceDef",
-        upsertRewardDef = "PhunMartUpsertRewardDef",
+        upsertSpecialDef = "PhunMartUpsertSpecialDef",
         upsertPoolDef = "PhunMartUpsertPoolDef",
         getShopList = "PhunMartGetShopList",
         getInstanceList = "PhunMartGetInstanceList",
@@ -78,11 +78,16 @@ PhunMart = {
         getWallet = "PhunMartGetWallet",
         resetWallet = "PhunMartResetWallet",
         updateWallet = "PhunMartUpdateWallet",
+        consumeCoin = "PhunMartConsumeCoin",
+        consumeDroppedWallet = "PhunMartConsumeDroppedWallet",
         -- Admin wallet
         getPlayerList = "PhunMartGetPlayerList",
         getPlayersWallet = "PhunMartGetPlayersWallet",
         adjustPlayerWallet = "PhunMartAdjustPlayerWallet",
-        claimVehicle = "PhunMartClaimVehicle"
+        claimVehicle = "PhunMartClaimVehicle",
+        -- Token rewards admin
+        getTokenRewards = "PhunMartGetTokenRewards",
+        saveTokenRewards = "PhunMartSaveTokenRewards"
     },
     events = {
         OnReady = "OnPhunMartOnReady",
@@ -602,7 +607,7 @@ function Core.compileWith(overrides)
 
     local ctx = {
         prices         = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
-        rewards        = mergeCtx({"PhunMart/defaults/rewards", "PhunMart/defaults/xp_rewards"}, overrides.rewards),
+        specials       = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards"}, overrides.specials),
         conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"}, overrides.conditionsDefs),
         items          = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),
         groups         = mergeCtx({"PhunMart/defaults/groups"}, overrides.groups),

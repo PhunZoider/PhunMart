@@ -226,7 +226,7 @@ return {
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
-            rewards = {"trait_add"}
+            specials = {"trait_add"}
         },
         roll = {
             mode = "weighted",
@@ -243,7 +243,7 @@ return {
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Remove Negative Traits",
         sources = {
-            rewards = {"trait_remove"}
+            specials = {"trait_remove"}
         },
         roll = {
             mode = "weighted",
@@ -413,7 +413,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            rewards = {"xp_t1"}
+            specials = {"xp_t1"}
         },
         roll = {
             mode = "weighted",
@@ -430,7 +430,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            rewards = {"xp_t2"}
+            specials = {"xp_t2"}
         },
         roll = {
             mode = "weighted",
@@ -447,7 +447,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Skills",
         sources = {
-            rewards = {"xp_t3"}
+            specials = {"xp_t3"}
         },
         roll = {
             mode = "weighted",
@@ -464,7 +464,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            rewards = {"boost_t1"}
+            specials = {"boost_t1"}
         },
         roll = {
             mode = "weighted",
@@ -481,7 +481,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            rewards = {"boost_t2"}
+            specials = {"boost_t2"}
         },
         roll = {
             mode = "weighted",
@@ -498,7 +498,7 @@ return {
         fallbackTexture = "Item_Book",
         fallbackCategory = "Boosts",
         sources = {
-            rewards = {"boost_t3"}
+            specials = {"boost_t3"}
         },
         roll = {
             mode = "weighted",

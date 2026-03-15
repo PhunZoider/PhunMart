@@ -24,9 +24,18 @@ function R:save()
 end
 
 -- Returns the persistent data record for a player, creating it if absent.
+-- In SP, getUsername() returns the character name which changes per playthrough,
+-- so we key on a constant to preserve progress across characters.
 function R:getPlayerData(usernameOrPlayer)
 
-    local name = type(usernameOrPlayer) == "string" and usernameOrPlayer or usernameOrPlayer:getUsername()
+    local name
+    if Core.isLocal then
+        name = 0
+    elseif type(usernameOrPlayer) == "string" then
+        name = usernameOrPlayer
+    else
+        name = usernameOrPlayer:getUsername()
+    end
 
     if not self.data[name] then
         self.data[name] = {
@@ -72,7 +81,9 @@ end
 
 -- currently online players, then persists the updated data.
 function R:tick()
-    if not self.loaded then return end
+    if not self.loaded then
+        return
+    end
     local players = Core.utils.onlinePlayers(true)
     if not players then
         return

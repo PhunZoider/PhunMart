@@ -443,6 +443,13 @@ if Core.isLocal then
         end
     end
 
+    Commands[Core.commands.adjustPlayerWallet] = function(player, args)
+        Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
+        for _, instance in pairs(UI.instances or {}) do
+            instance:setWallet(Core.wallet:get(args.playername))
+        end
+    end
+
     Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
         if module == Core.name and Commands[command] then
             Commands[command](playerObj, arguments)

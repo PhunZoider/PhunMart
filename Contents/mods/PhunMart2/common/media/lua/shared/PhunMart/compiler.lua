@@ -431,12 +431,12 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
 end
 
 -- -----------------------------
--- Reward (actions) resolution
+-- Special (actions) resolution
 -- -----------------------------
-local function resolveReward(rewardsTable, rewardRefOrInline, fallbackItemType, qty, logger)
+local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemType, qty, logger)
     local r
-    if rewardRefOrInline == nil then
-        -- auto-reward: give the item
+    if specialRefOrInline == nil then
+        -- auto-special: give the item
         return {
             display = {
                 item = fallbackItemType
@@ -449,17 +449,17 @@ local function resolveReward(rewardsTable, rewardRefOrInline, fallbackItemType, 
         }
     end
 
-    if type(rewardRefOrInline) == "string" then
-        r = rewardsTable[rewardRefOrInline]
+    if type(specialRefOrInline) == "string" then
+        r = specialsTable[specialRefOrInline]
         if type(r) ~= "table" then
-            logger:error("Unknown reward key: " .. tostring(rewardRefOrInline))
+            logger:error("Unknown special key: " .. tostring(specialRefOrInline))
             return nil
         end
         r = shallowCopy(r)
-    elseif type(rewardRefOrInline) == "table" then
-        r = shallowCopy(rewardRefOrInline)
+    elseif type(specialRefOrInline) == "table" then
+        r = shallowCopy(specialRefOrInline)
     else
-        logger:error("Invalid reward ref type: " .. tostring(type(rewardRefOrInline)))
+        logger:error("Invalid special ref type: " .. tostring(type(specialRefOrInline)))
         return nil
     end
 
@@ -631,7 +631,7 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     merged.offer = normalizeOffer(merged.offer)
 
     local priceResolved = resolvePrice(ctx.prices, merged.price, logger)
-    local rewardResolved = resolveReward(ctx.rewards, merged.reward, itemType, merged.offer.qty, logger)
+    local rewardResolved = resolveSpecial(ctx.specials, merged.reward, itemType, merged.offer.qty, logger)
 
     local offerId = buildOfferId(poolKey, itemType)
     local offerConditions = normalizeConditions(merged.conditions)
@@ -766,7 +766,7 @@ end
 -- -----------------------------
 -- Public: compile all
 -- ctx expects:
---  ctx.prices, ctx.rewards, ctx.conditionsDefs, ctx.items, ctx.groups, ctx.pools, ctx.shops
+--  ctx.prices, ctx.specials, ctx.conditionsDefs, ctx.items, ctx.groups, ctx.pools, ctx.shops
 -- -----------------------------
 function Compiler.compileAll(ctx)
     -- Reset the item category cache so each compile run reflects current game state
@@ -779,7 +779,7 @@ function Compiler.compileAll(ctx)
     -- We'll create "resolved" maps for each.
     local resolved = {
         prices = {},
-        rewards = {},
+        specials = {},
         conditionsDefs = {},
         items = {},
         groups = {},
@@ -799,7 +799,7 @@ function Compiler.compileAll(ctx)
     end
 
     resolveTable(ctx.prices or {}, resolved.prices, "prices")
-    resolveTable(ctx.rewards or {}, resolved.rewards, "rewards")
+    resolveTable(ctx.specials or {}, resolved.specials, "specials")
     resolveTable(ctx.conditionsDefs or {}, resolved.conditionsDefs, "conditions")
     resolveTable(ctx.items or {}, resolved.items, "items")
     resolveTable(ctx.groups or {}, resolved.groups, "groups")
@@ -869,23 +869,23 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- reward-based items: include all non-template items whose resolved
-            -- reward has a matching category (inherited from reward templates).
-            if type(sources.rewards) == "table" then
+            -- specials-based items: include all non-template items whose resolved
+            -- special has a matching category (inherited from special templates).
+            if type(sources.specials) == "table" then
                 local catSet = {}
-                for _, cat in ipairs(sources.rewards) do
+                for _, cat in ipairs(sources.specials) do
                     catSet[cat] = true
                 end
 
                 for itemKey, itemDef in pairs(resolved.items) do
                     if itemDef.template ~= true and not itemsSet[itemKey] then
-                        local rewardKey = itemDef.reward
-                        if type(rewardKey) == "string" then
-                            local rewardDef = resolved.rewards[rewardKey]
-                            if rewardDef and catSet[rewardDef.category] then
+                        local specialKey = itemDef.reward
+                        if type(specialKey) == "string" then
+                            local specialDef = resolved.specials[specialKey]
+                            if specialDef and catSet[specialDef.category] then
                                 itemsSet[itemKey] = {
                                     fromGroup = nil,
-                                    sourceType = "reward"
+                                    sourceType = "special"
                                 }
                             end
                         end
@@ -922,7 +922,7 @@ function Compiler.compileAll(ctx)
 
                         local offerId, offer = compileOfferForItem({
                             prices = resolved.prices,
-                            rewards = resolved.rewards,
+                            specials = resolved.specials,
                             autoCondsDefs = ctx.autoCondsDefs
                         }, poolKey, poolDef, meta.fromGroup and (function()
                             local g = meta.fromGroup
