@@ -55,14 +55,6 @@ local function formatSources(def)
     return table.concat(parts, " + ")
 end
 
--- Format roll summary.
-local function formatRoll(def)
-    if def.roll and def.roll.count then
-        return def.roll.count.min .. "-" .. def.roll.count.max
-    end
-    return ""
-end
-
 -- Format zones summary.
 local function formatZones(def)
     if def.zones and def.zones.difficulty then
@@ -176,71 +168,6 @@ function EditModal:createChildren()
         UIFont.Small, true)
     self.specialsHint:initialise()
     self:addChild(self.rewardsHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Roll Mode combo
-    self.modeLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMode"), 1, 1, 1, 1, UIFont.Small, true)
-    self.modeLabel:initialise()
-    self:addChild(self.modeLabel)
-
-    self.modeCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.modeCombo:initialise()
-    self.modeCombo:addOption("weighted")
-    local selectedModeIdx = 1
-    local currentMode = self.poolDef and self.poolDef.roll and self.poolDef.roll.mode or "weighted"
-    if currentMode == "weighted" then
-        selectedModeIdx = 1
-    end
-    self.modeCombo.selected = selectedModeIdx
-    self:addChild(self.modeCombo)
-    y = y + ROW_H + 2
-
-    self.modeHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMode"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.modeHint:initialise()
-    self:addChild(self.modeHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Roll Count Min
-    self.minLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMin"), 1, 1, 1, 1, UIFont.Small, true)
-    self.minLabel:initialise()
-    self:addChild(self.minLabel)
-
-    local minDefault = "1"
-    if self.poolDef and self.poolDef.roll and self.poolDef.roll.count then
-        minDefault = tostring(self.poolDef.roll.count.min or 1)
-    end
-    self.minEntry = ISTextEntryBox:new(minDefault, x + labelW, y, w - labelW, ROW_H)
-    self.minEntry:initialise()
-    self.minEntry:instantiate()
-    self:addChild(self.minEntry)
-    y = y + ROW_H + 2
-
-    self.minHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMin"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.minHint:initialise()
-    self:addChild(self.minHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Roll Count Max
-    self.maxLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMax"), 1, 1, 1, 1, UIFont.Small, true)
-    self.maxLabel:initialise()
-    self:addChild(self.maxLabel)
-
-    local maxDefault = "6"
-    if self.poolDef and self.poolDef.roll and self.poolDef.roll.count then
-        maxDefault = tostring(self.poolDef.roll.count.max or 6)
-    end
-    self.maxEntry = ISTextEntryBox:new(maxDefault, x + labelW, y, w - labelW, ROW_H)
-    self.maxEntry:initialise()
-    self.maxEntry:instantiate()
-    self:addChild(self.maxEntry)
-    y = y + ROW_H + 2
-
-    self.maxHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMax"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.maxHint:initialise()
-    self:addChild(self.maxHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Zones Difficulty (comma-separated numbers)
@@ -372,18 +299,6 @@ function EditModal:onApply()
         end
     end
 
-    -- Roll
-    local mode = self.modeCombo:getSelectedText()
-    local rollMin = tonumber(self.minEntry:getText())
-    local rollMax = tonumber(self.maxEntry:getText())
-    def.roll = {
-        mode = mode or "weighted",
-        count = {
-            min = rollMin or 1,
-            max = rollMax or 6
-        }
-    }
-
     -- Zones (optional)
     local zones = parseCSVNumbers(self.zonesEntry:getText())
     if zones then
@@ -422,7 +337,7 @@ end
 
 function EditModal:new(poolKey, poolDef, isNew, cb)
     local modalW = math.floor(520 * FONT_SCALE)
-    local modalH = PAD * 16 + FONT_HGT_MEDIUM + ROW_H * 11 + FONT_HGT_SMALL * 7 + PAD * 4
+    local modalH = PAD * 13 + FONT_HGT_MEDIUM + ROW_H * 8 + FONT_HGT_SMALL * 4 + PAD * 4
     local core = getCore()
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
@@ -491,7 +406,6 @@ function UI:refreshPools()
             key = key,
             price = formatPrice(def),
             sources = formatSources(def),
-            roll = formatRoll(def),
             zones = formatZones(def),
             def = def
         })
@@ -614,13 +528,11 @@ function UI:createChildren()
     self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
 
     local colPrice = math.floor(w * 0.30)
-    local colSources = math.floor(w * 0.45)
-    local colRoll = math.floor(w * 0.70)
-    local colZones = math.floor(w * 0.85)
+    local colSources = math.floor(w * 0.50)
+    local colZones = math.floor(w * 0.80)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Sources"), colSources)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Roll"), colRoll)
     self.datas:addColumn(getText("IGUI_PhunMart_Col_Zones"), colZones)
     self.datas:setVisible(false)
     self:addChild(self.datas)
@@ -650,7 +562,6 @@ function UI:drawDatas(y, item, alt)
     local col2X = self.columns[2].size
     local col3X = self.columns[3].size
     local col4X = self.columns[4].size
-    local col5X = self.columns[5].size
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
@@ -669,15 +580,9 @@ function UI:drawDatas(y, item, alt)
     self:drawText(data.sources, col3X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
 
-    -- Roll column
-    self:setStencilRect(col4X, clipY, col5X - col4X, clipY2 - clipY)
-    self:drawText(data.roll, col4X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
     -- Zones column
-    local rightEdge = self.width - SCROLLBAR_W
     if data.zones ~= "" then
-        self:drawText(data.zones, col5X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
+        self:drawText(data.zones, col4X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
     end
 
     self.itemsHeight = y + self.itemheight

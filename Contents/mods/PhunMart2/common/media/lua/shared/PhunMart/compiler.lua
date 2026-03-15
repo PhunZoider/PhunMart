@@ -824,7 +824,6 @@ function Compiler.compileAll(ctx)
             local poolRuntime = {
                 key = poolKey,
                 gate = poolDef.gate,
-                roll = poolDef.roll,
                 zones = poolDef.zones,
                 offers = {}
             }
@@ -963,6 +962,7 @@ function Compiler.compileAll(ctx)
                 sprites = shopDef.sprites,
                 unpoweredSprites = shopDef.unpoweredSprites,
                 powered = shopDef.powered,
+                roll = shopDef.roll,
                 poolSets = shopDef.poolSets,
                 throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,

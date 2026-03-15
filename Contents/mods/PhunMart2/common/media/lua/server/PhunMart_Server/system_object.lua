@@ -82,15 +82,15 @@ local function bakePrice(price, selfItem)
     return baked
 end
 
--- Weighted random pick without replacement. Returns array of {id, offer} pairs.
--- candidates: array of {offerId, offerDef}
+-- Default roll used when neither poolSet nor shop defines one.
+local DEFAULT_ROLL = { mode = "weighted", count = { min = 5, max = 8 } }
+
+-- Weighted random pick without replacement. Returns array of {id, offer, scaledWeight} entries.
+-- candidates: array of {id, offer, scaledWeight}
 local function weightedPickN(candidates, count)
     local pool = {}
-    for _, pair in ipairs(candidates) do
-        table.insert(pool, {
-            id = pair[1],
-            offer = pair[2]
-        })
+    for _, c in ipairs(candidates) do
+        table.insert(pool, { id = c.id, offer = c.offer, scaledWeight = c.scaledWeight })
     end
     local picked = {}
     count = math.min(count, #pool)
@@ -100,13 +100,13 @@ local function weightedPickN(candidates, count)
         end
         local total = 0
         for _, entry in ipairs(pool) do
-            total = total + (entry.offer.offer and entry.offer.offer.weight or 1.0)
+            total = total + entry.scaledWeight
         end
         local r = total > 0 and (ZombRand(math.max(1, math.floor(total * 10000))) / 10000.0) or 0
         local chosenIdx = #pool -- fallback to last
         local cumulative = 0
         for idx, entry in ipairs(pool) do
-            cumulative = cumulative + (entry.offer.offer and entry.offer.offer.weight or 1.0)
+            cumulative = cumulative + entry.scaledWeight
             if r < cumulative then
                 chosenIdx = idx
                 break
@@ -226,100 +226,86 @@ function ServerObject:buildOffers()
         return fallback
     end
 
+    local excluded = (Core.getBlacklist().items or {}).exclude or {}
+
     for _, poolSet in ipairs(shopDef.poolSets or {}) do
-        -- Build list of eligible pools, filtered by zone difficulty etc.
-        local eligible = {}
-        local totalWeight = 0
+        -- Resolve roll: poolSet > shop > global default
+        local roll = poolSet.roll or shopDef.roll or DEFAULT_ROLL
+        local mode = roll.mode or "weighted"
+
+        -- Merge candidates from ALL eligible pools in this poolSet.
+        -- Pool weight scales offer weights (acts as rarity multiplier between pools).
+        local candidates = {}
+        local seenItems = {} -- dedup: first occurrence by item key wins (highest scaled weight)
+
         for _, poolRef in ipairs(poolSet.keys or {}) do
             local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
-            local weight = type(poolRef) == "table" and poolRef.weight or 1.0
+            local poolWeight = type(poolRef) == "table" and poolRef.weight or 1.0
             local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
             if not pool then
                 Core.debugLn("buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
             elseif not poolPassesZoneFilter(pool, self.x, self.y) then
                 -- pool excluded by zone difficulty at this location; skip silently
             else
-                table.insert(eligible, { key = poolKey, pool = pool, weight = weight })
-                totalWeight = totalWeight + weight
+                for offerId, offer in pairs(pool.offers or {}) do
+                    if not excluded[offer.item] then
+                        local offerWeight = (offer.offer and offer.offer.weight or 1.0) * poolWeight
+                        local itemKey = offer.item
+                        if not seenItems[itemKey] then
+                            seenItems[itemKey] = true
+                            table.insert(candidates, {
+                                id = offerId,
+                                offer = offer,
+                                scaledWeight = offerWeight
+                            })
+                        end
+                    end
+                end
             end
         end
 
-        -- Pick one pool from the eligible set via weighted random.
-        if #eligible > 0 and totalWeight > 0 then
-            local r = ZombRand(math.max(1, math.floor(totalWeight * 10000))) / 10000.0
-            local cumulative = 0
-            local chosen = eligible[#eligible] -- fallback to last
-            for _, entry in ipairs(eligible) do
-                cumulative = cumulative + entry.weight
-                if r < cumulative then
-                    chosen = entry
-                    break
-                end
+        -- select which offers appear this restock cycle
+        local selected
+        if mode == "all" then
+            selected = candidates
+        else -- "weighted" (default): pick N via weighted random without replacement
+            local count = resolveCount(roll.count, 5)
+            count = math.min(count, #candidates)
+            selected = weightedPickN(candidates, count)
+        end
+
+        -- bake each selected offer: resolve price ranges and stock quantities
+        for _, sel in ipairs(selected) do
+            local offerId = sel.id
+            local offerDef = sel.offer
+            local srcOffer = offerDef.offer or {}
+
+            -- resolve stock: {min,max} -> concrete qty; absent = unlimited (-1)
+            local stockQty, restockHours
+            local stock = srcOffer.stock
+            if stock then
+                local sMin = stock.min or 1
+                local sMax = stock.max or sMin
+                stockQty = sMin + ZombRand(sMax - sMin + 1) -- inclusive [sMin, sMax]
+                restockHours = stock.restockHours
+            else
+                stockQty = -1
             end
 
-            local pool = chosen.pool
-            local roll = pool.roll or {}
-            local mode = roll.mode or "weighted"
-
-            -- flatten pool offers into a candidate list, respecting the runtime blacklist
-            local candidates = {}
-            local excluded = (Core.getBlacklist().items or {}).exclude or {}
-            for offerId, offer in pairs(pool.offers or {}) do
-                if not excluded[offer.item] then
-                    table.insert(candidates, {offerId, offer})
-                end
-            end
-
-            -- select which offers appear this restock cycle
-            local selected
-            if mode == "all" then
-                selected = {}
-                for _, pair in ipairs(candidates) do
-                    table.insert(selected, {
-                        id = pair[1],
-                        offer = pair[2]
-                    })
-                end
-            else -- "weighted" (default): pick N via weighted random without replacement
-                local count = resolveCount(roll.count, 5)
-                -- cap to pool size so we never spin forever
-                count = math.min(count, #candidates)
-                selected = weightedPickN(candidates, count)
-            end
-
-            -- bake each selected offer: resolve price ranges and stock quantities
-            for _, sel in ipairs(selected) do
-                local offerId = sel.id or sel[1]
-                local offerDef = sel.offer or sel[2]
-                local srcOffer = offerDef.offer or {}
-
-                -- resolve stock: {min,max} → concrete qty; absent = unlimited (-1)
-                local stockQty, restockHours
-                local stock = srcOffer.stock
-                if stock then
-                    local sMin = stock.min or 1
-                    local sMax = stock.max or sMin
-                    stockQty = sMin + ZombRand(sMax - sMin + 1) -- inclusive [sMin, sMax]
-                    restockHours = stock.restockHours
-                else
-                    stockQty = -1
-                end
-
-                offers[offerId] = {
-                    id = offerDef.id,
-                    item = offerDef.item,
-                    price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
-                    reward = offerDef.reward,
-                    offer = {
-                        qty = srcOffer.qty or 1, -- items given per purchase
-                        weight = srcOffer.weight or 1.0,
-                        stockQty = stockQty, -- purchase slots this cycle (-1 = unlimited)
-                        restockHours = restockHours
-                    },
-                    conditions = offerDef.conditions,
-                    meta = offerDef.meta
-                }
-            end
+            offers[offerId] = {
+                id = offerDef.id,
+                item = offerDef.item,
+                price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
+                reward = offerDef.reward,
+                offer = {
+                    qty = srcOffer.qty or 1, -- items given per purchase
+                    weight = srcOffer.weight or 1.0,
+                    stockQty = stockQty, -- purchase slots this cycle (-1 = unlimited)
+                    restockHours = restockHours
+                },
+                conditions = offerDef.conditions,
+                meta = offerDef.meta
+            }
         end
     end
     self.offers = offers

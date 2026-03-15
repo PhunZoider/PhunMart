@@ -6,6 +6,7 @@ return {
         background = "machine-good-phoods.png",
         sprites = {"phunmart_01_8", "phunmart_01_9", "phunmart_01_10", "phunmart_01_11"},
         unpoweredSprites = {"phunmart_01_12", "phunmart_01_13", "phunmart_01_14", "phunmart_01_15"},
+        roll = { mode = "weighted", count = { min = 6, max = 9 } },
         poolSets = {{
             keys = {{
                 key = "pool_goodphoods",
@@ -25,6 +26,7 @@ return {
         background = "machine-pity-the-tool.png",
         sprites = {"phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"},
         unpoweredSprites = {"phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_pittythetool",
@@ -41,21 +43,25 @@ return {
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
         poolSets = {{
+            roll = { mode = "weighted", count = { min = 2, max = 3 } },
             keys = {{
                 key = "pool_finalamendment_melee",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 4, max = 7 } },
             keys = {{
                 key = "pool_finalamendment_ammo",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 3, max = 5 } },
             keys = {{
                 key = "pool_finalamendment_guns",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 1, max = 3 } },
             keys = {{
                 key = "pool_finalamendment_explosives",
                 weight = 1.0
@@ -72,6 +78,7 @@ return {
         background = "machine-wrent-a-wreck.png",
         sprites = {"phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43"},
         unpoweredSprites = {"phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_vehicles_budget",
@@ -96,6 +103,7 @@ return {
         background = "machine-michelles.png",
         sprites = {"phunmart_01_48", "phunmart_01_49", "phunmart_01_50", "phunmart_01_51"},
         unpoweredSprites = {"phunmart_01_52", "phunmart_01_53", "phunmart_01_54", "phunmart_01_55"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_michellescrafts",
@@ -110,6 +118,7 @@ return {
         background = "machine-car-a-part.png",
         sprites = {"phunmart_01_56", "phunmart_01_57", "phunmart_01_58", "phunmart_01_59"},
         unpoweredSprites = {"phunmart_01_60", "phunmart_01_61", "phunmart_01_62", "phunmart_01_63"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_caraparts",
@@ -126,11 +135,13 @@ return {
         sprites = {"phunmart_02_0", "phunmart_02_1", "phunmart_02_2", "phunmart_02_3"},
         unpoweredSprites = {"phunmart_02_4", "phunmart_02_5", "phunmart_02_6", "phunmart_02_7"},
         poolSets = {{
+            roll = { mode = "weighted", count = { min = 3, max = 6 } },
             keys = {{
                 key = "pool_traiter_good",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 3, max = 5 } },
             keys = {{
                 key = "pool_traiter_bad_removal",
                 weight = 1.0
@@ -145,11 +156,13 @@ return {
         sprites = {"phunmart_02_8", "phunmart_02_9", "phunmart_02_10", "phunmart_02_11"},
         unpoweredSprites = {"phunmart_02_12", "phunmart_02_13", "phunmart_02_14", "phunmart_02_15"},
         poolSets = {{
+            roll = { mode = "weighted", count = { min = 4, max = 7 } },
             keys = {{
                 key = "pool_csvpharmacy_basic",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 1, max = 3 } },
             keys = {{
                 key = "pool_csvpharmacy_rare",
                 weight = 1.0
@@ -163,6 +176,7 @@ return {
         background = "machine-electronics.png",
         sprites = {"phunmart_02_16", "phunmart_02_17", "phunmart_02_18", "phunmart_02_19"},
         unpoweredSprites = {"phunmart_02_20", "phunmart_02_21", "phunmart_02_22", "phunmart_02_23"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_radiohacks",
@@ -177,6 +191,7 @@ return {
         background = "machine-phish4u.png",
         sprites = {"phunmart_02_24", "phunmart_02_25", "phunmart_02_26", "phunmart_02_27"},
         unpoweredSprites = {"phunmart_02_28", "phunmart_02_29", "phunmart_02_30", "phunmart_02_31"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_phish4u",
@@ -191,6 +206,7 @@ return {
         background = "machine-hoes.png",
         sprites = {"phunmart_02_32", "phunmart_02_33", "phunmart_02_34", "phunmart_02_35"},
         unpoweredSprites = {"phunmart_02_36", "phunmart_02_37", "phunmart_02_38", "phunmart_02_39"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_hoesnmoes",
@@ -207,6 +223,7 @@ return {
         background = "machine-budget-xp.png",
         sprites = {"phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"},
         unpoweredSprites = {"phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"},
+        roll = { mode = "weighted", count = { min = 4, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_xp_budget",
@@ -237,11 +254,13 @@ return {
         sprites = {"phunmart_03_0", "phunmart_03_1", "phunmart_03_2", "phunmart_03_3"},
         unpoweredSprites = {"phunmart_03_4", "phunmart_03_5", "phunmart_03_6", "phunmart_03_7"},
         poolSets = {{
+            roll = { mode = "weighted", count = { min = 4, max = 7 } },
             keys = {{
                 key = "pool_hardwear_clothing",
                 weight = 1.0
             }}
         }, {
+            roll = { mode = "weighted", count = { min = 2, max = 4 } },
             keys = {{
                 key = "pool_hardwear_protective",
                 weight = 1.0
@@ -255,6 +274,7 @@ return {
         background = "machine-sheds-and-commoners.png",
         sprites = {"phunmart_03_24", "phunmart_03_25", "phunmart_03_26", "phunmart_03_27"},
         unpoweredSprites = {"phunmart_03_28", "phunmart_03_29", "phunmart_03_30", "phunmart_03_31"},
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
             keys = {{
                 key = "pool_shedsandcommoners_t1",
@@ -282,6 +302,7 @@ return {
         background = "machine-collectors.png",
         sprites = {"phunmart_03_8", "phunmart_03_9", "phunmart_03_10", "phunmart_03_11"},
         unpoweredSprites = {"phunmart_03_12", "phunmart_03_13", "phunmart_03_14", "phunmart_03_15"},
+        roll = { mode = "weighted", count = { min = 1, max = 3 } },
         poolSets = {{
             keys = {{
                 key = "pool_collectors",

@@ -1,4 +1,4 @@
-# PhunMart — Customisation Guide
+# PhunMart -- Customisation Guide
 
 PhunMart is fully data-driven. Everything about what shops sell, what things cost, what
 conditions gate a purchase, and how tokens are earned is defined in plain Lua config files
@@ -27,20 +27,22 @@ that you can override without touching the mod itself.
 
 ## 1. How the pieces fit together
 
-A machine sells **offers** — each offer is a thing a player can buy. An offer has a cost
+A machine sells **offers** -- each offer is a thing a player can buy. An offer has a cost
 (coins, tokens, or inventory items) and an action (a game item, a trait, some XP, a vehicle
 key). It can also be gated: maybe only carpenters can buy it, maybe it's limited to one
 purchase per player, maybe it only appears once it's back in stock.
 
-Offers are grouped into **pools** by theme — food, XP boosts, vehicles. A pool rolls a
-random subset of its offers each restock, so the shop feels different each visit rather than
-showing the same items forever.
+Offers are grouped into **pools** by theme -- food, XP boosts, vehicles. A pool curates
+_what's on the menu_: which items are eligible, zone gating, fallback icons. Pools don't
+decide how many items appear -- that's the job of the layer above.
 
 A **shop** is a machine with a sprite and a visual identity. It references pools through
-**pool sets**. Each pool set picks one pool at random (weighted) on restock, and all pool
-sets contribute. This means separate pool sets always appear together, while multiple pools
-in the same set rotate — only one is chosen each cycle.
-That's the full chain: machine → pool set → pool → offers → special / cost / conditions.
+**pool sets**. Each pool set merges all of its eligible pools into one candidate list and
+then rolls a random subset from that merged set. The number of items to roll is controlled
+by a `roll` field that can live on the pool set or on the shop (as a default for all its
+pool sets). Separate pool sets produce independent shelves; multiple pools in the same set
+blend together into a single menu.
+That's the full chain: machine -> pool set -> pool -> offers -> special / cost / conditions.
 
 The config files exist because each of those concepts is reusable. Prices are named so the
 same `coin_25` applies to a hundred offers without repeating it. Conditions are named so
@@ -57,7 +59,7 @@ SHOP  (PhunMart_Shops.lua)
   Which machine sprite, which pool sets to blend
   │
   └─► POOL  (PhunMart_Pools.lua)
-        How many offers to show; where to get them from
+        What's eligible; where to get items from
         │
         ├─► GROUP  (PhunMart_Groups.lua)
         │     Which game items to include; default price & weight
@@ -82,17 +84,17 @@ SHOP  (PhunMart_Shops.lua)
 
 ### What each layer controls
 
-| Layer          | Controls                                       | Lives in                   |
-| -------------- | ---------------------------------------------- | -------------------------- |
-| **Shop**       | Machine sprite, which pool sets to show        | `PhunMart_Shops.lua`      |
-| **Pool**       | How many offers per restock; sourcing strategy | `PhunMart_Pools.lua`      |
+| Layer          | Controls                                       | Lives in                  |
+| -------------- | ---------------------------------------------- | ------------------------- |
+| **Shop**       | Machine sprite, pool sets, default roll count  | `PhunMart_Shops.lua`      |
+| **Pool**       | Item sourcing strategy; zone gating            | `PhunMart_Pools.lua`      |
 | **Group**      | Which game items are eligible; default price   | `PhunMart_Groups.lua`     |
 | **Special**    | What the player actually receives              | `PhunMart_Specials.lua`   |
 | **Item/Offer** | Per-offer weight, stock, price, conditions     | `PhunMart_Items.lua`      |
 | **Price**      | Cost in change, tokens, or inventory items     | `PhunMart_Prices.lua`     |
 | **Condition**  | Who can buy it and how many times              | `PhunMart_Conditions.lua` |
 
-Layers in the middle (Pool, Group) are primarily used for **item-type shops** — things that
+Layers in the middle (Pool, Group) are primarily used for **item-type shops** -- things that
 come from the PZ item catalogue. Trait, vehicle, XP, and other non-item shops skip Groups
 entirely and source directly from named Specials via category.
 
@@ -100,10 +102,10 @@ entirely and source directly from named Specials via category.
 
 ## 2. Quick start: a new shop from scratch
 
-This walkthrough builds a small "Bob's Hardware" tool shop from nothing — a new machine,
+This walkthrough builds a small "Bob's Hardware" tool shop from nothing -- a new machine,
 its own pool, a curated item group, prices, and one gated special offer.
 
-### Step 1 — Define a price (if you need one that doesn't exist yet)
+### Step 1 -- Define a price (if you need one that doesn't exist yet)
 
 `PhunMart_Prices.lua`
 
@@ -115,10 +117,10 @@ return {
 }
 ```
 
-### Step 2 — Define a special for the offer
+### Step 2 -- Define a special for the offer
 
 Specials (non-item actions like trait grants, XP boosts, vehicle spawns) go in Specials.
-Regular items sourced from a group don't need a special entry — the game item itself is the reward.
+Regular items sourced from a group don't need a special entry -- the game item itself is the reward.
 
 `PhunMart_Specials.lua`
 
@@ -132,7 +134,7 @@ return {
 }
 ```
 
-### Step 3 — Define a condition for the special offer
+### Step 3 -- Define a condition for the special offer
 
 `PhunMart_Conditions.lua`
 
@@ -152,7 +154,7 @@ return {
 }
 ```
 
-### Step 4 — Register the special offer as an Item entry
+### Step 4 -- Register the special offer as an Item entry
 
 `PhunMart_Items.lua`
 
@@ -167,7 +169,7 @@ return {
 }
 ```
 
-### Step 5 — Define the item group
+### Step 5 -- Define the item group
 
 Groups describe which game items to pull in from the PZ catalogue.
 
@@ -189,12 +191,12 @@ return {
 }
 ```
 
-### Step 6 — Define the pool
+### Step 6 -- Define the pool
 
 The pool draws from `bobs_tools` (which expands to all matching game items) and also includes
-the special offer key directly via `sources.items`. All offers — regular tools and the special
-sledgehammer — enter the same weighted roll; 5–8 are chosen each restock. The sledgehammer's
-lower weight (0.5) means it appears roughly half as often as a weight-1 item.
+the special offer key directly via `sources.items`. The sledgehammer's lower weight (0.5)
+means it appears roughly half as often as a weight-1 item when the pool set rolls its
+selection. How many items appear is controlled by `roll` on the shop or pool set -- not here.
 
 `PhunMart_Pools.lua`
 
@@ -203,17 +205,13 @@ return {
     pool_bobshardware = {
         sources = {
             groups = { "bobs_tools" },
-            items  = { "offer:sledgehammer_special" }  -- joins the same weighted roll
-        },
-        roll = {
-            mode  = "weighted",
-            count = { min = 5, max = 8 }
+            items  = { "offer:sledgehammer_special" }  -- joins the same candidate set
         }
     },
 }
 ```
 
-### Step 7 — Define the shop
+### Step 7 -- Define the shop
 
 `PhunMart_Shops.lua`
 
@@ -224,6 +222,7 @@ return {
         background       = "machine-hard-wear.png",   -- reuse an existing background, or add your own
         sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
         unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },  -- 5-8 items per restock
         poolSets = {
             { keys = {{ key = "pool_bobshardware", weight = 1.0 }} },
         }
@@ -242,8 +241,8 @@ via the admin menu.
 Each config layer has a built-in default file baked into the mod. Placing an override file in
 your server's `Zomboid/Lua/` folder patches on top of those defaults using a deep merge:
 
-| Override file                 | Patches                 |
-| ----------------------------- | ----------------------- |
+| Override file                | Patches                 |
+| ---------------------------- | ----------------------- |
 | `PhunMart_Prices.lua`        | Prices                  |
 | `PhunMart_Specials.lua`      | Specials                |
 | `PhunMart_Conditions.lua`    | Conditions              |
@@ -260,8 +259,8 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 - Tables are merged key-by-key recursively.
 - Arrays are replaced entirely (not merged element-by-element).
 - Setting a key to a new value in your override replaces it.
-- You only need to include the keys you want to change — everything else stays as-is.
-- `PhunMart_TokenRewards.lua` is loaded in full (not merged) — copy the whole file before editing.
+- You only need to include the keys you want to change -- everything else stays as-is.
+- `PhunMart_TokenRewards.lua` is loaded in full (not merged) -- copy the whole file before editing.
 
 Each override file must `return {}` with your changes as a Lua table.
 
@@ -276,10 +275,10 @@ Named price definitions. Referenced by pools (as `defaults.price`) and individua
 ```lua
 return {
 
-    -- Free — no cost
+    -- Free -- no cost
     free = { kind = "free" },
 
-    -- Currency — deducted from the player's wallet
+    -- Currency -- deducted from the player's wallet
     -- pool = "change"  (loose coin balance, stored in cents: 25 = $0.25)
     -- pool = "tokens"  (bound tokens, integer count)
     change_25 = {
@@ -301,7 +300,7 @@ return {
         amount = 1
     },
 
-    -- Physical items — items consumed from the player's inventory (barter)
+    -- Physical items -- items consumed from the player's inventory (barter)
     nails_10 = {
         kind  = "items",
         items = { { item = "Base.Nails", amount = 10 } }
@@ -324,7 +323,7 @@ return {
 
 File: `PhunMart_Specials.lua`
 
-Named special definitions — non-item actions the player receives (traits, XP, boosts, vehicles).
+Named special definitions -- non-item actions the player receives (traits, XP, boosts, vehicles).
 Supports inheritance via `inherit` to avoid repetition. Templates (`template = true`) are base
 definitions not used as offers directly.
 
@@ -441,7 +440,7 @@ return {
         price  = "coin_high",         -- key from Prices
         reward = "reward_pistol",     -- key from Specials
         offer  = {
-            weight = 1.0              -- relative probability during pool roll
+            weight = 1.0              -- relative probability during selection
         }
     },
 
@@ -479,12 +478,12 @@ return {
 | `price`                    | string   | Price key from Prices config                      |
 | `reward`                   | string   | Special key from Specials config                  |
 | `conditions`               | string[] | Array of condition keys; all must pass            |
-| `offer.weight`             | number   | Probability weight during pool roll (default 1.0) |
+| `offer.weight`             | number   | Probability weight during restock selection (default 1.0) |
 | `offer.stock.min`          | int      | Minimum stock on restock (default 1)              |
 | `offer.stock.max`          | int      | Maximum stock on restock (default 1)              |
 | `offer.stock.restockHours` | number   | In-game hours between restocks                    |
 
-Pools can also supply `defaults` that apply to all items sourced from a group — see [Pools](#9-pools).
+Pools can also supply `defaults` that apply to all items sourced from a group -- see [Pools](#9-pools).
 
 ---
 
@@ -494,11 +493,11 @@ File: `PhunMart_Groups.lua`
 
 Groups define which game items are eligible for a pool. The preferred approach is to source
 by **category** rather than listing items individually. A single category line like
-`categories = { "Clothing" }` automatically covers every clothing item in the game — hundreds
+`categories = { "Clothing" }` automatically covers every clothing item in the game -- hundreds
 of items in one declaration. It's also mod-compatible: any mod that adds items in that
 category gets included for free, with no config changes required.
 
-Explicit `include.items` lists are for cases where you need precise control — curated
+Explicit `include.items` lists are for cases where you need precise control -- curated
 selections that don't map cleanly to a single category, or vehicle script names which have no
 category at all. Use categories as the default; fall back to explicit lists when you need
 to hand-pick.
@@ -577,8 +576,10 @@ return {
 
 File: `PhunMart_Pools.lua`
 
-Pools define _what a shop slot shows_ — a set of offers drawn from groups or special categories,
-with a roll mode that picks a random subset on restock.
+Pools define _what's on the menu_ -- a set of eligible offers drawn from groups or special
+categories. Pools are pure curation: they control which items can appear, not how many.
+The number of items shown per restock is controlled by `roll` on the pool set or shop level
+(see [Shops](#10-shops)).
 
 ```lua
 return {
@@ -589,10 +590,6 @@ return {
         },
         sources = {
             groups = { "food_fresh", "food_cooking_utensils" }  -- pull from Groups
-        },
-        roll = {
-            mode  = "weighted",    -- "weighted" = random draw respecting offer weights
-            count = { min = 6, max = 9 }  -- how many offers to show per restock
         }
     },
 
@@ -603,10 +600,6 @@ return {
         fallbackCategory = "Positive Traits",
         sources = {
             specials = { "trait_add" }
-        },
-        roll = {
-            mode  = "weighted",
-            count = { min = 3, max = 6 }
         }
     },
 }
@@ -614,17 +607,14 @@ return {
 
 ### Pool fields
 
-| Field                | Description                                                                                                                                                                                                    |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defaults.price`     | Price key applied to every item drawn from this pool                                                                                                                                                           |
-| `sources.groups`     | Array of Group keys to pull items from                                                                                                                                                                         |
-| `sources.specials`   | Array of special category strings — pulls all items whose special has a matching `category` field                                                                                                                    |
-| `roll.mode`          | `"weighted"` (only mode currently supported)                                                                                                                                                                   |
-| `roll.count.min`     | Minimum number of offers to show                                                                                                                                                                               |
-| `roll.count.max`     | Maximum number of offers to show                                                                                                                                                                               |
-| `fallbackTexture`    | Icon to use when an offer has no icon                                                                                                                                                                          |
-| `fallbackCategory`   | Category label shown in the shop details panel                                                                                                                                                                 |
-| `zones.difficulty`   | Optional array of allowed zone difficulty values (1–5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). If omitted the pool is always eligible. Machines in unzoned areas also pass the filter. |
+| Field              | Description                                                                                                                                                                                                    |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaults.price`   | Price key applied to every item drawn from this pool                                                                                                                                                           |
+| `sources.groups`   | Array of Group keys to pull items from                                                                                                                                                                         |
+| `sources.specials` | Array of special category strings -- pulls all items whose special has a matching `category` field                                                                                                              |
+| `fallbackTexture`  | Icon to use when an offer has no icon                                                                                                                                                                          |
+| `fallbackCategory` | Category label shown in the shop details panel                                                                                                                                                                 |
+| `zones.difficulty` | Optional array of allowed zone difficulty values (0-5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). If omitted the pool is always eligible. Machines in unzoned areas also pass the filter. |
 
 #### Zone difficulty filtering
 
@@ -635,17 +625,16 @@ pool_weapons_advanced = {
     zones = {
         difficulty = { 3, 4, 5 }   -- only eligible in mid-to-hard zones
     },
-    sources = { ... },
-    roll    = { ... }
+    sources = { ... }
 }
 ```
 
 The filter applies at two points:
 
-1. **Placement time** — a shop will only be placed at a location if at least one of its pools passes the zone filter for that position.
-2. **Restock time** — only pools that pass the zone filter for the machine's position are included in that restock's offer build.
+1. **Placement time** -- a shop will only be placed at a location if at least one of its pools passes the zone filter for that position.
+2. **Restock time** -- only pools that pass the zone filter for the machine's position are included in that restock's merged candidate set.
 
-Pools without a `zones` field, machines in unzoned areas, and servers without PhunZones installed all behave permissively — every pool is eligible.
+Pools without a `zones` field, machines in unzoned areas, and servers without PhunZones installed all behave permissively -- every pool is eligible.
 
 ---
 
@@ -658,41 +647,49 @@ Shops bind a machine sprite to one or more pools. Each shop key is a unique mach
 ```lua
 return {
 
-    -- Simple shop: one pool set with one pool
+    -- Simple shop: one pool set, shop-level roll applies to all sets
     PittyTheTool = {
         category         = "Tool",
         background       = "machine-pity-the-tool.png",
         sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
         unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {
             { keys = {{ key = "pool_pittythetool", weight = 1.0 }} },
         }
     },
 
-    -- Multiple pool sets: each set picks one pool and all sets contribute.
-    -- Here each set has a single pool, so all four categories always appear.
+    -- Multiple pool sets with per-set roll overrides.
+    -- Each set is an independent shelf; all shelves contribute to the shop.
+    -- Per-set roll overrides the shop-level roll for that shelf.
     FinalAmendment = {
         category   = "Weapon",
         background = "machine-final-amendment.png",
         sprites    = { "phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35" },
         unpoweredSprites = { "phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39" },
         poolSets = {
-            { keys = {{ key = "pool_finalamendment_melee", weight = 1.0 }} },
-            { keys = {{ key = "pool_finalamendment_ammo",  weight = 1.0 }} },
-            { keys = {{ key = "pool_finalamendment_guns",  weight = 1.0 }} },
-            { keys = {{ key = "pool_finalamendment_explosives", weight = 1.0 }} },
+            { roll = { mode = "weighted", count = { min = 2, max = 3 } },
+              keys = {{ key = "pool_finalamendment_melee", weight = 1.0 }} },
+            { roll = { mode = "weighted", count = { min = 4, max = 7 } },
+              keys = {{ key = "pool_finalamendment_ammo",  weight = 1.0 }} },
+            { roll = { mode = "weighted", count = { min = 3, max = 5 } },
+              keys = {{ key = "pool_finalamendment_guns",  weight = 1.0 }} },
+            { roll = { mode = "weighted", count = { min = 1, max = 3 } },
+              keys = {{ key = "pool_finalamendment_explosives", weight = 1.0 }} },
         }
     },
 
-    -- Pool selection: multiple pools in ONE set — one is chosen at random per
-    -- restock, weighted by the `weight` field. Here the shop rotates between
-    -- budget, gifted, and luxury XP tiers each restock cycle.
+    -- Blended pools: multiple pools in ONE set merge into a single candidate
+    -- list. The weight on each key scales that pool's offer weights (rarity
+    -- multiplier). Here boost pools have weight 0.5 so boost items appear
+    -- roughly half as often as XP items in the merged selection.
     BudgetXPerience = {
         category    = "XP",
         defaultView = "list",
         background  = "machine-budget-xp.png",
         sprites     = { "phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43" },
         unpoweredSprites = { "phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47" },
+        roll = { mode = "weighted", count = { min = 4, max = 8 } },
         poolSets = {{
             keys = {
                 { key = "pool_xp_budget",    weight = 1.0 },
@@ -705,14 +702,15 @@ return {
         }}
     },
 
-    -- Zone-gated pool sets: each set picks one pool. With PhunZones, pools
-    -- can be filtered by zone difficulty so only eligible tiers appear.
+    -- Zone-gated pools: each pool has a zones.difficulty filter. At restock,
+    -- only pools matching the machine's zone are merged into the candidate set.
     WrentAWreck = {
         category    = "Vehicle",
         defaultView = "list",
         background  = "machine-wrent-a-wreck.png",
         sprites     = { "phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43" },
         unpoweredSprites = { "phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47" },
+        roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {
             { keys = {{ key = "pool_vehicles_budget",   weight = 1.0 }} },
             { keys = {{ key = "pool_vehicles_standard", weight = 1.0 }} },
@@ -730,28 +728,32 @@ return {
 | `background`       | PNG file name from `media/textures/` (no path prefix)                                                                                                                  |
 | `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                                                                                                  |
 | `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered                                                                                                        |
-| `defaultView`      | `"grid"` (default) or `"list"` — layout mode for the shop UI                                                                                                           |
-| `poolSets`         | Array of pool sets. Each set has a `keys` array of `{key, weight}` entries                                                                                             |
+| `defaultView`      | `"grid"` (default) or `"list"` -- layout mode for the shop UI                                                                                                           |
+| `roll`             | Default roll for all pool sets: `{ mode = "weighted", count = { min = N, max = M } }`. Can be overridden per pool set.                                                 |
+| `poolSets`         | Array of pool sets. Each set has a `keys` array and an optional `roll` override                                                                                        |
 | `probability`      | Relative weight in the placement lottery (default `1`). Set to `0` to disable automatic placement. Higher values make the shop appear more often.                      |
 | `minDistance`      | Minimum tile distance from any other machine of the same shop type (overrides `DefaultDistance` sandbox setting). Useful for keeping rare shops spread across the map. |
-| `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only — e.g. `168` for weekly.                |
+| `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only -- e.g. `168` for weekly.                |
 
 **How pool sets work:**
 
-Each pool set picks **one pool** from its `keys` array via weighted random. All pool sets
-then contribute their selected pool's offers to the shop's inventory.
+Each pool set merges **all eligible pools** from its `keys` into one candidate list, then
+rolls a random subset using the set's `roll` config. The `weight` on each key entry scales
+that pool's offer weights -- it acts as a rarity multiplier, not a selection probability.
+If the same item appears in multiple pools within a set, it is deduplicated (first
+occurrence wins).
+
+**Roll fallback chain:** `poolSet.roll` > `shop.roll` > global default `{min=5, max=8}`.
+You only need to set `roll` on the pool set if it differs from the shop default.
 
 This gives you two levels of control:
 
-- **Multiple pool sets** — each set always contributes. Use this when a shop should always
-  stock from several categories (e.g. FinalAmendment always has melee, ammo, guns, and
-  explosives).
-- **Multiple keys in one set** — only one is chosen per restock, weighted by `weight`. Use
-  this when a shop should rotate between alternatives (e.g. BudgetXPerience picks one XP
-  tier each restock cycle).
-
-You can combine both patterns: a shop with three pool sets where one of those sets has
-multiple keys will always draw from the first two sets and randomly pick from the third.
+- **Multiple pool sets** -- each set is an independent shelf. Use this when a shop should
+  always stock from several categories (e.g. FinalAmendment always has melee, ammo, guns,
+  and explosives as separate shelves with different roll counts).
+- **Multiple keys in one set** -- all pools blend together into a single merged menu. Use
+  this when pools share a theme but are zone-gated or have different rarity tiers (e.g.
+  BudgetXPerience merges all XP/boost pools; zone filtering decides which tiers contribute).
 
 ---
 
@@ -759,13 +761,13 @@ multiple keys will always draw from the first two sets and randomly pick from th
 
 File: `PhunMart_TokenRewards.lua`
 
-Controls when players automatically receive currency. This file is loaded in full — copy the
+Controls when players automatically receive currency. This file is loaded in full -- copy the
 entire example file and edit it. It is not merged with defaults; your file replaces them.
 
 ```lua
 return {
 
-    -- Playtime milestones — one-time each, atMinutes = cumulative real-world minutes online
+    -- Playtime milestones -- one-time each, atMinutes = cumulative real-world minutes online
     playtime = {
         { atMinutes = 10,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
         { atMinutes = 60,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
@@ -777,7 +779,7 @@ return {
         -- }},
     },
 
-    -- Normal zombie kill milestones — one-time each per wipe
+    -- Normal zombie kill milestones -- one-time each per wipe
     zombieKills = {
         { kills = 100,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
         { kills = 500,  rewards = { { item = "PhunMart.Token", amount = 2 } } },
@@ -807,7 +809,7 @@ return {
 ## 12. Item Blacklist
 
 The blacklist lets admins exclude specific items from all shop pools without editing any config
-file. Blacklisted items are filtered out at restock time — they will not appear as offers in
+file. Blacklisted items are filtered out at restock time -- they will not appear as offers in
 any pool, regardless of which group sourced them.
 
 ### Via the in-game UI
@@ -818,7 +820,7 @@ the next restock.
 
 ### Via override file
 
-`PhunMart_Items.lua` — set the item's `blacklisted` field to `true`:
+`PhunMart_Items.lua` -- set the item's `blacklisted` field to `true`:
 
 ```lua
 return {
@@ -869,13 +871,13 @@ Use `/dumppz perks` (admin command) to get the full list for your server.
 
 ## 14. Reference: special kinds
 
-### `kind = "item"` — spawn an item
+### `kind = "item"` -- spawn an item
 
 ```lua
 actions = { { type = "giveItem", item = "Base.BaseballBat", amount = 1 } }
 ```
 
-### `kind = "trait"` — add or remove a trait
+### `kind = "trait"` -- add or remove a trait
 
 ```lua
 -- Add a positive trait
@@ -887,19 +889,19 @@ actions = { { type = "removeTrait", trait = "base:slowlearner" } }
 
 Trait keys follow the `base:<name>` format. Use `/dumppz traits` to list all trait keys.
 
-### `kind = "skill"` — grant XP to a perk
+### `kind = "skill"` -- grant XP to a perk
 
 ```lua
 actions = { { type = "giveXP", perk = "Cooking", amount = 150 } }
 ```
 
-### `kind = "boost"` — apply a temporary XP multiplier
+### `kind = "boost"` -- apply a temporary XP multiplier
 
 ```lua
 actions = { { type = "applyBoost", perk = "Cooking", multiplier = 2.0, durationHours = 4 } }
 ```
 
-### `kind = "vehicle"` — spawn a vehicle
+### `kind = "vehicle"` -- spawn a vehicle
 
 ```lua
 actions = { {
@@ -913,4 +915,4 @@ actions = { {
 ```
 
 Use `scripts` (array) to pick randomly from multiple variants, or `script` (string) for a single type.
-Vehicle script names come from the game's vehicle script database — use `/dumppz vehicles` to list them.
+Vehicle script names come from the game's vehicle script database -- use `/dumppz vehicles` to list them.

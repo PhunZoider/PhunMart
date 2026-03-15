@@ -22,26 +22,32 @@ local AdminShops = Core.ui.admin_shops
 -- Pool Set Entry Sub-panel (one row: pool key + weight)
 ---------------------------------------------------------------------------
 
--- Format poolSets for display: "pool_a(1.0), pool_b(0.5) | pool_c(1.0)"
+-- Format poolSets for display: "[6,9] pool_a(1.0), pool_b(0.5) | pool_c(1.0)"
 local function formatPoolSets(def)
     if not def.poolSets then
         return ""
     end
     local setParts = {}
     for _, set in ipairs(def.poolSets) do
+        local prefix = ""
+        if set.roll and set.roll.count then
+            local c = set.roll.count
+            prefix = "[" .. tostring(c.min) .. "," .. tostring(c.max) .. "] "
+        end
         local keyParts = {}
         if set.keys then
             for _, entry in ipairs(set.keys) do
                 table.insert(keyParts, entry.key .. "(" .. tostring(entry.weight or 1.0) .. ")")
             end
         end
-        table.insert(setParts, table.concat(keyParts, ", "))
+        table.insert(setParts, prefix .. table.concat(keyParts, ", "))
     end
     return table.concat(setParts, " | ")
 end
 
 -- Parse pool sets from a text representation.
--- Format: "pool_a:1.0, pool_b:0.5 | pool_c:1.0"
+-- Format: "[6,9] pool_a:1.0, pool_b:0.5 | [3,5] pool_c:1.0"
+-- Optional [min,max] prefix per set overrides shop-level roll.
 -- Sets separated by |, keys separated by commas, key:weight pairs.
 local function parsePoolSets(text)
     if not text or text == "" then
@@ -49,6 +55,14 @@ local function parsePoolSets(text)
     end
     local sets = {}
     for setPart in text:gmatch("[^|]+") do
+        setPart = setPart:match("^%s*(.-)%s*$")
+        -- check for optional [min,max] roll prefix
+        local setRoll = nil
+        local rollMin, rollMax, rest = setPart:match("^%[(%d+)%s*[,%-]%s*(%d+)%]%s*(.*)")
+        if rollMin then
+            setRoll = { mode = "weighted", count = { min = tonumber(rollMin), max = tonumber(rollMax) } }
+            setPart = rest
+        end
         local keys = {}
         for entry in setPart:gmatch("[^,]+") do
             entry = entry:match("^%s*(.-)%s*$")
@@ -69,9 +83,11 @@ local function parsePoolSets(text)
             end
         end
         if #keys > 0 then
-            table.insert(sets, {
-                keys = keys
-            })
+            local set = { keys = keys }
+            if setRoll then
+                set.roll = setRoll
+            end
+            table.insert(sets, set)
         end
     end
     if #sets == 0 then
@@ -80,20 +96,25 @@ local function parsePoolSets(text)
     return sets
 end
 
--- Format poolSets for editing (colon-separated key:weight)
+-- Format poolSets for editing: "[6,9] pool_a:1.0, pool_b:0.5 | pool_c:1.0"
 local function formatPoolSetsForEdit(def)
     if not def.poolSets then
         return ""
     end
     local setParts = {}
     for _, set in ipairs(def.poolSets) do
+        local prefix = ""
+        if set.roll and set.roll.count then
+            local c = set.roll.count
+            prefix = "[" .. tostring(c.min) .. "," .. tostring(c.max) .. "] "
+        end
         local keyParts = {}
         if set.keys then
             for _, entry in ipairs(set.keys) do
                 table.insert(keyParts, entry.key .. ":" .. tostring(entry.weight or 1.0))
             end
         end
-        table.insert(setParts, table.concat(keyParts, ", "))
+        table.insert(setParts, prefix .. table.concat(keyParts, ", "))
     end
     return table.concat(setParts, " | ")
 end
@@ -274,6 +295,42 @@ function EditModal:createChildren()
     self:addChild(self.unpSpritesHint)
     y = y + FONT_HGT_SMALL + PAD
 
+    -- Roll Min (shop-level default for all poolSets)
+    self.rollMinLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMin"), 1, 1, 1, 1, UIFont.Small, true)
+    self.rollMinLabel:initialise()
+    self:addChild(self.rollMinLabel)
+
+    local rollMinDefault = ""
+    if self.shopDef.roll and self.shopDef.roll.count then
+        rollMinDefault = tostring(self.shopDef.roll.count.min or "")
+    end
+    self.rollMinEntry = ISTextEntryBox:new(rollMinDefault, x + labelW, y, (w - labelW - PAD) / 2, ROW_H)
+    self.rollMinEntry:initialise()
+    self.rollMinEntry:instantiate()
+    self:addChild(self.rollMinEntry)
+
+    -- Roll Max (inline next to min)
+    self.rollMaxLabel = ISLabel:new(x + labelW + (w - labelW - PAD) / 2 + PAD, y, ROW_H, "-", 1, 1, 1, 1, UIFont.Small, true)
+    self.rollMaxLabel:initialise()
+    self:addChild(self.rollMaxLabel)
+
+    local rollMaxDefault = ""
+    if self.shopDef.roll and self.shopDef.roll.count then
+        rollMaxDefault = tostring(self.shopDef.roll.count.max or "")
+    end
+    local dashW = getTextManager():MeasureStringX(UIFont.Small, "- ") + 4
+    self.rollMaxEntry = ISTextEntryBox:new(rollMaxDefault, x + labelW + (w - labelW - PAD) / 2 + PAD + dashW, y, (w - labelW - PAD) / 2 - dashW, ROW_H)
+    self.rollMaxEntry:initialise()
+    self.rollMaxEntry:instantiate()
+    self:addChild(self.rollMaxEntry)
+    y = y + ROW_H + 2
+
+    self.rollHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_ShopRoll"), 0.5, 0.5, 0.5, 1,
+        UIFont.Small, true)
+    self.rollHint:initialise()
+    self:addChild(self.rollHint)
+    y = y + FONT_HGT_SMALL + PAD
+
     -- Pool Sets
     self.poolSetsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_PoolSets"), 1, 1, 1, 1, UIFont.Small, true)
     self.poolSetsLabel:initialise()
@@ -379,6 +436,16 @@ function EditModal:onApply()
         def.unpoweredSprites = unpSprites
     end
 
+    -- Roll (shop-level default for all poolSets)
+    local rollMin = tonumber(self.rollMinEntry:getText())
+    local rollMax = tonumber(self.rollMaxEntry:getText())
+    if rollMin and rollMax then
+        def.roll = {
+            mode = "weighted",
+            count = { min = rollMin, max = rollMax }
+        }
+    end
+
     -- Pool Sets
     local poolSets = parsePoolSets(self.poolSetsEntry:getText())
     if poolSets then
@@ -403,7 +470,7 @@ end
 
 function EditModal:new(shopKey, shopDef, cb)
     local modalW = math.floor(560 * FONT_SCALE)
-    local modalH = PAD * 14 + FONT_HGT_MEDIUM + ROW_H * 11 + FONT_HGT_SMALL * 9 + PAD * 4
+    local modalH = PAD * 15 + FONT_HGT_MEDIUM + ROW_H * 12 + FONT_HGT_SMALL * 10 + PAD * 4
     local core = getCore()
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
