@@ -1,8 +1,8 @@
 version=1
 title=PhunMart 2 [DEV]
-description=Shop Smart. Shop PhunMart. Your total apocolyptic vending solution.
+description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 description=
-description=description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
+description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
 description=playtesting and balancing on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 description=
@@ -40,7 +40,6 @@ description=[*]Skill boosts and XP
 description=[*]Traits and perks
 description=[*]Vehicles
 description=[*]Server currencies and tokens
-description=[*]Fast travel terminals
 description=[/list]
 description=
 description=Each machine can have its own inventory, theme, pricing, and rules.

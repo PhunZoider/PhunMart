@@ -1,6 +1,6 @@
-# PhunMart2 — Customisation Guide
+# PhunMart — Customisation Guide
 
-PhunMart2 is fully data-driven. Everything about what shops sell, what things cost, what
+PhunMart is fully data-driven. Everything about what shops sell, what things cost, what
 conditions gate a purchase, and how tokens are earned is defined in plain Lua config files
 that you can override without touching the mod itself.
 
@@ -669,16 +669,16 @@ return {
     },
 
     -- Shop with multiple pools blended into one grid
-    FinalAmmendment = {
+    FinalAmendment = {
         category   = "Weapon",
-        background = "machine-final-ammendment.png",
+        background = "machine-final-amendment.png",
         sprites    = { "phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35" },
         unpoweredSprites = { "phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39" },
         poolSets = {{
             keys = {
-                { key = "pool_finalammendment_ammo",       weight = 1.0 },
-                { key = "pool_finalammendment_guns",       weight = 1.0 },
-                { key = "pool_finalammendment_explosives", weight = 0.5 },
+                { key = "pool_finalamendment_ammo",       weight = 1.0 },
+                { key = "pool_finalamendment_guns",       weight = 1.0 },
+                { key = "pool_finalamendment_explosives", weight = 0.5 },
             }
         }}
     },

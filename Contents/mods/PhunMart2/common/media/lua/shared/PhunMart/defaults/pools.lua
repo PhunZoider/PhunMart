@@ -58,9 +58,9 @@ return {
     },
 
     -- =========================================================
-    -- FinalAmmendment  (guns, ammo, explosives)
+    -- FinalAmendment  (guns, ammo, explosives)
     -- =========================================================
-    pool_finalammendment_melee = {
+    pool_finalamendment_melee = {
         defaults = {
             price = "coin_mid"
         },
@@ -76,7 +76,7 @@ return {
         }
     },
 
-    pool_finalammendment_ammo = {
+    pool_finalamendment_ammo = {
         defaults = {
             price = "coin_low"
         },
@@ -91,7 +91,7 @@ return {
             }
         }
     },
-    pool_finalammendment_guns = {
+    pool_finalamendment_guns = {
         defaults = {
             price = "coin_high"
         },
@@ -109,7 +109,7 @@ return {
             }
         }
     },
-    pool_finalammendment_explosives = {
+    pool_finalamendment_explosives = {
         defaults = {
             price = "coin_high"
         },

@@ -31,25 +31,25 @@ return {
         }}
     },
 
-    FinalAmmendment = {
+    FinalAmendment = {
         probability = 8,
         minDistance = 400,
         category = "Weapon",
-        background = "machine-final-ammendment.png",
+        background = "machine-final-amendment.png",
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
         poolSets = {{
             keys = {{
-                key = "pool_finalammendment_melee",
+                key = "pool_finalamendment_melee",
                 weight = 1.0
             }, {
-                key = "pool_finalammendment_ammo",
+                key = "pool_finalamendment_ammo",
                 weight = 1.0
             }, {
-                key = "pool_finalammendment_guns",
+                key = "pool_finalamendment_guns",
                 weight = 1.0
             }, {
-                key = "pool_finalammendment_explosives",
+                key = "pool_finalamendment_explosives",
                 weight = 0.5
             }}
         }}

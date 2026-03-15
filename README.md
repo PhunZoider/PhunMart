@@ -1,6 +1,6 @@
 # PhunMart
 
-A Project Zomboid (B42) that adds 15 themed automated shops to the world - dispensing food, gear, weapons,
+A Project Zomboid (B42) mod that adds 15 themed automated shops to the world - dispensing food, gear, weapons,
 vehicles, skill books, and things you won't find anywhere else. **Traits. XP boosts. Vehicles
 delivered to order.** Stock rotates. Coins come from scavenging. Tokens come from surviving or trading rare items.
 
@@ -49,7 +49,7 @@ the admin menu) and configure every aspect of the system through override Lua fi
 | **HoesNMoes**         | Gardening     | Common | Seeds, fertiliser, farming tools. Plan for next season.                                             |
 | **HardWear**          | Clothing      | Common | Civilian clothing at standard weight; military and protective gear at lower odds.                   |
 | **ShedsAndCommoners** | Literature    | Common | All 125 skill books across 25 B42 skills, sorted by volume tier.                                    |
-| **FinalAmmendment**   | Weapons       | Rare   | Firearms, ammunition, and explosives. Rare, spread out, and worth hunting down.                     |
+| **FinalAmendment**   | Weapons       | Rare   | Firearms, ammunition, and explosives. Rare, spread out, and worth hunting down.                     |
 | **WrentAWreck**       | Vehicles      | Rare   | Order a car. It spawns nearby. Budget, standard, and premium tiers. Restocks weekly.                |
 | **TraiterJoes**       | Traits        | Rare   | Spend tokens to gain positive traits or remove negative ones. The rarest machine in the world.      |
 | **BudgetXPerience**   | XP / Boosts   | Rare   | Direct skill XP grants and temporary XP multipliers, tiered by power.                               |

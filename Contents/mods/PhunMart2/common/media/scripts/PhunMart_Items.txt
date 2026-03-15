@@ -87,13 +87,13 @@ module PhunMart
         WorldObjectSprite = phunmart_01_24,
     }
 
-    item FinalAmmendment
+    item FinalAmendment
     {
         DisplayCategory   = Furniture,
         ItemType          = base:moveable,
         Icon              = VendingMachine,
         Weight            = 250,
-        DisplayName       = Final Ammendmend Vending Machine,
+        DisplayName       = Final Amendment Vending Machine,
         WorldObjectSprite = phunmart_01_32,
     }
 

@@ -130,7 +130,7 @@ option PhunMart.DefaultNumOfItemsWhenRestocking
 option PhunMart.Debug
 {
     type = boolean,
-    default = true,
+    default = false,
     page = PhunMart,
     translation=PhunMart_Debug,
 }
