@@ -721,13 +721,7 @@ function UI:onChangeTo(shopType)
 end
 
 function UI:onEditShop()
-    local shopDefs = (Core.defs and Core.defs.shops) or (Core.runtime and Core.runtime.shops) or {}
-    local shopDef = shopDefs[self.data.shopType] or {}
-    -- Merge in fields already available from the open-shop payload
-    shopDef.background = shopDef.background or self.data.background
-    shopDef.defaultView = shopDef.defaultView or self.data.defaultView
-    shopDef.poolSets = shopDef.poolSets or self.data.poolSets
-    Core.ui.client.shopEditor.open(self.player, self.data.shopType, shopDef)
+    Core.ClientSystem.instance:prepareOpenShopConfig(self.player, self.data.shopType)
 end
 
 function UI:onViewPool(poolKey)
@@ -751,14 +745,39 @@ function UI:onBlacklistSelected()
 end
 
 function UI:onBlacklistOffer(id, offer)
-    -- TODO: send blacklist command to server
-    local item = offer and offer.item
-    self:showFeedback("Blacklist coming soon: " .. tostring(item), 0.9, 0.4, 0.1)
+    local itemKey = offer and offer.item
+    if not itemKey then
+        return
+    end
+    sendClientCommand(Core.name, Core.commands.quickBlacklist, {
+        itemKey = itemKey
+    })
+    self:showFeedback("Blacklisted: " .. tostring(itemKey), 0.9, 0.5, 0.2)
 end
 
 function UI:onEditOffer(id, offer)
-    -- TODO: open Offer Editor modal
-    self:showFeedback("Offer Editor coming soon", 0.7, 0.7, 0.3)
+    -- Find which pool contains this offer so WeightEditor can target it
+    local poolKey = nil
+    if Core.runtime and Core.runtime.pools then
+        for pk, pool in pairs(Core.runtime.pools) do
+            if pool.offers and pool.offers[id] then
+                poolKey = pk
+                break
+            end
+        end
+    end
+    if not poolKey then
+        self:showFeedback("Pool not found for offer", 0.9, 0.3, 0.3)
+        return
+    end
+    local weight = (offer.offer and offer.offer.weight) or 1
+    local displayName = tools.resolveOfferDisplayName(offer)
+    WeightEditor.open(self.player, poolKey, {
+        id = id,
+        offer = offer,
+        weight = weight,
+        displayName = displayName
+    })
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────

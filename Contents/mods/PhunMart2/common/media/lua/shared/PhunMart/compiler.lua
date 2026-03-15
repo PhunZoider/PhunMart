@@ -563,6 +563,26 @@ local function expandGroupItems(groupDef, logger)
         end
     end
 
+    -- normalize: resolve unqualified item names (e.g. "Tweezers" → "Base.Tweezers")
+    local sm = getScriptManager and getScriptManager()
+    if sm then
+        local normalized = {}
+        for itemType, _ in pairs(outSet) do
+            if not itemType:find("%.") then
+                local si = sm:FindItem(itemType)
+                if si then
+                    local fullName = tostring(si:getFullName())
+                    normalized[fullName] = true
+                else
+                    normalized[itemType] = true -- keep as-is if not found
+                end
+            else
+                normalized[itemType] = true
+            end
+        end
+        outSet = normalized
+    end
+
     -- convert set -> array
     local out = {}
     for itemType, _ in pairs(outSet) do

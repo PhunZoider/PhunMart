@@ -448,10 +448,12 @@ Commands[Core.commands.requestPool] = function(playerObj, args)
         return
     end
     local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+    local excluded = (Core.getBlacklist().items or {}).exclude or {}
     local data = {
         poolKey = poolKey,
         offers = pool and pool.offers or {},
-        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        blacklisted = excluded
     }
     if Core.isLocal then
         Core.ui.client.poolViewer.open(playerObj, poolKey, data)

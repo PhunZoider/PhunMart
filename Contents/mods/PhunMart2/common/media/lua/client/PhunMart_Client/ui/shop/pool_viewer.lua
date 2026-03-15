@@ -213,6 +213,7 @@ function UI:buildRows()
     self.rows = {}
     local offers = self.poolData.offers or {}
     local condDefs = self.poolData.conditionsDefs
+    local blacklisted = self.poolData.blacklisted or {}
 
     for offerId, offer in pairs(offers) do
         local scriptItem = getScriptManager():getItem(offer.item)
@@ -248,7 +249,8 @@ function UI:buildRows()
             texture = texture,
             priceText = formatPrice(offer.price),
             weight = weight,
-            condText = conditionsText(offer.conditions, condDefs)
+            condText = conditionsText(offer.conditions, condDefs),
+            _blacklisted = blacklisted[offer.item] == true or false
         })
     end
 
