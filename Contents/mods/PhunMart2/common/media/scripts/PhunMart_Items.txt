@@ -74,23 +74,7 @@ module PhunMart
         Weight            = 250,
         DisplayName       = Good Phoods Vending Machine,
         WorldObjectSprite = phunmart_01_8,
-        isLight = true,
-        lightB = 0,
-        lightG = 255,
-        lightR = 255,
-        LightRadius = 24,
-        MaterialType = Glass_Light,
         
-    }
-
-    item PhatPhoods
-    {
-        DisplayCategory   = Furniture,
-        ItemType          = base:moveable,
-        Icon              = VendingMachine,
-        Weight            = 250,
-        DisplayName       = Phat Phoods Vending Machine,
-        WorldObjectSprite = phunmart_01_16,
     }
 
     item PittyTheTool
@@ -161,11 +145,6 @@ module PhunMart
         Weight            = 250,
         DisplayName       = CSV Pharmacy Vending Machine,
         WorldObjectSprite = phunmart_02_8,
-        lightB = 80,
-        lightG = 80,
-        lightR = 80,
-        LightRadius = 2,
-        MaterialType = Glass_Light,
     }
 
     item RadioHacks
@@ -208,26 +187,6 @@ module PhunMart
         WorldObjectSprite = phunmart_02_40,
     }
 
-    item GiftedXPerience
-    {
-        DisplayCategory   = Furniture,
-        ItemType          = base:moveable,
-        Icon              = VendingMachine,
-        Weight            = 250,
-        DisplayName       = GiftedXp Vending Machine,
-        WorldObjectSprite = phunmart_02_48,
-    }
-
-    item LuxuryXPerience
-    {
-        DisplayCategory   = Furniture,
-        ItemType          = base:moveable,
-        Icon              = VendingMachine,
-        Weight            = 250,
-        DisplayName       = LuxuryXp Vending Machine,
-        WorldObjectSprite = phunmart_02_56,
-    }
-
     item HardWear
     {
         DisplayCategory   = Furniture,
@@ -246,16 +205,6 @@ module PhunMart
         Weight            = 250,
         DisplayName       = Collectors Vending Machine,
         WorldObjectSprite = phunmart_03_8,
-    }
-
-    item Travel
-    {
-        DisplayCategory   = Furniture,
-        ItemType          = base:moveable,
-        Icon              = VendingMachine,
-        Weight            = 250,
-        DisplayName       = Travel Vending Machine,
-        WorldObjectSprite = phunmart_03_16,
     }
 
     item ShedsAndCommoners
