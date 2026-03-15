@@ -6,15 +6,10 @@ return {
         background = "machine-good-phoods.png",
         sprites = {"phunmart_01_8", "phunmart_01_9", "phunmart_01_10", "phunmart_01_11"},
         unpoweredSprites = {"phunmart_01_12", "phunmart_01_13", "phunmart_01_14", "phunmart_01_15"},
-        poolSets = {{
-            keys = {{
-                key = "pool_goodphoods",
-                weight = 1.0
-            }, {
-                key = "pool_phatphoods",
-                weight = 1.0
-            }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_goodphoods", weight = 1.0 }} },
+            { keys = {{ key = "pool_phatphoods", weight = 1.0 }} },
+        }
     },
 
     PittyTheTool = {
@@ -38,21 +33,12 @@ return {
         background = "machine-final-amendment.png",
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
-        poolSets = {{
-            keys = {{
-                key = "pool_finalamendment_melee",
-                weight = 1.0
-            }, {
-                key = "pool_finalamendment_ammo",
-                weight = 1.0
-            }, {
-                key = "pool_finalamendment_guns",
-                weight = 1.0
-            }, {
-                key = "pool_finalamendment_explosives",
-                weight = 0.5
-            }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_finalamendment_melee", weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_ammo", weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_guns", weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_explosives", weight = 1.0 }} },
+        }
     },
 
     WrentAWreck = {
@@ -117,15 +103,10 @@ return {
         background = "machine-traiter-joes.png",
         sprites = {"phunmart_02_0", "phunmart_02_1", "phunmart_02_2", "phunmart_02_3"},
         unpoweredSprites = {"phunmart_02_4", "phunmart_02_5", "phunmart_02_6", "phunmart_02_7"},
-        poolSets = {{
-            keys = {{
-                key = "pool_traiter_good",
-                weight = 1.0
-            }, {
-                key = "pool_traiter_bad_removal",
-                weight = 1.0
-            }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_traiter_good", weight = 1.0 }} },
+            { keys = {{ key = "pool_traiter_bad_removal", weight = 1.0 }} },
+        }
     },
 
     CSVPharmacy = {
@@ -134,15 +115,10 @@ return {
         background = "machine-csv.png",
         sprites = {"phunmart_02_8", "phunmart_02_9", "phunmart_02_10", "phunmart_02_11"},
         unpoweredSprites = {"phunmart_02_12", "phunmart_02_13", "phunmart_02_14", "phunmart_02_15"},
-        poolSets = {{
-            keys = {{
-                key = "pool_csvpharmacy_basic",
-                weight = 1.0
-            }, {
-                key = "pool_csvpharmacy_rare",
-                weight = 0.8
-            }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_csvpharmacy_basic", weight = 1.0 }} },
+            { keys = {{ key = "pool_csvpharmacy_rare", weight = 1.0 }} },
+        }
     },
 
     RadioHacks = {
@@ -224,15 +200,10 @@ return {
         background = "machine-hard-wear.png",
         sprites = {"phunmart_03_0", "phunmart_03_1", "phunmart_03_2", "phunmart_03_3"},
         unpoweredSprites = {"phunmart_03_4", "phunmart_03_5", "phunmart_03_6", "phunmart_03_7"},
-        poolSets = {{
-            keys = {{
-                key = "pool_hardwear_clothing",
-                weight = 1.0
-            }, {
-                key = "pool_hardwear_protective",
-                weight = 0.8
-            }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_hardwear_clothing", weight = 1.0 }} },
+            { keys = {{ key = "pool_hardwear_protective", weight = 1.0 }} },
+        }
     },
 
     ShedsAndCommoners = {

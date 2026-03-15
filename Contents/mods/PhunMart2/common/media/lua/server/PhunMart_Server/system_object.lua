@@ -216,87 +216,109 @@ function ServerObject:buildOffers()
         return
     end
 
+    -- resolve count: number | {min,max} | nil → default 5
+    local function resolveCount(countCfg, fallback)
+        if type(countCfg) == "table" and countCfg.min then
+            return ZombRand(countCfg.min, countCfg.max or countCfg.min)
+        elseif type(countCfg) == "number" then
+            return countCfg
+        end
+        return fallback
+    end
+
     for _, poolSet in ipairs(shopDef.poolSets or {}) do
+        -- Build list of eligible pools, filtered by zone difficulty etc.
+        local eligible = {}
+        local totalWeight = 0
         for _, poolRef in ipairs(poolSet.keys or {}) do
             local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
+            local weight = type(poolRef) == "table" and poolRef.weight or 1.0
             local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
             if not pool then
                 Core.debugLn("buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
             elseif not poolPassesZoneFilter(pool, self.x, self.y) then
                 -- pool excluded by zone difficulty at this location; skip silently
             else
-                local roll = pool.roll or {}
-                local mode = roll.mode or "weighted"
+                table.insert(eligible, { key = poolKey, pool = pool, weight = weight })
+                totalWeight = totalWeight + weight
+            end
+        end
 
-                -- flatten pool offers into a candidate list, respecting the runtime blacklist
-                local candidates = {}
-                local excluded = (Core.getBlacklist().items or {}).exclude or {}
-                for offerId, offer in pairs(pool.offers or {}) do
-                    if not excluded[offer.item] then
-                        table.insert(candidates, {offerId, offer})
-                    end
+        -- Pick one pool from the eligible set via weighted random.
+        if #eligible > 0 and totalWeight > 0 then
+            local r = ZombRand(math.max(1, math.floor(totalWeight * 10000))) / 10000.0
+            local cumulative = 0
+            local chosen = eligible[#eligible] -- fallback to last
+            for _, entry in ipairs(eligible) do
+                cumulative = cumulative + entry.weight
+                if r < cumulative then
+                    chosen = entry
+                    break
+                end
+            end
+
+            local pool = chosen.pool
+            local roll = pool.roll or {}
+            local mode = roll.mode or "weighted"
+
+            -- flatten pool offers into a candidate list, respecting the runtime blacklist
+            local candidates = {}
+            local excluded = (Core.getBlacklist().items or {}).exclude or {}
+            for offerId, offer in pairs(pool.offers or {}) do
+                if not excluded[offer.item] then
+                    table.insert(candidates, {offerId, offer})
+                end
+            end
+
+            -- select which offers appear this restock cycle
+            local selected
+            if mode == "all" then
+                selected = {}
+                for _, pair in ipairs(candidates) do
+                    table.insert(selected, {
+                        id = pair[1],
+                        offer = pair[2]
+                    })
+                end
+            else -- "weighted" (default): pick N via weighted random without replacement
+                local count = resolveCount(roll.count, 5)
+                -- cap to pool size so we never spin forever
+                count = math.min(count, #candidates)
+                selected = weightedPickN(candidates, count)
+            end
+
+            -- bake each selected offer: resolve price ranges and stock quantities
+            for _, sel in ipairs(selected) do
+                local offerId = sel.id or sel[1]
+                local offerDef = sel.offer or sel[2]
+                local srcOffer = offerDef.offer or {}
+
+                -- resolve stock: {min,max} → concrete qty; absent = unlimited (-1)
+                local stockQty, restockHours
+                local stock = srcOffer.stock
+                if stock then
+                    local sMin = stock.min or 1
+                    local sMax = stock.max or sMin
+                    stockQty = sMin + ZombRand(sMax - sMin + 1) -- inclusive [sMin, sMax]
+                    restockHours = stock.restockHours
+                else
+                    stockQty = -1
                 end
 
-                -- resolve count: number | {min,max} | nil → default 5
-                local function resolveCount(countCfg, fallback)
-                    if type(countCfg) == "table" and countCfg.min then
-                        return ZombRand(countCfg.min, countCfg.max or countCfg.min)
-                    elseif type(countCfg) == "number" then
-                        return countCfg
-                    end
-                    return fallback
-                end
-
-                -- select which offers appear this restock cycle
-                local selected
-                if mode == "all" then
-                    selected = {}
-                    for _, pair in ipairs(candidates) do
-                        table.insert(selected, {
-                            id = pair[1],
-                            offer = pair[2]
-                        })
-                    end
-                else -- "weighted" (default): pick N via weighted random without replacement
-                    local count = resolveCount(roll.count, 5)
-                    -- cap to pool size so we never spin forever
-                    count = math.min(count, #candidates)
-                    selected = weightedPickN(candidates, count)
-                end
-
-                -- bake each selected offer: resolve price ranges and stock quantities
-                for _, sel in ipairs(selected) do
-                    local offerId = sel.id or sel[1]
-                    local offerDef = sel.offer or sel[2]
-                    local srcOffer = offerDef.offer or {}
-
-                    -- resolve stock: {min,max} → concrete qty; absent = unlimited (-1)
-                    local stockQty, restockHours
-                    local stock = srcOffer.stock
-                    if stock then
-                        local sMin = stock.min or 1
-                        local sMax = stock.max or sMin
-                        stockQty = sMin + ZombRand(sMax - sMin + 1) -- inclusive [sMin, sMax]
-                        restockHours = stock.restockHours
-                    else
-                        stockQty = -1
-                    end
-
-                    offers[offerId] = {
-                        id = offerDef.id,
-                        item = offerDef.item,
-                        price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
-                        reward = offerDef.reward,
-                        offer = {
-                            qty = srcOffer.qty or 1, -- items given per purchase
-                            weight = srcOffer.weight or 1.0,
-                            stockQty = stockQty, -- purchase slots this cycle (-1 = unlimited)
-                            restockHours = restockHours
-                        },
-                        conditions = offerDef.conditions,
-                        meta = offerDef.meta
-                    }
-                end
+                offers[offerId] = {
+                    id = offerDef.id,
+                    item = offerDef.item,
+                    price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
+                    reward = offerDef.reward,
+                    offer = {
+                        qty = srcOffer.qty or 1, -- items given per purchase
+                        weight = srcOffer.weight or 1.0,
+                        stockQty = stockQty, -- purchase slots this cycle (-1 = unlimited)
+                        restockHours = restockHours
+                    },
+                    conditions = offerDef.conditions,
+                    meta = offerDef.meta
+                }
             end
         end
     end
@@ -360,6 +382,9 @@ function ServerObject:stateFromIsoObject(isoObject)
 end
 
 function ServerObject:stateToIsoObject(isoObject)
+    Core.debugLn("stateToIsoObject: self.type=" .. tostring(self.type)
+        .. " isoObject=" .. tostring(isoObject ~= nil)
+        .. " pos=" .. tostring(self.x) .. "," .. tostring(self.y) .. "," .. tostring(self.z))
     -- For newly created objects the iso object holds the authoritative data
     -- (set by initializeShopObject / the moveable system).  Read it first
     -- so we don't overwrite good data with initNew defaults.

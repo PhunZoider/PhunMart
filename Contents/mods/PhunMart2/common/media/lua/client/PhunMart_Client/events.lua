@@ -35,6 +35,10 @@ Events.OnObjectRightMouseButtonUp.Add(function(object, x, y)
     end
 end)
 
+Events.OnObjectAdded.Add(function(object)
+    Core.ClientSystem.instance:checkObjectAdded(object)
+end)
+
 Events.OnPreFillWorldObjectContextMenu.Add(function(playerObj, context, worldobjects, test)
     Core.contexts.open(playerObj, context, worldobjects, test)
     Core:reloadShopDefinitions()

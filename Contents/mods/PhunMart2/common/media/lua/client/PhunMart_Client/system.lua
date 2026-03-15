@@ -136,6 +136,53 @@ function ClientSystem:OnServerCommand(command, args)
     end
 end
 
+function ClientSystem:newLuaObjectAt(x, y, z)
+    local globalObject = self.system:newObject(x, y, z)
+    return self:newLuaObject(globalObject)
+end
+
+function ClientSystem:checkObjectAdded(obj)
+    if not obj then
+        return
+    end
+    local sprite = obj:getSprite()
+    if not sprite then
+        return
+    end
+    local customName = sprite:getProperties():get("CustomName")
+    local name = obj:getName()
+    local spriteName = sprite:getName() or "nil"
+
+    Core.debugLn("CLIENT checkObjectAdded: sprite=" .. spriteName
+        .. " customName=" .. tostring(customName)
+        .. " name=" .. tostring(name))
+
+    -- Match by sprite CustomName (like the server does), not by isValidIsoObject,
+    -- because the object may arrive on the client before the server has set its name.
+    if not customName or not Core.shops[customName] then
+        return
+    end
+
+    -- Ensure the object is named so the engine's isValidIsoObject can find it later.
+    if name ~= "PhunMartVendingMachine" then
+        obj:setName("PhunMartVendingMachine")
+        Core.debugLn("CLIENT checkObjectAdded: set name to PhunMartVendingMachine")
+    end
+
+    local x, y, z = obj:getX(), obj:getY(), obj:getZ()
+    local existing = self:getLuaObjectAt(x, y, z)
+    Core.debugLn("CLIENT checkObjectAdded: pos=" .. x .. "," .. y .. "," .. z
+        .. " existingLuaObj=" .. tostring(existing ~= nil))
+
+    if not existing then
+        local luaObj = self:newLuaObjectAt(x, y, z)
+        Core.debugLn("CLIENT checkObjectAdded: newLuaObjectAt result=" .. tostring(luaObj ~= nil))
+        if luaObj then
+            luaObj:stateFromIsoObject(obj)
+        end
+    end
+end
+
 function ClientSystem:checkLocals()
     for i = 1, self:getLuaObjectCount() do
 

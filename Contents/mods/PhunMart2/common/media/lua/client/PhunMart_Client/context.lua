@@ -12,6 +12,24 @@ Core.contexts.open = function(player, context, worldobjects, test)
 
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
         obj = Core.ClientSystem.instance:getLuaObjectOnSquare(wObj:getSquare())
+        -- Fallback: if no global object but the IsoObject has a PhunMart sprite,
+        -- try to register it on the spot (recovers orphaned machines).
+        if not obj then
+            local sq = wObj:getSquare()
+            local objects = sq:getObjects()
+            for i = 0, objects:size() - 1 do
+                local iso = objects:get(i)
+                local sprite = iso:getSprite()
+                if sprite then
+                    local cn = sprite:getProperties():get("CustomName")
+                    if cn and Core.shops[cn] then
+                        Core.ClientSystem.instance:checkObjectAdded(iso)
+                        obj = Core.ClientSystem.instance:getLuaObjectOnSquare(sq)
+                        break
+                    end
+                end
+            end
+        end
         if obj then
             isShop = true
             wsq = wObj:getSquare()

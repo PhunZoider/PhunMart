@@ -36,8 +36,11 @@ Offers are grouped into **pools** by theme — food, XP boosts, vehicles. A pool
 random subset of its offers each restock, so the shop feels different each visit rather than
 showing the same items forever.
 
-A **shop** is a machine with a sprite and a visual identity. It points at one or more pools.
-That's the full chain: machine → pool → offers → reward / cost / conditions.
+A **shop** is a machine with a sprite and a visual identity. It references pools through
+**pool sets**. Each pool set picks one pool at random (weighted) on restock, and all pool
+sets contribute. This means separate pool sets always appear together, while multiple pools
+in the same set rotate — only one is chosen each cycle.
+That's the full chain: machine → pool set → pool → offers → reward / cost / conditions.
 
 The config files exist because each of those concepts is reusable. Prices are named so the
 same `coin_25` applies to a hundred offers without repeating it. Conditions are named so
@@ -221,9 +224,9 @@ return {
         background       = "machine-hard-wear.png",   -- reuse an existing background, or add your own
         sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
         unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
-        poolSets = {{
-            keys = {{ key = "pool_bobshardware", weight = 1.0 }}
-        }}
+        poolSets = {
+            { keys = {{ key = "pool_bobshardware", weight = 1.0 }} },
+        }
     },
 }
 ```
@@ -654,36 +657,55 @@ Shops bind a machine sprite to one or more pools. Each shop key is a unique mach
 ```lua
 return {
 
-    -- Simple shop: one pool, one sprite set
-    GoodPhoods = {
-        category         = "Food",
-        background       = "machine-good-phoods.png",
-        sprites          = { "phunmart_01_8",  "phunmart_01_9",  "phunmart_01_10", "phunmart_01_11" },
-        unpoweredSprites = { "phunmart_01_12", "phunmart_01_13", "phunmart_01_14", "phunmart_01_15" },
-        poolSets = {{
-            keys = {{
-                key    = "pool_goodphoods",
-                weight = 1.0
-            }}
-        }}
+    -- Simple shop: one pool set with one pool
+    PittyTheTool = {
+        category         = "Tool",
+        background       = "machine-pity-the-tool.png",
+        sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
+        unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
+        poolSets = {
+            { keys = {{ key = "pool_pittythetool", weight = 1.0 }} },
+        }
     },
 
-    -- Shop with multiple pools blended into one grid
+    -- Multiple pool sets: each set picks one pool and all sets contribute.
+    -- Here each set has a single pool, so all four categories always appear.
     FinalAmendment = {
         category   = "Weapon",
         background = "machine-final-amendment.png",
         sprites    = { "phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35" },
         unpoweredSprites = { "phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39" },
+        poolSets = {
+            { keys = {{ key = "pool_finalamendment_melee", weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_ammo",  weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_guns",  weight = 1.0 }} },
+            { keys = {{ key = "pool_finalamendment_explosives", weight = 1.0 }} },
+        }
+    },
+
+    -- Pool selection: multiple pools in ONE set — one is chosen at random per
+    -- restock, weighted by the `weight` field. Here the shop rotates between
+    -- budget, gifted, and luxury XP tiers each restock cycle.
+    BudgetXPerience = {
+        category    = "XP",
+        defaultView = "list",
+        background  = "machine-budget-xp.png",
+        sprites     = { "phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43" },
+        unpoweredSprites = { "phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47" },
         poolSets = {{
             keys = {
-                { key = "pool_finalamendment_ammo",       weight = 1.0 },
-                { key = "pool_finalamendment_guns",       weight = 1.0 },
-                { key = "pool_finalamendment_explosives", weight = 0.5 },
+                { key = "pool_xp_budget",    weight = 1.0 },
+                { key = "pool_boost_budget", weight = 0.5 },
+                { key = "pool_xp_gifted",    weight = 1.0 },
+                { key = "pool_boost_gifted", weight = 0.5 },
+                { key = "pool_xp_luxury",    weight = 1.0 },
+                { key = "pool_boost_luxury", weight = 0.5 },
             }
         }}
     },
 
-    -- Shop with multiple pool *sets* (future: gated by zone/tier)
+    -- Zone-gated pool sets: each set picks one pool. With PhunZones, pools
+    -- can be filtered by zone difficulty so only eligible tiers appear.
     WrentAWreck = {
         category    = "Vehicle",
         defaultView = "list",
@@ -691,9 +713,9 @@ return {
         sprites     = { "phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43" },
         unpoweredSprites = { "phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47" },
         poolSets = {
-            { keys = { { key = "pool_vehicles_budget",   weight = 1.0 } } },
-            { keys = { { key = "pool_vehicles_standard", weight = 1.0 } } },
-            { keys = { { key = "pool_vehicles_premium",  weight = 1.0 } } },
+            { keys = {{ key = "pool_vehicles_budget",   weight = 1.0 }} },
+            { keys = {{ key = "pool_vehicles_standard", weight = 1.0 }} },
+            { keys = {{ key = "pool_vehicles_premium",  weight = 1.0 }} },
         }
     },
 }
@@ -705,7 +727,7 @@ return {
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `category`         | Display category shown in admin tools                                                                                                                                  |
 | `background`       | PNG file name from `media/textures/` (no path prefix)                                                                                                                  |
-| `sprites`          | 4-element array of tile sprite names (N/E/S/W facing)                                                                                                                  |
+| `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                                                                                                  |
 | `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered                                                                                                        |
 | `defaultView`      | `"grid"` (default) or `"list"` — layout mode for the shop UI                                                                                                           |
 | `poolSets`         | Array of pool sets. Each set has a `keys` array of `{key, weight}` entries                                                                                             |
@@ -713,10 +735,22 @@ return {
 | `minDistance`      | Minimum tile distance from any other machine of the same shop type (overrides `DefaultDistance` sandbox setting). Useful for keeping rare shops spread across the map. |
 | `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only — e.g. `168` for weekly.                |
 
-**Pool sets vs pool keys:**
-A shop selects one pool _set_ at runtime (first set is always used currently; zone gating
-is planned). Within that set, multiple pool keys are blended — each pool's offers are drawn
-and combined into a single grid.
+**How pool sets work:**
+
+Each pool set picks **one pool** from its `keys` array via weighted random. All pool sets
+then contribute their selected pool's offers to the shop's inventory.
+
+This gives you two levels of control:
+
+- **Multiple pool sets** — each set always contributes. Use this when a shop should always
+  stock from several categories (e.g. FinalAmendment always has melee, ammo, guns, and
+  explosives).
+- **Multiple keys in one set** — only one is chosen per restock, weighted by `weight`. Use
+  this when a shop should rotate between alternatives (e.g. BudgetXPerience picks one XP
+  tier each restock cycle).
+
+You can combine both patterns: a shop with three pool sets where one of those sets has
+multiple keys will always draw from the first two sets and randomly pick from the third.
 
 ---
 

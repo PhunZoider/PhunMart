@@ -326,7 +326,6 @@ function ServerSystem:getShopList()
     return shops
 end
 
-
 function ServerSystem:upsertShopDefinition(data)
     self:upsertDefinition("PhunMart_Shops.lua", "shops", data.type, data)
 end
@@ -349,22 +348,58 @@ function ServerSystem:upsertDefinition(filename, defsKey, key, def)
 end
 
 function ServerSystem:checkObjectAdded(obj)
-    if obj and obj.getSprite then
-        local customName = obj:getSprite():getProperties():get("CustomName")
-        if customName and Core.shops[customName] then
-            if not self:isValidIsoObject(obj) then
-                -- is a shop sprite but not an instance?
-                self.initializeShopObject(obj)
-            end
-            -- Register with the global object system immediately so the machine
-            -- is live without waiting for a chunk reload.
-            local x, y, z = obj:getX(), obj:getY(), obj:getZ()
-            if not self:getLuaObjectAt(x, y, z) then
-                local luaObj = self:newLuaObjectAt(x, y, z)
-                if luaObj then
-                    luaObj:stateFromIsoObject(obj)
+    if not obj or not obj.getSprite then
+        return
+    end
+    local sprite = obj:getSprite()
+    if not sprite then
+        return
+    end
+    local customName = sprite:getProperties():get("CustomName")
+    local objType = tostring(obj:getType())
+    local objName = tostring(obj:getName())
+    local spriteName = sprite:getName() or "nil"
+
+    Core.debugLn("checkObjectAdded: sprite=" .. spriteName .. " customName=" .. tostring(customName) .. " objType=" ..
+                     objType .. " objName=" .. objName)
+
+    if not customName or not Core.shops[customName] then
+        return
+    end
+
+    local isValid = self:isValidIsoObject(obj)
+    Core.debugLn("checkObjectAdded: isValidIsoObject=" .. tostring(isValid))
+
+    if not isValid then
+        self.initializeShopObject(obj)
+        Core.debugLn("checkObjectAdded: initialized as PhunMartVendingMachine")
+    end
+
+    local x, y, z = obj:getX(), obj:getY(), obj:getZ()
+    local existing = self:getLuaObjectAt(x, y, z)
+    Core.debugLn("checkObjectAdded: pos=" .. x .. "," .. y .. "," .. z .. " existingLuaObj=" ..
+                     tostring(existing ~= nil))
+
+    if not existing then
+        -- Check if the object is actually on its square before creating the global object.
+        local sq = obj:getSquare()
+        local onSquare = false
+        if sq then
+            local objects = sq:getObjects()
+            for i = 0, objects:size() - 1 do
+                if objects:get(i) == obj then
+                    onSquare = true
+                    break
                 end
             end
+        end
+        Core.debugLn("checkObjectAdded: onSquare=" .. tostring(onSquare))
+
+        local luaObj = self:newLuaObjectAt(x, y, z)
+        Core.debugLn("checkObjectAdded: newLuaObjectAt result=" .. tostring(luaObj ~= nil))
+        if luaObj then
+            luaObj:stateFromIsoObject(obj)
+            Core.debugLn("checkObjectAdded: stateFromIsoObject completed, type=" .. tostring(luaObj.type))
         end
     end
 end
@@ -378,15 +413,19 @@ function ServerSystem:loadGridsquare(square)
         local sprite = obj:getSprite()
         if sprite and sprite.getProperties then
 
-            if Core.targetSprites[sprite:getName()] then
-                -- have we already checked?
-                -- has it already been tested?
+            local customName = sprite:getProperties():get("CustomName")
+
+            if customName and Core.shops[customName] then
+                -- PhunMart sprite: ensure it has backing global object data.
+                -- Recovers orphaned machines after a crash/restart without save.
+                self:checkObjectAdded(obj)
+
+            elseif Core.targetSprites[sprite:getName()] then
+                -- Vanilla vending machine sprite: try to auto-convert.
                 local modData = obj:getModData()
                 if not modData.PhunMart then
                     modData.PhunMart = {}
                 end
-                -- if modData.PhunMart.replacementKey ~= Core.settings.ReplacementKey then
-                --    modData.PhunMart.replacementKey = Core.settings.ReplacementKey
                 if Core.settings.ChanceToConvert > 0 then
                     local chance = ZombRand(100)
                     if chance <= Core.settings.ChanceToConvert then
@@ -398,7 +437,6 @@ function ServerSystem:loadGridsquare(square)
                         end
                     end
                 end
-                -- end
             end
         end
 
