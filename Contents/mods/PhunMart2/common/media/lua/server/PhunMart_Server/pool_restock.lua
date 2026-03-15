@@ -1,6 +1,3 @@
-if isClient() then
-    return
-end
 local Core = PhunMart
 
 function Core.getCoinChance(zed)
