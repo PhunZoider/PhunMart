@@ -3,7 +3,7 @@ VERSION = 1,
 
 option PhunMart.ChanceToDropChange
 {
-    type = number,
+    type = integer,
     default = 30,
     min=0,
     max=100
@@ -13,7 +13,7 @@ option PhunMart.ChanceToDropChange
 
 option PhunMart.MinCoinsToDrop
 {
-    type = number,
+    type = integer,
     default = 30,
     min=5,
     max=1000
@@ -23,7 +23,7 @@ option PhunMart.MinCoinsToDrop
 
 option PhunMart.MaxCoinsToDrop
 {
-    type = number,
+    type = integer,
     default = 30,
     min=10,
     max=1000

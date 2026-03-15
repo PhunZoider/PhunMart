@@ -1,8 +1,9 @@
 version=1
+id=3685690481
 title=PhunMart 2 [DEV]
 description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 description=
-description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback for PhunMart 2. This version may change frequently and could break between updates. 
+description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback for PhunMart 2. This version may change frequently during our balance testing.
 description=playtesting and balancing on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 description=
@@ -67,12 +68,15 @@ description=PhunMart is extremely configurable, but to keep this page readable t
 description=
 description=[url=https://github.com/PhunZoider/PhunMart]PhunMart Customisation Guide[/url]
 description=
+description=[list]
+description=[*]What will happen to my customisations moving to the live branch? All customisations you make in PhunMart are saved to your file system so it survives restarts, wipes and even swapping between the Preview and Production version!
+description=[*]Can I customise my own shops? Yes
+description=[*]Can I create my own unique shop? Yes
+description=[*]Can I just say how awesome you are? Yes
+description=[*]Where can I test this? SP, your own server or  [url=https://discord.gg/v2USyAtP6q]Come play on ours[/url][/list]
+description=[/list]
+description=
 description=[h2]FAQs[/h2]
-description=
-description=
-description=
-description=
-
 description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
 description=
 description=[h2]More Phun Mods[/h2]
@@ -81,5 +85,5 @@ description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=36238970
 description=
 description=Coded with love for the awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=
-tags=Build 42;Items;Multiplayer
+tags=Build 42;Balance;Clothing/Armor;Food;Framework;Interface;Items;Misc;Multiplayer;Skills;Traits;Vehicles;Weapons
 visibility=public
