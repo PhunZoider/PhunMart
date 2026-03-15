@@ -40,6 +40,9 @@ return {
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
         poolSets = {{
             keys = {{
+                key = "pool_finalammendment_melee",
+                weight = 1.0
+            }, {
                 key = "pool_finalammendment_ammo",
                 weight = 1.0
             }, {

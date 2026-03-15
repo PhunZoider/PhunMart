@@ -163,6 +163,19 @@ return {
                                "AnimalPartWeapon", "FirstAidWeapon", "VehicleMaintenanceWeapon"}
     },
 
+    weapons_melee = {
+        defaults = {
+            price = "coin_mid",
+            offer = {
+                weight = 1.0
+            }
+        },
+        include = {
+            categories = {"WeaponCrafted", "WeaponImprovised", "CookingWeapon", "HouseholdWeapon", "InstrumentWeapon",
+                          "JunkWeapon", "MaterialWeapon", "AnimalPartWeapon"}
+        }
+    },
+
     weapons_parts = {
         defaults = {
             price = "coin_mid",
@@ -282,6 +295,19 @@ return {
         },
         include = {
             categories = {"ProtectiveGear"}
+        }
+    },
+
+    -- Tier 3: bags, backpacks, cases (DisplayCategory = Container)
+    hardwear_bags = {
+        defaults = {
+            price = "coin_mid",
+            offer = {
+                weight = 0.2
+            }
+        },
+        include = {
+            categories = {"Container"}
         }
     },
 

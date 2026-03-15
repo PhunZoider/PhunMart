@@ -60,6 +60,22 @@ return {
     -- =========================================================
     -- FinalAmmendment  (guns, ammo, explosives)
     -- =========================================================
+    pool_finalammendment_melee = {
+        defaults = {
+            price = "coin_mid"
+        },
+        sources = {
+            groups = {"weapons_melee"}
+        },
+        roll = {
+            mode = "weighted",
+            count = {
+                min = 2,
+                max = 3
+            }
+        }
+    },
+
     pool_finalammendment_ammo = {
         defaults = {
             price = "coin_low"
