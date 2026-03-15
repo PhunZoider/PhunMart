@@ -671,7 +671,8 @@ function UI:onAdminMenu(btn)
     if #poolSets > 0 then
         local poolsMenu = context:getNew(context)
         for si, poolSet in ipairs(poolSets) do
-            local setLabel = #poolSets > 1 and getText("IGUI_PhunMart_Admin_SetN", tostring(si)) or getText("IGUI_PhunMart_Admin_ActivePools")
+            local setLabel = #poolSets > 1 and getText("IGUI_PhunMart_Admin_SetN", tostring(si)) or
+                                 getText("IGUI_PhunMart_Admin_ActivePools")
             poolsMenu:addOption("-- " .. setLabel .. " --")
             for _, poolRef in ipairs(poolSet.keys or {}) do
                 local key = type(poolRef) == "table" and poolRef.key or poolRef
@@ -780,7 +781,11 @@ function UI:onMoveOfferToPool(id, offer)
         return
     end
     local displayName = tools.resolveOfferDisplayName(offer)
-    MoveToPoolModal.open(self.player, poolKey, {{id = id, displayName = displayName, offer = offer}}, nil)
+    MoveToPoolModal.open(self.player, poolKey, {{
+        id = id,
+        displayName = displayName,
+        offer = offer
+    }}, nil)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────

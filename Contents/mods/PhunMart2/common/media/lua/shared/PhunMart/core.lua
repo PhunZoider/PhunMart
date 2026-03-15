@@ -24,7 +24,6 @@ PhunMart = {
     },
     commands = {
         -- Shop admin
-        getBlackList = "PhunMartGetBlacklist",
         setBlacklist = "PhunMartSetBlacklist",
         compile = "PhunMartCompileShops",
         reroll = "PhunMartReroll",
@@ -42,7 +41,6 @@ PhunMart = {
         upsertPriceDef = "PhunMartUpsertPriceDef",
         upsertRewardDef = "PhunMartUpsertRewardDef",
         upsertPoolDef = "PhunMartUpsertPoolDef",
-        getShopDefinition = "PhunMartGetShopDefinition",
         getShopList = "PhunMartGetShopList",
         getInstanceList = "PhunMartGetInstanceList",
         getShopData = "PhunMartGetShopData",

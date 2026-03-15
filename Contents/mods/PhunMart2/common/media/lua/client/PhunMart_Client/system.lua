@@ -150,18 +150,6 @@ function ClientSystem:openShopList(player)
     Core.ui.shop_selector.open(player or getSpecificPlayer(0))
 end
 
-function ClientSystem:prepareOpenShopConfig(player, shopType)
-
-    self:sendCommand(player or getSpecificPlayer(0), Core.commands.getShopDefinition, {
-        type = shopType
-    })
-
-end
-
-function ClientSystem:openShopConfig(player, data)
-    Core.ui.shop_config.open(player, data)
-end
-
 function ClientSystem:upsertShopDefinition(args, player)
 
     self:sendCommand(player or getSpecificPlayer(0), Core.commands.upsertShopDefinition, {

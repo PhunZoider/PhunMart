@@ -39,12 +39,6 @@ Commands[Core.commands.openError] = function(args)
     modal:addToUIManager()
 end
 
-Commands[Core.commands.getBlackList] = function(args)
-    local player = Core.utils.getPlayerByUsername(args.username)
-    if player then
-        Core.ui.pools_blacklist_main.OnOpenPanel(player, args.data)
-    end
-end
 
 Commands[Core.commands.serverPurchaseFailed] = function(arguments)
     local player = getSpecificPlayer(arguments.playerIndex)
@@ -179,13 +173,8 @@ Commands[Core.commands.getInstanceList] = function(args)
     end
 end
 
-Commands[Core.commands.getShopDefinition] = function(args)
-    local player = Core.utils.getPlayerByUsername(args.username)
-    if player then
-        Core.ClientSystem.instance:openShopConfig(player, args.data)
-    end
 
-end
+
 
 Commands[Core.commands.requestShopDefs] = function(arguments)
     Core.compileWith(arguments.overrides)

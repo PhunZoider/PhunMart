@@ -10,14 +10,6 @@ Commands[Core.commands.compile] = function(playerObj, args)
     Core.ServerSystem.instance:recompileShops()
 end
 
-Commands[Core.commands.getBlackList] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
-    local list = Core.getBlacklist() or {}
-    sendServerCommand(playerObj, Core.name, Core.commands.getBlackList, {
-        username = playerObj:getUsername(),
-        data = list
-    })
-end
 
 Commands[Core.commands.setBlacklist] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then return end
@@ -390,20 +382,8 @@ Commands[Core.commands.getInstanceList] = function(playerObj, args)
     end
 end
 
-Commands[Core.commands.getShopDefinition] = function(playerObj, args)
-    local shop = Core.ServerSystem.instance:getShopDefinition(args.type)
-    if shop then
-        if Core.isLocal then
-            Core.ClientSystem.instance:openShopConfig(playerObj, shop)
-        else
-            local data = {
-                username = playerObj:getUsername(),
-                data = shop
-            }
-            sendServerCommand(playerObj, Core.name, Core.commands.getShopDefinition, data)
-        end
-    end
-end
+
+
 
 Commands[Core.commands.getShopData] = function(playerObj, args)
     local data = Core.ServerSystem.instance:getShopData(args.location)

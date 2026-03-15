@@ -326,11 +326,6 @@ function ServerSystem:getShopList()
     return shops
 end
 
-function ServerSystem:getShopDefinition(shopType)
-    local data = Core.shops[shopType] or {}
-    data.type = shopType
-    return data
-end
 
 function ServerSystem:upsertShopDefinition(data)
     self:upsertDefinition("PhunMart_Shops.lua", "shops", data.type, data)

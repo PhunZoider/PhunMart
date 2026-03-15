@@ -276,18 +276,6 @@ function UI:createChildren()
     self.controls.btnCompile = btnCompile;
     self.controls._controlPanel:addChild(btnCompile);
 
-    local btnBlacklist = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Blacklist"), self, function()
-        if Core.isLocal then
-            Core.ui.pools_blacklist_main.OnOpenPanel(self.player, Core.getBlacklist())
-        else
-            sendClientCommand(Core.name, Core.commands.getBlackList, {})
-        end
-    end);
-    btnBlacklist.internal = "BLACKLIST";
-    btnBlacklist:initialise();
-    btnBlacklist:instantiate();
-    self.controls.btnBlacklist = btnBlacklist;
-    self.controls._controlPanel:addChild(btnBlacklist);
 
     local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Prices"), self, function()
         Core.ui.admin_prices.OnOpenPanel(self.player)
