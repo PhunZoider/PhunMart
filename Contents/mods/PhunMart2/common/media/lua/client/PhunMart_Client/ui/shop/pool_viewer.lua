@@ -24,11 +24,12 @@ local SCROLLBAR_W = 13
 -- Column widths (pixels, left-to-right after left PAD)
 local COL_ICON = ICON_SZ + 4
 local COL_NAME = math.floor(190 * FONT_SCALE)
-local COL_PRICE = math.floor(72 * FONT_SCALE)
+local COL_PRICE = math.floor(90 * FONT_SCALE)
 local COL_WEIGHT = math.floor(44 * FONT_SCALE)
+local COL_SOURCE = math.floor(100 * FONT_SCALE)
 -- COL_COND fills remaining space
 
-local BASE_W = math.floor(640 * FONT_SCALE)
+local BASE_W = math.floor(740 * FONT_SCALE)
 local BASE_H = math.floor(500 * FONT_SCALE)
 
 -- ---------------------------------------------------------------------------
@@ -38,6 +39,14 @@ local UI = Core.ui.client.poolViewer
 UI.instances = {}
 
 -- --- helpers ----------------------------------------------------------------
+
+local function formatCents(cents)
+    if cents % 100 == 0 then
+        return "$" .. tostring(cents / 100)
+    else
+        return string.format("$%.2f", cents / 100)
+    end
+end
 
 local function formatPrice(price)
     if not price then
@@ -49,16 +58,19 @@ local function formatPrice(price)
     if price.kind == "currency" then
         local amt = price.amount
         if type(amt) == "table" then
-            amt = amt.min
+            if amt.min and amt.max and amt.min ~= amt.max then
+                if price.pool == "tokens" then
+                    return amt.min .. "-" .. amt.max .. "t"
+                else
+                    return formatCents(amt.min) .. "-" .. formatCents(amt.max)
+                end
+            end
+            amt = amt.min or amt.max or 0
         end
         if price.pool == "tokens" then
             return tostring(amt) .. "t"
         else
-            if amt % 100 == 0 then
-                return "$" .. tostring(amt / 100)
-            else
-                return string.format("$%.2f", amt / 100)
-            end
+            return formatCents(amt)
         end
     end
     if price.kind == "items" and price.items and price.items[1] then
@@ -291,6 +303,10 @@ function UI:createChildren()
     self.hdrWt:initialise()
     self:addChild(self.hdrWt)
     cx = cx + COL_WEIGHT
+    self.hdrSource = ISLabel:new(cx, hdrY, hdrH, "Source", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrSource:initialise()
+    self:addChild(self.hdrSource)
+    cx = cx + COL_SOURCE
     self.hdrCond = ISLabel:new(cx, hdrY, hdrH, "Conditions", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrCond:initialise()
     self:addChild(self.hdrCond)
@@ -418,6 +434,19 @@ function UI:buildRows()
             catMap[category] = true
         end
 
+        local meta = offer.meta or {}
+        local sourceType = meta.sourceType or "group"
+        local sourceLabel
+        if sourceType == "group" and meta.sourceGroup then
+            sourceLabel = meta.sourceGroup
+        elseif sourceType == "reward" then
+            sourceLabel = "reward"
+        elseif sourceType == "item" then
+            sourceLabel = "item"
+        else
+            sourceLabel = meta.sourceGroup or sourceType
+        end
+
         table.insert(self.rows, {
             id = offerId,
             offer = offer,
@@ -425,6 +454,9 @@ function UI:buildRows()
             texture = texture,
             priceText = formatPrice(offer.price),
             weight = weight,
+            sourceType = sourceType,
+            sourceKey = meta.sourceGroup,
+            sourceLabel = sourceLabel,
             condText = conditionsText(offer.conditions, condDefs),
             category = category,
             _blacklisted = blacklisted[offer.item] == true or false
@@ -547,6 +579,18 @@ function UI.doDrawListItem(self, y, item, alt)
     self:drawText(string.format("%.1f", row.weight), rx, ty, wr, wg, wb, dimA, font)
     rx = rx + COL_WEIGHT
 
+    -- source
+    local sr, sg, sb
+    if row.sourceType == "group" then
+        sr, sg, sb = 0.55, 0.75, 0.55
+    elseif row.sourceType == "reward" then
+        sr, sg, sb = 0.75, 0.55, 0.75
+    else
+        sr, sg, sb = 0.55, 0.70, 0.85
+    end
+    self:drawText(tools.truncate(row.sourceLabel or "-", COL_SOURCE - 4, font), rx, ty, sr, sg, sb, dimA, font)
+    rx = rx + COL_SOURCE
+
     local condW = self:getWidth() - rx - PAD - SCROLLBAR_W
     self:drawText(tools.truncate(row.condText, condW, font), rx, ty, 0.70, 0.70, 0.45, dimA, font)
 
@@ -591,11 +635,33 @@ function UI:showContextMenu(row, absX, absY)
             context:addOption("Add to blacklist", self, UI.onBlacklistRow, row)
         end
         context:addOption("Edit weight", self, UI.onEditWeightRow, row)
+
+        -- Edit source: open the appropriate admin editor
+        if row.sourceType == "group" and row.sourceKey then
+            context:addOption("Edit group: " .. row.sourceKey, self, UI.onEditSource, row)
+        elseif row.sourceType == "item" then
+            context:addOption("Edit item def", self, UI.onEditSource, row)
+        elseif row.sourceType == "reward" then
+            context:addOption("Edit item def", self, UI.onEditSource, row)
+        end
     else
         context:addOption("Blacklist " .. count .. " items", self, UI.onBlacklistSelected)
     end
     local moveLabel = count > 1 and ("Move " .. count .. " to pool") or "Move to pool"
     context:addOption(moveLabel, self, UI.onMoveToPool)
+end
+
+function UI:onEditSource(row)
+    if row.sourceType == "group" and row.sourceKey then
+        if Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
+            Core.ui.admin_groups.OnEditGroup(self.player, row.sourceKey)
+        end
+    elseif row.sourceType == "item" or row.sourceType == "reward" then
+        local itemKey = row.offer and row.offer.item
+        if itemKey and Core.ui.admin_items and Core.ui.admin_items.OnEditItem then
+            Core.ui.admin_items.OnEditItem(self.player, itemKey)
+        end
+    end
 end
 
 function UI:onBlacklistRow(row)

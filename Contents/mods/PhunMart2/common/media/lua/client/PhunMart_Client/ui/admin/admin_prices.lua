@@ -350,8 +350,8 @@ function UI:refreshPrices()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    -- Load price definitions from defaults (shared code, always available)
-    local prices = require "PhunMart/defaults/prices"
+    -- Read from compiled context (defaults + overrides merged)
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
 
     -- Sort keys alphabetically for stable display
     local keys = {}
@@ -372,11 +372,21 @@ function UI:refreshPrices()
     self.datas:setVisible(true)
 end
 
+local function savePriceDef(self, key, def)
+    sendClientCommand(Core.name, Core.commands.upsertPriceDef, {
+        key = key,
+        def = def
+    })
+    -- Optimistically update local defs so the list refreshes immediately
+    if Core.defs and Core.defs.prices then
+        Core.defs.prices[key] = def
+    end
+    self:refreshPrices()
+end
+
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        -- TODO: send to server as price override
-        print("[PhunMart] Price added: " .. key)
-        self:refreshPrices()
+        savePriceDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -393,9 +403,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        -- TODO: send to server as price override
-        print("[PhunMart] Price updated: " .. key)
-        self:refreshPrices()
+        savePriceDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -405,8 +413,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        print("[PhunMart] Price updated: " .. key)
-        self:refreshPrices()
+        savePriceDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()

@@ -138,7 +138,7 @@ function EditModal:createChildren()
     self.priceCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.priceCombo:initialise()
     self.priceCombo:addOption("")
-    local prices = require "PhunMart/defaults/prices"
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceKeys = getSortedKeys(prices)
     local selectedPriceIdx = 1
     for i, pk in ipairs(priceKeys) do
@@ -165,7 +165,7 @@ function EditModal:createChildren()
     self.rewardCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.rewardCombo:initialise()
     self.rewardCombo:addOption("")
-    local rewards = require "PhunMart/defaults/rewards"
+    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
     local rewardKeys = getSortedKeys(rewards)
     local selectedRewardIdx = 1
     for i, rk in ipairs(rewardKeys) do
@@ -449,11 +449,31 @@ function UI.OnOpenPanel(player)
     return instance
 end
 
+function UI.OnEditGroup(player, groupKey)
+    local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
+    local def = groups[groupKey]
+    if not def then return end
+    local modal = EditModal:new(groupKey, def, false, function(key, editedDef)
+        sendClientCommand(Core.name, Core.commands.upsertGroupDef, {key = key, def = editedDef})
+        if Core.defs and Core.defs.groups then
+            Core.defs.groups[key] = editedDef
+        end
+        -- Refresh open list panel if any
+        local inst = UI.instances[player:getPlayerNum()]
+        if inst and inst:isVisible() then
+            inst:refreshGroups()
+        end
+    end)
+    modal:initialise()
+    modal:addToUIManager()
+    modal:bringToTop()
+end
+
 function UI:refreshGroups()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    local groups = require "PhunMart/defaults/groups"
+    local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
 
     local keys = {}
     for k in pairs(groups) do
@@ -475,11 +495,17 @@ function UI:refreshGroups()
     self.datas:setVisible(true)
 end
 
+local function saveGroupDef(self, key, def)
+    sendClientCommand(Core.name, Core.commands.upsertGroupDef, {key = key, def = def})
+    if Core.defs and Core.defs.groups then
+        Core.defs.groups[key] = def
+    end
+    self:refreshGroups()
+end
+
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        -- TODO: send to server as group override
-        print("[PhunMart] Group added: " .. key)
-        self:refreshGroups()
+        saveGroupDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -496,9 +522,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        -- TODO: send to server as group override
-        print("[PhunMart] Group updated: " .. key)
-        self:refreshGroups()
+        saveGroupDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -508,8 +532,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        print("[PhunMart] Group updated: " .. key)
-        self:refreshGroups()
+        saveGroupDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()

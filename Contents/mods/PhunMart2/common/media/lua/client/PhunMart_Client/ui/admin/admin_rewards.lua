@@ -181,7 +181,7 @@ function EditModal:createChildren()
     self.inheritCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.inheritCombo:initialise()
     self.inheritCombo:addOption("(none)")
-    local rewards = require "PhunMart/defaults/rewards"
+    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
     local templateKeys = {}
     for k, v in pairs(rewards) do
         if v.template then
@@ -457,7 +457,7 @@ function UI:refreshRewards()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    local rewards = require "PhunMart/defaults/rewards"
+    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
 
     local keys = {}
     for k in pairs(rewards) do
@@ -478,11 +478,17 @@ function UI:refreshRewards()
     self.datas:setVisible(true)
 end
 
+local function saveRewardDef(self, key, def)
+    sendClientCommand(Core.name, Core.commands.upsertRewardDef, {key = key, def = def})
+    if Core.defs and Core.defs.rewards then
+        Core.defs.rewards[key] = def
+    end
+    self:refreshRewards()
+end
+
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        -- TODO: send to server as reward override
-        print("[PhunMart] Reward added: " .. key)
-        self:refreshRewards()
+        saveRewardDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -499,9 +505,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        -- TODO: send to server as reward override
-        print("[PhunMart] Reward updated: " .. key)
-        self:refreshRewards()
+        saveRewardDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -511,8 +515,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        print("[PhunMart] Reward updated: " .. key)
-        self:refreshRewards()
+        saveRewardDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()

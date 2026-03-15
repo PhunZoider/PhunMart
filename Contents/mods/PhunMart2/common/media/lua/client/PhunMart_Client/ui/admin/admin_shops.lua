@@ -442,7 +442,11 @@ function AdminShops.OnOpenPanel(player, shopKey)
     local shopDef = shops[shopKey]
 
     local modal = EditModal:new(shopKey, shopDef, function(key, def)
-        -- TODO: send to server as shop override
+        def.type = key
+        sendClientCommand(Core.name, Core.commands.upsertShopDefinition, def)
+        if Core.defs and Core.defs.shops then
+            Core.defs.shops[key] = def
+        end
         print("[PhunMart] Shop updated: " .. key)
     end)
     modal:initialise()

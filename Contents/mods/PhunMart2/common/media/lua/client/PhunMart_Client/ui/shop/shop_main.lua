@@ -689,7 +689,7 @@ function UI:onAdminMenu(btn)
 
     -- ── Blacklist (only when an offer is selected) ────────────────────────
     if self.selectedOffer then
-        context:addOption("Blacklist in pool", self, UI.onBlacklistSelected)
+        context:addOption("Global blacklist", self, UI.onBlacklistSelected)
     end
 end
 
@@ -701,8 +701,9 @@ function UI:onItemRightClick(id, offer, screenX, screenY)
     end
     local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
     context:clear()
-    context:addOption("Blacklist in pool", self, UI.onBlacklistOffer, id, offer)
-    context:addOption("Edit offer", self, UI.onEditOffer, id, offer)
+    context:addOption("Blacklist in pool", self, UI.onBlacklistInPool, id, offer)
+    context:addOption("Global blacklist", self, UI.onBlacklistOffer, id, offer)
+    context:addOption("Move to pool", self, UI.onMoveOfferToPool, id, offer)
 end
 
 -- ── Action stubs (each will become a panel) ───────────────────────────────
@@ -750,32 +751,36 @@ function UI:onBlacklistOffer(id, offer)
     sendClientCommand(Core.name, Core.commands.quickBlacklist, {
         itemKey = itemKey
     })
-    self:showFeedback("Blacklisted: " .. tostring(itemKey), 0.9, 0.5, 0.2)
+    self:showFeedback("Global blacklisted: " .. tostring(itemKey), 0.9, 0.5, 0.2)
 end
 
-function UI:onEditOffer(id, offer)
-    -- Find which pool contains this offer so WeightEditor can target it
-    local poolKey = nil
-    if Core.runtime and Core.runtime.pools then
-        for pk, pool in pairs(Core.runtime.pools) do
-            if pool.offers and pool.offers[id] then
-                poolKey = pk
-                break
-            end
-        end
+function UI:onBlacklistInPool(id, offer)
+    local itemKey = offer and offer.item
+    if not itemKey then
+        return
     end
+    -- Extract pool key from offer ID (format: poolKey|itemType)
+    local poolKey = id and id:match("^(.+)|")
     if not poolKey then
         self:showFeedback("Pool not found for offer", 0.9, 0.3, 0.3)
         return
     end
-    local weight = (offer.offer and offer.offer.weight) or 1
-    local displayName = tools.resolveOfferDisplayName(offer)
-    WeightEditor.open(self.player, poolKey, {
-        id = id,
-        offer = offer,
-        weight = weight,
-        displayName = displayName
+    sendClientCommand(Core.name, Core.commands.blacklistInPool, {
+        poolKey = poolKey,
+        itemKey = itemKey
     })
+    self:showFeedback("Blacklisted in " .. poolKey .. ": " .. tostring(itemKey), 0.9, 0.5, 0.2)
+end
+
+function UI:onMoveOfferToPool(id, offer)
+    -- Extract pool key from offer ID (format: poolKey|itemType)
+    local poolKey = id and id:match("^(.+)|")
+    if not poolKey then
+        self:showFeedback("Pool not found for offer", 0.9, 0.3, 0.3)
+        return
+    end
+    local displayName = tools.resolveOfferDisplayName(offer)
+    MoveToPoolModal.open(self.player, poolKey, {{id = id, displayName = displayName, offer = offer}}, nil)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────

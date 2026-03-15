@@ -333,15 +333,24 @@ function ServerSystem:getShopDefinition(shopType)
 end
 
 function ServerSystem:upsertShopDefinition(data)
+    self:upsertDefinition("PhunMart_Shops.lua", "shops", data.type, data)
+end
 
-    -- Load the current override file (only admin-edited entries, not all defaults).
-    local override = Core.fileUtils.loadTable("PhunMart_Shops.lua") or {}
-    -- Update just this shop's entry in the override.
-    override[data.type] = data
-    -- Persist the override, then recompile so defaults + override merge correctly.
-    Core.fileUtils.saveTable("PhunMart_Shops.lua", override)
+--- Generic upsert: diff against defaults, merge into override file, save, recompile.
+--- `defsKey` is the Core.defs key (e.g. "prices", "groups") used to look up the
+--- raw default for diffing. Only changed fields are persisted.
+function ServerSystem:upsertDefinition(filename, defsKey, key, def)
+    local defaults = Core.defs and Core.defs[defsKey] or {}
+    local diff = Core.utils.diffTable(defaults[key] or {}, def)
+    if not diff then
+        return -- nothing changed
+    end
+    local override = Core.fileUtils.loadTable(filename) or {}
+    -- Merge into any existing override entry so two admins editing different
+    -- fields of the same definition don't clobber each other.
+    override[key] = Core.utils.deepMerge(override[key] or {}, diff)
+    Core.fileUtils.saveTable(filename, override)
     self:recompileShops()
-
 end
 
 function ServerSystem:checkObjectAdded(obj)

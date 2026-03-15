@@ -117,7 +117,7 @@ function EditModal:createChildren()
     self.priceCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.priceCombo:initialise()
     self.priceCombo:addOption("")
-    local prices = require "PhunMart/defaults/prices"
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceKeys = getSortedKeys(prices)
     local selectedPriceIdx = 1
     for i, pk in ipairs(priceKeys) do
@@ -477,7 +477,7 @@ function UI:refreshPools()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    local pools = require "PhunMart/defaults/pools"
+    local pools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
 
     local keys = {}
     for k in pairs(pools) do
@@ -499,10 +499,16 @@ function UI:refreshPools()
     self.datas:setVisible(true)
 end
 
+local function savePoolDef(key, def)
+    sendClientCommand(Core.name, Core.commands.upsertPoolDef, {key = key, def = def})
+    if Core.defs and Core.defs.pools then
+        Core.defs.pools[key] = def
+    end
+end
+
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        -- TODO: send to server as pool override
-        print("[PhunMart] Pool added: " .. key)
+        savePoolDef(key, def)
         self:refreshPools()
     end)
     modal:initialise()
@@ -535,8 +541,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        -- TODO: send to server as pool override
-        print("[PhunMart] Pool updated: " .. key)
+        savePoolDef(key, def)
         self:refreshPools()
     end)
     modal:initialise()
@@ -547,7 +552,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        print("[PhunMart] Pool updated: " .. key)
+        savePoolDef(key, def)
         self:refreshPools()
     end)
     modal:initialise()
@@ -713,7 +718,7 @@ function UI.OnEditPool(player, poolKey)
     local poolDef = nil
     local isNew = true
     if poolKey then
-        local pools = require "PhunMart/defaults/pools"
+        local pools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
         poolDef = pools[poolKey]
         if not poolDef then
             return
@@ -721,7 +726,7 @@ function UI.OnEditPool(player, poolKey)
         isNew = false
     end
     local modal = EditModal:new(poolKey, poolDef, isNew, function(key, def)
-        -- TODO: send to server as pool override
+        savePoolDef(key, def)
         print("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
     end)
     modal:initialise()

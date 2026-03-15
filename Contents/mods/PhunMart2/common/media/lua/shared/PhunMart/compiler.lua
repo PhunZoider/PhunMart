@@ -850,7 +850,8 @@ function Compiler.compileAll(ctx)
                             local expanded = expandGroupItems(groupDef, logger)
                             for _, itemType in ipairs(expanded) do
                                 itemsSet[itemType] = {
-                                    fromGroup = groupDef
+                                    fromGroup = groupDef,
+                                    sourceType = "group"
                                 }
                             end
                         end
@@ -862,7 +863,8 @@ function Compiler.compileAll(ctx)
             if type(sources.items) == "table" then
                 for _, itemType in ipairs(sources.items) do
                     itemsSet[itemType] = itemsSet[itemType] or {
-                        fromGroup = nil
+                        fromGroup = nil,
+                        sourceType = "item"
                     }
                 end
             end
@@ -882,11 +884,19 @@ function Compiler.compileAll(ctx)
                             local rewardDef = resolved.rewards[rewardKey]
                             if rewardDef and catSet[rewardDef.category] then
                                 itemsSet[itemKey] = {
-                                    fromGroup = nil
+                                    fromGroup = nil,
+                                    sourceType = "reward"
                                 }
                             end
                         end
                     end
+                end
+            end
+
+            -- pool-level blacklist
+            if type(poolDef.blacklist) == "table" then
+                for _, itemType in ipairs(poolDef.blacklist) do
+                    itemsSet[itemType] = nil
                 end
             end
 
@@ -923,6 +933,7 @@ function Compiler.compileAll(ctx)
                         if offer == nil then
                             -- skipped (e.g. disabledInMultiplayer)
                         elseif offer.price and offer.reward then
+                            offer.meta.sourceType = meta.sourceType or "group"
                             poolRuntime.offers[offerId] = offer
                         elseif not offer.price then
                             logger:error("Offer '" .. offerId .. "' has no price (use price='free' if intended)")

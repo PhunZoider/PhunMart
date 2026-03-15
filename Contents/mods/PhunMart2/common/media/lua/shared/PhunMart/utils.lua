@@ -48,10 +48,57 @@ function utils.onlinePlayers(all)
 end
 
 function utils.isAdmin(player, ignoreLocal)
-    if isAdmin() or getDebug() or (PhunMart.isLocal and not ignoreLocal) then
+    if isAdmin() or getDebug() or (utils.isLocal and not ignoreLocal) then
+        return true
+    end
+    local level = player and player.getAccessLevel and player:getAccessLevel()
+    if level == "admin" or level == "moderator" then
         return true
     end
     return (getAccessLevel and (getAccessLevel() == "moderator" or getAccessLevel() == "admin")) or false
+end
+
+
+--- Compute a minimal diff of `edited` against `original`.
+--- Returns a table containing only keys whose values differ.
+--- Nested maps are diffed recursively; sequences are compared as wholes.
+--- Returns nil if there are no differences.
+function utils.diffTable(original, edited)
+    if original == nil then
+        return utils.shallowClone(edited)
+    end
+    if edited == nil then
+        return nil
+    end
+    if type(original) ~= "table" or type(edited) ~= "table" then
+        if original == edited then
+            return nil
+        end
+        return edited
+    end
+    -- Sequences: compare as a whole
+    if utils.isSequence(original) or utils.isSequence(edited) then
+        -- Quick length check
+        if #original ~= #edited then
+            return utils.shallowClone(edited)
+        end
+        for i = 1, #original do
+            if original[i] ~= edited[i] then
+                return utils.shallowClone(edited)
+            end
+        end
+        return nil
+    end
+    local diff = {}
+    local hasDiff = false
+    for k, v in pairs(edited) do
+        local sub = utils.diffTable(original[k], v)
+        if sub ~= nil then
+            diff[k] = sub
+            hasDiff = true
+        end
+    end
+    return hasDiff and diff or nil
 end
 
 function utils.formatWholeNumber(n)
@@ -93,19 +140,29 @@ end
 
 -- Shallow copy a table (one level deep). Non-tables pass through unchanged.
 function utils.shallowClone(t)
-    if type(t) ~= "table" then return t end
+    if type(t) ~= "table" then
+        return t
+    end
     local out = {}
-    for k, v in pairs(t) do out[k] = v end
+    for k, v in pairs(t) do
+        out[k] = v
+    end
     return out
 end
 
 -- Returns true if t is a non-empty table with only consecutive integer keys.
 function utils.isSequence(t)
-    if type(t) ~= "table" then return false end
+    if type(t) ~= "table" then
+        return false
+    end
     local n = #t
-    if n == 0 then return false end
+    if n == 0 then
+        return false
+    end
     for k in pairs(t) do
-        if type(k) ~= "number" or k < 1 or k > n or k % 1 ~= 0 then return false end
+        if type(k) ~= "number" or k < 1 or k > n or k % 1 ~= 0 then
+            return false
+        end
     end
     return true
 end
@@ -113,8 +170,12 @@ end
 -- Deep merge: scalars → child wins; sequences → child replaces; maps → recurse.
 -- This is the canonical merge used by both the compiler and core.compileWith.
 function utils.deepMerge(parent, child)
-    if child == nil then return utils.shallowClone(parent) end
-    if parent == nil then return utils.shallowClone(child) end
+    if child == nil then
+        return utils.shallowClone(parent)
+    end
+    if parent == nil then
+        return utils.shallowClone(child)
+    end
     if type(parent) ~= "table" or type(child) ~= "table" then
         return utils.shallowClone(child)
     end
@@ -124,8 +185,8 @@ function utils.deepMerge(parent, child)
     local out = utils.shallowClone(parent)
     for k, vChild in pairs(child) do
         local vParent = out[k]
-        if type(vChild) == "table" and type(vParent) == "table"
-            and not utils.isSequence(vChild) and not utils.isSequence(vParent) then
+        if type(vChild) == "table" and type(vParent) == "table" and not utils.isSequence(vChild) and
+            not utils.isSequence(vParent) then
             out[k] = utils.deepMerge(vParent, vChild)
         else
             out[k] = utils.shallowClone(vChild)
@@ -166,7 +227,9 @@ function utils.merge(tableA, tableB, excludeKeys)
                 exclude[excludeKeys:get(i)] = true
             end
         else
-            for _, k in ipairs(excludeKeys) do exclude[k] = true end
+            for _, k in ipairs(excludeKeys) do
+                exclude[k] = true
+            end
         end
     end
     for k, v in pairs(tableA or {}) do

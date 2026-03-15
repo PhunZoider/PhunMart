@@ -37,6 +37,11 @@ PhunMart = {
         updateShop = "PhunMartUpdateShop",
         requestShopGenerate = "PhunMartRequestShopGenerate",
         upsertShopDefinition = "PhunMartUpsertShopDefinition",
+        upsertGroupDef = "PhunMartUpsertGroupDef",
+        upsertItemDef = "PhunMartUpsertItemDef",
+        upsertPriceDef = "PhunMartUpsertPriceDef",
+        upsertRewardDef = "PhunMartUpsertRewardDef",
+        upsertPoolDef = "PhunMartUpsertPoolDef",
         getShopDefinition = "PhunMartGetShopDefinition",
         getShopList = "PhunMartGetShopList",
         getInstanceList = "PhunMartGetInstanceList",
@@ -46,6 +51,7 @@ PhunMart = {
         requestItemDefs = "PhunMartRequestItemDefs",
         requestPool = "PhunMartRequestPool",
         quickBlacklist = "PhunMartQuickBlacklist",
+        blacklistInPool = "PhunMartBlacklistInPool",
         updateOfferWeight = "PhunMartUpdateOfferWeight",
         moveOffers = "PhunMartMoveOffers",
         -- Shop player flow
@@ -86,7 +92,8 @@ PhunMart = {
         OnShopChange = "OnPhunMartShopChange",
         OnPurchaseComplete = "OnPhunMartPurchaseComplete",
         OnApplyTraitReward = "OnPhunMartApplyTraitReward",
-        OnRewardGranted = "OnPhunMartRewardGranted"
+        OnRewardGranted = "OnPhunMartRewardGranted",
+        OnDefsUpdated = "OnPhunMartDefsUpdated"
     },
     utils = require "PhunMart/utils",
     settings = {},
@@ -607,9 +614,11 @@ function Core.compileWith(overrides)
 
     local runtime, log = Core.compiler.compileAll(ctx)
     Core.runtime = runtime
+    Core.defs = ctx
     Core.shops = runtime.shops
     Core:reloadShopDefinitions()
     Core.debug("Warn", log.warnings, "Errors", log.errors)
+    triggerEvent(Core.events.OnDefsUpdated)
     return runtime, log
 end
 

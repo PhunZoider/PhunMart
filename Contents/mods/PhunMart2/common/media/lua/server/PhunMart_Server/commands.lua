@@ -6,12 +6,12 @@ local Core = PhunMart
 local Commands = {}
 
 Commands[Core.commands.compile] = function(playerObj, args)
-
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:recompileShops()
-
 end
 
 Commands[Core.commands.getBlackList] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local list = Core.getBlacklist() or {}
     sendServerCommand(playerObj, Core.name, Core.commands.getBlackList, {
         username = playerObj:getUsername(),
@@ -20,6 +20,7 @@ Commands[Core.commands.getBlackList] = function(playerObj, args)
 end
 
 Commands[Core.commands.setBlacklist] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.setBlacklist(args)
 end
 
@@ -28,6 +29,7 @@ Commands[Core.commands.openShop] = function(playerObj, args)
 end
 
 Commands[Core.commands.restock] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)
     if not obj then
         return
@@ -45,6 +47,7 @@ Commands[Core.commands.restock] = function(playerObj, args)
 end
 
 Commands[Core.commands.changeTo] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local loc = args.location
     local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
     local oldKey = oldObj and oldObj:getKey()
@@ -69,7 +72,33 @@ Commands[Core.commands.closeShop] = function(playerObj, args)
 end
 
 Commands[Core.commands.upsertShopDefinition] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:upsertShopDefinition(args)
+end
+
+Commands[Core.commands.upsertGroupDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.lua", "groups", args.key, args.def)
+end
+
+Commands[Core.commands.upsertItemDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Items.lua", "items", args.key, args.def)
+end
+
+Commands[Core.commands.upsertPriceDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.lua", "prices", args.key, args.def)
+end
+
+Commands[Core.commands.upsertRewardDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Rewards.lua", "rewards", args.key, args.def)
+end
+
+Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.lua", "pools", args.key, args.def)
 end
 
 Commands[Core.commands.buy] = function(playerObj, args)
@@ -166,6 +195,7 @@ Commands[Core.commands.buy] = function(playerObj, args)
 end
 
 Commands[Core.commands.requestItemDefs] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     -- because this can be so massive, we will need to chunk it down
     local row = 0
     local chunkIteration = 0
@@ -209,6 +239,7 @@ Commands[Core.commands.requestItemDefs] = function(playerObj, args)
 end
 
 Commands[Core.commands.reroll] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local loc = args.location
     local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
     local oldKey = oldObj and oldObj:getKey()
@@ -231,10 +262,12 @@ Commands[Core.commands.reroll] = function(playerObj, args)
 end
 
 Commands[Core.commands.rerollAllShops] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:rerollAll()
 end
 
 Commands[Core.commands.restockAllShops] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:restockAll()
 end
 
@@ -248,6 +281,7 @@ end
 
 -- generates or re-generates shop and inventory
 Commands[Core.commands.requestShopGenerate] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     Core.ServerSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
 end
 
@@ -420,6 +454,7 @@ Commands[Core.commands.reportKills] = function(playerObj, args)
 end
 
 Commands[Core.commands.getPlayerList] = function(player, args)
+    if not Core.utils.isAdmin(player) then return end
     local players = {}
     for k, v in pairs(Core.wallet.data) do
         table.insert(players, tostring(k))
@@ -430,19 +465,35 @@ Commands[Core.commands.getPlayerList] = function(player, args)
 end
 
 Commands[Core.commands.getPlayersWallet] = function(player, args)
+    if not Core.utils.isAdmin(player) then return end
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
         wallet = Core.wallet:get(args.playername)
     })
 end
 
 Commands[Core.commands.adjustPlayerWallet] = function(player, args)
+    if not Core.utils.isAdmin(player) then return end
     Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
+    local wallet = Core.wallet:get(args.playername)
+    -- Update the admin editor
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
-        wallet = Core.wallet:get(args.playername)
+        wallet = wallet
     })
+    -- Notify the target player so their character tab refreshes.
+    -- In SP the shared wallet data is already updated in-place.
+    if not Core.isLocal then
+        local targetPlayer = Core.utils.getPlayerByUsername(args.playername)
+        if targetPlayer then
+            sendServerCommand(targetPlayer, Core.name, Core.commands.getWallet, {
+                username = args.playername,
+                wallet = wallet
+            })
+        end
+    end
 end
 
 Commands[Core.commands.requestPool] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local poolKey = args and args.poolKey
     if not poolKey then
         return
@@ -467,6 +518,7 @@ Commands[Core.commands.requestPool] = function(playerObj, args)
 end
 
 Commands[Core.commands.quickBlacklist] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local itemKey = args and args.itemKey
     if not itemKey then
         return
@@ -478,7 +530,27 @@ Commands[Core.commands.quickBlacklist] = function(playerObj, args)
     Core.setBlacklist(list)
 end
 
+Commands[Core.commands.blacklistInPool] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
+    local poolKey = args and args.poolKey
+    local itemKey = args and args.itemKey
+    if not (poolKey and itemKey) then
+        return
+    end
+    local override = Core.fileUtils.loadTable("PhunMart_Pools.lua") or {}
+    override[poolKey] = override[poolKey] or {}
+    override[poolKey].blacklist = override[poolKey].blacklist or {}
+    -- avoid duplicates
+    for _, v in ipairs(override[poolKey].blacklist) do
+        if v == itemKey then return end
+    end
+    table.insert(override[poolKey].blacklist, itemKey)
+    Core.fileUtils.saveTable("PhunMart_Pools.lua", override)
+    Core.ServerSystem.instance:recompileShops()
+end
+
 Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local poolKey = args and args.poolKey
     local offerId = args and args.offerId
     local weight = args and tonumber(args.weight)
@@ -499,6 +571,7 @@ Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
 end
 
 Commands[Core.commands.moveOffers] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then return end
     local fromPool = args and args.fromPool
     local toPool = args and args.toPool
     local offerIds = args and args.offerIds

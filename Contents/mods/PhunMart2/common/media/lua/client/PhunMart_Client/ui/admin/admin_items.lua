@@ -97,7 +97,7 @@ function EditModal:createChildren()
 
     self.priceCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.priceCombo:initialise()
-    local prices = require "PhunMart/defaults/prices"
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceKeys = getSortedKeys(prices)
     local selectedPriceIdx = 1
     for i, pk in ipairs(priceKeys) do
@@ -117,7 +117,7 @@ function EditModal:createChildren()
 
     self.rewardCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.rewardCombo:initialise()
-    local rewards = require "PhunMart/defaults/rewards"
+    local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
     local rewardKeys = getSortedKeys(rewards)
     local selectedRewardIdx = 1
     for i, rk in ipairs(rewardKeys) do
@@ -307,11 +307,30 @@ function UI.OnOpenPanel(player)
     return instance
 end
 
+function UI.OnEditItem(player, itemKey)
+    local items = Core.defs and Core.defs.items or require "PhunMart/defaults/items"
+    local def = items[itemKey]
+    if not def then return end
+    local modal = EditModal:new(itemKey, def, false, function(key, editedDef)
+        sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = editedDef})
+        if Core.defs and Core.defs.items then
+            Core.defs.items[key] = editedDef
+        end
+        local inst = UI.instances[player:getPlayerNum()]
+        if inst and inst:isVisible() then
+            inst:refreshItems()
+        end
+    end)
+    modal:initialise()
+    modal:addToUIManager()
+    modal:bringToTop()
+end
+
 function UI:refreshItems()
     self.datas:clear()
     self.datas:setVisible(false)
 
-    local items = require "PhunMart/defaults/items"
+    local items = Core.defs and Core.defs.items or require "PhunMart/defaults/items"
 
     -- Sort keys alphabetically for stable display
     local keys = {}
@@ -334,11 +353,17 @@ function UI:refreshItems()
     self.datas:setVisible(true)
 end
 
+local function saveItemDef(self, key, def)
+    sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = def})
+    if Core.defs and Core.defs.items then
+        Core.defs.items[key] = def
+    end
+    self:refreshItems()
+end
+
 function UI:onAddClick()
     local modal = EditModal:new(nil, nil, true, function(key, def)
-        -- TODO: send to server as item override
-        print("[PhunMart] Item added: " .. key)
-        self:refreshItems()
+        saveItemDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -355,9 +380,7 @@ function UI:onEditClick()
     end
     local data = selectedItem.item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        -- TODO: send to server as item override
-        print("[PhunMart] Item updated: " .. key)
-        self:refreshItems()
+        saveItemDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()
@@ -367,8 +390,7 @@ end
 function UI:GridDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
-        print("[PhunMart] Item updated: " .. key)
-        self:refreshItems()
+        saveItemDef(self, key, def)
     end)
     modal:initialise()
     modal:addToUIManager()

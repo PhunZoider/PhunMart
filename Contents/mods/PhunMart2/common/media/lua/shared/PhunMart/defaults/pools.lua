@@ -79,6 +79,9 @@ return {
         defaults = {
             price = "coin_high"
         },
+        zones = {
+            difficulty = {3, 4}
+        },
         sources = {
             groups = {"weapons_firearms", "weapons_parts"}
         },
@@ -93,6 +96,9 @@ return {
     pool_finalammendment_explosives = {
         defaults = {
             price = "coin_high"
+        },
+        zones = {
+            difficulty = {4}
         },
         sources = {
             groups = {"explosives"}
