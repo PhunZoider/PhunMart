@@ -69,7 +69,7 @@ function UI:createChildren()
     local x = 0
     local y = 0
     self.controls = {}
-    local list = tools.getListbox(x, y, self:getWidth(), self.height - tools.HEADER_HGT, {"Category"}, {
+    local list = tools.getListbox(x, y, self:getWidth(), self.height - tools.HEADER_HGT, {getText("IGUI_PhunMart_Col_Category")}, {
         draw = self.drawDatas,
         click = self.click,
         rightClick = self.rightClick

@@ -245,7 +245,7 @@ function UI:createChildren()
     self:addChild(self.controls.grid)
 
     -- ── buy button (green zone, bottom-right) ────────────────────────────────
-    self.controls.buyBtn = ISButton:new(rightX, trayY, rightW, trayH, "BUY", self, UI.onBuy)
+    self.controls.buyBtn = ISButton:new(rightX, trayY, rightW, trayH, getText("IGUI_PhunMart_Buy"), self, UI.onBuy)
     self.controls.buyBtn:initialise()
     self.controls.buyBtn:instantiate()
     self.controls.buyBtn:setEnable(false)
@@ -523,12 +523,12 @@ function UI:onBuy()
     end
     local loc = self.data and self.data.location
     if not loc then
-        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
     -- Disable button immediately to prevent double-click
     self.controls.buyBtn:setEnable(false)
-    self:showFeedback("Purchasing...", 0.9, 0.9, 0.3)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_Purchasing"), 0.9, 0.9, 0.3)
     sendClientCommand(Core.name, Core.commands.buy, {
         offerId = self.selectedId,
         location = loc,
@@ -539,13 +539,13 @@ end
 function UI:onPurchaseComplete(result)
     if result.failed then
         local msgs = {
-            OutOfStock = "Out of stock",
-            InsufficientFunds = "Not enough funds",
-            ConditionsFailed = "Requirements not met",
-            ShopNotFound = "Shop not found",
-            OfferNotFound = "Offer not found"
+            OutOfStock = getText("IGUI_PhunMart_Msg_OutOfStock"),
+            InsufficientFunds = getText("IGUI_PhunMart_Msg_NotEnoughFunds"),
+            ConditionsFailed = getText("IGUI_PhunMart_Msg_RequirementsNotMet"),
+            ShopNotFound = getText("IGUI_PhunMart_Msg_ShopNotFound"),
+            OfferNotFound = getText("IGUI_PhunMart_Msg_OfferNotFound")
         }
-        local msg = msgs[result.message] or ("Purchase failed: " .. tostring(result.message))
+        local msg = msgs[result.message] or getText("IGUI_PhunMart_Msg_PurchaseFailed", tostring(result.message))
         self:showFeedback(msg, 0.9, 0.3, 0.3)
         -- Re-enable buy button so the player can try again or choose another
         if self.selectedId then
@@ -570,7 +570,7 @@ function UI:onPurchaseComplete(result)
         self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer, self.selectedId))
     end
 
-    self:showFeedback("Purchased!", 0.35, 0.90, 0.35)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_Purchased"), 0.35, 0.90, 0.35)
 end
 
 function UI:showFeedback(msg, r, g, b)
@@ -594,9 +594,9 @@ function UI:onShopChange(key, data, replaced)
     end
     self:setData(data)
     if replaced then
-        self:showFeedback("Rerolled", 0.3, 0.5, 0.9)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_Rerolled"), 0.3, 0.5, 0.9)
     else
-        self:showFeedback("Restocked", 0.4, 0.9, 0.4)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_Restocked"), 0.4, 0.9, 0.4)
     end
 end
 
@@ -615,21 +615,21 @@ end
 function UI:onAdminRestock()
     local obj = self:getClientObject()
     if not obj then
-        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
     obj:restock(self.player)
-    self:showFeedback("Restocking...", 0.9, 0.6, 0.2)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_Restocking"), 0.9, 0.6, 0.2)
 end
 
 function UI:onAdminReroll()
     local obj = self:getClientObject()
     if not obj then
-        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
     obj:reroll()
-    self:showFeedback("Rerolling shop...", 0.3, 0.5, 0.9)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_Rerolling"), 0.3, 0.5, 0.9)
 end
 
 function UI:onAdminMenu(btn)
@@ -641,7 +641,7 @@ function UI:onAdminMenu(btn)
 
     -- ── Change To (replaces Reroll) ───────────────────────────────────────
     local changeMenu = context:getNew(context)
-    changeMenu:addOption("Random", self, UI.onAdminReroll)
+    changeMenu:addOption(getText("IGUI_PhunMart_Admin_Random"), self, UI.onAdminReroll)
     -- Fall back to Core.runtime.shops in SP (same Lua state; Core.defs.shops
     -- may not be populated yet if sendServerCommand is still queued).
     local shopDefs = (Core.defs and Core.defs.shops) or (Core.runtime and Core.runtime.shops)
@@ -657,39 +657,39 @@ function UI:onAdminMenu(btn)
             changeMenu:addOption(shopType, self, UI.onChangeTo, shopType)
         end
     end
-    local changeOpt = context:addOption("Change To")
+    local changeOpt = context:addOption(getText("IGUI_PhunMart_Admin_ChangeTo"))
     context:addSubMenu(changeOpt, changeMenu)
 
     -- ── Restock ───────────────────────────────────────────────────────────
-    context:addOption("Restock", self, UI.onAdminRestock)
+    context:addOption(getText("IGUI_PhunMart_Admin_Restock"), self, UI.onAdminRestock)
 
     -- ── Edit Shop ─────────────────────────────────────────────────────────
-    context:addOption("Edit Shop", self, UI.onEditShop)
+    context:addOption(getText("IGUI_PhunMart_Admin_EditShop"), self, UI.onEditShop)
 
     -- ── Pools (grouped by pool set; each pool → View / Edit submenu) ──────
     local poolSets = self.data and self.data.poolSets or {}
     if #poolSets > 0 then
         local poolsMenu = context:getNew(context)
         for si, poolSet in ipairs(poolSets) do
-            local setLabel = #poolSets > 1 and ("Set " .. si) or "Active pools"
+            local setLabel = #poolSets > 1 and getText("IGUI_PhunMart_Admin_SetN", tostring(si)) or getText("IGUI_PhunMart_Admin_ActivePools")
             poolsMenu:addOption("-- " .. setLabel .. " --")
             for _, poolRef in ipairs(poolSet.keys or {}) do
                 local key = type(poolRef) == "table" and poolRef.key or poolRef
                 local poolSub = poolsMenu:getNew(poolsMenu)
-                poolSub:addOption("View", self, UI.onViewPool, key)
-                poolSub:addOption("Edit", self, UI.onEditPool, key)
+                poolSub:addOption(getText("IGUI_PhunMart_Btn_View"), self, UI.onViewPool, key)
+                poolSub:addOption(getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditPool, key)
                 local poolOpt = poolsMenu:addOption("* " .. key)
                 poolsMenu:addSubMenu(poolOpt, poolSub)
             end
         end
-        poolsMenu:addOption("+ Add Pool", self, UI.onNewPool)
-        local poolsOpt = context:addOption("Pools")
+        poolsMenu:addOption(getText("IGUI_PhunMart_Admin_AddPool"), self, UI.onNewPool)
+        local poolsOpt = context:addOption(getText("IGUI_PhunMart_Admin_Pools"))
         context:addSubMenu(poolsOpt, poolsMenu)
     end
 
     -- ── Blacklist (only when an offer is selected) ────────────────────────
     if self.selectedOffer then
-        context:addOption("Global blacklist", self, UI.onBlacklistSelected)
+        context:addOption(getText("IGUI_PhunMart_Admin_GlobalBlacklist"), self, UI.onBlacklistSelected)
     end
 end
 
@@ -701,9 +701,9 @@ function UI:onItemRightClick(id, offer, screenX, screenY)
     end
     local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
     context:clear()
-    context:addOption("Blacklist in pool", self, UI.onBlacklistInPool, id, offer)
-    context:addOption("Global blacklist", self, UI.onBlacklistOffer, id, offer)
-    context:addOption("Move to pool", self, UI.onMoveOfferToPool, id, offer)
+    context:addOption(getText("IGUI_PhunMart_Admin_BlacklistInPool"), self, UI.onBlacklistInPool, id, offer)
+    context:addOption(getText("IGUI_PhunMart_Admin_GlobalBlacklist"), self, UI.onBlacklistOffer, id, offer)
+    context:addOption(getText("IGUI_PhunMart_Admin_MoveToPool"), self, UI.onMoveOfferToPool, id, offer)
 end
 
 -- ── Action stubs (each will become a panel) ───────────────────────────────
@@ -711,14 +711,14 @@ end
 function UI:onChangeTo(shopType)
     local loc = self.data and self.data.location
     if not loc then
-        self:showFeedback("No location data", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
     sendClientCommand(Core.name, Core.commands.changeTo, {
         to = shopType,
         location = loc
     })
-    self:showFeedback("Changing to " .. shopType .. "...", 0.5, 0.7, 0.9)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_ChangingTo", shopType), 0.5, 0.7, 0.9)
 end
 
 function UI:onEditShop()
@@ -751,7 +751,7 @@ function UI:onBlacklistOffer(id, offer)
     sendClientCommand(Core.name, Core.commands.quickBlacklist, {
         itemKey = itemKey
     })
-    self:showFeedback("Global blacklisted: " .. tostring(itemKey), 0.9, 0.5, 0.2)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_GlobalBlacklisted", tostring(itemKey)), 0.9, 0.5, 0.2)
 end
 
 function UI:onBlacklistInPool(id, offer)
@@ -762,21 +762,21 @@ function UI:onBlacklistInPool(id, offer)
     -- Extract pool key from offer ID (format: poolKey|itemType)
     local poolKey = id and id:match("^(.+)|")
     if not poolKey then
-        self:showFeedback("Pool not found for offer", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_PoolNotFound"), 0.9, 0.3, 0.3)
         return
     end
     sendClientCommand(Core.name, Core.commands.blacklistInPool, {
         poolKey = poolKey,
         itemKey = itemKey
     })
-    self:showFeedback("Blacklisted in " .. poolKey .. ": " .. tostring(itemKey), 0.9, 0.5, 0.2)
+    self:showFeedback(getText("IGUI_PhunMart_Msg_BlacklistedInPool", poolKey, tostring(itemKey)), 0.9, 0.5, 0.2)
 end
 
 function UI:onMoveOfferToPool(id, offer)
     -- Extract pool key from offer ID (format: poolKey|itemType)
     local poolKey = id and id:match("^(.+)|")
     if not poolKey then
-        self:showFeedback("Pool not found for offer", 0.9, 0.3, 0.3)
+        self:showFeedback(getText("IGUI_PhunMart_Msg_PoolNotFound"), 0.9, 0.3, 0.3)
         return
     end
     local displayName = tools.resolveOfferDisplayName(offer)
@@ -898,7 +898,7 @@ function UI:render()
         end
         self:renderDetails(dz)
     else
-        local hint = "Select an item"
+        local hint = getText("IGUI_PhunMart_SelectAnItem")
         local tw = getTextManager():MeasureStringX(UIFont.Small, hint)
         self:drawText(hint, math.floor(pz.x + (pz.w - tw) / 2), math.floor(pz.y + (pz.h - FONT_SM) / 2), 0.38, 0.38,
             0.38, 1, UIFont.Small)
@@ -947,7 +947,7 @@ function UI:render()
         end
 
         -- "Balance" header + divider
-        self:drawText("Balance", bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
+        self:drawText(getText("IGUI_PhunMart_Balance"), bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
         local divY = bz.y + pad + FONT_SM + 2
         self:drawRect(bz.x + pad, divY, bz.w - pad * 2, 1, 0.35, 0.30, 0.30, 0.40)
 
@@ -1036,9 +1036,9 @@ function UI:renderDetails(z)
     local priceText
     local isCollector = price and price.selfPay == true
     if not price then
-        priceText = "Price: ?"
+        priceText = getText("IGUI_PhunMart_PriceUnknown")
     elseif price.kind == "free" then
-        priceText = "Price: FREE"
+        priceText = getText("IGUI_PhunMart_PriceFree")
     elseif price.kind == "currency" then
         local amt = price.amount
         local isTokens = price.pool == "tokens"
@@ -1049,11 +1049,11 @@ function UI:renderDetails(z)
             return fmtCents(n)
         end
         if type(amt) == "table" and amt.min and amt.max then
-            priceText = "Price: " .. fmtAmt(amt.min) .. " - " .. fmtAmt(amt.max)
+            priceText = getText("IGUI_PhunMart_PriceRange", fmtAmt(amt.min), fmtAmt(amt.max))
         elseif type(amt) == "number" then
-            priceText = "Price: " .. fmtAmt(amt)
+            priceText = getText("IGUI_PhunMart_PriceAmount", fmtAmt(amt))
         else
-            priceText = "Price: ?"
+            priceText = getText("IGUI_PhunMart_PriceUnknown")
         end
     elseif isCollector and price.items and price.items[1] then
         -- Collector offer: the displayed item IS the price. Show "Bring: Nx item".
@@ -1064,13 +1064,13 @@ function UI:renderDetails(z)
         if si then
             itemName = si:getDisplayName() or itemName
         end
-        priceText = "Bring: " .. amt .. "x " .. itemName
+        priceText = getText("IGUI_PhunMart_BringItems", amt, itemName)
     elseif price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
-        priceText = "Price: " .. amt .. "x " .. (pi.item or "?")
+        priceText = getText("IGUI_PhunMart_PriceItems", amt, pi.item or "?")
     else
-        priceText = "Price: ?"
+        priceText = getText("IGUI_PhunMart_PriceUnknown")
     end
     local pr, pg, pb = 0.72, 0.88, 0.28 -- green: affordable
     if adapter and price then
@@ -1099,7 +1099,7 @@ function UI:renderDetails(z)
     if isCollector and offer.reward and offer.reward.actions then
         for _, action in ipairs(offer.reward.actions) do
             if action.type == "grantBoundTokens" then
-                local receiveText = "Receive: " .. tostring(action.amount or 1) .. " token(s)"
+                local receiveText = getText("IGUI_PhunMart_ReceiveTokens", tostring(action.amount or 1))
                 self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
                 y = y + lh + 4
                 break
@@ -1150,7 +1150,7 @@ function UI:renderDetails(z)
 
         if failure then
             if not headerDrawn then
-                self:drawText("Requires:", x, headerY, 0.75, 0.55, 0.25, 1, UIFont.Small)
+                self:drawText(getText("IGUI_PhunMart_Requires"), x, headerY, 0.75, 0.55, 0.25, 1, UIFont.Small)
                 headerDrawn = true
             end
             local label = truncate("- " .. failureLabel(failure), maxW - 4, UIFont.Small)

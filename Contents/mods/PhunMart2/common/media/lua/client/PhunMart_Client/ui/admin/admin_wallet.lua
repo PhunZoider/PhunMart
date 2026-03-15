@@ -75,7 +75,7 @@ function EditModal:createChildren()
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Current balance
-    self.currentLabel = ISLabel:new(x, y, ROW_H, "Current: " .. self.currentFormatted, 0.8, 0.8, 0.8, 1, UIFont.Small,
+    self.currentLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Current", self.currentFormatted), 0.8, 0.8, 0.8, 1, UIFont.Small,
         true)
     self.currentLabel:initialise()
     self:addChild(self.currentLabel)
@@ -83,20 +83,20 @@ function EditModal:createChildren()
 
     -- Action combo
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Amount: ") + 8
-    self.actionLabel = ISLabel:new(x, y, ROW_H, "Action:", 1, 1, 1, 1, UIFont.Small, true)
+    self.actionLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Action"), 1, 1, 1, 1, UIFont.Small, true)
     self.actionLabel:initialise()
     self:addChild(self.actionLabel)
 
     self.actionCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.actionCombo:initialise()
-    self.actionCombo:addOption("Add")
-    self.actionCombo:addOption("Subtract")
-    self.actionCombo:addOption("Set to")
+    self.actionCombo:addOption(getText("IGUI_PhunMart_Lbl_ActionAdd"))
+    self.actionCombo:addOption(getText("IGUI_PhunMart_Lbl_ActionSubtract"))
+    self.actionCombo:addOption(getText("IGUI_PhunMart_Lbl_ActionSetTo"))
     self:addChild(self.actionCombo)
     y = y + ROW_H + PAD
 
     -- Amount entry
-    self.amountLabel = ISLabel:new(x, y, ROW_H, "Amount:", 1, 1, 1, 1, UIFont.Small, true)
+    self.amountLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Amount"), 1, 1, 1, 1, UIFont.Small, true)
     self.amountLabel:initialise()
     self:addChild(self.amountLabel)
 
@@ -110,7 +110,7 @@ function EditModal:createChildren()
     y = y + ROW_H + 2
 
     -- Format hint
-    local hint = self.format == "cents" and "Enter as dollars (e.g. 5.00)" or "Enter whole number"
+    local hint = self.format == "cents" and getText("IGUI_PhunMart_Hint_EnterDollars") or getText("IGUI_PhunMart_Hint_EnterWholeNumber")
     self.hintLabel = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.hintLabel:initialise()
     self:addChild(self.hintLabel)
@@ -122,11 +122,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end
@@ -137,13 +137,13 @@ function EditModal:onApply()
         return
     end
 
-    local op = self.actionCombo:getSelectedText()
+    local opIdx = self.actionCombo.selected
     local value
-    if op == "Add" then
+    if opIdx == 1 then
         value = raw
-    elseif op == "Subtract" then
+    elseif opIdx == 2 then
         value = -raw
-    elseif op == "Set to" then
+    elseif opIdx == 3 then
         value = raw - self.rawAmount
     end
 
@@ -271,7 +271,7 @@ function UI:openEditModal(item)
     local walletType = item.isBound and "bound" or "current"
     local label = item.label
     if item.isBound then
-        label = label .. " (bound)"
+        label = label .. " " .. getText("IGUI_PhunMart_Bound")
     end
     local modal = EditModal:new(player, walletType, item.pool, label, item.rawAmount, item.format)
     modal:initialise()
@@ -302,7 +302,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Wallet Admin", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_WalletAdmin"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -327,13 +327,13 @@ function UI:createChildren()
     self.box:initialise()
     self:addChild(self.box)
 
-    self.refreshPlayersButton = ISButton:new(x + comboW + gap, y, btnW, ROW_H, "Refresh", self, function()
+    self.refreshPlayersButton = ISButton:new(x + comboW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Refresh"), self, function()
         refreshPlayerWallet(self.box:getSelectedText())
     end)
     self.refreshPlayersButton:initialise()
     self:addChild(self.refreshPlayersButton)
 
-    self.editButton = ISButton:new(x + comboW + gap + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + comboW + gap + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
@@ -351,8 +351,8 @@ function UI:createChildren()
     self.datas.doDrawItem = self.drawDatas
     self.datas.drawBorder = true
     self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-    self.datas:addColumn("Pool", 0)
-    self.datas:addColumn("Balance", math.floor(w * 0.6))
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Pool"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Balance"), math.floor(w * 0.6))
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end
@@ -377,7 +377,7 @@ function UI:drawDatas(y, item, alt)
     local xoffset = 10
     local label = item.item.label or item.text or ""
     if item.item.isBound then
-        label = label .. " (bound)"
+        label = label .. " " .. getText("IGUI_PhunMart_Bound")
     end
 
     local clipX = self.columns[1].size

@@ -46,7 +46,7 @@ local function formatInclude(def)
             table.insert(parts, table.concat(def.include.categories, ", "))
         end
         if def.include.items then
-            table.insert(parts, #def.include.items .. " items")
+            table.insert(parts, getText("IGUI_PhunMart_NItems", tostring(#def.include.items)))
         end
     end
     if #parts == 0 then
@@ -92,14 +92,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Blacklist Cats: ") + 8
 
     -- Title
-    local titleText = self.isNew and "Add Group" or ("Edit: " .. self.groupKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddGroup") or getText("IGUI_PhunMart_Title_EditX", self.groupKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, "Key:", 1, 1, 1, 1, UIFont.Small, true)
+    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
@@ -113,7 +113,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Label entry (optional display label)
-    self.labelLabel = ISLabel:new(x, y, ROW_H, "Label:", 1, 1, 1, 1, UIFont.Small, true)
+    self.labelLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Label"), 1, 1, 1, 1, UIFont.Small, true)
     self.labelLabel:initialise()
     self:addChild(self.labelLabel)
 
@@ -124,14 +124,14 @@ function EditModal:createChildren()
     self:addChild(self.labelEntry)
     y = y + ROW_H + 2
 
-    self.labelHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Leave blank for default", 0.5, 0.5, 0.5, 1,
+    self.labelHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_OptionalDefault"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.labelHint:initialise()
     self:addChild(self.labelHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default Price combo
-    self.priceLabel = ISLabel:new(x, y, ROW_H, "Price:", 1, 1, 1, 1, UIFont.Small, true)
+    self.priceLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Price"), 1, 1, 1, 1, UIFont.Small, true)
     self.priceLabel:initialise()
     self:addChild(self.priceLabel)
 
@@ -151,14 +151,14 @@ function EditModal:createChildren()
     self:addChild(self.priceCombo)
     y = y + ROW_H + 2
 
-    self.priceHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Leave blank for default", 0.5, 0.5, 0.5, 1,
+    self.priceHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_OptionalDefault"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.priceHint:initialise()
     self:addChild(self.priceHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default Reward combo (optional — used by vehicle groups)
-    self.rewardLabel = ISLabel:new(x, y, ROW_H, "Reward:", 1, 1, 1, 1, UIFont.Small, true)
+    self.rewardLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Reward"), 1, 1, 1, 1, UIFont.Small, true)
     self.rewardLabel:initialise()
     self:addChild(self.rewardLabel)
 
@@ -178,14 +178,14 @@ function EditModal:createChildren()
     self:addChild(self.rewardCombo)
     y = y + ROW_H + 2
 
-    self.rewardHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Leave blank for default", 0.5, 0.5, 0.5, 1,
+    self.rewardHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_OptionalDefault"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.rewardHint:initialise()
     self:addChild(self.rewardHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default Weight entry
-    self.weightLabel = ISLabel:new(x, y, ROW_H, "Weight:", 1, 1, 1, 1, UIFont.Small, true)
+    self.weightLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Weight"), 1, 1, 1, 1, UIFont.Small, true)
     self.weightLabel:initialise()
     self:addChild(self.weightLabel)
 
@@ -200,13 +200,13 @@ function EditModal:createChildren()
     y = y + ROW_H + 2
 
     self.weightHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL,
-        "(optional) Override the probability of appearing in shop", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        getText("IGUI_PhunMart_Hint_WeightOverride"), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.weightHint:initialise()
     self:addChild(self.weightHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Include Categories (comma-separated text entry)
-    self.catsLabel = ISLabel:new(x, y, ROW_H, "Categories:", 1, 1, 1, 1, UIFont.Small, true)
+    self.catsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Categories"), 1, 1, 1, 1, UIFont.Small, true)
     self.catsLabel:initialise()
     self:addChild(self.catsLabel)
 
@@ -220,14 +220,14 @@ function EditModal:createChildren()
     self:addChild(self.catsEntry)
     y = y + ROW_H + 2
 
-    self.catsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Comma-separated display categories", 0.5, 0.5, 0.5, 1,
+    self.catsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_DisplayCategories"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.catsHint:initialise()
     self:addChild(self.catsHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Include Items (comma-separated text entry)
-    self.itemsLabel = ISLabel:new(x, y, ROW_H, "Items:", 1, 1, 1, 1, UIFont.Small, true)
+    self.itemsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Items"), 1, 1, 1, 1, UIFont.Small, true)
     self.itemsLabel:initialise()
     self:addChild(self.itemsLabel)
 
@@ -246,13 +246,13 @@ function EditModal:createChildren()
         itemCount = #self.groupDef.include.items
     end
     self.itemsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL,
-        "Comma-separated item IDs (" .. itemCount .. " current)", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        getText("IGUI_PhunMart_Hint_ItemIDs", tostring(itemCount)), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.itemsHint:initialise()
     self:addChild(self.itemsHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Blacklist items (comma-separated text entry)
-    self.blLabel = ISLabel:new(x, y, ROW_H, "Blacklist:", 1, 1, 1, 1, UIFont.Small, true)
+    self.blLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_BlacklistItems"), 1, 1, 1, 1, UIFont.Small, true)
     self.blLabel:initialise()
     self:addChild(self.blLabel)
 
@@ -268,13 +268,13 @@ function EditModal:createChildren()
 
     local blCount = self.groupDef and self.groupDef.blacklist and #self.groupDef.blacklist or 0
     self.blHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL,
-        "Comma-separated item IDs (" .. blCount .. " current)", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        getText("IGUI_PhunMart_Hint_ItemIDs", tostring(blCount)), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.blHint:initialise()
     self:addChild(self.blHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Blacklist Categories (comma-separated text entry)
-    self.blCatsLabel = ISLabel:new(x, y, ROW_H, "Blacklist Cats:", 1, 1, 1, 1, UIFont.Small, true)
+    self.blCatsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_BlacklistCats"), 1, 1, 1, 1, UIFont.Small, true)
     self.blCatsLabel:initialise()
     self:addChild(self.blCatsLabel)
 
@@ -294,11 +294,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end
@@ -547,7 +547,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Group Definitions", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_GroupDefs"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -565,11 +565,11 @@ function UI:createChildren()
     local btnW = math.floor(70 * FONT_SCALE)
     local gap = math.floor(5 * FONT_SCALE)
 
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, "Add", self, UI.onAddClick)
+    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
@@ -592,11 +592,11 @@ function UI:createChildren()
     local colInclude = math.floor(w * 0.42)
     local colBlacklist = math.floor(w * 0.75)
     local colWeight = math.floor(w * 0.87)
-    self.datas:addColumn("Key", 0)
-    self.datas:addColumn("Price", colPrice)
-    self.datas:addColumn("Include", colInclude)
-    self.datas:addColumn("BL", colBlacklist)
-    self.datas:addColumn("Weight", colWeight)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Include"), colInclude)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_BL"), colBlacklist)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Weight"), colWeight)
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end

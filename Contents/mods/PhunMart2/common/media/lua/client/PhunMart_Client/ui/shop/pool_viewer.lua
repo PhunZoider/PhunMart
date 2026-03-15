@@ -53,7 +53,7 @@ local function formatPrice(price)
         return "-"
     end
     if price.kind == "free" then
-        return "FREE"
+        return getText("IGUI_PhunMart_Admin_FREE")
     end
     if price.kind == "currency" then
         local amt = price.amount
@@ -216,7 +216,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Pool: " .. (self.poolKey or "?"), 1, 1, 1, 1, UIFont.Medium,
+    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Admin_PoolTitle", self.poolKey or "?"), 1, 1, 1, 1, UIFont.Medium,
         true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
@@ -236,7 +236,7 @@ function UI:createChildren()
     local gap = math.floor(5 * FONT_SCALE)
 
     if isAdmin() or isDebugEnabled() then
-        self.editPoolBtn = ISButton:new(x, y, btnW, ROW_H, "Edit Pool", self, UI.onEditPool)
+        self.editPoolBtn = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Admin_EditPool"), self, UI.onEditPool)
         self.editPoolBtn:initialise()
         self:addChild(self.editPoolBtn)
     end
@@ -245,7 +245,7 @@ function UI:createChildren()
     self.showBlacklistedTick = ISTickBox:new(self.width - PAD - math.floor(140 * FONT_SCALE), y, ROW_H, ROW_H, "")
     self.showBlacklistedTick:initialise()
     self.showBlacklistedTick:instantiate()
-    self.showBlacklistedTick:addOption("Show blacklisted", nil)
+    self.showBlacklistedTick:addOption(getText("IGUI_PhunMart_Admin_ShowBlacklisted"), nil)
     self.showBlacklistedTick:setSelected(1, false)
     self.showBlacklistedTick.changeOptionMethod = UI.onBlacklistToggle
     self.showBlacklistedTick.changeOptionTarget = self
@@ -254,14 +254,14 @@ function UI:createChildren()
     y = y + ROW_H + PAD
 
     -- Filter row
-    local filterLabelW = getTextManager():MeasureStringX(UIFont.Small, "Filter: ") + 4
-    self.filterLabel = ISLabel:new(x, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, "Filter:", 0.7,
+    local filterLabelW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Admin_Filter") .. " ") + 4
+    self.filterLabel = ISLabel:new(x, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, getText("IGUI_PhunMart_Admin_Filter"), 0.7,
         0.7, 0.7, 1, UIFont.Small, true)
     self.filterLabel:initialise()
     self:addChild(self.filterLabel)
 
     local catComboW = math.floor(160 * FONT_SCALE)
-    local catLabelW = getTextManager():MeasureStringX(UIFont.Small, "Category: ") + 4
+    local catLabelW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Admin_Category") .. " ") + 4
     local filterEntryW = w - filterLabelW - catLabelW - catComboW - gap * 2
 
     self.filterEntry = ISTextEntryBox:new("", x + filterLabelW, y, filterEntryW, ROW_H)
@@ -273,7 +273,7 @@ function UI:createChildren()
     self:addChild(self.filterEntry)
 
     local catX = x + filterLabelW + filterEntryW + gap
-    self.catLabel = ISLabel:new(catX, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, "Category:", 0.7,
+    self.catLabel = ISLabel:new(catX, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, getText("IGUI_PhunMart_Admin_Category"), 0.7,
         0.7, 0.7, 1, UIFont.Small, true)
     self.catLabel:initialise()
     self:addChild(self.catLabel)
@@ -291,23 +291,23 @@ function UI:createChildren()
     local hdrH = FONT_HGT_SMALL + math.floor(4 * FONT_SCALE)
 
     local cx = PAD + COL_ICON + 2
-    self.hdrName = ISLabel:new(cx, hdrY, hdrH, "Name", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrName = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Name"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrName:initialise()
     self:addChild(self.hdrName)
     cx = cx + COL_NAME
-    self.hdrPrice = ISLabel:new(cx, hdrY, hdrH, "Price", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrPrice = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Price"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrPrice:initialise()
     self:addChild(self.hdrPrice)
     cx = cx + COL_PRICE
-    self.hdrWt = ISLabel:new(cx, hdrY, hdrH, "Wt", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrWt = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Wt"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrWt:initialise()
     self:addChild(self.hdrWt)
     cx = cx + COL_WEIGHT
-    self.hdrSource = ISLabel:new(cx, hdrY, hdrH, "Source", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrSource = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Source"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrSource:initialise()
     self:addChild(self.hdrSource)
     cx = cx + COL_SOURCE
-    self.hdrCond = ISLabel:new(cx, hdrY, hdrH, "Conditions", 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrCond = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Conditions"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrCond:initialise()
     self:addChild(self.hdrCond)
 
@@ -632,22 +632,22 @@ function UI:showContextMenu(row, absX, absY)
 
     if count <= 1 then
         if not row._blacklisted then
-            context:addOption("Add to blacklist", self, UI.onBlacklistRow, row)
+            context:addOption(getText("IGUI_PhunMart_Admin_AddToBlacklist"), self, UI.onBlacklistRow, row)
         end
-        context:addOption("Edit weight", self, UI.onEditWeightRow, row)
+        context:addOption(getText("IGUI_PhunMart_Admin_EditWeight"), self, UI.onEditWeightRow, row)
 
         -- Edit source: open the appropriate admin editor
         if row.sourceType == "group" and row.sourceKey then
-            context:addOption("Edit group: " .. row.sourceKey, self, UI.onEditSource, row)
+            context:addOption(getText("IGUI_PhunMart_Admin_EditGroupX", row.sourceKey), self, UI.onEditSource, row)
         elseif row.sourceType == "item" then
-            context:addOption("Edit item def", self, UI.onEditSource, row)
+            context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditSource, row)
         elseif row.sourceType == "reward" then
-            context:addOption("Edit item def", self, UI.onEditSource, row)
+            context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditSource, row)
         end
     else
-        context:addOption("Blacklist " .. count .. " items", self, UI.onBlacklistSelected)
+        context:addOption(getText("IGUI_PhunMart_Admin_BlacklistNItems", tostring(count)), self, UI.onBlacklistSelected)
     end
-    local moveLabel = count > 1 and ("Move " .. count .. " to pool") or "Move to pool"
+    local moveLabel = count > 1 and getText("IGUI_PhunMart_Admin_MoveNToPool", tostring(count)) or getText("IGUI_PhunMart_Admin_MoveToPool")
     context:addOption(moveLabel, self, UI.onMoveToPool)
 end
 
@@ -756,11 +756,11 @@ function UI:render()
     end
     local countText
     if selCount > 0 then
-        countText = tostring(selCount) .. " selected"
+        countText = getText("IGUI_PhunMart_Admin_NSelected", tostring(selCount))
     elseif shown == total then
-        countText = tostring(total) .. " offer" .. (total == 1 and "" or "s")
+        countText = total == 1 and getText("IGUI_PhunMart_Admin_OfferCount", tostring(total)) or getText("IGUI_PhunMart_Admin_OfferCountPlural", tostring(total))
     else
-        countText = tostring(shown) .. "/" .. tostring(total) .. " offers"
+        countText = getText("IGUI_PhunMart_Admin_OfferCountFiltered", tostring(shown), tostring(total))
     end
     local cntW = getTextManager():MeasureStringX(UIFont.Small, countText)
     local closeSz = math.floor(25 * FONT_SCALE)
@@ -769,7 +769,7 @@ function UI:render()
 
     -- empty state
     if #self.filteredRows == 0 then
-        local msg = #self.rows == 0 and "No offers in this pool" or "No matching offers"
+        local msg = #self.rows == 0 and getText("IGUI_PhunMart_Admin_NoOffers") or getText("IGUI_PhunMart_Admin_NoMatching")
         local msgW = getTextManager():MeasureStringX(UIFont.Small, msg)
         local listY = self.list:getY()
         local viewH = self.height - listY - PAD
@@ -848,8 +848,8 @@ function WeightEditor._Panel:createChildren()
 
     local btnW = math.floor((entryW - WE_PAD) / 2)
     local btnY = entryY + ROW_H + WE_PAD
-    self.okBtn = ISButton:new(x, btnY, btnW, ROW_H, "OK", self, WeightEditor._Panel.onOK)
-    self.cancelBtn = ISButton:new(x + btnW + WE_PAD, btnY, btnW, ROW_H, "Cancel", self, WeightEditor._Panel.onCancel)
+    self.okBtn = ISButton:new(x, btnY, btnW, ROW_H, getText("IGUI_PhunMart_Btn_OK"), self, WeightEditor._Panel.onOK)
+    self.cancelBtn = ISButton:new(x + btnW + WE_PAD, btnY, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, WeightEditor._Panel.onCancel)
     self.okBtn:initialise()
     self.okBtn:instantiate()
     self:addChild(self.okBtn)
@@ -896,7 +896,7 @@ end
 
 function WeightEditor._Panel:render()
     ISPanel.render(self)
-    local label = "Weight: " .. tools.truncate(self.row.displayName, self.width - WE_PAD * 4, UIFont.Small)
+    local label = getText("IGUI_PhunMart_Admin_WeightLabel", tools.truncate(self.row.displayName, self.width - WE_PAD * 4, UIFont.Small))
     self:drawText(label, WE_PAD, WE_PAD, 0.9, 0.8, 0.3, 1, UIFont.Small)
 end
 
@@ -964,7 +964,7 @@ function MoveToPoolModal._Panel:createChildren()
 
     -- Title
     local count = #self.rows
-    local titleText = "Move " .. count .. " item" .. (count == 1 and "" or "s") .. " to pool"
+    local titleText = getText("IGUI_PhunMart_Admin_MoveItemsToPool", tostring(count))
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
@@ -988,11 +988,11 @@ function MoveToPoolModal._Panel:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.okBtn = ISButton:new(btnX, y, btnW, ROW_H, "Move", self, MoveToPoolModal._Panel.onOK)
+    self.okBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Move"), self, MoveToPoolModal._Panel.onOK)
     self.okBtn:initialise()
     self:addChild(self.okBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self,
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
         MoveToPoolModal._Panel.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)

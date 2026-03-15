@@ -51,9 +51,9 @@ end
 -- Format enabled status.
 local function formatEnabled(itemDef)
     if itemDef.enabled == false then
-        return "No"
+        return getText("IGUI_PhunMart_No")
     end
-    return "Yes"
+    return getText("IGUI_PhunMart_Yes")
 end
 
 ---------------------------------------------------------------------------
@@ -70,14 +70,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Reward: ") + 8
 
     -- Title
-    local titleText = self.isNew and "Add Item" or ("Edit: " .. self.itemKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddItem") or getText("IGUI_PhunMart_Title_EditX", self.itemKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, "Key:", 1, 1, 1, 1, UIFont.Small, true)
+    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
@@ -91,7 +91,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Price combo
-    self.priceLabel = ISLabel:new(x, y, ROW_H, "Price:", 1, 1, 1, 1, UIFont.Small, true)
+    self.priceLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Price"), 1, 1, 1, 1, UIFont.Small, true)
     self.priceLabel:initialise()
     self:addChild(self.priceLabel)
 
@@ -111,7 +111,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Reward combo
-    self.rewardLabel = ISLabel:new(x, y, ROW_H, "Reward:", 1, 1, 1, 1, UIFont.Small, true)
+    self.rewardLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Reward"), 1, 1, 1, 1, UIFont.Small, true)
     self.rewardLabel:initialise()
     self:addChild(self.rewardLabel)
 
@@ -131,7 +131,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Weight entry
-    self.weightLabel = ISLabel:new(x, y, ROW_H, "Weight:", 1, 1, 1, 1, UIFont.Small, true)
+    self.weightLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Weight"), 1, 1, 1, 1, UIFont.Small, true)
     self.weightLabel:initialise()
     self:addChild(self.weightLabel)
 
@@ -146,7 +146,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Stock min entry
-    self.stockMinLabel = ISLabel:new(x, y, ROW_H, "Stock Min:", 1, 1, 1, 1, UIFont.Small, true)
+    self.stockMinLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_StockMin"), 1, 1, 1, 1, UIFont.Small, true)
     self.stockMinLabel:initialise()
     self:addChild(self.stockMinLabel)
 
@@ -161,7 +161,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Stock max entry
-    self.stockMaxLabel = ISLabel:new(x, y, ROW_H, "Stock Max:", 1, 1, 1, 1, UIFont.Small, true)
+    self.stockMaxLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_StockMax"), 1, 1, 1, 1, UIFont.Small, true)
     self.stockMaxLabel:initialise()
     self:addChild(self.stockMaxLabel)
 
@@ -175,7 +175,7 @@ function EditModal:createChildren()
     self:addChild(self.stockMaxEntry)
     y = y + ROW_H + 2
 
-    self.stockHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Leave blank for unlimited stock", 0.5, 0.5, 0.5, 1,
+    self.stockHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_UnlimitedStock"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.stockHint:initialise()
     self:addChild(self.stockHint)
@@ -185,7 +185,7 @@ function EditModal:createChildren()
     self.enabledCheck = ISTickBox:new(x, y, w, ROW_H, "")
     self.enabledCheck:initialise()
     self.enabledCheck:instantiate()
-    self.enabledCheck:addOption("Enabled", nil)
+    self.enabledCheck:addOption(getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), nil)
     local isEnabled = not self.itemDef or self.itemDef.enabled ~= false
     self.enabledCheck:setSelected(1, isEnabled)
     self:addChild(self.enabledCheck)
@@ -197,11 +197,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end
@@ -405,7 +405,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Item Definitions", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_ItemDefs"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -423,11 +423,11 @@ function UI:createChildren()
     local btnW = math.floor(70 * FONT_SCALE)
     local gap = math.floor(5 * FONT_SCALE)
 
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, "Add", self, UI.onAddClick)
+    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
@@ -450,11 +450,11 @@ function UI:createChildren()
     local colReward = math.floor(w * 0.55)
     local colWeight = math.floor(w * 0.72)
     local colEnabled = math.floor(w * 0.85)
-    self.datas:addColumn("Key", 0)
-    self.datas:addColumn("Price", colPrice)
-    self.datas:addColumn("Reward", colReward)
-    self.datas:addColumn("Weight", colWeight)
-    self.datas:addColumn("Enabled", colEnabled)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Reward"), colReward)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Weight"), colWeight)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Enabled"), colEnabled)
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end
@@ -509,7 +509,7 @@ function UI:drawDatas(y, item, alt)
     self:clearStencilRect()
 
     -- Enabled column
-    local enabledColor = data.enabled == "Yes" and {0.4, 0.9, 0.4} or {0.9, 0.4, 0.4}
+    local enabledColor = data.enabled == getText("IGUI_PhunMart_Yes") and {0.4, 0.9, 0.4} or {0.9, 0.4, 0.4}
     self:drawText(data.enabled, col5X + 4, textY, enabledColor[1], enabledColor[2], enabledColor[3], a, self.font)
 
     self.itemsHeight = y + self.itemheight

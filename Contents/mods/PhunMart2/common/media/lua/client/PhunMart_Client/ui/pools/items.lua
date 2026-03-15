@@ -92,7 +92,7 @@ function UI:createChildren()
     self.controls.filtersPanel = filtersPanel
     self:addChild(filtersPanel);
 
-    local list = tools.getListbox(x, y, self:getWidth(), filtersPanel.y, {"Item", "Category"}, {
+    local list = tools.getListbox(x, y, self:getWidth(), filtersPanel.y, {getText("IGUI_PhunMart_Col_Item"), getText("IGUI_PhunMart_Col_Category")}, {
         draw = self.drawDatas,
         click = self.click,
         rightClick = self.rightClick
@@ -102,7 +102,7 @@ function UI:createChildren()
     self.controls.list = list
     self:addChild(list)
 
-    local lblFilter = tools.getLabel("Filter", padding, padding)
+    local lblFilter = tools.getLabel(getText("IGUI_PhunMart_Admin_Filter"), padding, padding)
     filtersPanel:addChild(lblFilter)
 
     local inputY = padding + FONT_HGT_SMALL + padding
@@ -117,7 +117,7 @@ function UI:createChildren()
 
     local left = filter.x + filter.width + padding
 
-    local lblFilterCategory = tools.getLabel("Category", filtersPanel.width - x - left, padding)
+    local lblFilterCategory = tools.getLabel(getText("IGUI_PhunMart_Admin_Category"), filtersPanel.width - x - left, padding)
     filtersPanel:addChild(lblFilterCategory)
     self.controls.lblFilterCategory = lblFilterCategory
     local filterCategory = ISComboBox:new(left, inputY, filtersPanel.width - x - left, FONT_HGT_MEDIUM, self, function()

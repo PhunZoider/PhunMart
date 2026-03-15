@@ -33,7 +33,7 @@ end
 -- Format the kind/inherit column for display.
 local function formatType(def)
     if def.template then
-        return "template"
+        return getText("IGUI_PhunMart_Template")
     end
     if def.inherit then
         return def.inherit
@@ -84,14 +84,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Action Arg: ") + 8
 
     -- Title
-    local titleText = self.isNew and "Add Reward" or ("Edit: " .. self.rewardKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddReward") or getText("IGUI_PhunMart_Title_EditX", self.rewardKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, "Key:", 1, 1, 1, 1, UIFont.Small, true)
+    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
@@ -108,7 +108,7 @@ function EditModal:createChildren()
     self.templateCheck = ISTickBox:new(x, y, w, ROW_H, "")
     self.templateCheck:initialise()
     self.templateCheck:instantiate()
-    self.templateCheck:addOption("Is Template", nil)
+    self.templateCheck:addOption(getText("IGUI_PhunMart_Lbl_IsTemplate"), nil)
     self.templateCheck:setSelected(1, self.rewardDef and self.rewardDef.template or false)
     self.templateCheck.changeOptionMethod = EditModal.onTemplateChanged
     self.templateCheck.changeOptionTarget = self
@@ -118,7 +118,7 @@ function EditModal:createChildren()
     -- ── Template fields ──
 
     -- Kind combo
-    self.kindLabel = ISLabel:new(x, y, ROW_H, "Kind:", 1, 1, 1, 1, UIFont.Small, true)
+    self.kindLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Kind"), 1, 1, 1, 1, UIFont.Small, true)
     self.kindLabel:initialise()
     self:addChild(self.kindLabel)
 
@@ -136,7 +136,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Category entry
-    self.categoryLabel = ISLabel:new(x, y, ROW_H, "Category:", 1, 1, 1, 1, UIFont.Small, true)
+    self.categoryLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Category"), 1, 1, 1, 1, UIFont.Small, true)
     self.categoryLabel:initialise()
     self:addChild(self.categoryLabel)
 
@@ -148,7 +148,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Texture entry
-    self.textureLabel = ISLabel:new(x, y, ROW_H, "Texture:", 1, 1, 1, 1, UIFont.Small, true)
+    self.textureLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Texture"), 1, 1, 1, 1, UIFont.Small, true)
     self.textureLabel:initialise()
     self:addChild(self.textureLabel)
 
@@ -160,7 +160,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Overlay entry
-    self.overlayLabel = ISLabel:new(x, y, ROW_H, "Overlay:", 1, 1, 1, 1, UIFont.Small, true)
+    self.overlayLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Overlay"), 1, 1, 1, 1, UIFont.Small, true)
     self.overlayLabel:initialise()
     self:addChild(self.overlayLabel)
 
@@ -174,13 +174,13 @@ function EditModal:createChildren()
     -- ── Non-template fields ──
 
     -- Inherit combo
-    self.inheritLabel = ISLabel:new(x, y, ROW_H, "Inherit:", 1, 1, 1, 1, UIFont.Small, true)
+    self.inheritLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Inherit"), 1, 1, 1, 1, UIFont.Small, true)
     self.inheritLabel:initialise()
     self:addChild(self.inheritLabel)
 
     self.inheritCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
     self.inheritCombo:initialise()
-    self.inheritCombo:addOption("(none)")
+    self.inheritCombo:addOption(getText("IGUI_PhunMart_Lbl_None"))
     local rewards = Core.defs and Core.defs.rewards or require "PhunMart/defaults/rewards"
     local templateKeys = {}
     for k, v in pairs(rewards) do
@@ -201,7 +201,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Display text entry
-    self.displayLabel = ISLabel:new(x, y, ROW_H, "Display:", 1, 1, 1, 1, UIFont.Small, true)
+    self.displayLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Display"), 1, 1, 1, 1, UIFont.Small, true)
     self.displayLabel:initialise()
     self:addChild(self.displayLabel)
 
@@ -213,7 +213,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Action type combo
-    self.actionLabel = ISLabel:new(x, y, ROW_H, "Action:", 1, 1, 1, 1, UIFont.Small, true)
+    self.actionLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Action"), 1, 1, 1, 1, UIFont.Small, true)
     self.actionLabel:initialise()
     self:addChild(self.actionLabel)
 
@@ -232,7 +232,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Action arg entry (trait key, script name, or token amount depending on type)
-    self.actionArgLabel = ISLabel:new(x, y, ROW_H, "Action Arg:", 1, 1, 1, 1, UIFont.Small, true)
+    self.actionArgLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_ActionArg"), 1, 1, 1, 1, UIFont.Small, true)
     self.actionArgLabel:initialise()
     self:addChild(self.actionArgLabel)
 
@@ -265,11 +265,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 
@@ -305,11 +305,11 @@ end
 function EditModal:onActionChanged()
     local actionType = self.actionCombo:getSelectedText()
     if actionType == "addTrait" or actionType == "removeTrait" then
-        self.actionArgHint:setName("Trait key (e.g. base:brave)")
+        self.actionArgHint:setName(getText("IGUI_PhunMart_Hint_TraitKey"))
     elseif actionType == "spawnVehicle" then
-        self.actionArgHint:setName("Script name(s), comma-separated")
+        self.actionArgHint:setName(getText("IGUI_PhunMart_Hint_ScriptNames"))
     elseif actionType == "grantBoundTokens" then
-        self.actionArgHint:setName("Token amount (integer)")
+        self.actionArgHint:setName(getText("IGUI_PhunMart_Hint_TokenAmount"))
     else
         self.actionArgHint:setName("")
     end
@@ -344,7 +344,7 @@ function EditModal:onApply()
         end
     else
         local inheritText = self.inheritCombo:getSelectedText()
-        if inheritText ~= "(none)" then
+        if self.inheritCombo.selected > 1 then
             def.inherit = inheritText
         end
         local dispText = self.displayEntry:getText()
@@ -530,7 +530,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Reward Definitions", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_RewardDefs"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -548,11 +548,11 @@ function UI:createChildren()
     local btnW = math.floor(70 * FONT_SCALE)
     local gap = math.floor(5 * FONT_SCALE)
 
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, "Add", self, UI.onAddClick)
+    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
@@ -574,10 +574,10 @@ function UI:createChildren()
     local colType = math.floor(w * 0.32)
     local colDisplay = math.floor(w * 0.55)
     local colAction = math.floor(w * 0.78)
-    self.datas:addColumn("Key", 0)
-    self.datas:addColumn("Type", colType)
-    self.datas:addColumn("Display", colDisplay)
-    self.datas:addColumn("Action", colAction)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Type"), colType)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Display"), colDisplay)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Action"), colAction)
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end

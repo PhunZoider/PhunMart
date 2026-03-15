@@ -44,7 +44,7 @@ end
 -- Format the kind column display.
 local function formatKind(priceDef)
     if priceDef.kind == "free" then
-        return "Free"
+        return getText("IGUI_PhunMart_Free")
     end
     if priceDef.kind == "currency" then
         return priceDef.pool or "currency"
@@ -72,14 +72,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Amount: ") + 8
 
     -- Title
-    local titleText = self.isNew and "Add Price" or ("Edit: " .. self.priceKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddPrice") or getText("IGUI_PhunMart_Title_EditX", self.priceKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, "Key:", 1, 1, 1, 1, UIFont.Small, true)
+    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
@@ -93,7 +93,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Kind combo
-    self.kindLabel = ISLabel:new(x, y, ROW_H, "Kind:", 1, 1, 1, 1, UIFont.Small, true)
+    self.kindLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Kind"), 1, 1, 1, 1, UIFont.Small, true)
     self.kindLabel:initialise()
     self:addChild(self.kindLabel)
 
@@ -116,7 +116,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Pool combo (only for currency)
-    self.poolLabel = ISLabel:new(x, y, ROW_H, "Pool:", 1, 1, 1, 1, UIFont.Small, true)
+    self.poolLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Pool"), 1, 1, 1, 1, UIFont.Small, true)
     self.poolLabel:initialise()
     self:addChild(self.poolLabel)
 
@@ -131,7 +131,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Amount entry
-    self.amountLabel = ISLabel:new(x, y, ROW_H, "Amount:", 1, 1, 1, 1, UIFont.Small, true)
+    self.amountLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Amount"), 1, 1, 1, 1, UIFont.Small, true)
     self.amountLabel:initialise()
     self:addChild(self.amountLabel)
 
@@ -160,14 +160,14 @@ function EditModal:createChildren()
     self:addChild(self.amountEntry)
     y = y + ROW_H + 2
 
-    local hint = "For change pool, enter as dollars (e.g. 5.00)"
+    local hint = getText("IGUI_PhunMart_Hint_AmountDollars")
     self.amountHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.amountHint:initialise()
     self:addChild(self.amountHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Max amount entry (for ranges)
-    self.maxLabel = ISLabel:new(x, y, ROW_H, "Max:", 1, 1, 1, 1, UIFont.Small, true)
+    self.maxLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Max"), 1, 1, 1, 1, UIFont.Small, true)
     self.maxLabel:initialise()
     self:addChild(self.maxLabel)
 
@@ -187,7 +187,7 @@ function EditModal:createChildren()
     self:addChild(self.maxEntry)
     y = y + ROW_H + 2
 
-    self.maxHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Leave blank for fixed amount", 0.5, 0.5, 0.5, 1,
+    self.maxHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_FixedAmount"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.maxHint:initialise()
     self:addChild(self.maxHint)
@@ -199,11 +199,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 
@@ -428,7 +428,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Price Definitions", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_PriceDefs"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -446,11 +446,11 @@ function UI:createChildren()
     local btnW = math.floor(70 * FONT_SCALE)
     local gap = math.floor(5 * FONT_SCALE)
 
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, "Add", self, UI.onAddClick)
+    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
@@ -471,9 +471,9 @@ function UI:createChildren()
 
     local colKind = math.floor(w * 0.50)
     local colAmount = math.floor(w * 0.72)
-    self.datas:addColumn("Key", 0)
-    self.datas:addColumn("Kind", colKind)
-    self.datas:addColumn("Amount", colAmount)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Kind"), colKind)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Amount"), colAmount)
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end

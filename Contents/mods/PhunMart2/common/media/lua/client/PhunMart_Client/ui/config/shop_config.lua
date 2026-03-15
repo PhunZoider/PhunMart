@@ -158,14 +158,14 @@ function UI:createChildren()
         player = self.player
     })
     self.controls.props = props
-    self.controls.tabPanel:addView("Props", props)
+    self.controls.tabPanel:addView(getText("IGUI_PhunMart_Tab_Props"), props)
 
     local pools = Core.ui.pools:new(0, 100, tabPanel.width, tabPanel.height - tabPanel.tabHeight, {
         player = self.player
     });
     pools:initialise()
     self.controls.pools = pools
-    self.controls.tabPanel:addView("Pool Sets", self.controls.pools)
+    self.controls.tabPanel:addView(getText("IGUI_PhunMart_Tab_PoolSets"), self.controls.pools)
 
     -- Disable Pool Sets tab (not yet implemented)
     local tp = self.controls.tabPanel
@@ -181,7 +181,7 @@ function UI:createChildren()
                 self2:drawRect(tx, 0, tw, self2.tabHeight - 1, 0.55, 0, 0, 0)
                 if self2:getMouseY() >= 0 and self2:getMouseY() < self2.tabHeight and self2:isMouseOver() and
                     self2:getTabIndexAtX(self2:getMouseX()) == idx then
-                    self2:drawTextCentre("Coming Soon", tx + tw / 2, 3, 0.95, 0.8, 0.4, 1, UIFont.Small)
+                    self2:drawTextCentre(getText("IGUI_PhunMart_Hint_ComingSoon"), tx + tw / 2, 3, 0.95, 0.8, 0.4, 1, UIFont.Small)
                 end
             end
         end

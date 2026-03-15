@@ -441,7 +441,7 @@ end
 
 -- Toggle button rect (right side of the toggle bar).
 function UI:toggleBtnRect()
-    local label = self.viewMode == VIEW_GRID and "List" or "Grid"
+    local label = self.viewMode == VIEW_GRID and getText("IGUI_PhunMart_Btn_List") or getText("IGUI_PhunMart_Btn_Grid")
     local lw = getTextManager():MeasureStringX(UIFont.Small, label)
     local bw = lw + PAD_EDGE * 2
     bw = TOGGLE_H - 2
@@ -598,7 +598,7 @@ function UI:renderGrid()
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
 
                 -- price/OOS badge bottom-right
-                local badge = isOOS and "OUT" or formatPrice(e.offer)
+                local badge = isOOS and getText("IGUI_PhunMart_Msg_OutBadge") or formatPrice(e.offer)
                 if badge then
                     local bw = getTextManager():MeasureStringX(UIFont.Small, badge)
                     local bx = cx + cs - bw - 3
@@ -681,7 +681,7 @@ function UI:renderList()
                 end
 
                 -- price/OOS badge (compute width first so name can avoid it)
-                local badge = isOOS and "OUT" or formatPrice(e.offer)
+                local badge = isOOS and getText("IGUI_PhunMart_Msg_OutBadge") or formatPrice(e.offer)
                 local badgeW = badge and (getTextManager():MeasureStringX(font, badge) + PAD_EDGE) or 0
 
                 -- name (truncated to avoid badge)
@@ -731,11 +731,13 @@ function UI:render()
         local hoursLeft = math.max(0, (self.lastRestock + self.restockFrequency) - now)
         local statusText
         if hoursLeft < 0.1 then
-            statusText = "Restock ready"
+            statusText = getText("IGUI_PhunMart_Msg_RestockReady")
         elseif hoursLeft < 1 then
-            statusText = string.format("Restocks in %dm", math.floor(hoursLeft * 60))
+            local minutes = math.floor(hoursLeft * 60)
+            statusText = getText("IGUI_PhunMart_Msg_RestockMinutes", minutes)
         else
-            statusText = string.format("Restocks in %.1fh", hoursLeft)
+            local hours = string.format("%.1f", hoursLeft)
+            statusText = getText("IGUI_PhunMart_Msg_RestockHours", hours)
         end
         local ty = math.floor((TOGGLE_H - FONT_SM) / 2)
         local ready = hoursLeft < 0.1
@@ -745,7 +747,7 @@ function UI:render()
 
     -- ── empty state ───────────────────────────────────────────────────────────
     if self:totalItems() == 0 then
-        local msg = "No items available"
+        local msg = getText("IGUI_PhunMart_Msg_NoItemsAvailable")
         local tw = getTextManager():MeasureStringX(UIFont.Small, msg)
         local viewH = self.height - TOGGLE_H
         self:drawText(msg, (self.width - tw) / 2, TOGGLE_H + (viewH - FONT_SM) / 2, 0.5, 0.5, 0.5, 0.8, UIFont.Small)

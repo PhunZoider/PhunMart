@@ -159,7 +159,7 @@ function tools.formatPriceShort(offer)
         return nil
     end
     if price.kind == "free" then
-        return "FREE"
+        return getText("IGUI_PhunMart_Admin_FREE")
     end
     if price.kind == "currency" then
         local amt = price.amount
@@ -167,7 +167,7 @@ function tools.formatPriceShort(offer)
             amt = amt.min
         end
         if price.pool == "tokens" then
-            return tostring(amt) .. "t"
+            return tostring(amt) .. getText("IGUI_PhunMart_TokenSuffix")
         else
             if amt % 100 == 0 then
                 return "$" .. tostring(amt / 100)

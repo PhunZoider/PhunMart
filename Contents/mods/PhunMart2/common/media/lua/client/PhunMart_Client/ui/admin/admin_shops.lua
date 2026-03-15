@@ -112,14 +112,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Restock Frequency: ") + 8
 
     -- Title
-    local titleText = "Edit: " .. self.shopKey
+    local titleText = getText("IGUI_PhunMart_Title_EditX", self.shopKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Enabled
-    self.enabledLabel = ISLabel:new(x, y, ROW_H, "Enabled:", 1, 1, 1, 1, UIFont.Small, true)
+    self.enabledLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Enabled"), 1, 1, 1, 1, UIFont.Small, true)
     self.enabledLabel:initialise()
     self:addChild(self.enabledLabel)
 
@@ -132,7 +132,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Category
-    self.catLabel = ISLabel:new(x, y, ROW_H, "Category:", 1, 1, 1, 1, UIFont.Small, true)
+    self.catLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Category"), 1, 1, 1, 1, UIFont.Small, true)
     self.catLabel:initialise()
     self:addChild(self.catLabel)
 
@@ -142,14 +142,14 @@ function EditModal:createChildren()
     self:addChild(self.catEntry)
     y = y + ROW_H + 2
 
-    self.catHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Display category shown in admin tools", 0.5, 0.5, 0.5, 1,
+    self.catHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_CategoryShown"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.catHint:initialise()
     self:addChild(self.catHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Probability
-    self.probLabel = ISLabel:new(x, y, ROW_H, "Probability:", 1, 1, 1, 1, UIFont.Small, true)
+    self.probLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Probability"), 1, 1, 1, 1, UIFont.Small, true)
     self.probLabel:initialise()
     self:addChild(self.probLabel)
 
@@ -160,14 +160,14 @@ function EditModal:createChildren()
     self:addChild(self.probEntry)
     y = y + ROW_H + 2
 
-    self.probHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Relative weight in placement lottery (0 = manual only)", 0.5, 0.5, 0.5, 1,
+    self.probHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Probability"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.probHint:initialise()
     self:addChild(self.probHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Min Distance
-    self.distLabel = ISLabel:new(x, y, ROW_H, "Min Distance:", 1, 1, 1, 1, UIFont.Small, true)
+    self.distLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_MinDistance"), 1, 1, 1, 1, UIFont.Small, true)
     self.distLabel:initialise()
     self:addChild(self.distLabel)
 
@@ -178,14 +178,14 @@ function EditModal:createChildren()
     self:addChild(self.distEntry)
     y = y + ROW_H + 2
 
-    self.distHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Min tile distance between same shop type", 0.5, 0.5, 0.5, 1,
+    self.distHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_MinDistance"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.distHint:initialise()
     self:addChild(self.distHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Restock Frequency
-    self.restockLabel = ISLabel:new(x, y, ROW_H, "Restock Frequency:", 1, 1, 1, 1, UIFont.Small, true)
+    self.restockLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RestockFrequency"), 1, 1, 1, 1, UIFont.Small, true)
     self.restockLabel:initialise()
     self:addChild(self.restockLabel)
 
@@ -196,14 +196,14 @@ function EditModal:createChildren()
     self:addChild(self.restockEntry)
     y = y + ROW_H + 2
 
-    self.restockHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) In-game hours between restocks", 0.5, 0.5, 0.5, 1,
+    self.restockHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RestockFrequency"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.restockHint:initialise()
     self:addChild(self.restockHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Default View
-    self.viewLabel = ISLabel:new(x, y, ROW_H, "Default View:", 1, 1, 1, 1, UIFont.Small, true)
+    self.viewLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_DefaultView"), 1, 1, 1, 1, UIFont.Small, true)
     self.viewLabel:initialise()
     self:addChild(self.viewLabel)
 
@@ -215,14 +215,14 @@ function EditModal:createChildren()
     self:addChild(self.viewCombo)
     y = y + ROW_H + 2
 
-    self.viewHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Layout mode for the shop UI", 0.5, 0.5, 0.5, 1,
+    self.viewHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_ViewMode"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.viewHint:initialise()
     self:addChild(self.viewHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Background
-    self.bgLabel = ISLabel:new(x, y, ROW_H, "Background:", 1, 1, 1, 1, UIFont.Small, true)
+    self.bgLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Background"), 1, 1, 1, 1, UIFont.Small, true)
     self.bgLabel:initialise()
     self:addChild(self.bgLabel)
 
@@ -232,14 +232,14 @@ function EditModal:createChildren()
     self:addChild(self.bgEntry)
     y = y + ROW_H + 2
 
-    self.bgHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "PNG filename from media/textures/", 0.5, 0.5, 0.5, 1,
+    self.bgHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Background"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.bgHint:initialise()
     self:addChild(self.bgHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Sprites
-    self.spritesLabel = ISLabel:new(x, y, ROW_H, "Sprites:", 1, 1, 1, 1, UIFont.Small, true)
+    self.spritesLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Sprites"), 1, 1, 1, 1, UIFont.Small, true)
     self.spritesLabel:initialise()
     self:addChild(self.spritesLabel)
 
@@ -250,14 +250,14 @@ function EditModal:createChildren()
     self:addChild(self.spritesEntry)
     y = y + ROW_H + 2
 
-    self.spritesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "4 tile sprite names (N, E, S, W facing)", 0.5, 0.5, 0.5, 1,
+    self.spritesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Sprites"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.spritesHint:initialise()
     self:addChild(self.spritesHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Unpowered Sprites
-    self.unpSpritesLabel = ISLabel:new(x, y, ROW_H, "Unp. Sprites:", 1, 1, 1, 1, UIFont.Small, true)
+    self.unpSpritesLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_UnpSprites"), 1, 1, 1, 1, UIFont.Small, true)
     self.unpSpritesLabel:initialise()
     self:addChild(self.unpSpritesLabel)
 
@@ -268,14 +268,14 @@ function EditModal:createChildren()
     self:addChild(self.unpSpritesEntry)
     y = y + ROW_H + 2
 
-    self.unpSpritesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "4 tile sprite names shown when machine is unpowered", 0.5, 0.5, 0.5, 1,
+    self.unpSpritesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_UnpSprites"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.unpSpritesHint:initialise()
     self:addChild(self.unpSpritesHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Pool Sets
-    self.poolSetsLabel = ISLabel:new(x, y, ROW_H, "Pool Sets:", 1, 1, 1, 1, UIFont.Small, true)
+    self.poolSetsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_PoolSets"), 1, 1, 1, 1, UIFont.Small, true)
     self.poolSetsLabel:initialise()
     self:addChild(self.poolSetsLabel)
 
@@ -286,7 +286,7 @@ function EditModal:createChildren()
     self:addChild(self.poolSetsEntry)
     y = y + ROW_H + 2
 
-    self.poolSetsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "key:weight, ... | key:weight, ... (sets separated by |)", 0.5, 0.5, 0.5, 1,
+    self.poolSetsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_PoolSets"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.poolSetsHint:initialise()
     self:addChild(self.poolSetsHint)
@@ -298,11 +298,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end

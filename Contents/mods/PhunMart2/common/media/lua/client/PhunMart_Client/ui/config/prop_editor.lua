@@ -21,56 +21,56 @@ local shopProperties = {
     enabled = {
         type = "boolean",
         label = "Enabled",
-        tooltip = "Untick to disable this shop from spawning. This will not remove existing shops that have already been created.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropEnabled"),
         default = true
     },
     type = {
         type = "string",
         label = "Type",
-        tooltip = "A unique type that defines this shop. Cannot be edited.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropKey"),
         disableOnEdit = true,
         default = ""
     },
     label = {
         type = "string",
         label = "Label",
-        tooltip = "Display name of the shop. Leave blank for default.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropName"),
         default = ""
     },
     category = {
         type = "string",
         label = "Category",
-        tooltip = "Category grouping for this shop (e.g. Food, Weapon, Vehicle). Used to prevent similar shops spawning too close together.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropCategory"),
         default = ""
     },
     defaultView = {
         type = "string",
         label = "Default View",
-        tooltip = "The default display layout when a player opens this shop. Use 'grid' or 'list'. Leave blank for default (grid).",
+        tooltip = getText("IGUI_PhunMart_Hint_PropDefaultView"),
         default = ""
     },
     probability = {
         type = "int",
         label = "Probability",
-        tooltip = "The probability of this shop spawning relative to other shops. Leave blank for global defaults.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropProbability"),
         default = ""
     },
     minDistance = {
         type = "int",
         label = "Min Distance",
-        tooltip = "Minimum tile distance between this shop and others sharing the same category. Leave blank for global defaults.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropMinDistance"),
         default = ""
     },
     currency = {
         type = "string",
         label = "Currency",
-        tooltip = "Default currency for this shop. Can be overridden at pool or item level. Leave blank for global defaults.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropCurrency"),
         default = ""
     },
     requiresPower = {
         type = "boolean",
         label = "Requires Power",
-        tooltip = "Tick to require that this shop is powered in order to function.",
+        tooltip = getText("IGUI_PhunMart_Hint_PropPowered"),
         default = false
     }
 }

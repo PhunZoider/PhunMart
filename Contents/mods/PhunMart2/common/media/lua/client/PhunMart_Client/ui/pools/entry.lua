@@ -42,7 +42,7 @@ function UI:createChildren()
     self.controls = {}
 
     local lbl = ISLabel:new(pad, pad, FONT_HGT_MEDIUM,
-        "Pool references - each entry selects a pool to draw items from.", 1, 1, 1, 0.7, UIFont.Small, true)
+        getText("IGUI_PhunMart_Lbl_PoolReferences"), 1, 1, 1, 0.7, UIFont.Small, true)
     lbl:initialise();
     lbl:instantiate()
     self:addChild(lbl)
@@ -59,8 +59,8 @@ function UI:createChildren()
     list.font = UIFont.NewSmall
     list.drawBorder = true
     list.doDrawItem = self.drawRow
-    list:addColumn("Pool Key", 0)
-    list:addColumn("Weight", 200)
+    list:addColumn(getText("IGUI_PhunMart_Col_PoolKey"), 0)
+    list:addColumn(getText("IGUI_PhunMart_Col_Weight"), 200)
     list.onMouseUp = function(l, x, y)
         local row = l:rowAt(x, y)
         if row and row > 0 then
@@ -73,7 +73,7 @@ function UI:createChildren()
 
     local btnY = listY + listH + pad
 
-    local btnAdd = ISButton:new(pad, btnY, 80, BUTTON_HGT, "Add", self, self.onAdd)
+    local btnAdd = ISButton:new(pad, btnY, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Add"), self, self.onAdd)
     btnAdd:initialise();
     btnAdd:instantiate()
     if btnAdd.enableAcceptColor then
@@ -82,13 +82,13 @@ function UI:createChildren()
     self.controls.btnAdd = btnAdd
     self:addChild(btnAdd)
 
-    local btnEdit = ISButton:new(pad + 90, btnY, 80, BUTTON_HGT, "Edit", self, self.onEditSelected)
+    local btnEdit = ISButton:new(pad + 90, btnY, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Edit"), self, self.onEditSelected)
     btnEdit:initialise();
     btnEdit:instantiate()
     self.controls.btnEdit = btnEdit
     self:addChild(btnEdit)
 
-    local btnRemove = ISButton:new(pad + 180, btnY, 80, BUTTON_HGT, "Remove", self, self.onRemove)
+    local btnRemove = ISButton:new(pad + 180, btnY, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Remove"), self, self.onRemove)
     btnRemove:initialise();
     btnRemove:instantiate()
     if btnRemove.enableCancelColor then
@@ -97,13 +97,13 @@ function UI:createChildren()
     self.controls.btnRemove = btnRemove
     self:addChild(btnRemove)
 
-    local btnUp = ISButton:new(pad + 270, btnY, 60, BUTTON_HGT, "Up", self, self.onMoveUp)
+    local btnUp = ISButton:new(pad + 270, btnY, 60, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Up"), self, self.onMoveUp)
     btnUp:initialise();
     btnUp:instantiate()
     self.controls.btnUp = btnUp
     self:addChild(btnUp)
 
-    local btnDown = ISButton:new(pad + 340, btnY, 60, BUTTON_HGT, "Down", self, self.onMoveDown)
+    local btnDown = ISButton:new(pad + 340, btnY, 60, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Down"), self, self.onMoveDown)
     btnDown:initialise();
     btnDown:instantiate()
     self.controls.btnDown = btnDown
@@ -281,7 +281,7 @@ function UI:openKeyWeightDialog(existingKey, existingWeight, cb)
 
     local pad = 10
 
-    local lblKey = ISLabel:new(pad, pad, FONT_HGT_SMALL, "Pool Key:", 1, 1, 1, 1, UIFont.Small, true)
+    local lblKey = ISLabel:new(pad, pad, FONT_HGT_SMALL, getText("IGUI_PhunMart_Lbl_PoolKey"), 1, 1, 1, 1, UIFont.Small, true)
     lblKey:initialise();
     lblKey:instantiate();
     dlg:addChild(lblKey)
@@ -291,7 +291,7 @@ function UI:openKeyWeightDialog(existingKey, existingWeight, cb)
     txtKey:instantiate();
     dlg:addChild(txtKey)
 
-    local lblW = ISLabel:new(pad, pad * 2 + FONT_HGT_SMALL + 8, FONT_HGT_SMALL, "Weight:", 1, 1, 1, 1, UIFont.Small,
+    local lblW = ISLabel:new(pad, pad * 2 + FONT_HGT_SMALL + 8, FONT_HGT_SMALL, getText("IGUI_PhunMart_Lbl_Weight"), 1, 1, 1, 1, UIFont.Small,
         true)
     lblW:initialise();
     lblW:instantiate();
@@ -303,12 +303,12 @@ function UI:openKeyWeightDialog(existingKey, existingWeight, cb)
     dlg:addChild(txtW)
 
     local hint = ISLabel:new(pad, lblW.y + FONT_HGT_SMALL + pad + 4, FONT_HGT_SMALL,
-        "Weight: relative draw probability, e.g. 1.0 or 0.5", 0.65, 0.65, 0.65, 1, UIFont.Small, true)
+        getText("IGUI_PhunMart_Hint_PoolWeight"), 0.65, 0.65, 0.65, 1, UIFont.Small, true)
     hint:initialise();
     hint:instantiate();
     dlg:addChild(hint)
 
-    local btnOK = ISButton:new(dw - 90 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "OK", dlg, function()
+    local btnOK = ISButton:new(dw - 90 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_OK"), dlg, function()
         local key = txtKey:getText():match("^%s*(.-)%s*$")
         local weight = tonumber(txtW:getText()) or 1.0
         if key ~= "" then
@@ -323,7 +323,7 @@ function UI:openKeyWeightDialog(existingKey, existingWeight, cb)
     end
     dlg:addChild(btnOK)
 
-    local btnCancel = ISButton:new(dw - 180 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "Cancel", dlg, function()
+    local btnCancel = ISButton:new(dw - 180 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Cancel"), dlg, function()
         dlg:removeFromUIManager()
     end)
     btnCancel:initialise();

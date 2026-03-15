@@ -118,7 +118,7 @@ function UI:new(x, y, width, height, player, playerIndex)
     o.player = player
     o.playerIndex = playerIndex
     o:setWantKeyEvents(true)
-    o:setTitle("Item Offer Properties")
+    o:setTitle(getText("IGUI_PhunMart_Title_ItemOfferProps"))
     return o
 end
 
@@ -237,7 +237,7 @@ function UI:createChildren()
     local propsPanel = ISPanel:new(0, 0, tabW, tabPanel.height - HEADER_HGT)
     propsPanel:initialise();
     propsPanel:instantiate()
-    tabPanel:addView("Props", propsPanel)
+    tabPanel:addView(getText("IGUI_PhunMart_Tab_Props"), propsPanel)
     self.controls.propsPanel = propsPanel
 
     local fy = pad
@@ -265,7 +265,7 @@ function UI:createChildren()
     local condPanel = ISPanel:new(0, 0, tabW, tabPanel.height - HEADER_HGT)
     condPanel:initialise();
     condPanel:instantiate()
-    tabPanel:addView("Conditions", condPanel)
+    tabPanel:addView(getText("IGUI_PhunMart_Tab_Conditions"), condPanel)
     self.controls.condPanel = condPanel
 
     self:buildConditionsTab(condPanel, tabW)
@@ -281,7 +281,7 @@ function UI:buildConditionsTab(parent, tabW)
     local listW = tabW - pad * 2
 
     -- "all" section
-    local lblAll = ISLabel:new(pad, pad, FONT_HGT_SMALL, "ALL of these conditions must pass:", 1, 1, 1, 0.85,
+    local lblAll = ISLabel:new(pad, pad, FONT_HGT_SMALL, getText("IGUI_PhunMart_Lbl_AllConditions"), 1, 1, 1, 0.85,
         UIFont.Small, true)
     lblAll:initialise();
     lblAll:instantiate();
@@ -292,7 +292,7 @@ function UI:buildConditionsTab(parent, tabW)
     parent:addChild(listAll)
     self.controls.listAll = listAll
 
-    local btnAddAll = ISButton:new(pad, listAll.y + listAll.height + 4, 80, BUTTON_HGT, "Add", parent, function()
+    local btnAddAll = ISButton:new(pad, listAll.y + listAll.height + 4, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Add"), parent, function()
         self:promptConditionKey(function(key)
             self:addConditionKey("all", key)
         end)
@@ -304,7 +304,7 @@ function UI:buildConditionsTab(parent, tabW)
     end
     parent:addChild(btnAddAll)
 
-    local btnRemAll = ISButton:new(pad + 90, listAll.y + listAll.height + 4, 80, BUTTON_HGT, "Remove", parent,
+    local btnRemAll = ISButton:new(pad + 90, listAll.y + listAll.height + 4, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Remove"), parent,
         function()
             self:removeConditionKey("all")
         end)
@@ -318,7 +318,7 @@ function UI:buildConditionsTab(parent, tabW)
 
     -- "any" section
     local anyY = listAll.y + listAll.height + BUTTON_HGT + pad * 2
-    local lblAny = ISLabel:new(pad, anyY, FONT_HGT_SMALL, "ANY one of these conditions must pass:", 1, 1, 1, 0.85,
+    local lblAny = ISLabel:new(pad, anyY, FONT_HGT_SMALL, getText("IGUI_PhunMart_Lbl_AnyConditions"), 1, 1, 1, 0.85,
         UIFont.Small, true)
     lblAny:initialise();
     lblAny:instantiate();
@@ -329,7 +329,7 @@ function UI:buildConditionsTab(parent, tabW)
     parent:addChild(listAny)
     self.controls.listAny = listAny
 
-    local btnAddAny = ISButton:new(pad, listAny.y + listAny.height + 4, 80, BUTTON_HGT, "Add", parent, function()
+    local btnAddAny = ISButton:new(pad, listAny.y + listAny.height + 4, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Add"), parent, function()
         self:promptConditionKey(function(key)
             self:addConditionKey("any", key)
         end)
@@ -341,7 +341,7 @@ function UI:buildConditionsTab(parent, tabW)
     end
     parent:addChild(btnAddAny)
 
-    local btnRemAny = ISButton:new(pad + 90, listAny.y + listAny.height + 4, 80, BUTTON_HGT, "Remove", parent,
+    local btnRemAny = ISButton:new(pad + 90, listAny.y + listAny.height + 4, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Remove"), parent,
         function()
             self:removeConditionKey("any")
         end)
@@ -364,7 +364,7 @@ function UI:makeConditionList(x, y, w, h)
     list.font = UIFont.NewSmall
     list.drawBorder = true
     list.doDrawItem = self.drawConditionRow
-    list:addColumn("Condition Key", 0)
+    list:addColumn(getText("IGUI_PhunMart_Col_ConditionKey"), 0)
     return list
 end
 
@@ -438,7 +438,7 @@ function UI:promptConditionKey(cb)
     dlg:setAlwaysOnTop(true)
 
     local pad = 10
-    local lbl = ISLabel:new(pad, pad, FONT_HGT_SMALL, "Condition key:", 1, 1, 1, 1, UIFont.Small, true)
+    local lbl = ISLabel:new(pad, pad, FONT_HGT_SMALL, getText("IGUI_PhunMart_Lbl_ConditionKey"), 1, 1, 1, 1, UIFont.Small, true)
     lbl:initialise();
     lbl:instantiate();
     dlg:addChild(lbl)
@@ -448,7 +448,7 @@ function UI:promptConditionKey(cb)
     txt:instantiate();
     dlg:addChild(txt)
 
-    local btnOK = ISButton:new(dw - 90 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "OK", dlg, function()
+    local btnOK = ISButton:new(dw - 90 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_OK"), dlg, function()
         local key = txt:getText():match("^%s*(.-)%s*$")
         if key ~= "" then
             cb(key)
@@ -462,7 +462,7 @@ function UI:promptConditionKey(cb)
     end
     dlg:addChild(btnOK)
 
-    local btnCancel = ISButton:new(dw - 180 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, "Cancel", dlg, function()
+    local btnCancel = ISButton:new(dw - 180 - pad, dh - BUTTON_HGT - pad, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Cancel"), dlg, function()
         dlg:removeFromUIManager()
     end)
     btnCancel:initialise();

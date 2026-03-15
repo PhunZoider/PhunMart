@@ -107,8 +107,8 @@ function UI:createChildren()
     self.datas.font = UIFont.NewSmall;
     self.datas.doDrawItem = self.drawDatas;
     self.datas.drawBorder = true;
-    self.datas:addColumn("Currency", 0);
-    self.datas:addColumn("Value", 200);
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Currency"), 0);
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Value"), 200);
 
     self:addChild(self.datas);
 
@@ -292,5 +292,5 @@ local function addCharacterPageTab(tabName, pageType, label)
     end
 end
 
-addCharacterPageTab("PhunWallet", PhunWalletUI, "Wallet")
+addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
 

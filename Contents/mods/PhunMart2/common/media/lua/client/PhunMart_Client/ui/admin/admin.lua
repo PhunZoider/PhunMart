@@ -28,7 +28,7 @@ function ISAdminPanelUI:create()
     local x = UI_BORDER_SPACING + 1;
     local y = FONT_HGT_MEDIUM + UI_BORDER_SPACING * 2 + 1;
 
-    self.showPhunMartConfigs = ISButton:new(x, y, btnWid, BUTTON_HGT, "** PhunMart **", self, showPhunMartConfigs);
+    self.showPhunMartConfigs = ISButton:new(x, y, btnWid, BUTTON_HGT, getText("IGUI_PhunMart_Admin_PanelBtn"), self, showPhunMartConfigs);
     self.showPhunMartConfigs.internal = "";
     self.showPhunMartConfigs:initialise();
     self.showPhunMartConfigs:instantiate();

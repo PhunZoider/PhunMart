@@ -129,7 +129,7 @@ function UI:new(x, y, width, height, player, playerIndex, shopKey)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    local title = (shopKey and (getTextOrNull("IGUI_PhunMart_Shop_" .. shopKey) or shopKey)) or "Locations"
+    local title = (shopKey and (getTextOrNull("IGUI_PhunMart_Shop_" .. shopKey) or shopKey)) or getText("IGUI_PhunMart_Title_Locations")
     o:setTitle(title)
     return o;
 end
@@ -239,12 +239,12 @@ function UI:createChildren()
         end
     end
 
-    list:addColumn("Shop", 0);
-    list:addColumn("Group", 150);
+    list:addColumn(getText("IGUI_PhunMart_Col_Shop"), 0);
+    list:addColumn(getText("IGUI_PhunMart_Col_Group"), 150);
     self.controls.list = list;
     self.controls._listPanel:addChild(list);
 
-    local btnPort = ISButton:new(0, 10, 100, BUTTON_HGT, "Port", self, function()
+    local btnPort = ISButton:new(0, 10, 100, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Port"), self, function()
         if self.controls.list.selected and self.controls.list.selected > 0 and
             self.controls.list.items[self.controls.list.selected] then
             local item = self.controls.list.items[self.controls.list.selected].item

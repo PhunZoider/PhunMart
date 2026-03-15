@@ -139,10 +139,10 @@ end
 function UI:createChildren()
     ISPanel:createChildren(self);
 
-    local min = self:addLabeledTextbox("min", "Min", "Minimum value", self, 20)
-    local max = self:addLabeledTextbox("max", "Max", "Maximum value", self, 20 + FONT_HGT_SMALL + 4 + 10)
+    local min = self:addLabeledTextbox("min", getText("IGUI_PhunMart_Lbl_Min"), getText("IGUI_PhunMart_Hint_MinValue"), self, 20)
+    local max = self:addLabeledTextbox("max", getText("IGUI_PhunMart_Lbl_Max"), getText("IGUI_PhunMart_Hint_MaxValue"), self, 20 + FONT_HGT_SMALL + 4 + 10)
 
-    local accept = ISButton:new(10, self.height - 10 - FONT_HGT_SMALL - 4, 100, FONT_HGT_SMALL + 4, "Accept", self,
+    local accept = ISButton:new(10, self.height - 10 - FONT_HGT_SMALL - 4, 100, FONT_HGT_SMALL + 4, getText("IGUI_PhunMart_Btn_Accept"), self,
         UI.onAccept);
     accept:initialise();
     accept:instantiate();
@@ -152,7 +152,7 @@ function UI:createChildren()
     self:addChild(accept);
 
     local cancel = ISButton:new(self.width - 10 - 100, self.height - 10 - FONT_HGT_SMALL - 4, 100, FONT_HGT_SMALL + 4,
-        "Cancel", self, UI.onCancel);
+        getText("IGUI_PhunMart_Btn_Cancel"), self, UI.onCancel);
     cancel:initialise();
     cancel:instantiate();
     if cancel.enableCancelColor then

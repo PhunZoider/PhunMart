@@ -96,11 +96,11 @@ function UI:createChildren()
             type = self.listType
         });
     end
-    self.tabPanel:addView("Categories", self.categories)
+    self.tabPanel:addView(getText("IGUI_PhunMart_Tab_Categories"), self.categories)
     if self.blacklist ~= true then
-        self.tabPanel:addView("Inclusions", self.inclusions)
+        self.tabPanel:addView(getText("IGUI_PhunMart_Tab_Inclusions"), self.inclusions)
     end
-    self.tabPanel:addView("Exclusions", self.exclusions)
+    self.tabPanel:addView(getText("IGUI_PhunMart_Tab_Exclusions"), self.exclusions)
 
 end
 function UI:prerender()

@@ -119,7 +119,7 @@ function UI:new(x, y, width, height, player, playerIndex)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    o:setTitle("Shops")
+    o:setTitle(getText("IGUI_PhunMart_Title_Shops"))
     return o;
 end
 
@@ -222,12 +222,12 @@ function UI:createChildren()
     list.onMouseMove = self.doOnMouseMove
     list.onMouseMoveOutside = self.doOnMouseMoveOutside
 
-    list:addColumn("Shop", 0);
-    list:addColumn("In World", 150);
+    list:addColumn(getText("IGUI_PhunMart_Col_Shop"), 0);
+    list:addColumn(getText("IGUI_PhunMart_Col_InWorld"), 150);
     self.controls.list = list;
     self.controls._listPanel:addChild(list);
 
-    local btnClose = ISButton:new(0, 10, 80, BUTTON_HGT, "Close", self, self.close);
+    local btnClose = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Close"), self, self.close);
     btnClose.internal = "CLOSE";
     btnClose:initialise();
     btnClose:instantiate();
@@ -237,7 +237,7 @@ function UI:createChildren()
     self.controls.btnClose = btnClose;
     self.controls._controlPanel:addChild(btnClose);
 
-    local btnConfig = ISButton:new(0, 10, 80, BUTTON_HGT, "Config", self, self.onEdit);
+    local btnConfig = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Config"), self, self.onEdit);
     btnConfig.internal = "EDIT";
     btnConfig:initialise();
     btnConfig:instantiate();
@@ -245,7 +245,7 @@ function UI:createChildren()
     self.controls.btnConfig = btnConfig;
     self.controls._controlPanel:addChild(btnConfig);
 
-    local btnInstances = ISButton:new(0, 10, 80, BUTTON_HGT, "Locations", self, function()
+    local btnInstances = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Locations"), self, function()
         local shop = self.controls.list.items[self.controls.list.selected].item
         if shop and shop.type then
             Core.ui.shop_instances.open(self.player, shop.type)
@@ -258,7 +258,7 @@ function UI:createChildren()
     self.controls.btnInstances = btnInstances;
     self.controls._controlPanel:addChild(btnInstances);
 
-    local btnWallet = ISButton:new(0, 10, 80, BUTTON_HGT, "Wallet", self, function()
+    local btnWallet = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Wallet"), self, function()
         Core.ui.admin.OnOpenPanel(self.player)
     end);
     btnWallet.internal = "WALLET";
@@ -267,7 +267,7 @@ function UI:createChildren()
     self.controls.btnWallet = btnWallet;
     self.controls._controlPanel:addChild(btnWallet);
 
-    local btnCompile = ISButton:new(0, 10, 80, BUTTON_HGT, "Recompile", self, function()
+    local btnCompile = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Recompile"), self, function()
         sendClientCommand(Core.name, Core.commands.compile, {})
     end);
     btnCompile.internal = "COMPILE";
@@ -276,7 +276,7 @@ function UI:createChildren()
     self.controls.btnCompile = btnCompile;
     self.controls._controlPanel:addChild(btnCompile);
 
-    local btnBlacklist = ISButton:new(0, 10, 80, BUTTON_HGT, "Blacklist", self, function()
+    local btnBlacklist = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Blacklist"), self, function()
         if Core.isLocal then
             Core.ui.pools_blacklist_main.OnOpenPanel(self.player, Core.getBlacklist())
         else
@@ -289,7 +289,7 @@ function UI:createChildren()
     self.controls.btnBlacklist = btnBlacklist;
     self.controls._controlPanel:addChild(btnBlacklist);
 
-    local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, "Prices", self, function()
+    local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Prices"), self, function()
         Core.ui.admin_prices.OnOpenPanel(self.player)
     end);
     btnPrices.internal = "PRICES";
@@ -298,7 +298,7 @@ function UI:createChildren()
     self.controls.btnPrices = btnPrices;
     self.controls._controlPanel:addChild(btnPrices);
 
-    local btnItems = ISButton:new(0, 10, 80, BUTTON_HGT, "Items", self, function()
+    local btnItems = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Items"), self, function()
         Core.ui.admin_items.OnOpenPanel(self.player)
     end);
     btnItems.internal = "ITEMS";
@@ -307,7 +307,7 @@ function UI:createChildren()
     self.controls.btnItems = btnItems;
     self.controls._controlPanel:addChild(btnItems);
 
-    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, "Rewards", self, function()
+    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Rewards"), self, function()
         Core.ui.admin_rewards.OnOpenPanel(self.player)
     end);
     btnRewards.internal = "REWARDS";
@@ -316,7 +316,7 @@ function UI:createChildren()
     self.controls.btnRewards = btnRewards;
     self.controls._controlPanel:addChild(btnRewards);
 
-    local btnGroups = ISButton:new(0, 10, 80, BUTTON_HGT, "Groups", self, function()
+    local btnGroups = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Groups"), self, function()
         Core.ui.admin_groups.OnOpenPanel(self.player)
     end);
     btnGroups.internal = "GROUPS";
@@ -325,7 +325,7 @@ function UI:createChildren()
     self.controls.btnGroups = btnGroups;
     self.controls._controlPanel:addChild(btnGroups);
 
-    local btnPools = ISButton:new(0, 10, 80, BUTTON_HGT, "Pools", self, function()
+    local btnPools = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Pools"), self, function()
         Core.ui.admin_pools.OnOpenPanel(self.player)
     end);
     btnPools.internal = "POOLS";

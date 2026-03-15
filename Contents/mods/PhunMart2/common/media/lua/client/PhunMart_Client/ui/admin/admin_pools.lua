@@ -43,10 +43,10 @@ local function formatSources(def)
     local parts = {}
     if def.sources then
         if def.sources.groups then
-            table.insert(parts, #def.sources.groups .. " groups")
+            table.insert(parts, getText("IGUI_PhunMart_NGroups", tostring(#def.sources.groups)))
         end
         if def.sources.rewards then
-            table.insert(parts, #def.sources.rewards .. " rewards")
+            table.insert(parts, getText("IGUI_PhunMart_NRewards", tostring(#def.sources.rewards)))
         end
     end
     if #parts == 0 then
@@ -89,14 +89,14 @@ function EditModal:createChildren()
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Fallback Category: ") + 8
 
     -- Title
-    local titleText = self.isNew and "Add Pool" or ("Edit: " .. self.poolKey)
+    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", self.poolKey)
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, "Key:", 1, 1, 1, 1, UIFont.Small, true)
+    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
     self.keyLabel:initialise()
     self:addChild(self.keyLabel)
 
@@ -110,7 +110,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Default Price combo
-    self.priceLabel = ISLabel:new(x, y, ROW_H, "Price:", 1, 1, 1, 1, UIFont.Small, true)
+    self.priceLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Price"), 1, 1, 1, 1, UIFont.Small, true)
     self.priceLabel:initialise()
     self:addChild(self.priceLabel)
 
@@ -130,14 +130,14 @@ function EditModal:createChildren()
     self:addChild(self.priceCombo)
     y = y + ROW_H + 2
 
-    self.priceHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Fallback price for items in this pool", 0.5, 0.5, 0.5, 1,
+    self.priceHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_FallbackPrice"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.priceHint:initialise()
     self:addChild(self.priceHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Source Groups (comma-separated)
-    self.groupsLabel = ISLabel:new(x, y, ROW_H, "Groups:", 1, 1, 1, 1, UIFont.Small, true)
+    self.groupsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Groups"), 1, 1, 1, 1, UIFont.Small, true)
     self.groupsLabel:initialise()
     self:addChild(self.groupsLabel)
 
@@ -151,14 +151,14 @@ function EditModal:createChildren()
     self:addChild(self.groupsEntry)
     y = y + ROW_H + 2
 
-    self.groupsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Comma-separated list of group keys to include in pool", 0.5, 0.5, 0.5, 1,
+    self.groupsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Groups"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.groupsHint:initialise()
     self:addChild(self.groupsHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Source Rewards (comma-separated)
-    self.rewardsLabel = ISLabel:new(x, y, ROW_H, "Rewards:", 1, 1, 1, 1, UIFont.Small, true)
+    self.rewardsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Rewards"), 1, 1, 1, 1, UIFont.Small, true)
     self.rewardsLabel:initialise()
     self:addChild(self.rewardsLabel)
 
@@ -172,14 +172,14 @@ function EditModal:createChildren()
     self:addChild(self.rewardsEntry)
     y = y + ROW_H + 2
 
-    self.rewardsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Comma-separated reward categories (e.g. trait_add, xp_t1)", 0.5, 0.5, 0.5, 1,
+    self.rewardsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Rewards"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.rewardsHint:initialise()
     self:addChild(self.rewardsHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Roll Mode combo
-    self.modeLabel = ISLabel:new(x, y, ROW_H, "Roll Mode:", 1, 1, 1, 1, UIFont.Small, true)
+    self.modeLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMode"), 1, 1, 1, 1, UIFont.Small, true)
     self.modeLabel:initialise()
     self:addChild(self.modeLabel)
 
@@ -195,14 +195,14 @@ function EditModal:createChildren()
     self:addChild(self.modeCombo)
     y = y + ROW_H + 2
 
-    self.modeHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "How to choose items in pool", 0.5, 0.5, 0.5, 1,
+    self.modeHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMode"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.modeHint:initialise()
     self:addChild(self.modeHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Roll Count Min
-    self.minLabel = ISLabel:new(x, y, ROW_H, "Roll Min:", 1, 1, 1, 1, UIFont.Small, true)
+    self.minLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMin"), 1, 1, 1, 1, UIFont.Small, true)
     self.minLabel:initialise()
     self:addChild(self.minLabel)
 
@@ -216,14 +216,14 @@ function EditModal:createChildren()
     self:addChild(self.minEntry)
     y = y + ROW_H + 2
 
-    self.minHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Minimum number of items per restock", 0.5, 0.5, 0.5, 1,
+    self.minHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMin"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.minHint:initialise()
     self:addChild(self.minHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Roll Count Max
-    self.maxLabel = ISLabel:new(x, y, ROW_H, "Roll Max:", 1, 1, 1, 1, UIFont.Small, true)
+    self.maxLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RollMax"), 1, 1, 1, 1, UIFont.Small, true)
     self.maxLabel:initialise()
     self:addChild(self.maxLabel)
 
@@ -237,14 +237,14 @@ function EditModal:createChildren()
     self:addChild(self.maxEntry)
     y = y + ROW_H + 2
 
-    self.maxHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "Maximum number of items per restock", 0.5, 0.5, 0.5, 1,
+    self.maxHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RollMax"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.maxHint:initialise()
     self:addChild(self.maxHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Zones Difficulty (comma-separated numbers)
-    self.zonesLabel = ISLabel:new(x, y, ROW_H, "Zones:", 1, 1, 1, 1, UIFont.Small, true)
+    self.zonesLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Zones"), 1, 1, 1, 1, UIFont.Small, true)
     self.zonesLabel:initialise()
     self:addChild(self.zonesLabel)
 
@@ -262,14 +262,14 @@ function EditModal:createChildren()
     self:addChild(self.zonesEntry)
     y = y + ROW_H + 2
 
-    self.zonesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "(optional) Comma-separated PhunZones difficulty levels", 0.5, 0.5, 0.5, 1,
+    self.zonesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Zones"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.zonesHint:initialise()
     self:addChild(self.zonesHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Fallback Texture
-    self.fbTexLabel = ISLabel:new(x, y, ROW_H, "Fallback Texture:", 1, 1, 1, 1, UIFont.Small, true)
+    self.fbTexLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_FallbackTexture"), 1, 1, 1, 1, UIFont.Small, true)
     self.fbTexLabel:initialise()
     self:addChild(self.fbTexLabel)
 
@@ -281,7 +281,7 @@ function EditModal:createChildren()
     y = y + ROW_H + PAD
 
     -- Fallback Category
-    self.fbCatLabel = ISLabel:new(x, y, ROW_H, "Fallback Category:", 1, 1, 1, 1, UIFont.Small, true)
+    self.fbCatLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_FallbackCategory"), 1, 1, 1, 1, UIFont.Small, true)
     self.fbCatLabel:initialise()
     self:addChild(self.fbCatLabel)
 
@@ -298,11 +298,11 @@ function EditModal:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, "Apply", self, EditModal.onApply)
+    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, "Cancel", self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end
@@ -568,7 +568,7 @@ function UI:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, "Pool Definitions", 1, 1, 1, 1, UIFont.Medium, true)
+    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_PoolDefs"), 1, 1, 1, 1, UIFont.Medium, true)
     self.title:initialise()
     self.title:instantiate()
     self:addChild(self.title)
@@ -586,15 +586,15 @@ function UI:createChildren()
     local btnW = math.floor(70 * FONT_SCALE)
     local gap = math.floor(5 * FONT_SCALE)
 
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, "Add", self, UI.onAddClick)
+    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
     self.addButton:initialise()
     self:addChild(self.addButton)
 
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, "Edit", self, UI.onEditClick)
+    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
     self.editButton:initialise()
     self:addChild(self.editButton)
 
-    self.viewButton = ISButton:new(x + (btnW + gap) * 2, y, btnW, ROW_H, "View", self, UI.onViewClick)
+    self.viewButton = ISButton:new(x + (btnW + gap) * 2, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_View"), self, UI.onViewClick)
     self.viewButton:initialise()
     self:addChild(self.viewButton)
 
@@ -617,11 +617,11 @@ function UI:createChildren()
     local colSources = math.floor(w * 0.45)
     local colRoll = math.floor(w * 0.70)
     local colZones = math.floor(w * 0.85)
-    self.datas:addColumn("Key", 0)
-    self.datas:addColumn("Price", colPrice)
-    self.datas:addColumn("Sources", colSources)
-    self.datas:addColumn("Roll", colRoll)
-    self.datas:addColumn("Zones", colZones)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Sources"), colSources)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Roll"), colRoll)
+    self.datas:addColumn(getText("IGUI_PhunMart_Col_Zones"), colZones)
     self.datas:setVisible(false)
     self:addChild(self.datas)
 end

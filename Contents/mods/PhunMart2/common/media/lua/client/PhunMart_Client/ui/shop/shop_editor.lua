@@ -74,13 +74,13 @@ function UI:createChildren()
     -- ── Default view toggle ──────────────────────────────────────────────────
     y = y + LH
     local btnW = 70
-    self.gridBtn = ISButton:new(PAD, y - 2, btnW, FH, "Grid", self, UI.onSetViewGrid)
+    self.gridBtn = ISButton:new(PAD, y - 2, btnW, FH, getText("IGUI_PhunMart_Btn_Grid"), self, UI.onSetViewGrid)
     self.gridBtn:initialise()
     self.gridBtn:instantiate()
     self.gridBtn.font = FONT
     self:addChild(self.gridBtn)
 
-    self.listBtn = ISButton:new(PAD + btnW + 6, y - 2, btnW, FH, "List", self, UI.onSetViewList)
+    self.listBtn = ISButton:new(PAD + btnW + 6, y - 2, btnW, FH, getText("IGUI_PhunMart_Btn_List"), self, UI.onSetViewList)
     self.listBtn:initialise()
     self.listBtn:instantiate()
     self.listBtn.font = FONT
@@ -95,7 +95,7 @@ function UI:createChildren()
     local btnH = 28
     local btnY = self.height - btnH - PAD
 
-    self.saveBtn = ISButton:new(PAD, btnY, saveBtnW, btnH, "Save", self, UI.onSave)
+    self.saveBtn = ISButton:new(PAD, btnY, saveBtnW, btnH, getText("IGUI_PhunMart_Btn_Save"), self, UI.onSave)
     self.saveBtn:initialise()
     self.saveBtn:instantiate()
     self.saveBtn.font = FONT
@@ -104,7 +104,7 @@ function UI:createChildren()
     self.saveBtn.borderColor = {r = 0.15, g = 0.65, b = 0.15, a = 1.0}
     self:addChild(self.saveBtn)
 
-    self.cancelBtn = ISButton:new(PAD + saveBtnW + 8, btnY, cancelBtnW, btnH, "Cancel", self, UI.onCancel)
+    self.cancelBtn = ISButton:new(PAD + saveBtnW + 8, btnY, cancelBtnW, btnH, getText("IGUI_PhunMart_Btn_Cancel"), self, UI.onCancel)
     self.cancelBtn:initialise()
     self.cancelBtn:instantiate()
     self.cancelBtn.font = FONT
@@ -189,15 +189,15 @@ end
 function UI:render()
     ISPanel.render(self)
 
-    local title = "Edit Shop: " .. tostring(self.shopType)
+    local title = getText("IGUI_PhunMart_Title_EditShopX", tostring(self.shopType))
     local tw = getTextManager():MeasureStringX(FONT, title)
     self:drawText(title, math.floor((self.width - tw) / 2), math.floor((28 - FONT_HGT) / 2), 0.90, 0.75, 0.35, 1, FONT)
 
     -- field labels (drawn above each input)
     local y = 34
-    self:drawText("Background", PAD, y, 0.60, 0.60, 0.65, 1, FONT)
+    self:drawText(getText("IGUI_PhunMart_Lbl_Background"), PAD, y, 0.60, 0.60, 0.65, 1, FONT)
     y = y + LH + FH + PAD
-    self:drawText("Category", PAD, y, 0.60, 0.60, 0.65, 1, FONT)
+    self:drawText(getText("IGUI_PhunMart_Lbl_Category"), PAD, y, 0.60, 0.60, 0.65, 1, FONT)
     y = y + LH + FH + PAD
-    self:drawText("Default view", PAD, y, 0.60, 0.60, 0.65, 1, FONT)
+    self:drawText(getText("IGUI_PhunMart_Lbl_DefaultView"), PAD, y, 0.60, 0.60, 0.65, 1, FONT)
 end
