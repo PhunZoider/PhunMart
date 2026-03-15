@@ -21,13 +21,41 @@ local instances = {}
 
 function UI:refreshAll()
     self.controls.list:clear()
+    self.controls.list.instanceCounts = {}
     local shops = Core.runtime and Core.runtime.shops or {}
     for shopType, shopDef in pairs(shops) do
         self.controls.list:addItem(getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType, {
             type = shopType,
-            group = shopDef.group or "NONE",
             enabled = shopDef.enabled ~= false
         })
+    end
+
+    -- Fetch instance counts
+    if Core.isLocal then
+        local counts = {}
+        for _, v in pairs(Core.instances or {}) do
+            counts[v.type] = (counts[v.type] or 0) + 1
+        end
+        self.controls.list.instanceCounts = counts
+    else
+        sendClientCommand(Core.name, Core.commands.getInstanceList, {})
+    end
+end
+
+function UI:setInstanceCounts(list)
+    local counts = {}
+    for _, v in ipairs(list) do
+        counts[v.type] = (counts[v.type] or 0) + 1
+    end
+    self.controls.list.instanceCounts = counts
+end
+
+-- Class-level: update all open selector instances with instance counts
+function UI.updateInstanceCounts(list)
+    for _, inst in pairs(instances) do
+        if inst.setInstanceCounts then
+            inst:setInstanceCounts(list)
+        end
     end
 end
 
@@ -195,7 +223,7 @@ function UI:createChildren()
     list.onMouseMoveOutside = self.doOnMouseMoveOutside
 
     list:addColumn("Shop", 0);
-    list:addColumn("Group", 150);
+    list:addColumn("In World", 150);
     self.controls.list = list;
     self.controls._listPanel:addChild(list);
 
@@ -261,6 +289,42 @@ function UI:createChildren()
     self.controls.btnBlacklist = btnBlacklist;
     self.controls._controlPanel:addChild(btnBlacklist);
 
+    local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, "Prices", self, function()
+        Core.ui.admin_prices.OnOpenPanel(self.player)
+    end);
+    btnPrices.internal = "PRICES";
+    btnPrices:initialise();
+    btnPrices:instantiate();
+    self.controls.btnPrices = btnPrices;
+    self.controls._controlPanel:addChild(btnPrices);
+
+    local btnItems = ISButton:new(0, 10, 80, BUTTON_HGT, "Items", self, function()
+        Core.ui.admin_items.OnOpenPanel(self.player)
+    end);
+    btnItems.internal = "ITEMS";
+    btnItems:initialise();
+    btnItems:instantiate();
+    self.controls.btnItems = btnItems;
+    self.controls._controlPanel:addChild(btnItems);
+
+    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, "Rewards", self, function()
+        Core.ui.admin_rewards.OnOpenPanel(self.player)
+    end);
+    btnRewards.internal = "REWARDS";
+    btnRewards:initialise();
+    btnRewards:instantiate();
+    self.controls.btnRewards = btnRewards;
+    self.controls._controlPanel:addChild(btnRewards);
+
+    local btnGroups = ISButton:new(0, 10, 80, BUTTON_HGT, "Groups", self, function()
+        Core.ui.admin_groups.OnOpenPanel(self.player)
+    end);
+    btnGroups.internal = "GROUPS";
+    btnGroups:initialise();
+    btnGroups:instantiate();
+    self.controls.btnGroups = btnGroups;
+    self.controls._controlPanel:addChild(btnGroups);
+
     self:refreshAll()
 end
 
@@ -322,10 +386,18 @@ function UI:prerender()
     self.controls.btnWallet:setVisible(isAdminUser)
     self.controls.btnCompile:setVisible(isAdminUser)
     self.controls.btnBlacklist:setVisible(isAdminUser)
+    self.controls.btnPrices:setVisible(isAdminUser)
+    self.controls.btnItems:setVisible(isAdminUser)
+    self.controls.btnRewards:setVisible(isAdminUser)
+    self.controls.btnGroups:setVisible(isAdminUser)
     if isAdminUser then
         self.controls.btnBlacklist:setX(10)
         self.controls.btnCompile:setX(self.controls.btnBlacklist.x + self.controls.btnBlacklist.width + 10)
         self.controls.btnWallet:setX(self.controls.btnCompile.x + self.controls.btnCompile.width + 10)
+        self.controls.btnPrices:setX(self.controls.btnWallet.x + self.controls.btnWallet.width + 10)
+        self.controls.btnItems:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
+        self.controls.btnRewards:setX(self.controls.btnItems.x + self.controls.btnItems.width + 10)
+        self.controls.btnGroups:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
     end
 
 end
@@ -368,9 +440,9 @@ function UI:drawDatas(y, item, alt)
     self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
-    local value = item.item.group or ""
+    local count = (self.instanceCounts or {})[item.item.type] or 0
     local cw = self.columns[2].size
-    self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
+    self:drawText(tostring(count), cw + 4, y + 4, 0.8, 0.8, 0.8, a, self.font);
     self.itemsHeight = y + self.itemheight;
     return self.itemsHeight;
 end
