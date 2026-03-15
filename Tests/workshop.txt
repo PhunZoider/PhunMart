@@ -68,6 +68,12 @@ description=PhunMart is extremely configurable, but to keep this page readable t
 description=
 description=[url=https://github.com/PhunZoider/PhunMart]PhunMart Customisation Guide[/url]
 description=
+description=[h2]FAQs[/h2]
+description=
+description=
+description=
+description=
+
 description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
 description=
 description=[h2]More Phun Mods[/h2]
