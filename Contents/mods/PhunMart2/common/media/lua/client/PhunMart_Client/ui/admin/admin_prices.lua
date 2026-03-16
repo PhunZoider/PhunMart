@@ -81,9 +81,6 @@ local function formatKind(priceDef)
     else
         base = kind or "?"
     end
-    if priceDef.inherit then
-        base = base .. " <" .. priceDef.inherit
-    end
     return base
 end
 
@@ -289,7 +286,7 @@ function UI.OnOpenPanel(player)
     local instance = UI.instances[playerIndex]
     if not instance then
         local core = getCore()
-        local width = math.floor(420 * FONT_SCALE)
+        local width = math.floor(500 * FONT_SCALE)
         local height = math.floor(450 * FONT_SCALE)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
@@ -312,15 +309,16 @@ function UI:createChildren()
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
     self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.50)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Amount"), 0.72)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.38)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Inherit"), 0.56)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Amount"), 0.76)
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
 end
 
 function UI:getFilterText(itemData)
-    return itemData.key .. " " .. itemData.kind
+    return itemData.key .. " " .. itemData.kind .. " " .. itemData.inherit
 end
 
 function UI:refreshPrices()
@@ -341,6 +339,7 @@ function UI:refreshPrices()
         self:addListItem(key, {
             key = key,
             kind = formatKind(def),
+            inherit = def.inherit or "",
             amount = formatAmount(def),
             def = def
         })
@@ -417,6 +416,7 @@ function UI:drawRow(y, item, alt)
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size
     local col3X = self.columns[3].size
+    local col4X = self.columns[4].size
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
@@ -428,6 +428,13 @@ function UI:drawRow(y, item, alt)
     self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
     self:drawText(data.kind, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
+
+    -- Inherit column
+    if data.inherit ~= "" then
+        self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
+        self:drawText(data.inherit, col3X + 4, textY, 0.6, 0.8, 0.6, a, self.font)
+        self:clearStencilRect()
+    end
 
     -- Amount column (right-aligned, accounting for scrollbar)
     local amountWidth = getTextManager():MeasureStringX(self.font, data.amount)

@@ -66,7 +66,8 @@ description=
 description=[h2]Customisation[/h2]
 description=PhunMart is extremely configurable, but to keep this page readable the full setup and customisation guide lives here:
 description=
-description=[url=https://github.com/PhunZoider/PhunMart]PhunMart Customisation Guide[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/CUSTOMISATION.md]PhunMart Customisation Guide[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ITEM_CURRENCY.md]Using a Physical Item as Currency[/url]
 description=
 description=[list]
 description=[*]What will happen to my customisations moving to the live branch? All customisations you make in PhunMart are saved to your file system so it survives restarts, wipes and even swapping between the Preview and Production version!

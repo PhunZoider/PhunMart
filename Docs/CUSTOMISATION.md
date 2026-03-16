@@ -357,6 +357,13 @@ When checking affordability, the system sums the player's inventory count of the
 plus all substitutes. When deducting, it removes from the primary item first, then from each
 substitute in order until the required amount is met.
 
+### Using a physical item as currency
+
+If you'd rather price shops in a lootable item like `Base.Money` instead of the built-in
+change wallet, you can switch `currency_base` to `kind = "items"` and use the `factor`
+property to scale the entire price tree in one step. See the dedicated guide:
+[Using an Item as Currency](GUIDE_ITEM_CURRENCY.md).
+
 ---
 
 ## 5. Specials
