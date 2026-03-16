@@ -2,33 +2,24 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
+require "ISUI/ISCollapsableWindowJoypad"
 
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_SCALE = FONT_HGT_SMALL / 14
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local PAD = math.max(10, math.floor(10 * FONT_SCALE))
-local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
-local SCROLLBAR_W = 13
+local PAD = ListPanel.PAD
+local ROW_H = ListPanel.ROW_H
+local FONT_SCALE = ListPanel.FONT_SCALE
+local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
+local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
+local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 
 local windowName = "PhunSpecialsAdminUI"
 
-Core.ui.admin_specials = ISPanel:derive(windowName)
+Core.ui.admin_specials = ListPanel:derive(windowName)
 Core.ui.admin_specials.instances = {}
 local UI = Core.ui.admin_specials
-
--- Collect sorted keys from a table.
-local function getSortedKeys(tbl)
-    local keys = {}
-    for k in pairs(tbl) do
-        table.insert(keys, k)
-    end
-    table.sort(keys)
-    return keys
-end
 
 -- Format the kind/inherit column for display.
 local function formatType(def)
@@ -70,26 +61,19 @@ end
 ---------------------------------------------------------------------------
 -- Edit / Add Modal
 ---------------------------------------------------------------------------
-local EditModal = ISPanel:derive("PhunSpecialEditModal")
+local EditModal = ISCollapsableWindowJoypad:derive("PhunSpecialEditModal")
 
 local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens"}
 local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector"}
 
 function EditModal:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = PAD
-    local y = PAD
+    local y = th + PAD
     local w = self.width - PAD * 2
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Action Arg: ") + 8
-
-    -- Title
-    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddSpecial") or
-                          getText("IGUI_PhunMart_Title_EditX", self.specialKey)
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-    y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
     self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
@@ -402,8 +386,7 @@ function EditModal:onCancel()
 end
 
 function EditModal:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
 end
 
 function EditModal:new(specialKey, specialDef, isNew, cb)
@@ -414,7 +397,7 @@ function EditModal:new(specialKey, specialDef, isNew, cb)
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
 
-    local o = ISPanel:new(sx, sy, modalW, modalH)
+    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
     o.specialKey = specialKey or ""
@@ -427,13 +410,12 @@ function EditModal:new(specialKey, specialDef, isNew, cb)
         b = 0.1,
         a = 0.95
     }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
-    o.moveWithMouse = true
+    o.resizable = false
+
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddSpecial") or
+                          getText("IGUI_PhunMart_Title_EditX", specialKey or "")
+    o.title = titleText
+
     return o
 end
 
@@ -451,6 +433,8 @@ function UI.OnOpenPanel(player)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
         instance = UI:new(x, y, width, height, player)
+        instance:setTitle(getText("IGUI_PhunMart_Title_SpecialDefs"))
+        instance.description = getText("IGUI_PhunMart_Desc_SpecialDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
@@ -460,9 +444,32 @@ function UI.OnOpenPanel(player)
     return instance
 end
 
+function UI:createChildren()
+    ListPanel.createChildren(self)
+
+    -- Columns: Key, Type, Display, Action
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Type"), 0.32)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Display"), 0.55)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Action"), 0.78)
+
+    -- Custom row drawing
+    self.list.doDrawItem = self.drawRow
+
+    -- Double-click to edit
+    self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
+
+    -- Bottom buttons
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), UI.onAddClick, false)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
+end
+
+function UI:getFilterText(itemData)
+    return (itemData.key or "") .. " " .. (itemData.typeCol or "") .. " " .. (itemData.action or "")
+end
+
 function UI:refreshSpecials()
-    self.datas:clear()
-    self.datas:setVisible(false)
+    self:clearList()
 
     local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
 
@@ -474,7 +481,7 @@ function UI:refreshSpecials()
 
     for _, key in ipairs(keys) do
         local def = specials[key]
-        self.datas:addItem(key, {
+        self:addListItem(key, {
             key = key,
             typeCol = formatType(def),
             display = formatDisplay(def),
@@ -482,7 +489,6 @@ function UI:refreshSpecials()
             def = def
         })
     end
-    self.datas:setVisible(true)
 end
 
 local function saveSpecialDef(self, key, def)
@@ -506,10 +512,10 @@ function UI:onAddClick()
 end
 
 function UI:onEditClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    if not self.list.selected or self.list.selected == 0 then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
+    local selectedItem = self.list.items[self.list.selected]
     if not selectedItem then
         return
     end
@@ -522,7 +528,7 @@ function UI:onEditClick()
     modal:bringToTop()
 end
 
-function UI:GridDoubleClick(item)
+function UI:onDoubleClick(item)
     local data = item
     local modal = EditModal:new(data.key, data.def, false, function(key, def)
         saveSpecialDef(self, key, def)
@@ -532,69 +538,7 @@ function UI:GridDoubleClick(item)
     modal:bringToTop()
 end
 
-function UI:createChildren()
-    ISPanel.createChildren(self)
-
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
-
-    -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_SpecialDefs"), 1, 1, 1, 1,
-        UIFont.Medium, true)
-    self.title:initialise()
-    self.title:instantiate()
-    self:addChild(self.title)
-
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        self:close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
-
-    y = y + FONT_HGT_MEDIUM + PAD
-
-    -- Toolbar: Add / Edit buttons
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
-    self.addButton:initialise()
-    self:addChild(self.addButton)
-
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self,
-        UI.onEditClick)
-    self.editButton:initialise()
-    self:addChild(self.editButton)
-
-    y = y + ROW_H + PAD + tools.HEADER_HGT
-
-    -- Data list
-    local listH = self.height - y - PAD
-    self.datas = ISScrollingListBox:new(x, y, w, listH)
-    self.datas:initialise()
-    self.datas:instantiate()
-    self.datas.itemheight = FONT_HGT_MEDIUM + math.floor(8 * FONT_SCALE)
-    self.datas.selected = 0
-    self.datas.joypadParent = self
-    self.datas.font = UIFont.NewSmall
-    self.datas.doDrawItem = self.drawDatas
-    self.datas.drawBorder = true
-    self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-
-    local colType = math.floor(w * 0.32)
-    local colDisplay = math.floor(w * 0.55)
-    local colAction = math.floor(w * 0.78)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Type"), colType)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Display"), colDisplay)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Action"), colAction)
-    self.datas:setVisible(false)
-    self:addChild(self.datas)
-end
-
-function UI:drawDatas(y, item, alt)
+function UI:drawRow(y, item, alt)
     if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
         return y + self.itemheight
     end
@@ -621,7 +565,7 @@ function UI:drawDatas(y, item, alt)
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
-    -- Key column
+    -- Key column (gold for templates)
     local isTemplate = data.def and data.def.template
     local keyR, keyG, keyB = 1, 1, 1
     if isTemplate then
@@ -652,29 +596,6 @@ function UI:drawDatas(y, item, alt)
 end
 
 function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
-end
-
-function UI:new(x, y, width, height, player)
-    local o = ISPanel:new(x, y, width, height, player)
-    setmetatable(o, self)
-    self.__index = self
-    o.player = player
-    o.playerIndex = player:getPlayerNum()
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    }
-    o.moveWithMouse = true
-    return o
 end

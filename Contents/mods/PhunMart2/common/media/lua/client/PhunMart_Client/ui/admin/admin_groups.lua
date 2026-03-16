@@ -2,25 +2,22 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
-
 local Core = PhunMart
-local tools = require "PhunMart_Client/ui/ui_utils"
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_SCALE = FONT_HGT_SMALL / 14
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
+local CategoryPicker = require "PhunMart_Client/ui/base/category_picker"
+local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 
-local PAD = math.max(10, math.floor(10 * FONT_SCALE))
-local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
-local SCROLLBAR_W = 13
+local PAD = ListPanel.PAD
+local ROW_H = ListPanel.ROW_H
+local FONT_SCALE = ListPanel.FONT_SCALE
+local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
+local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
+local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 
-local windowName = "PhunGroupsAdminUI"
+---------------------------------------------------------------------------
+-- Helpers
+---------------------------------------------------------------------------
 
-Core.ui.admin_groups = ISPanel:derive(windowName)
-Core.ui.admin_groups.instances = {}
-local UI = Core.ui.admin_groups
-
--- Collect sorted keys from a table.
 local function getSortedKeys(tbl)
     local keys = {}
     for k in pairs(tbl) do
@@ -81,22 +78,16 @@ end
 ---------------------------------------------------------------------------
 -- Edit / Add Modal
 ---------------------------------------------------------------------------
-local EditModal = ISPanel:derive("PhunGroupEditModal")
+local EditModal = ISCollapsableWindowJoypad:derive("PhunGroupEditModal")
 
 function EditModal:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = PAD
-    local y = PAD
+    local y = th + PAD
     local w = self.width - PAD * 2
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Blacklist Cats: ") + 8
-
-    -- Title
-    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddGroup") or getText("IGUI_PhunMart_Title_EditX", self.groupKey)
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-    y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
     self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
@@ -157,7 +148,7 @@ function EditModal:createChildren()
     self:addChild(self.priceHint)
     y = y + FONT_HGT_SMALL + PAD
 
-    -- Default Reward combo (optional — used by vehicle groups)
+    -- Default Reward combo (optional -- used by vehicle groups)
     self.specialLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Special"), 1, 1, 1, 1, UIFont.Small, true)
     self.specialLabel:initialise()
     self:addChild(self.specialLabel)
@@ -205,87 +196,100 @@ function EditModal:createChildren()
     self:addChild(self.weightHint)
     y = y + FONT_HGT_SMALL + PAD
 
-    -- Include Categories (comma-separated text entry)
+    -- Include Categories (picker)
     self.catsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Categories"), 1, 1, 1, 1, UIFont.Small, true)
     self.catsLabel:initialise()
     self:addChild(self.catsLabel)
 
-    local catsDefault = ""
+    self._selectedCats = {}
     if self.groupDef and self.groupDef.include and self.groupDef.include.categories then
-        catsDefault = table.concat(self.groupDef.include.categories, ", ")
+        for _, c in ipairs(self.groupDef.include.categories) do
+            table.insert(self._selectedCats, c)
+        end
     end
-    self.catsEntry = ISTextEntryBox:new(catsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.catsEntry:initialise()
-    self.catsEntry:instantiate()
-    self:addChild(self.catsEntry)
-    y = y + ROW_H + 2
 
-    self.catsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_DisplayCategories"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.catsHint:initialise()
-    self:addChild(self.catsHint)
-    y = y + FONT_HGT_SMALL + PAD
+    local pickBtnW = math.max(math.floor(60 * FONT_SCALE),
+        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
+    self.catsPickBtn = ISButton:new(x + w - pickBtnW, y, pickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickCats)
+    self.catsPickBtn:initialise()
+    self:addChild(self.catsPickBtn)
 
-    -- Include Items (comma-separated text entry)
+    self.catsDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+    self.catsDisplay:initialise()
+    self:addChild(self.catsDisplay)
+    self:refreshCatsDisplay()
+    y = y + ROW_H + PAD
+
+    -- Include Items (picker)
     self.itemsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Items"), 1, 1, 1, 1, UIFont.Small, true)
     self.itemsLabel:initialise()
     self:addChild(self.itemsLabel)
 
-    local itemsDefault = ""
+    self._selectedItems = {}
     if self.groupDef and self.groupDef.include and self.groupDef.include.items then
-        itemsDefault = table.concat(self.groupDef.include.items, ", ")
+        for _, item in ipairs(self.groupDef.include.items) do
+            table.insert(self._selectedItems, item)
+        end
     end
-    self.itemsEntry = ISTextEntryBox:new(itemsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.itemsEntry:initialise()
-    self.itemsEntry:instantiate()
-    self:addChild(self.itemsEntry)
-    y = y + ROW_H + 2
 
-    local itemCount = 0
-    if self.groupDef and self.groupDef.include and self.groupDef.include.items then
-        itemCount = #self.groupDef.include.items
-    end
-    self.itemsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL,
-        getText("IGUI_PhunMart_Hint_ItemIDs", tostring(itemCount)), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
-    self.itemsHint:initialise()
-    self:addChild(self.itemsHint)
-    y = y + FONT_HGT_SMALL + PAD
+    local itemPickBtnW = math.max(math.floor(60 * FONT_SCALE),
+        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
+    self.itemsPickBtn = ISButton:new(x + w - itemPickBtnW, y, itemPickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickItems)
+    self.itemsPickBtn:initialise()
+    self:addChild(self.itemsPickBtn)
 
-    -- Blacklist items (comma-separated text entry)
+    self.itemsDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+    self.itemsDisplay:initialise()
+    self:addChild(self.itemsDisplay)
+    self:refreshItemsDisplay()
+    y = y + ROW_H + PAD
+
+    -- Blacklist items (picker)
     self.blLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_BlacklistItems"), 1, 1, 1, 1, UIFont.Small, true)
     self.blLabel:initialise()
     self:addChild(self.blLabel)
 
-    local blDefault = ""
+    self._selectedBlItems = {}
     if self.groupDef and self.groupDef.blacklist then
-        blDefault = table.concat(self.groupDef.blacklist, ", ")
+        for _, item in ipairs(self.groupDef.blacklist) do
+            table.insert(self._selectedBlItems, item)
+        end
     end
-    self.blEntry = ISTextEntryBox:new(blDefault, x + labelW, y, w - labelW, ROW_H)
-    self.blEntry:initialise()
-    self.blEntry:instantiate()
-    self:addChild(self.blEntry)
-    y = y + ROW_H + 2
 
-    local blCount = self.groupDef and self.groupDef.blacklist and #self.groupDef.blacklist or 0
-    self.blHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL,
-        getText("IGUI_PhunMart_Hint_ItemIDs", tostring(blCount)), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
-    self.blHint:initialise()
-    self:addChild(self.blHint)
-    y = y + FONT_HGT_SMALL + PAD
+    local blItemPickBtnW = math.max(math.floor(60 * FONT_SCALE),
+        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
+    self.blPickBtn = ISButton:new(x + w - blItemPickBtnW, y, blItemPickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickBlItems)
+    self.blPickBtn:initialise()
+    self:addChild(self.blPickBtn)
 
-    -- Blacklist Categories (comma-separated text entry)
+    self.blDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+    self.blDisplay:initialise()
+    self:addChild(self.blDisplay)
+    self:refreshBlItemsDisplay()
+    y = y + ROW_H + PAD
+
+    -- Blacklist Categories (picker)
     self.blCatsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_BlacklistCats"), 1, 1, 1, 1, UIFont.Small, true)
     self.blCatsLabel:initialise()
     self:addChild(self.blCatsLabel)
 
-    local blCatsDefault = ""
+    self._selectedBlCats = {}
     if self.groupDef and self.groupDef.blacklistCategories then
-        blCatsDefault = table.concat(self.groupDef.blacklistCategories, ", ")
+        for _, c in ipairs(self.groupDef.blacklistCategories) do
+            table.insert(self._selectedBlCats, c)
+        end
     end
-    self.blCatsEntry = ISTextEntryBox:new(blCatsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.blCatsEntry:initialise()
-    self.blCatsEntry:instantiate()
-    self:addChild(self.blCatsEntry)
+
+    local blPickBtnW = math.max(math.floor(60 * FONT_SCALE),
+        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
+    self.blCatsPickBtn = ISButton:new(x + w - blPickBtnW, y, blPickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickBlCats)
+    self.blCatsPickBtn:initialise()
+    self:addChild(self.blCatsPickBtn)
+
+    self.blCatsDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+    self.blCatsDisplay:initialise()
+    self:addChild(self.blCatsDisplay)
+    self:refreshBlCatsDisplay()
     y = y + ROW_H + PAD * 2
 
     -- Buttons
@@ -298,27 +302,82 @@ function EditModal:createChildren()
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
+        EditModal.onCancel)
     self.cancelBtn:initialise()
+    if self.cancelBtn.enableCancelColor then
+        self.cancelBtn:enableCancelColor()
+    end
     self:addChild(self.cancelBtn)
 end
 
--- Parse a comma-separated string into a trimmed array. Returns nil for empty input.
-local function parseCSV(text)
-    if not text or text == "" then
-        return nil
+function EditModal:refreshCatsDisplay()
+    local text = #self._selectedCats > 0 and table.concat(self._selectedCats, ", ") or getText("IGUI_PhunMart_Lbl_None")
+    self.catsDisplay:setName(text)
+end
+
+function EditModal:refreshBlCatsDisplay()
+    local text = #self._selectedBlCats > 0 and table.concat(self._selectedBlCats, ", ") or getText("IGUI_PhunMart_Lbl_None")
+    self.blCatsDisplay:setName(text)
+end
+
+function EditModal:onPickCats()
+    local modal = self
+    CategoryPicker.open(getSpecificPlayer(0), self._selectedCats, function(keys)
+        modal._selectedCats = keys or {}
+        modal:refreshCatsDisplay()
+    end)
+end
+
+-- Format a list of item keys as "Name1, Name2, Name3 and X others" or "(none)".
+local function formatItemList(keys)
+    local count = #keys
+    if count == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
     end
-    local result = {}
-    for s in text:gmatch("[^,]+") do
-        s = s:match("^%s*(.-)%s*$")
-        if s ~= "" then
-            table.insert(result, s)
-        end
+    local names = {}
+    local limit = math.min(count, 3)
+    for i = 1, limit do
+        local si = getScriptManager():getItem(keys[i])
+        names[i] = si and si:getDisplayName() or keys[i]
     end
-    if #result == 0 then
-        return nil
+    local text = table.concat(names, ", ")
+    if count > 3 then
+        text = text .. " +" .. tostring(count - 3) .. " more"
     end
-    return result
+    return text
+end
+
+function EditModal:refreshItemsDisplay()
+    self.itemsDisplay:setName(formatItemList(self._selectedItems))
+end
+
+function EditModal:refreshBlItemsDisplay()
+    self.blDisplay:setName(formatItemList(self._selectedBlItems))
+end
+
+function EditModal:onPickItems()
+    local modal = self
+    ItemPicker.open(getSpecificPlayer(0), self._selectedItems, function(keys)
+        modal._selectedItems = keys or {}
+        modal:refreshItemsDisplay()
+    end)
+end
+
+function EditModal:onPickBlItems()
+    local modal = self
+    ItemPicker.open(getSpecificPlayer(0), self._selectedBlItems, function(keys)
+        modal._selectedBlItems = keys or {}
+        modal:refreshBlItemsDisplay()
+    end)
+end
+
+function EditModal:onPickBlCats()
+    local modal = self
+    CategoryPicker.open(getSpecificPlayer(0), self._selectedBlCats, function(keys)
+        modal._selectedBlCats = keys or {}
+        modal:refreshBlCatsDisplay()
+    end)
 end
 
 function EditModal:onApply()
@@ -356,8 +415,8 @@ function EditModal:onApply()
     end
 
     -- Include
-    local cats = parseCSV(self.catsEntry:getText())
-    local items = parseCSV(self.itemsEntry:getText())
+    local cats = #self._selectedCats > 0 and self._selectedCats or nil
+    local items = #self._selectedItems > 0 and self._selectedItems or nil
     if cats or items then
         def.include = {}
         if cats then
@@ -369,15 +428,13 @@ function EditModal:onApply()
     end
 
     -- Blacklist
-    local bl = parseCSV(self.blEntry:getText())
-    if bl then
-        def.blacklist = bl
+    if #self._selectedBlItems > 0 then
+        def.blacklist = self._selectedBlItems
     end
 
     -- Blacklist categories
-    local blCats = parseCSV(self.blCatsEntry:getText())
-    if blCats then
-        def.blacklistCategories = blCats
+    if #self._selectedBlCats > 0 then
+        def.blacklistCategories = self._selectedBlCats
     end
 
     if self.cb then
@@ -391,11 +448,6 @@ function EditModal:onCancel()
     self:close()
 end
 
-function EditModal:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
-end
-
 function EditModal:new(groupKey, groupDef, isNew, cb)
     local modalW = math.floor(480 * FONT_SCALE)
     local modalH = PAD * 14 + FONT_HGT_MEDIUM + ROW_H * 10 + FONT_HGT_SMALL * 8 + PAD * 4
@@ -403,32 +455,27 @@ function EditModal:new(groupKey, groupDef, isNew, cb)
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
 
-    local o = ISPanel:new(sx, sy, modalW, modalH)
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddGroup") or getText("IGUI_PhunMart_Title_EditX", groupKey or "")
+
+    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
     o.groupKey = groupKey or ""
     o.groupDef = groupDef
     o.isNew = isNew
     o.cb = cb
-    o.backgroundColor = {
-        r = 0.1,
-        g = 0.1,
-        b = 0.1,
-        a = 0.95
-    }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
-    o.moveWithMouse = true
+    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0.8}
+    o:setTitle(titleText)
     return o
 end
 
 ---------------------------------------------------------------------------
--- Main Groups Panel
+-- Main Groups Panel (ListPanel subclass)
 ---------------------------------------------------------------------------
+
+Core.ui.admin_groups = ListPanel:derive("PhunGroupsAdminUI")
+Core.ui.admin_groups.instances = {}
+local UI = Core.ui.admin_groups
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -440,6 +487,8 @@ function UI.OnOpenPanel(player)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
         instance = UI:new(x, y, width, height, player)
+        instance:setTitle(getText("IGUI_PhunMart_Title_GroupDefs"))
+        instance.description = getText("IGUI_PhunMart_Desc_GroupDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
@@ -469,9 +518,28 @@ function UI.OnEditGroup(player, groupKey)
     modal:bringToTop()
 end
 
+function UI:createChildren()
+    ListPanel.createChildren(self)
+
+    self.list.doDrawItem = self.drawRow
+    self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
+
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.25)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Include"), 0.42)
+    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.75)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.87)
+
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+end
+
+function UI:getFilterText(itemData)
+    return itemData.key .. " " .. itemData.price .. " " .. itemData.include
+end
+
 function UI:refreshGroups()
-    self.datas:clear()
-    self.datas:setVisible(false)
+    self:clearList()
 
     local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
 
@@ -483,7 +551,7 @@ function UI:refreshGroups()
 
     for _, key in ipairs(keys) do
         local def = groups[key]
-        self.datas:addItem(key, {
+        self:addListItem(key, {
             key = key,
             price = formatPrice(def),
             include = formatInclude(def),
@@ -492,7 +560,6 @@ function UI:refreshGroups()
             def = def
         })
     end
-    self.datas:setVisible(true)
 end
 
 local function saveGroupDef(self, key, def)
@@ -513,10 +580,10 @@ function UI:onAddClick()
 end
 
 function UI:onEditClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    if not self.list.selected or self.list.selected == 0 then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
+    local selectedItem = self.list.items[self.list.selected]
     if not selectedItem then
         return
     end
@@ -529,9 +596,8 @@ function UI:onEditClick()
     modal:bringToTop()
 end
 
-function UI:GridDoubleClick(item)
-    local data = item
-    local modal = EditModal:new(data.key, data.def, false, function(key, def)
+function UI:onDoubleClick(item)
+    local modal = EditModal:new(item.key, item.def, false, function(key, def)
         saveGroupDef(self, key, def)
     end)
     modal:initialise()
@@ -539,69 +605,12 @@ function UI:GridDoubleClick(item)
     modal:bringToTop()
 end
 
-function UI:createChildren()
-    ISPanel.createChildren(self)
-
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
-
-    -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_GroupDefs"), 1, 1, 1, 1, UIFont.Medium, true)
-    self.title:initialise()
-    self.title:instantiate()
-    self:addChild(self.title)
-
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        self:close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
-
-    y = y + FONT_HGT_MEDIUM + PAD
-
-    -- Toolbar: Add / Edit buttons
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
-    self.addButton:initialise()
-    self:addChild(self.addButton)
-
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
-    self.editButton:initialise()
-    self:addChild(self.editButton)
-
-    y = y + ROW_H + PAD + tools.HEADER_HGT
-
-    -- Data list
-    local listH = self.height - y - PAD
-    self.datas = ISScrollingListBox:new(x, y, w, listH)
-    self.datas:initialise()
-    self.datas:instantiate()
-    self.datas.itemheight = FONT_HGT_MEDIUM + math.floor(8 * FONT_SCALE)
-    self.datas.selected = 0
-    self.datas.joypadParent = self
-    self.datas.font = UIFont.NewSmall
-    self.datas.doDrawItem = self.drawDatas
-    self.datas.drawBorder = true
-    self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-
-    local colPrice = math.floor(w * 0.25)
-    local colInclude = math.floor(w * 0.42)
-    local colBlacklist = math.floor(w * 0.75)
-    local colWeight = math.floor(w * 0.87)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Include"), colInclude)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_BL"), colBlacklist)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Weight"), colWeight)
-    self.datas:setVisible(false)
-    self:addChild(self.datas)
+function UI:close()
+    ISCollapsableWindowJoypad.close(self)
+    UI.instances[self.playerIndex] = nil
 end
 
-function UI:drawDatas(y, item, alt)
+function UI:drawRow(y, item, alt)
     if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
         return y + self.itemheight
     end
@@ -652,37 +661,8 @@ function UI:drawDatas(y, item, alt)
     self:clearStencilRect()
 
     -- Weight column
-    local rightEdge = self.width - SCROLLBAR_W
     self:drawText(data.weight, col5X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
 
     self.itemsHeight = y + self.itemheight
     return self.itemsHeight
-end
-
-function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
-    UI.instances[self.playerIndex] = nil
-end
-
-function UI:new(x, y, width, height, player)
-    local o = ISPanel:new(x, y, width, height, player)
-    setmetatable(o, self)
-    self.__index = self
-    o.player = player
-    o.playerIndex = player:getPlayerNum()
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    }
-    o.moveWithMouse = true
-    return o
 end

@@ -65,7 +65,7 @@ function UI.open(player)
 
     if not instance then
         local core = getCore()
-        local width = 600 * FONT_SCALE
+        local width = 350 * FONT_SCALE
         local height = 300 * FONT_SCALE
 
         local x = (core:getScreenWidth() - width) / 2
@@ -205,18 +205,15 @@ function UI:createChildren()
         list.selected = row
     end
 
-    list.onRightMouseUp = function(target, x, y, a, b)
+    list.onRightMouseUp = function(target, x, y)
         local row = target:rowAt(x, y)
         if row == -1 then
             return
         end
-        if self.selected ~= row then
-            self.selected = row
-            target.selected = row
-            target:ensureVisible(target.selected)
-        end
-        local item = target.items[target.selected].item
-
+        target.selected = row
+        target:ensureVisible(row)
+        local item = target.items[row].item
+        self:onRowContextMenu(item, target:getAbsoluteX() + x, target:getAbsoluteY() + y)
     end
     list.drawBorder = true;
     list.onMouseMove = self.doOnMouseMove
@@ -237,117 +234,13 @@ function UI:createChildren()
     self.controls.btnClose = btnClose;
     self.controls._controlPanel:addChild(btnClose);
 
-    local btnConfig = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Config"), self, self.onEdit);
-    btnConfig.internal = "EDIT";
-    btnConfig:initialise();
-    btnConfig:instantiate();
-    btnConfig:setEnable(false);
-    self.controls.btnConfig = btnConfig;
-    self.controls._controlPanel:addChild(btnConfig);
-
-    local btnInstances = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Locations"), self, function()
-        local shop = self.controls.list.items[self.controls.list.selected].item
-        if shop and shop.type then
-            Core.ui.shop_instances.open(self.player, shop.type)
-        end
-    end);
-    btnInstances.internal = "INSTANCES";
-    btnInstances:initialise();
-    btnInstances:instantiate();
-    btnInstances:setEnable(false);
-    self.controls.btnInstances = btnInstances;
-    self.controls._controlPanel:addChild(btnInstances);
-
-    local btnWallet = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Wallet"), self, function()
-        Core.ui.admin.OnOpenPanel(self.player)
-    end);
-    btnWallet.internal = "WALLET";
-    btnWallet:initialise();
-    btnWallet:instantiate();
-    self.controls.btnWallet = btnWallet;
-    self.controls._controlPanel:addChild(btnWallet);
-
-    local btnRewards = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Rewards"), self, function()
-        Core.ui.admin_rewards.OnOpenPanel(self.player)
-    end);
-    btnRewards.internal = "REWARDS";
-    btnRewards:initialise();
-    btnRewards:instantiate();
-    self.controls.btnRewards = btnRewards;
-    self.controls._controlPanel:addChild(btnRewards);
-
-    local btnCompile = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Recompile"), self, function()
-        sendClientCommand(Core.name, Core.commands.compile, {})
-    end);
-    btnCompile.internal = "COMPILE";
-    btnCompile:initialise();
-    btnCompile:instantiate();
-    self.controls.btnCompile = btnCompile;
-    self.controls._controlPanel:addChild(btnCompile);
-
-    local btnRestockAll = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
-        local w = 300
-        local h = 150
-        local modal = ISModalDialog:new(
-            getCore():getScreenWidth() / 2 - w / 2,
-            getCore():getScreenHeight() / 2 - h / 2,
-            w, h,
-            getText("IGUI_PhunMart_Confirm_RestockAll"),
-            true, self, self.onConfirmRestockAll)
-        modal:initialise()
-        modal:addToUIManager()
-    end);
-    btnRestockAll.internal = "RESTOCKALL";
-    btnRestockAll:initialise();
-    btnRestockAll:instantiate();
-    self.controls.btnRestockAll = btnRestockAll;
-    self.controls._controlPanel:addChild(btnRestockAll);
-
-
-    local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Prices"), self, function()
-        Core.ui.admin_prices.OnOpenPanel(self.player)
-    end);
-    btnPrices.internal = "PRICES";
-    btnPrices:initialise();
-    btnPrices:instantiate();
-    self.controls.btnPrices = btnPrices;
-    self.controls._controlPanel:addChild(btnPrices);
-
-    local btnItems = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Items"), self, function()
-        Core.ui.admin_items.OnOpenPanel(self.player)
-    end);
-    btnItems.internal = "ITEMS";
-    btnItems:initialise();
-    btnItems:instantiate();
-    self.controls.btnItems = btnItems;
-    self.controls._controlPanel:addChild(btnItems);
-
-    local btnSpecials = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Specials"), self, function()
-        Core.ui.admin_specials.OnOpenPanel(self.player)
-    end);
-    btnSpecials.internal = "SPECIALS";
-    btnSpecials:initialise();
-    btnSpecials:instantiate();
-    self.controls.btnSpecials = btnSpecials;
-    self.controls._controlPanel:addChild(btnSpecials);
-
-    local btnGroups = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Groups"), self, function()
-        Core.ui.admin_groups.OnOpenPanel(self.player)
-    end);
-    btnGroups.internal = "GROUPS";
-    btnGroups:initialise();
-    btnGroups:instantiate();
-    self.controls.btnGroups = btnGroups;
-    self.controls._controlPanel:addChild(btnGroups);
-
-    local btnPools = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Pools"), self, function()
-        Core.ui.admin_pools.OnOpenPanel(self.player)
-    end);
-    btnPools.internal = "POOLS";
-    btnPools:initialise();
-    btnPools:instantiate();
-    self.controls.btnPools = btnPools;
-    self.controls._controlPanel:addChild(btnPools);
+    local btnAdmin = ISButton:new(0, 10, 100, BUTTON_HGT, getText("IGUI_PhunMart_Btn_AdminTools"), self,
+        self.onAdminToolsMenu);
+    btnAdmin.internal = "ADMIN";
+    btnAdmin:initialise();
+    btnAdmin:instantiate();
+    self.controls.btnAdmin = btnAdmin;
+    self.controls._controlPanel:addChild(btnAdmin);
 
     self:refreshAll()
 end
@@ -367,6 +260,57 @@ function UI:onEdit(item)
     if shop and shop.type then
         Core.ui.admin_shops.OnOpenPanel(self.player, shop.type)
     end
+end
+
+function UI:onRowContextMenu(item, screenX, screenY)
+    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    context:addOption(getText("IGUI_PhunMart_Btn_Locations"), self, function()
+        Core.ui.shop_instances.open(self.player, item.type)
+    end)
+    if isAdmin() or isDebugEnabled() then
+        context:addOption(getText("IGUI_PhunMart_Btn_Config"), self, function()
+            Core.ui.admin_shops.OnOpenPanel(self.player, item.type)
+        end)
+    end
+end
+
+function UI:onAdminToolsMenu(btn)
+    local screenX = btn:getAbsoluteX()
+    local screenY = btn:getAbsoluteY()
+
+    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    context:addOption(getText("IGUI_PhunMart_Btn_Pools"), self, function()
+        Core.ui.admin_pools.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Groups"), self, function()
+        Core.ui.admin_groups.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Specials"), self, function()
+        Core.ui.admin_specials.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Items"), self, function()
+        Core.ui.admin_items.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Prices"), self, function()
+        Core.ui.admin_prices.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
+        Core.ui.admin.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Rewards"), self, function()
+        Core.ui.admin_rewards.OnOpenPanel(self.player)
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_Recompile"), self, function()
+        sendClientCommand(Core.name, Core.commands.compile, {})
+    end)
+    context:addOption(getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
+        local w = 300
+        local h = 150
+        local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - w / 2, getCore():getScreenHeight() / 2 - h / 2,
+            w, h, getText("IGUI_PhunMart_Confirm_RestockAll"), true, self, self.onConfirmRestockAll)
+        modal:initialise()
+        modal:addToUIManager()
+    end)
 end
 
 function UI:onConfirmRestockAll(button)
@@ -399,39 +343,15 @@ function UI:prerender()
     self.controls._controlPanel:setHeight(BUTTON_HGT + 20)
     self.controls._controlPanel:setY(self.controls._controlPanel.parent.height - self.controls._controlPanel.height)
 
-    -- right side: Close, Locations
+    -- right side: Close
     self.controls.btnClose:setX(self.controls.btnClose.parent.width - self.controls.btnClose.width - 10)
-    self.controls.btnClose:setEnable(self.controls.list.selected > 0)
 
-    self.controls.btnInstances:setX(self.controls.btnClose.x - self.controls.btnInstances.width - 10)
-    self.controls.btnInstances:setEnable(self.controls.list.selected > 0)
-
-    -- admin buttons (left side, visible only for admins)
+    -- left side: Admin Tools (admin only)
     local isAdminUser = isAdmin() or isDebugEnabled()
-    self.controls.btnConfig:setVisible(isAdminUser)
-    self.controls.btnPools:setVisible(isAdminUser)
-    self.controls.btnGroups:setVisible(isAdminUser)
-    self.controls.btnSpecials:setVisible(isAdminUser)
-    self.controls.btnItems:setVisible(isAdminUser)
-    self.controls.btnPrices:setVisible(isAdminUser)
-    self.controls.btnWallet:setVisible(isAdminUser)
-    self.controls.btnRewards:setVisible(isAdminUser)
-    self.controls.btnCompile:setVisible(isAdminUser)
-    self.controls.btnRestockAll:setVisible(isAdminUser)
+    self.controls.btnAdmin:setVisible(isAdminUser)
     if isAdminUser then
-        self.controls.btnConfig:setX(10)
-        self.controls.btnConfig:setEnable(self.controls.list.selected > 0)
-        self.controls.btnPools:setX(self.controls.btnConfig.x + self.controls.btnConfig.width + 10)
-        self.controls.btnGroups:setX(self.controls.btnPools.x + self.controls.btnPools.width + 10)
-        self.controls.btnSpecials:setX(self.controls.btnGroups.x + self.controls.btnGroups.width + 10)
-        self.controls.btnItems:setX(self.controls.btnSpecials.x + self.controls.btnSpecials.width + 10)
-        self.controls.btnPrices:setX(self.controls.btnItems.x + self.controls.btnItems.width + 10)
-        self.controls.btnWallet:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
-        self.controls.btnRewards:setX(self.controls.btnWallet.x + self.controls.btnWallet.width + 10)
-        self.controls.btnCompile:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
-        self.controls.btnRestockAll:setX(self.controls.btnCompile.x + self.controls.btnCompile.width + 10)
+        self.controls.btnAdmin:setX(10)
     end
-
 end
 
 function UI:drawDatas(y, item, alt)

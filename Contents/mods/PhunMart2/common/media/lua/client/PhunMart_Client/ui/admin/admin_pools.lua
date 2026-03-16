@@ -2,21 +2,19 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
+require "ISUI/ISCollapsableWindowJoypad"
 
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_SCALE = FONT_HGT_SMALL / 14
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local PAD = math.max(10, math.floor(10 * FONT_SCALE))
-local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
-local SCROLLBAR_W = 13
+local PAD = ListPanel.PAD
+local ROW_H = ListPanel.ROW_H
+local FONT_SCALE = ListPanel.FONT_SCALE
+local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
+local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
 
-local windowName = "PhunPoolsAdminUI"
-
-Core.ui.admin_pools = ISPanel:derive(windowName)
+Core.ui.admin_pools = ListPanel:derive("PhunPoolsAdminUI")
 Core.ui.admin_pools.instances = {}
 local UI = Core.ui.admin_pools
 
@@ -67,25 +65,56 @@ local function formatZones(def)
     return ""
 end
 
+-- Parse a comma-separated string into a trimmed array. Returns nil for empty input.
+local function parseCSV(text)
+    if not text or text == "" then
+        return nil
+    end
+    local result = {}
+    for s in text:gmatch("[^,]+") do
+        s = s:match("^%s*(.-)%s*$")
+        if s ~= "" then
+            table.insert(result, s)
+        end
+    end
+    if #result == 0 then
+        return nil
+    end
+    return result
+end
+
+-- Parse a comma-separated string of numbers into an integer array. Returns nil for empty input.
+local function parseCSVNumbers(text)
+    if not text or text == "" then
+        return nil
+    end
+    local result = {}
+    for s in text:gmatch("[^,]+") do
+        s = s:match("^%s*(.-)%s*$")
+        local n = tonumber(s)
+        if n then
+            table.insert(result, math.floor(n))
+        end
+    end
+    if #result == 0 then
+        return nil
+    end
+    return result
+end
+
 ---------------------------------------------------------------------------
 -- Edit / Add Modal
 ---------------------------------------------------------------------------
-local EditModal = ISPanel:derive("PhunPoolEditModal")
+local EditModal = ISCollapsableWindowJoypad:derive("PhunPoolEditModal")
 
 function EditModal:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = PAD
-    local y = PAD
+    local y = th + PAD
     local w = self.width - PAD * 2
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Fallback Category: ") + 8
-
-    -- Title
-    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", self.poolKey)
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-    y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
     self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
@@ -167,7 +196,7 @@ function EditModal:createChildren()
     self.specialsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Specials"), 0.5, 0.5, 0.5, 1,
         UIFont.Small, true)
     self.specialsHint:initialise()
-    self:addChild(self.rewardsHint)
+    self:addChild(self.specialsHint)
     y = y + FONT_HGT_SMALL + PAD
 
     -- Zones Difficulty (comma-separated numbers)
@@ -234,43 +263,6 @@ function EditModal:createChildren()
     self:addChild(self.cancelBtn)
 end
 
--- Parse a comma-separated string into a trimmed array. Returns nil for empty input.
-local function parseCSV(text)
-    if not text or text == "" then
-        return nil
-    end
-    local result = {}
-    for s in text:gmatch("[^,]+") do
-        s = s:match("^%s*(.-)%s*$")
-        if s ~= "" then
-            table.insert(result, s)
-        end
-    end
-    if #result == 0 then
-        return nil
-    end
-    return result
-end
-
--- Parse a comma-separated string of numbers into an integer array. Returns nil for empty input.
-local function parseCSVNumbers(text)
-    if not text or text == "" then
-        return nil
-    end
-    local result = {}
-    for s in text:gmatch("[^,]+") do
-        s = s:match("^%s*(.-)%s*$")
-        local n = tonumber(s)
-        if n then
-            table.insert(result, math.floor(n))
-        end
-    end
-    if #result == 0 then
-        return nil
-    end
-    return result
-end
-
 function EditModal:onApply()
     local key = self.keyEntry:getText()
     if not key or key == "" then
@@ -331,8 +323,7 @@ function EditModal:onCancel()
 end
 
 function EditModal:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
 end
 
 function EditModal:new(poolKey, poolDef, isNew, cb)
@@ -342,7 +333,7 @@ function EditModal:new(poolKey, poolDef, isNew, cb)
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
 
-    local o = ISPanel:new(sx, sy, modalW, modalH)
+    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
     o.poolKey = poolKey or ""
@@ -355,19 +346,22 @@ function EditModal:new(poolKey, poolDef, isNew, cb)
         b = 0.1,
         a = 0.95
     }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
-    o.moveWithMouse = true
+    o.resizable = false
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", poolKey or "")
+    o:setTitle(titleText)
     return o
 end
 
 ---------------------------------------------------------------------------
 -- Main Pools Panel
 ---------------------------------------------------------------------------
+
+local function savePoolDef(key, def)
+    sendClientCommand(Core.name, Core.commands.upsertPoolDef, {key = key, def = def})
+    if not Core.isLocal and Core.defs and Core.defs.pools then
+        Core.defs.pools[key] = def
+    end
+end
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -379,6 +373,8 @@ function UI.OnOpenPanel(player)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
         instance = UI:new(x, y, width, height, player)
+        instance:setTitle(getText("IGUI_PhunMart_Title_PoolDefs"))
+        instance.description = getText("IGUI_PhunMart_Desc_PoolDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
@@ -388,9 +384,33 @@ function UI.OnOpenPanel(player)
     return instance
 end
 
+function UI:createChildren()
+    ListPanel.createChildren(self)
+
+    -- Columns: Key, Price, Sources, Zones
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.30)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.50)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.80)
+
+    -- Custom row renderer
+    self.list.doDrawItem = self.drawDatas
+
+    -- Double-click to edit
+    self.list:setOnMouseDoubleClick(self, self.GridDoubleClick)
+
+    -- Bottom buttons: New, Edit (requires selection), View (requires selection)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), UI.onAddClick, false)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_View"), UI.onViewClick, true)
+end
+
+function UI:getFilterText(itemData)
+    return (itemData.key or "") .. " " .. (itemData.price or "") .. " " .. (itemData.sources or "")
+end
+
 function UI:refreshPools()
-    self.datas:clear()
-    self.datas:setVisible(false)
+    self:clearList()
 
     local pools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
 
@@ -402,21 +422,13 @@ function UI:refreshPools()
 
     for _, key in ipairs(keys) do
         local def = pools[key]
-        self.datas:addItem(key, {
+        self:addListItem(key, {
             key = key,
             price = formatPrice(def),
             sources = formatSources(def),
             zones = formatZones(def),
             def = def
         })
-    end
-    self.datas:setVisible(true)
-end
-
-local function savePoolDef(key, def)
-    sendClientCommand(Core.name, Core.commands.upsertPoolDef, {key = key, def = def})
-    if not Core.isLocal and Core.defs and Core.defs.pools then
-        Core.defs.pools[key] = def
     end
 end
 
@@ -431,10 +443,10 @@ function UI:onAddClick()
 end
 
 function UI:onViewClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    if not self.list.selected or self.list.selected == 0 then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
+    local selectedItem = self.list.items[self.list.selected]
     if not selectedItem then
         return
     end
@@ -446,10 +458,10 @@ function UI:onViewClick()
 end
 
 function UI:onEditClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    if not self.list.selected or self.list.selected == 0 then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
+    local selectedItem = self.list.items[self.list.selected]
     if not selectedItem then
         return
     end
@@ -472,70 +484,6 @@ function UI:GridDoubleClick(item)
     modal:initialise()
     modal:addToUIManager()
     modal:bringToTop()
-end
-
-function UI:createChildren()
-    ISPanel.createChildren(self)
-
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
-
-    -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_PoolDefs"), 1, 1, 1, 1, UIFont.Medium, true)
-    self.title:initialise()
-    self.title:instantiate()
-    self:addChild(self.title)
-
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        self:close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
-
-    y = y + FONT_HGT_MEDIUM + PAD
-
-    -- Toolbar: Add / Edit buttons
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
-    self.addButton:initialise()
-    self:addChild(self.addButton)
-
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
-    self.editButton:initialise()
-    self:addChild(self.editButton)
-
-    self.viewButton = ISButton:new(x + (btnW + gap) * 2, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_View"), self, UI.onViewClick)
-    self.viewButton:initialise()
-    self:addChild(self.viewButton)
-
-    y = y + ROW_H + PAD + tools.HEADER_HGT
-
-    -- Data list
-    local listH = self.height - y - PAD
-    self.datas = ISScrollingListBox:new(x, y, w, listH)
-    self.datas:initialise()
-    self.datas:instantiate()
-    self.datas.itemheight = FONT_HGT_MEDIUM + math.floor(8 * FONT_SCALE)
-    self.datas.selected = 0
-    self.datas.joypadParent = self
-    self.datas.font = UIFont.NewSmall
-    self.datas.doDrawItem = self.drawDatas
-    self.datas.drawBorder = true
-    self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-
-    local colPrice = math.floor(w * 0.30)
-    local colSources = math.floor(w * 0.50)
-    local colZones = math.floor(w * 0.80)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Price"), colPrice)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Sources"), colSources)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Zones"), colZones)
-    self.datas:setVisible(false)
-    self:addChild(self.datas)
 end
 
 function UI:drawDatas(y, item, alt)
@@ -590,31 +538,8 @@ function UI:drawDatas(y, item, alt)
 end
 
 function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
-end
-
-function UI:new(x, y, width, height, player)
-    local o = ISPanel:new(x, y, width, height, player)
-    setmetatable(o, self)
-    self.__index = self
-    o.player = player
-    o.playerIndex = player:getPlayerNum()
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    }
-    o.moveWithMouse = true
-    return o
 end
 
 -- Open the edit modal directly for a specific pool key (used by shop_main context menu).

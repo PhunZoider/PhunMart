@@ -2,7 +2,7 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
+require "ISUI/ISCollapsableWindowJoypad"
 require "ISUI/ISButton"
 require "ISUI/ISTextEntryBox"
 require "ISUI/ISTickBox"
@@ -18,6 +18,7 @@ local FONT_SCALE = FONT_HGT_SMALL / 14
 
 local PAD = math.max(10, math.floor(10 * FONT_SCALE))
 local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
+local BUTTON_HGT = FONT_HGT_SMALL + 6
 local ICON_SZ = FONT_HGT_SMALL
 local SCROLLBAR_W = 13
 
@@ -34,7 +35,7 @@ local BASE_H = math.floor(500 * FONT_SCALE)
 
 -- ---------------------------------------------------------------------------
 
-Core.ui.client.poolViewer = ISPanel:derive("PhunMartUIPoolViewer")
+Core.ui.client.poolViewer = ISCollapsableWindowJoypad:derive("PhunMartUIPoolViewer")
 local UI = Core.ui.client.poolViewer
 UI.instances = {}
 
@@ -176,7 +177,7 @@ function UI.refreshData(poolKey, data)
 end
 
 function UI:new(x, y, w, h, player, poolKey, data)
-    local o = ISPanel:new(x, y, w, h)
+    local o = ISCollapsableWindowJoypad:new(x, y, w, h)
     setmetatable(o, self)
     self.__index = self
     o.player = player or getPlayer()
@@ -188,136 +189,158 @@ function UI:new(x, y, w, h, player, poolKey, data)
     o.selected = {} -- map of row.id -> true for multi-select
     o.lastClickedIdx = nil
     o.showBlacklisted = false
-    o.moveWithMouse = true
+    o.anchorRight = true
+    o.anchorBottom = true
     o.backgroundColor = {
         r = 0,
         g = 0,
         b = 0,
         a = 0.8
     }
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
+    o:setWantKeyEvents(true)
+    o:setTitle(getText("IGUI_PhunMart_Admin_PoolTitle", poolKey or "?"))
     return o
 end
 
-function UI:initialise()
-    ISPanel.initialise(self)
-end
-
 function UI:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
+    local th = self:titleBarHeight()
+    local rh = self:resizeWidgetHeight()
+    local w = self.width
+    local contentH = self.height - th - rh
 
-    -- Title
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Admin_PoolTitle", self.poolKey or "?"), 1, 1, 1, 1, UIFont.Medium,
-        true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
+    -- Main content panel (opaque so list rows don't bleed through)
+    local mainPanel = ISPanel:new(0, th, w, contentH)
+    mainPanel:initialise()
+    mainPanel:instantiate()
+    mainPanel.backgroundColor = {
+        r = 0,
+        g = 0,
+        b = 0,
+        a = 0.8
+    }
+    self:addChild(mainPanel)
+    self._mainPanel = mainPanel
 
-    -- Close button
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        self:close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
+    -- Bottom button bar (opaque to cover list overflow)
+    local btnBarH = BUTTON_HGT + PAD * 2
+    local btnBar = ISPanel:new(0, contentH - btnBarH, w, btnBarH)
+    btnBar:initialise()
+    btnBar:instantiate()
+    btnBar.backgroundColor = {
+        r = 0,
+        g = 0,
+        b = 0,
+        a = 0.8
+    }
+    self._mainPanel:addChild(btnBar)
+    self._buttonBar = btnBar
 
-    y = y + FONT_HGT_MEDIUM + PAD
+    -- Close button (right side of button bar)
+    local closeBtnW = math.max(math.floor(70 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, getText(
+        "IGUI_PhunMart_Btn_Close")) + PAD * 2)
+    local closeBtn = ISButton:new(0, PAD, closeBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Close"), self, self.close)
+    closeBtn:initialise()
+    closeBtn:instantiate()
+    if closeBtn.enableCancelColor then
+        closeBtn:enableCancelColor()
+    end
+    self._buttonBar:addChild(closeBtn)
+    self._closeBtn = closeBtn
 
-    -- Toolbar: Edit Pool button
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-
+    -- Edit Pool button (admin only, right side next to Close)
     if isAdmin() or isDebugEnabled() then
-        self.editPoolBtn = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Admin_EditPool"), self, UI.onEditPool)
+        local editBtnW = math.max(math.floor(70 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, getText(
+            "IGUI_PhunMart_Admin_EditPool")) + PAD * 2)
+        self.editPoolBtn = ISButton:new(0, PAD, editBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Admin_EditPool"), self,
+            UI.onEditPool)
         self.editPoolBtn:initialise()
-        self:addChild(self.editPoolBtn)
+        self.editPoolBtn:instantiate()
+        self._buttonBar:addChild(self.editPoolBtn)
     end
 
-    -- Show blacklisted tickbox (right side of toolbar)
-    self.showBlacklistedTick = ISTickBox:new(self.width - PAD - math.floor(140 * FONT_SCALE), y, ROW_H, ROW_H, "")
+    -- Filter controls in button bar (left side)
+    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+    local filterLbl = ISLabel:new(PAD, PAD, BUTTON_HGT, getText("IGUI_PhunMart_Lbl_Filter"), 0.8, 0.8, 0.8, 1,
+        UIFont.Small, true)
+    filterLbl:initialise()
+    self._buttonBar:addChild(filterLbl)
+    self._filterLabel = filterLbl
+
+    self.filterEntry = ISTextEntryBox:new("", PAD + filterLblW, PAD, 100, BUTTON_HGT)
+    self.filterEntry:initialise()
+    self.filterEntry:instantiate()
+    self.filterEntry:setClearButton(true)
+    self.filterEntry.onTextChange = function()
+        self:applyFilters()
+    end
+    self._buttonBar:addChild(self.filterEntry)
+
+    local catLabelW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Admin_Category") .. " ") + 4
+    self.catLabel = ISLabel:new(0, PAD, BUTTON_HGT, getText("IGUI_PhunMart_Admin_Category"), 0.8, 0.8, 0.8, 1,
+        UIFont.Small, true)
+    self.catLabel:initialise()
+    self._buttonBar:addChild(self.catLabel)
+    self._catLabelW = catLabelW
+
+    local catComboW = math.floor(160 * FONT_SCALE)
+    self.catCombo = ISComboBox:new(0, PAD, catComboW, BUTTON_HGT, self, function()
+        self:applyFilters()
+    end)
+    self.catCombo:initialise()
+    self._buttonBar:addChild(self.catCombo)
+    self._catComboW = catComboW
+
+    -- Show blacklisted tickbox (in button bar, between filters and buttons)
+    self.showBlacklistedTick = ISTickBox:new(0, PAD, BUTTON_HGT, BUTTON_HGT, "")
     self.showBlacklistedTick:initialise()
     self.showBlacklistedTick:instantiate()
     self.showBlacklistedTick:addOption(getText("IGUI_PhunMart_Admin_ShowBlacklisted"), nil)
     self.showBlacklistedTick:setSelected(1, false)
     self.showBlacklistedTick.changeOptionMethod = UI.onBlacklistToggle
     self.showBlacklistedTick.changeOptionTarget = self
-    self:addChild(self.showBlacklistedTick)
+    self._buttonBar:addChild(self.showBlacklistedTick)
 
-    y = y + ROW_H + PAD
-
-    -- Filter row
-    local filterLabelW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Admin_Filter") .. " ") + 4
-    self.filterLabel = ISLabel:new(x, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, getText("IGUI_PhunMart_Admin_Filter"), 0.7,
-        0.7, 0.7, 1, UIFont.Small, true)
-    self.filterLabel:initialise()
-    self:addChild(self.filterLabel)
-
-    local catComboW = math.floor(160 * FONT_SCALE)
-    local catLabelW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Admin_Category") .. " ") + 4
-    local filterEntryW = w - filterLabelW - catLabelW - catComboW - gap * 2
-
-    self.filterEntry = ISTextEntryBox:new("", x + filterLabelW, y, filterEntryW, ROW_H)
-    self.filterEntry:initialise()
-    self.filterEntry:instantiate()
-    self.filterEntry.onTextChange = function()
-        self:applyFilters()
-    end
-    self:addChild(self.filterEntry)
-
-    local catX = x + filterLabelW + filterEntryW + gap
-    self.catLabel = ISLabel:new(catX, y + math.floor((ROW_H - FONT_HGT_SMALL) / 2), FONT_HGT_SMALL, getText("IGUI_PhunMart_Admin_Category"), 0.7,
-        0.7, 0.7, 1, UIFont.Small, true)
-    self.catLabel:initialise()
-    self:addChild(self.catLabel)
-
-    self.catCombo = ISComboBox:new(catX + catLabelW, y, catComboW, ROW_H, self, function()
-        self:applyFilters()
-    end)
-    self.catCombo:initialise()
-    self:addChild(self.catCombo)
-
-    y = y + ROW_H + PAD
+    local y = 0
 
     -- Column headers row
     local hdrY = y
     local hdrH = FONT_HGT_SMALL + math.floor(4 * FONT_SCALE)
 
     local cx = PAD + COL_ICON + 2
-    self.hdrName = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Name"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrName = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Name"), 0.55, 0.55, 0.55, 1, UIFont.Small,
+        true)
     self.hdrName:initialise()
-    self:addChild(self.hdrName)
+    self._mainPanel:addChild(self.hdrName)
     cx = cx + COL_NAME
-    self.hdrPrice = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Price"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrPrice = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Price"), 0.55, 0.55, 0.55, 1, UIFont.Small,
+        true)
     self.hdrPrice:initialise()
-    self:addChild(self.hdrPrice)
+    self._mainPanel:addChild(self.hdrPrice)
     cx = cx + COL_PRICE
     self.hdrWt = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Wt"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
     self.hdrWt:initialise()
-    self:addChild(self.hdrWt)
+    self._mainPanel:addChild(self.hdrWt)
     cx = cx + COL_WEIGHT
-    self.hdrSource = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Source"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrSource = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Source"), 0.55, 0.55, 0.55, 1, UIFont.Small,
+        true)
     self.hdrSource:initialise()
-    self:addChild(self.hdrSource)
+    self._mainPanel:addChild(self.hdrSource)
     cx = cx + COL_SOURCE
-    self.hdrCond = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Conditions"), 0.55, 0.55, 0.55, 1, UIFont.Small, true)
+    self.hdrCond = ISLabel:new(cx, hdrY, hdrH, getText("IGUI_PhunMart_Col_Conditions"), 0.55, 0.55, 0.55, 1,
+        UIFont.Small, true)
     self.hdrCond:initialise()
-    self:addChild(self.hdrCond)
+    self._mainPanel:addChild(self.hdrCond)
 
     y = hdrY + hdrH + 2
 
-    -- Separator line is drawn in render
+    -- Separator line position (stored for render)
+    self._dividerY = y - 1
 
     -- List
-    local listH = self.height - y - PAD
-    self.list = ISScrollingListBox:new(0, y, self.width, listH)
+    local listH = contentH - y - btnBarH
+    self.list = ISScrollingListBox:new(0, y, w, listH)
     self.list:initialise()
     self.list:instantiate()
     self.list.itemheight = ROW_H
@@ -383,10 +406,7 @@ function UI:createChildren()
             listSelf:getMouseY() + listSelf:getAbsoluteY())
     end
 
-    self:addChild(self.list)
-
-    -- Divider y position (stored for render)
-    self.dividerY = y - 1
+    self._mainPanel:addChild(self.list)
 
     self:buildRows()
     self:applyFilters()
@@ -647,7 +667,8 @@ function UI:showContextMenu(row, absX, absY)
     else
         context:addOption(getText("IGUI_PhunMart_Admin_BlacklistNItems", tostring(count)), self, UI.onBlacklistSelected)
     end
-    local moveLabel = count > 1 and getText("IGUI_PhunMart_Admin_MoveNToPool", tostring(count)) or getText("IGUI_PhunMart_Admin_MoveToPool")
+    local moveLabel = count > 1 and getText("IGUI_PhunMart_Admin_MoveNToPool", tostring(count)) or
+                          getText("IGUI_PhunMart_Admin_MoveToPool")
     context:addOption(moveLabel, self, UI.onMoveToPool)
 end
 
@@ -710,8 +731,7 @@ end
 -- --- input ------------------------------------------------------------------
 
 function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
 end
 
@@ -719,10 +739,9 @@ function UI:isKeyConsumed(key)
     return key == Keyboard.KEY_ESCAPE
 end
 
-function UI:onKeyPressed(key)
+function UI:onKeyRelease(key)
     if key == Keyboard.KEY_ESCAPE then
         self:close()
-        return true
     end
 end
 
@@ -736,18 +755,79 @@ end
 -- --- render -----------------------------------------------------------------
 
 function UI:prerender()
-    ISPanel.prerender(self)
+    ISCollapsableWindowJoypad.prerender(self)
+
+    local th = self:titleBarHeight()
+    local rh = self:resizeWidgetHeight()
+    local w = self.width
+    local contentH = self.height - th - rh
+
+    -- Main panel
+    self._mainPanel:setX(0)
+    self._mainPanel:setY(th)
+    self._mainPanel:setWidth(w)
+    self._mainPanel:setHeight(contentH)
+
+    -- Button bar at bottom
+    local btnBarH = BUTTON_HGT + PAD * 2
+    self._buttonBar:setX(0)
+    self._buttonBar:setY(contentH - btnBarH)
+    self._buttonBar:setWidth(w)
+    self._buttonBar:setHeight(btnBarH)
+
+    -- Right side of button bar: Close, then Edit Pool right-to-left
+    local rightX = w - PAD
+    self._closeBtn:setX(rightX - self._closeBtn.width)
+    rightX = rightX - self._closeBtn.width - PAD
+
+    if self.editPoolBtn then
+        self.editPoolBtn:setX(rightX - self.editPoolBtn.width)
+        rightX = rightX - self.editPoolBtn.width - PAD
+    end
+
+    -- Left side of button bar: Filter label, filter entry, Cat label, Cat combo, Show BL tick
+    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+    self._filterLabel:setX(PAD)
+
+    -- Category combo and label (fixed width, positioned after filter entry)
+    -- Show blacklisted tickbox width
+    local blTickW = math.floor(140 * FONT_SCALE)
+
+    -- Filter entry fills remaining space between filter label and category label
+    local fixedRight = self._catLabelW + self._catComboW + PAD + blTickW + PAD
+    local filterEntryW = rightX - PAD - filterLblW - fixedRight
+    if filterEntryW < 60 then
+        filterEntryW = 60
+    end
+
+    self.filterEntry:setX(PAD + filterLblW)
+    self.filterEntry:setWidth(filterEntryW)
+
+    local catX = PAD + filterLblW + filterEntryW + PAD
+    self.catLabel:setX(catX)
+    self.catCombo:setX(catX + self._catLabelW)
+
+    local blX = catX + self._catLabelW + self._catComboW + PAD
+    self.showBlacklistedTick:setX(blX)
+
+    -- List
+    local listY = self.list:getY()
+    local listH = contentH - listY - btnBarH
+    self.list:setWidth(w)
+    self.list:setHeight(listH)
 end
 
 function UI:render()
-    ISPanel.render(self)
+    ISCollapsableWindowJoypad.render(self)
+
+    local th = self:titleBarHeight()
 
     -- Divider line below column headers
-    if self.dividerY then
-        self:drawRect(0, self.dividerY, self.width, 1, 1.0, 0.20, 0.20, 0.24)
+    if self._dividerY then
+        self:drawRect(0, th + self._dividerY, self.width, 1, 1.0, 0.20, 0.20, 0.24)
     end
 
-    -- Offer count (top right, next to close button)
+    -- Offer count (in title bar area, right side)
     local total = #self.rows
     local shown = #self.filteredRows
     local selCount = 0
@@ -758,34 +838,33 @@ function UI:render()
     if selCount > 0 then
         countText = getText("IGUI_PhunMart_Admin_NSelected", tostring(selCount))
     elseif shown == total then
-        countText = total == 1 and getText("IGUI_PhunMart_Admin_OfferCount", tostring(total)) or getText("IGUI_PhunMart_Admin_OfferCountPlural", tostring(total))
+        countText = total == 1 and getText("IGUI_PhunMart_Admin_OfferCount", tostring(total)) or
+                        getText("IGUI_PhunMart_Admin_OfferCountPlural", tostring(total))
     else
         countText = getText("IGUI_PhunMart_Admin_OfferCountFiltered", tostring(shown), tostring(total))
     end
     local cntW = getTextManager():MeasureStringX(UIFont.Small, countText)
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self:drawText(countText, self.width - cntW - closeSz - PAD * 2,
-        PAD + math.floor((FONT_HGT_MEDIUM - FONT_HGT_SMALL) / 2), 0.55, 0.55, 0.55, 1, UIFont.Small)
+    self:drawText(countText, self.width - cntW - PAD - SCROLLBAR_W, th + PAD, 0.55, 0.55, 0.55, 1, UIFont.Small)
 
     -- empty state
     if #self.filteredRows == 0 then
-        local msg = #self.rows == 0 and getText("IGUI_PhunMart_Admin_NoOffers") or getText("IGUI_PhunMart_Admin_NoMatching")
+        local msg = #self.rows == 0 and getText("IGUI_PhunMart_Admin_NoOffers") or
+                        getText("IGUI_PhunMart_Admin_NoMatching")
         local msgW = getTextManager():MeasureStringX(UIFont.Small, msg)
-        local listY = self.list:getY()
-        local viewH = self.height - listY - PAD
-        self:drawText(msg, math.floor((self.width - msgW) / 2),
-            listY + math.floor((viewH - FONT_HGT_SMALL) / 2), 0.45, 0.45, 0.45, 1, UIFont.Small)
+        local listY = th + self.list:getY()
+        local listH = self.list:getHeight()
+        self:drawText(msg, math.floor((self.width - msgW) / 2), listY + math.floor((listH - FONT_HGT_SMALL) / 2), 0.45,
+            0.45, 0.45, 1, UIFont.Small)
     end
 end
 
 -- ===========================================================================
--- Weight editor dialog (small floating ISPanel)
+-- Weight editor dialog
 -- ===========================================================================
 
 WeightEditor = {}
 
 local WE_W = math.floor(260 * FONT_SCALE)
-local WE_H = math.floor(108 * FONT_SCALE)
 local WE_PAD = PAD
 
 function WeightEditor.open(player, poolKey, row, viewer)
@@ -793,51 +872,45 @@ function WeightEditor.open(player, poolKey, row, viewer)
         WeightEditor._inst:removeFromUIManager()
         WeightEditor._inst = nil
     end
+    local th = getTextManager():getFontHeight(UIFont.Medium) + 4
+    local WE_H = th + WE_PAD + FONT_HGT_SMALL + 6 + ROW_H + WE_PAD + ROW_H + WE_PAD
     local core = getCore()
     local x = math.floor((core:getScreenWidth() - WE_W) / 2)
     local y = math.floor((core:getScreenHeight() - WE_H) / 2)
     local inst = WeightEditor._Panel:new(x, y, WE_W, WE_H, player, poolKey, row, viewer)
     inst:initialise()
-    inst:instantiate()
     inst:addToUIManager()
     WeightEditor._inst = inst
 end
 
-WeightEditor._Panel = ISPanel:derive("PhunMartWeightEditor")
+WeightEditor._Panel = ISCollapsableWindowJoypad:derive("PhunMartWeightEditor")
 
 function WeightEditor._Panel:new(x, y, w, h, player, poolKey, row, viewer)
-    local o = ISPanel:new(x, y, w, h)
+    local o = ISCollapsableWindowJoypad:new(x, y, w, h)
     setmetatable(o, self)
     self.__index = self
     o.player = player
     o.poolKey = poolKey
     o.row = row
     o.viewer = viewer
-    o.moveWithMouse = true
+    o.resizable = false
     o.backgroundColor = {
-        r = 0.1,
-        g = 0.1,
-        b = 0.1,
-        a = 0.95
+        r = 0,
+        g = 0,
+        b = 0,
+        a = 0.8
     }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
+    o:setTitle(getText("IGUI_PhunMart_Admin_WeightLabel", tools.truncate(row.displayName, w - WE_PAD * 4, UIFont.Small)))
+    o:setWantKeyEvents(true)
     return o
 end
 
-function WeightEditor._Panel:initialise()
-    ISPanel.initialise(self)
-end
-
 function WeightEditor._Panel:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = WE_PAD
-    local entryY = WE_PAD + FONT_HGT_SMALL + 6
+    local entryY = th + WE_PAD
     local entryW = WE_W - WE_PAD * 2
 
     self.entry = ISTextEntryBox:new(string.format("%.2f", self.row.weight), x, entryY, entryW, ROW_H)
@@ -849,12 +922,16 @@ function WeightEditor._Panel:createChildren()
     local btnW = math.floor((entryW - WE_PAD) / 2)
     local btnY = entryY + ROW_H + WE_PAD
     self.okBtn = ISButton:new(x, btnY, btnW, ROW_H, getText("IGUI_PhunMart_Btn_OK"), self, WeightEditor._Panel.onOK)
-    self.cancelBtn = ISButton:new(x + btnW + WE_PAD, btnY, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, WeightEditor._Panel.onCancel)
+    self.cancelBtn = ISButton:new(x + btnW + WE_PAD, btnY, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
+        WeightEditor._Panel.onCancel)
     self.okBtn:initialise()
     self.okBtn:instantiate()
     self:addChild(self.okBtn)
     self.cancelBtn:initialise()
     self.cancelBtn:instantiate()
+    if self.cancelBtn.enableCancelColor then
+        self.cancelBtn:enableCancelColor()
+    end
     self:addChild(self.cancelBtn)
 end
 
@@ -870,34 +947,29 @@ function WeightEditor._Panel:onOK()
         self.row.weight = val
         self.row._edited = true
     end
-    self:removeFromUIManager()
+    self:close()
     WeightEditor._inst = nil
 end
 
 function WeightEditor._Panel:onCancel()
-    self:removeFromUIManager()
+    self:close()
     WeightEditor._inst = nil
+end
+
+function WeightEditor._Panel:close()
+    ISCollapsableWindowJoypad.close(self)
 end
 
 function WeightEditor._Panel:isKeyConsumed(key)
     return key == Keyboard.KEY_ESCAPE or key == Keyboard.KEY_RETURN
 end
 
-function WeightEditor._Panel:onKeyPressed(key)
+function WeightEditor._Panel:onKeyRelease(key)
     if key == Keyboard.KEY_RETURN then
         self:onOK()
-        return true
-    end
-    if key == Keyboard.KEY_ESCAPE then
+    elseif key == Keyboard.KEY_ESCAPE then
         self:onCancel()
-        return true
     end
-end
-
-function WeightEditor._Panel:render()
-    ISPanel.render(self)
-    local label = getText("IGUI_PhunMart_Admin_WeightLabel", tools.truncate(self.row.displayName, self.width - WE_PAD * 4, UIFont.Small))
-    self:drawText(label, WE_PAD, WE_PAD, 0.9, 0.8, 0.3, 1, UIFont.Small)
 end
 
 -- ===========================================================================
@@ -908,13 +980,14 @@ MoveToPoolModal = {}
 
 local MP_W = math.floor(340 * FONT_SCALE)
 local MP_LIST_H = math.floor(220 * FONT_SCALE)
-local MP_H = PAD + FONT_HGT_MEDIUM + PAD + MP_LIST_H + PAD + ROW_H + PAD
 
 function MoveToPoolModal.open(player, fromPoolKey, rows, viewer)
     if MoveToPoolModal._inst then
         MoveToPoolModal._inst:removeFromUIManager()
         MoveToPoolModal._inst = nil
     end
+    local th = getTextManager():getFontHeight(UIFont.Medium) + 4
+    local MP_H = th + PAD + MP_LIST_H + PAD + ROW_H + PAD
     local core = getCore()
     local x = math.floor((core:getScreenWidth() - MP_W) / 2)
     local y = math.floor((core:getScreenHeight() - MP_H) / 2)
@@ -925,50 +998,36 @@ function MoveToPoolModal.open(player, fromPoolKey, rows, viewer)
     MoveToPoolModal._inst = inst
 end
 
-MoveToPoolModal._Panel = ISPanel:derive("PhunMartMoveToPoolModal")
+MoveToPoolModal._Panel = ISCollapsableWindowJoypad:derive("PhunMartMoveToPoolModal")
 
 function MoveToPoolModal._Panel:new(x, y, w, h, player, fromPoolKey, rows, viewer)
-    local o = ISPanel:new(x, y, w, h)
+    local o = ISCollapsableWindowJoypad:new(x, y, w, h)
     setmetatable(o, self)
     self.__index = self
     o.player = player
     o.fromPoolKey = fromPoolKey
     o.rows = rows
     o.viewer = viewer
-    o.moveWithMouse = true
+    o.resizable = false
     o.backgroundColor = {
-        r = 0.1,
-        g = 0.1,
-        b = 0.1,
-        a = 0.95
+        r = 0,
+        g = 0,
+        b = 0,
+        a = 0.8
     }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
+    local count = #rows
+    o:setTitle(getText("IGUI_PhunMart_Admin_MoveItemsToPool", tostring(count)))
+    o:setWantKeyEvents(true)
     return o
 end
 
-function MoveToPoolModal._Panel:initialise()
-    ISPanel.initialise(self)
-end
-
 function MoveToPoolModal._Panel:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = PAD
-    local y = PAD
+    local y = th + PAD
     local w = self.width - PAD * 2
-
-    -- Title
-    local count = #self.rows
-    local titleText = getText("IGUI_PhunMart_Admin_MoveItemsToPool", tostring(count))
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-    y = y + FONT_HGT_MEDIUM + PAD
 
     -- Pool list
     self.poolList = ISScrollingListBox:new(x, y, w, MP_LIST_H)
@@ -988,13 +1047,17 @@ function MoveToPoolModal._Panel:createChildren()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
-    self.okBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Move"), self, MoveToPoolModal._Panel.onOK)
+    self.okBtn =
+        ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Move"), self, MoveToPoolModal._Panel.onOK)
     self.okBtn:initialise()
     self:addChild(self.okBtn)
 
     self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
         MoveToPoolModal._Panel.onCancel)
     self.cancelBtn:initialise()
+    if self.cancelBtn.enableCancelColor then
+        self.cancelBtn:enableCancelColor()
+    end
     self:addChild(self.cancelBtn)
 
     self:populatePoolList()
@@ -1024,7 +1087,9 @@ function MoveToPoolModal._Panel:populatePoolList()
     table.sort(poolKeys)
 
     for _, key in ipairs(poolKeys) do
-        self.poolList:addItem(key, { key = key })
+        self.poolList:addItem(key, {
+            key = key
+        })
     end
 end
 
@@ -1092,7 +1157,7 @@ function MoveToPoolModal._Panel:onCancel()
 end
 
 function MoveToPoolModal._Panel:close()
-    self:removeFromUIManager()
+    ISCollapsableWindowJoypad.close(self)
     MoveToPoolModal._inst = nil
 end
 
@@ -1100,13 +1165,10 @@ function MoveToPoolModal._Panel:isKeyConsumed(key)
     return key == Keyboard.KEY_ESCAPE or key == Keyboard.KEY_RETURN
 end
 
-function MoveToPoolModal._Panel:onKeyPressed(key)
+function MoveToPoolModal._Panel:onKeyRelease(key)
     if key == Keyboard.KEY_RETURN then
         self:onOK()
-        return true
-    end
-    if key == Keyboard.KEY_ESCAPE then
+    elseif key == Keyboard.KEY_ESCAPE then
         self:onCancel()
-        return true
     end
 end
