@@ -306,9 +306,7 @@ Events[Core.events.OnReady].Add(function()
     local change = Core.getOption("EnableChangePool")
     local tokens = Core.getOption("EnableTokenPool")
     if change ~= false or tokens ~= false then
-        print("PhunMart: Adding character info tab")
         addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
-
         -- The window may already exist if OnReady fires after character creation.
         -- Retroactively add the tab to any existing instances.
         local viewName = "PhunWalletView"
