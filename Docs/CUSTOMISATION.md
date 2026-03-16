@@ -45,7 +45,7 @@ blend together into a single menu.
 That's the full chain: machine -> pool set -> pool -> offers -> special / cost / conditions.
 
 The config files exist because each of those concepts is reusable. Prices are named so the
-same `coin_25` applies to a hundred offers without repeating it. Conditions are named so
+same `currency_25` applies to a hundred offers without repeating it. Conditions are named so
 `onceOnly` can be shared across pools. Specials are named so the same "Gain: Brave" definition
 isn't duplicated for every shop that sells traits. The layering is indirection in service of
 reuse.
@@ -281,14 +281,14 @@ return {
     -- Currency -- deducted from the player's wallet
     -- pool = "change"  (loose coin balance, stored in cents: 25 = $0.25)
     -- pool = "tokens"  (bound tokens, integer count)
-    change_25 = {
+    currency_25 = {
         kind   = "currency",
         pool   = "change",
         amount = 25          -- $0.25
     },
 
     -- Amount can be a fixed number or a random range rolled per restock
-    coin_low = {
+    currency_low = {
         kind   = "currency",
         pool   = "change",
         amount = { min = 250, max = 600 }   -- $2.50–$6.00
@@ -314,8 +314,44 @@ return {
             { item = "Base.Plank",  amount = 3 },
         }
     },
+
+    -- Item substitutes -- accept variant items as equivalent payment.
+    -- Many PZ items have colour or style variants with different keys but
+    -- identical gameplay value (e.g. denim shirts). Adding `substitutes`
+    -- lets the system count any listed variant toward the required amount.
+    -- The primary item is consumed first; substitutes fill the remainder.
+    denim_barter = {
+        kind  = "items",
+        items = {{
+            item        = "Base.CraftedDenimShirt",
+            substitutes = { "Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random" },
+            amount      = 3
+        }}
+    },
+
+    -- Self-pay with substitutes -- collector offers where players hand over
+    -- N of the displayed item. Substitutes let colour variants count too.
+    self_with_subs = {
+        kind        = "self",
+        amount      = 3,
+        substitutes = { "Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random" }
+    },
 }
 ```
+
+### Substitutes
+
+The `substitutes` field is an optional array of item keys that count as equivalent payment
+alongside the primary `item`. This is useful when PZ has multiple variants of the same item
+(colour variants, crafted vs looted, etc.) that players would reasonably expect to be
+interchangeable.
+
+- On `kind = "items"` prices: add `substitutes` to any item line in the `items` array.
+- On `kind = "self"` prices: add `substitutes` at the top level of the price entry.
+
+When checking affordability, the system sums the player's inventory count of the primary item
+plus all substitutes. When deducting, it removes from the primary item first, then from each
+substitute in order until the required amount is met.
 
 ---
 
@@ -437,7 +473,7 @@ return {
 
     -- Simple item offer
     ["offer:my_pistol"] = {
-        price  = "coin_high",         -- key from Prices
+        price  = "currency_high",     -- key from Prices
         reward = "reward_pistol",     -- key from Specials
         offer  = {
             weight = 1.0              -- relative probability during selection
@@ -460,7 +496,7 @@ return {
 
     -- Offer gated by conditions
     ["offer:rare_sword"] = {
-        price      = "coin_high",
+        price      = "currency_high",
         reward     = "reward_katana",
         conditions = { "minHours", "onceOnly" },   -- all must pass
         offer      = { weight = 0.3 }
@@ -508,7 +544,7 @@ return {
     -- Category-based: covers every tool in the game, including from mods
     tools_general = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = { weight = 1.0 }
         },
         include = {
@@ -519,7 +555,7 @@ return {
     -- Include specific items only
     crafts_sewing = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = { weight = 0.8 }
         },
         include = {
@@ -530,7 +566,7 @@ return {
     -- Broad category with unwanted items removed
     food_fresh = {
         defaults = {
-            price = "coin_xlow",
+            price = "currency_xlow",
             offer = { weight = 1.0 }
         },
         include = {
@@ -586,7 +622,7 @@ return {
 
     pool_goodphoods = {
         defaults = {
-            price = "coin_5"       -- overrides group defaults for items in this pool
+            price = "currency_05"  -- overrides group defaults for items in this pool
         },
         sources = {
             groups = { "food_fresh", "food_cooking_utensils" }  -- pull from Groups

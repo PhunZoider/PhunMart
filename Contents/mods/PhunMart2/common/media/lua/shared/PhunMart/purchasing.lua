@@ -17,7 +17,13 @@ function Core:canAfford(player, price)
         return Core.wallet:getBalance(player, price.pool) >= price.amount
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do
-            if player:getInventory():getItemCountRecursive(entry.item) < entry.amount then
+            local count = player:getInventory():getItemCountRecursive(entry.item)
+            if entry.substitutes then
+                for _, sub in ipairs(entry.substitutes) do
+                    count = count + player:getInventory():getItemCountRecursive(sub)
+                end
+            end
+            if count < entry.amount then
                 return false
             end
         end
@@ -48,7 +54,26 @@ function Core:deduct(player, price)
         return true
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do
-            player:getInventory():RemoveItemAmount(entry.item, entry.amount)
+            local remaining = entry.amount
+            -- Remove from primary item first
+            local primaryCount = player:getInventory():getItemCountRecursive(entry.item)
+            local fromPrimary = math.min(remaining, primaryCount)
+            if fromPrimary > 0 then
+                player:getInventory():RemoveItemAmount(entry.item, fromPrimary)
+                remaining = remaining - fromPrimary
+            end
+            -- Then from substitutes
+            if remaining > 0 and entry.substitutes then
+                for _, sub in ipairs(entry.substitutes) do
+                    if remaining <= 0 then break end
+                    local subCount = player:getInventory():getItemCountRecursive(sub)
+                    local fromSub = math.min(remaining, subCount)
+                    if fromSub > 0 then
+                        player:getInventory():RemoveItemAmount(sub, fromSub)
+                        remaining = remaining - fromSub
+                    end
+                end
+            end
         end
         return true
     end

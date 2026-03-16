@@ -2,23 +2,21 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
-
 local Core = PhunMart
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local tools = require "PhunMart_Client/ui/ui_utils"
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_SCALE = FONT_HGT_SMALL / 14
+local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 
-local PAD = math.max(10, math.floor(10 * FONT_SCALE))
-local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
-local SCROLLBAR_W = 13
+local PAD = ListPanel.PAD
+local ROW_H = ListPanel.ROW_H
+local FONT_SCALE = ListPanel.FONT_SCALE
+local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
+local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
+local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 
-local windowName = "PhunPricesAdminUI"
-
-Core.ui.admin_prices = ISPanel:derive(windowName)
-Core.ui.admin_prices.instances = {}
-local UI = Core.ui.admin_prices
+---------------------------------------------------------------------------
+-- Helpers
+---------------------------------------------------------------------------
 
 -- Format a price amount for display.
 local function formatAmount(priceDef)
@@ -52,19 +50,35 @@ local function formatAmount(priceDef)
     return tostring(amount)
 end
 
+-- Resolve the effective kind for a price def by walking the inheritance chain.
+local function resolveKind(priceDef)
+    if priceDef.kind then
+        return priceDef.kind, priceDef.pool
+    end
+    if priceDef.inherit then
+        local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+        local parent = prices[priceDef.inherit]
+        if parent then
+            return resolveKind(parent)
+        end
+    end
+    return nil, nil
+end
+
 -- Format the kind column display.
 local function formatKind(priceDef)
+    local kind, pool = resolveKind(priceDef)
     local base
-    if priceDef.kind == "free" then
+    if kind == "free" then
         base = getText("IGUI_PhunMart_Free")
-    elseif priceDef.kind == "currency" then
-        base = priceDef.pool or "currency"
-    elseif priceDef.kind == "self" then
+    elseif kind == "currency" then
+        base = pool or "currency"
+    elseif kind == "self" then
         base = "self"
-    elseif priceDef.kind == "items" then
+    elseif kind == "items" then
         base = "items"
     else
-        base = priceDef.kind or "?"
+        base = kind or "?"
     end
     if priceDef.inherit then
         base = base .. " <" .. priceDef.inherit
@@ -75,22 +89,16 @@ end
 ---------------------------------------------------------------------------
 -- Edit / Add Modal
 ---------------------------------------------------------------------------
-local EditModal = ISPanel:derive("PhunPriceEditModal")
+local EditModal = ISCollapsableWindowJoypad:derive("PhunPriceEditModal")
 
 function EditModal:createChildren()
-    ISPanel.createChildren(self)
+    ISCollapsableWindowJoypad.createChildren(self)
 
+    local th = self:titleBarHeight()
     local x = PAD
-    local y = PAD
+    local y = th + PAD
     local w = self.width - PAD * 2
     local labelW = getTextManager():MeasureStringX(UIFont.Small, "Amount: ") + 8
-
-    -- Title
-    local titleText = self.isNew and getText("IGUI_PhunMart_Title_AddPrice") or getText("IGUI_PhunMart_Title_EditX", self.priceKey)
-    self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-    y = y + FONT_HGT_MEDIUM + PAD
 
     -- Key entry
     self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
@@ -156,7 +164,7 @@ function EditModal:createChildren()
     if self.priceDef and self.priceDef.amount then
         local amt = self.priceDef.amount
         if type(amt) == "table" then
-            -- range — populate min field, max below
+            -- range -- populate min field, max below
             if self.priceDef.pool == "change" then
                 amountDefault = tostring(amt.min / 100)
             else
@@ -210,27 +218,29 @@ function EditModal:createChildren()
     self:addChild(self.maxHint)
     y = y + FONT_HGT_SMALL + PAD
 
-    -- Item entry (for kind="items")
+    -- Item entry (for kind="items") — display + Pick button
     self.itemLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Item"), 1, 1, 1, 1, UIFont.Small, true)
     self.itemLabel:initialise()
     self:addChild(self.itemLabel)
 
-    local itemDefault = ""
+    self._selectedItem = nil
     if self.priceDef and self.priceDef.item then
-        itemDefault = self.priceDef.item
+        self._selectedItem = self.priceDef.item
     elseif self.priceDef and self.priceDef.items and self.priceDef.items[1] then
-        itemDefault = self.priceDef.items[1].item or ""
+        self._selectedItem = self.priceDef.items[1].item
     end
-    self.itemEntry = ISTextEntryBox:new(itemDefault, x + labelW, y, w - labelW, ROW_H)
-    self.itemEntry:initialise()
-    self.itemEntry:instantiate()
-    self:addChild(self.itemEntry)
-    y = y + ROW_H + 2
 
-    self.itemHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_ItemKey"), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
-    self.itemHint:initialise()
-    self:addChild(self.itemHint)
-    y = y + FONT_HGT_SMALL + PAD
+    local pickBtnW = math.max(math.floor(60 * FONT_SCALE),
+        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
+    self.itemPickBtn = ISButton:new(x + w - pickBtnW, y, pickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickItem)
+    self.itemPickBtn:initialise()
+    self:addChild(self.itemPickBtn)
+
+    self.itemDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+    self.itemDisplay:initialise()
+    self:addChild(self.itemDisplay)
+    self:refreshItemDisplay()
+    y = y + ROW_H + PAD
 
     -- Inherit entry
     self.inheritLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Inherit"), 1, 1, 1, 1, UIFont.Small, true)
@@ -281,9 +291,32 @@ function EditModal:createChildren()
 
     self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
     self.cancelBtn:initialise()
+    if self.cancelBtn.enableCancelColor then
+        self.cancelBtn:enableCancelColor()
+    end
     self:addChild(self.cancelBtn)
 
     self:onKindChanged()
+end
+
+function EditModal:refreshItemDisplay()
+    if self._selectedItem then
+        local si = getScriptManager():getItem(self._selectedItem)
+        local name = si and si:getDisplayName() or self._selectedItem
+        self.itemDisplay:setName(name)
+    else
+        self.itemDisplay:setName(getText("IGUI_PhunMart_Lbl_None"))
+    end
+end
+
+function EditModal:onPickItem()
+    local modal = self
+    local initial = self._selectedItem and {self._selectedItem} or {}
+    local picker = ItemPicker.open(getSpecificPlayer(0), initial, function(key)
+        modal._selectedItem = key
+        modal:refreshItemDisplay()
+    end)
+    picker.singleSelect = true
 end
 
 function EditModal:onKindChanged()
@@ -301,8 +334,8 @@ function EditModal:onKindChanged()
     self.maxEntry:setVisible(not isFree and not isItems)
     self.maxHint:setVisible(not isFree and not isItems)
     self.itemLabel:setVisible(isItems)
-    self.itemEntry:setVisible(isItems)
-    self.itemHint:setVisible(isItems)
+    self.itemDisplay:setVisible(isItems)
+    self.itemPickBtn:setVisible(isItems)
 end
 
 function EditModal:onApply()
@@ -356,11 +389,10 @@ function EditModal:onApply()
         end
         def.amount = math.floor(amt + 0.5)
     elseif kind == "items" then
-        local itemKey = self.itemEntry:getText()
-        if not itemKey or itemKey == "" then
+        if not self._selectedItem or self._selectedItem == "" then
             return
         end
-        def.item = itemKey
+        def.item = self._selectedItem
         local amt = tonumber(self.amountEntry:getText())
         if amt then
             def.amount = math.floor(amt + 0.5)
@@ -379,6 +411,16 @@ function EditModal:onApply()
         def.factor = factor
     end
 
+    -- Preserve fields the editor doesn't manage yet (e.g. substitutes, items array)
+    if self.priceDef then
+        if self.priceDef.substitutes and not def.substitutes then
+            def.substitutes = self.priceDef.substitutes
+        end
+        if self.priceDef.items and not def.items then
+            def.items = self.priceDef.items
+        end
+    end
+
     if self.cb then
         self.cb(key, def)
     end
@@ -390,11 +432,6 @@ function EditModal:onCancel()
     self:close()
 end
 
-function EditModal:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
-end
-
 function EditModal:new(priceKey, priceDef, isNew, cb)
     local modalW = math.floor(320 * FONT_SCALE)
     local modalH = PAD * 10 + FONT_HGT_MEDIUM + ROW_H * 9 + FONT_HGT_SMALL * 5 + PAD * 5
@@ -402,32 +439,27 @@ function EditModal:new(priceKey, priceDef, isNew, cb)
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
 
-    local o = ISPanel:new(sx, sy, modalW, modalH)
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddPrice") or getText("IGUI_PhunMart_Title_EditX", priceKey)
+
+    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
     o.priceKey = priceKey or ""
     o.priceDef = priceDef
     o.isNew = isNew
     o.cb = cb
-    o.backgroundColor = {
-        r = 0.1,
-        g = 0.1,
-        b = 0.1,
-        a = 0.95
-    }
-    o.borderColor = {
-        r = 0.6,
-        g = 0.6,
-        b = 0.6,
-        a = 1
-    }
-    o.moveWithMouse = true
+    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0.8}
+    o:setTitle(titleText)
     return o
 end
 
 ---------------------------------------------------------------------------
--- Main Prices Panel
+-- Main Prices Panel (ListPanel subclass)
 ---------------------------------------------------------------------------
+
+Core.ui.admin_prices = ListPanel:derive("PhunPricesAdminUI")
+Core.ui.admin_prices.instances = {}
+local UI = Core.ui.admin_prices
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -439,6 +471,8 @@ function UI.OnOpenPanel(player)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
         instance = UI:new(x, y, width, height, player)
+        instance:setTitle(getText("IGUI_PhunMart_Title_PriceDefs"))
+        instance.description = getText("IGUI_PhunMart_Desc_PriceDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
@@ -448,9 +482,26 @@ function UI.OnOpenPanel(player)
     return instance
 end
 
+function UI:createChildren()
+    ListPanel.createChildren(self)
+
+    self.list.doDrawItem = self.drawRow
+    self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
+
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.50)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Amount"), 0.72)
+
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+end
+
+function UI:getFilterText(itemData)
+    return itemData.key .. " " .. itemData.kind
+end
+
 function UI:refreshPrices()
-    self.datas:clear()
-    self.datas:setVisible(false)
+    self:clearList()
 
     -- Read from compiled context (defaults + overrides merged)
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
@@ -464,14 +515,13 @@ function UI:refreshPrices()
 
     for _, key in ipairs(keys) do
         local def = prices[key]
-        self.datas:addItem(key, {
+        self:addListItem(key, {
             key = key,
             kind = formatKind(def),
             amount = formatAmount(def),
             def = def
         })
     end
-    self.datas:setVisible(true)
 end
 
 local function savePriceDef(self, key, def)
@@ -498,10 +548,10 @@ function UI:onAddClick()
 end
 
 function UI:onEditClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    if not self.list.selected or self.list.selected == 0 then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
+    local selectedItem = self.list.items[self.list.selected]
     if not selectedItem then
         return
     end
@@ -514,9 +564,8 @@ function UI:onEditClick()
     modal:bringToTop()
 end
 
-function UI:GridDoubleClick(item)
-    local data = item
-    local modal = EditModal:new(data.key, data.def, false, function(key, def)
+function UI:onDoubleClick(item)
+    local modal = EditModal:new(item.key, item.def, false, function(key, def)
         savePriceDef(self, key, def)
     end)
     modal:initialise()
@@ -524,65 +573,12 @@ function UI:GridDoubleClick(item)
     modal:bringToTop()
 end
 
-function UI:createChildren()
-    ISPanel.createChildren(self)
-
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
-
-    -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_PriceDefs"), 1, 1, 1, 1, UIFont.Medium, true)
-    self.title:initialise()
-    self.title:instantiate()
-    self:addChild(self.title)
-
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        self:close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
-
-    y = y + FONT_HGT_MEDIUM + PAD
-
-    -- Toolbar: Add / Edit buttons
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-
-    self.addButton = ISButton:new(x, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, UI.onAddClick)
-    self.addButton:initialise()
-    self:addChild(self.addButton)
-
-    self.editButton = ISButton:new(x + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
-    self.editButton:initialise()
-    self:addChild(self.editButton)
-
-    y = y + ROW_H + PAD + tools.HEADER_HGT
-
-    -- Data list
-    local listH = self.height - y - PAD
-    self.datas = ISScrollingListBox:new(x, y, w, listH)
-    self.datas:initialise()
-    self.datas:instantiate()
-    self.datas.itemheight = FONT_HGT_MEDIUM + math.floor(8 * FONT_SCALE)
-    self.datas.selected = 0
-    self.datas.joypadParent = self
-    self.datas.font = UIFont.NewSmall
-    self.datas.doDrawItem = self.drawDatas
-    self.datas.drawBorder = true
-    self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-
-    local colKind = math.floor(w * 0.50)
-    local colAmount = math.floor(w * 0.72)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Kind"), colKind)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Amount"), colAmount)
-    self.datas:setVisible(false)
-    self:addChild(self.datas)
+function UI:close()
+    ISCollapsableWindowJoypad.close(self)
+    UI.instances[self.playerIndex] = nil
 end
 
-function UI:drawDatas(y, item, alt)
+function UI:drawRow(y, item, alt)
     if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
         return y + self.itemheight
     end
@@ -625,32 +621,4 @@ function UI:drawDatas(y, item, alt)
 
     self.itemsHeight = y + self.itemheight
     return self.itemsHeight
-end
-
-function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
-    UI.instances[self.playerIndex] = nil
-end
-
-function UI:new(x, y, width, height, player)
-    local o = ISPanel:new(x, y, width, height, player)
-    setmetatable(o, self)
-    self.__index = self
-    o.player = player
-    o.playerIndex = player:getPlayerNum()
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    }
-    o.moveWithMouse = true
-    return o
 end

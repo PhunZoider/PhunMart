@@ -28,6 +28,7 @@ local function bakePrice(price, selfItem)
     end
     -- "self" price: player pays by handing over N of the offer item itself (collector offers).
     -- Bake into a standard items price so canAfford/deduct need no special-casing.
+    -- Carries substitutes through so purchasing counts variant items toward the total.
     if price.kind == "self" then
         local amt = price.amount
         local bakedAmt
@@ -36,11 +37,13 @@ local function bakePrice(price, selfItem)
         else
             bakedAmt = amt or 1
         end
+        local subs = type(price.substitutes) == "table" and price.substitutes or nil
         return {
             kind = "items",
             items = {{
                 item = selfItem,
-                amount = bakedAmt
+                amount = bakedAmt,
+                substitutes = subs
             }},
             selfPay = true -- flag: the price IS the displayed item (collector offer)
         }
@@ -69,7 +72,8 @@ local function bakePrice(price, selfItem)
     for _, line in ipairs(price.items or {}) do
         local bl = {
             item = line.item,
-            itemAny = line.itemAny
+            itemAny = line.itemAny,
+            substitutes = line.substitutes
         }
         local amt = line.amount
         if type(amt) == "table" then

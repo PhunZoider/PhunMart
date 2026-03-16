@@ -465,7 +465,13 @@ function UI:canPurchase(offer, offerId)
     elseif adapter and price and price.items then
         for _, pi in ipairs(price.items) do
             local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-            if (adapter:countItem(pi.item) or 0) < need then
+            local count = adapter:countItem(pi.item) or 0
+            if pi.substitutes then
+                for _, sub in ipairs(pi.substitutes) do
+                    count = count + (adapter:countItem(sub) or 0)
+                end
+            end
+            if count < need then
                 return false
             end
         end
@@ -1104,7 +1110,13 @@ function UI:renderDetails(z)
         elseif price.kind == "items" and price.items then
             for _, pi in ipairs(price.items) do
                 local need = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-                if (adapter:countItem(pi.item) or 0) < need then
+                local count = adapter:countItem(pi.item) or 0
+                if pi.substitutes then
+                    for _, sub in ipairs(pi.substitutes) do
+                        count = count + (adapter:countItem(sub) or 0)
+                    end
+                end
+                if count < need then
                     pr, pg, pb = 0.90, 0.30, 0.30
                     break
                 end

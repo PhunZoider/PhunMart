@@ -307,29 +307,34 @@ local function normalizeAmount(amount)
     return amount -- leave as-is, validator can warn
 end
 
--- Normalize a single cost line: { item=string|{...}, amount=number|{min,max}|nil }
+-- Normalize a single cost line: { item=string|{...}, amount=number|{min,max}|nil, substitutes={...}|nil }
+-- substitutes: optional list of item keys accepted as equivalent payment toward this line's amount.
 local function normalizeCostLine(line)
     if type(line) ~= "table" then
         return nil
     end
     local item = line.item
     local amount = normalizeAmount(line.amount)
+    local subs = type(line.substitutes) == "table" and shallowCopy(line.substitutes) or nil
 
     -- item can be string or array of strings (any-of)
     if type(item) == "string" then
         return {
             item = item,
-            amount = amount
+            amount = amount,
+            substitutes = subs
         }
     elseif type(item) == "table" and isArray(item) then
         return {
             itemAny = shallowCopy(item),
-            amount = amount
+            amount = amount,
+            substitutes = subs
         }
     end
     return {
         item = item,
-        amount = amount
+        amount = amount,
+        substitutes = subs
     } -- keep but likely invalid
 end
 
@@ -438,10 +443,13 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
 
     -- "self" price: the offer's own item is the payment. Amount normalised here;
     -- the baked concrete item reference is resolved in bakePrice() at restock time.
+    -- substitutes: optional list of item keys also accepted as payment (e.g. color variants).
     if p.kind == "self" then
+        local subs = type(p.substitutes) == "table" and shallowCopy(p.substitutes) or nil
         return {
             kind = "self",
-            amount = normalizeAmount(p.amount or 1)
+            amount = normalizeAmount(p.amount or 1),
+            substitutes = subs
         }
     end
 
