@@ -475,7 +475,15 @@ function ServerObject:requiresRestock()
     local shop = Core.runtime.shops and Core.runtime.shops[self.type]
     local frequency = (shop and shop.restockFrequency) or 24
     local now = GameTime:getInstance():getWorldAgeHours()
-    return now >= (self.lastRestock or 0) + frequency
+    if now >= (self.lastRestock or 0) + frequency then
+        return true
+    end
+    -- Check if an admin forced a global restock while this chunk was unloaded
+    local md = ModData.getOrCreate("PhunMart")
+    if md.forceRestockAt and md.forceRestockAt > (self.lastRestock or 0) then
+        return true
+    end
+    return false
 end
 
 -- regenerate inventory and persist

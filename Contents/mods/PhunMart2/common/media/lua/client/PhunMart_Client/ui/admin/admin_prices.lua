@@ -25,6 +25,17 @@ local function formatAmount(priceDef)
     if priceDef.kind == "free" then
         return ""
     end
+    if priceDef.kind == "items" then
+        local item = priceDef.item
+        if not item and priceDef.items and priceDef.items[1] then
+            item = priceDef.items[1].item
+        end
+        local amt = priceDef.amount or (priceDef.items and priceDef.items[1] and priceDef.items[1].amount) or 1
+        if type(amt) == "table" then
+            return tostring(amt.min) .. "-" .. tostring(amt.max) .. "x " .. (item or "?")
+        end
+        return tostring(amt) .. "x " .. (item or "?")
+    end
     local amount = priceDef.amount
     if amount == nil then
         return ""
@@ -43,19 +54,22 @@ end
 
 -- Format the kind column display.
 local function formatKind(priceDef)
+    local base
     if priceDef.kind == "free" then
-        return getText("IGUI_PhunMart_Free")
+        base = getText("IGUI_PhunMart_Free")
+    elseif priceDef.kind == "currency" then
+        base = priceDef.pool or "currency"
+    elseif priceDef.kind == "self" then
+        base = "self"
+    elseif priceDef.kind == "items" then
+        base = "items"
+    else
+        base = priceDef.kind or "?"
     end
-    if priceDef.kind == "currency" then
-        return priceDef.pool or "currency"
+    if priceDef.inherit then
+        base = base .. " <" .. priceDef.inherit
     end
-    if priceDef.kind == "self" then
-        return "self"
-    end
-    if priceDef.kind == "items" then
-        return "items"
-    end
-    return priceDef.kind or "?"
+    return base
 end
 
 ---------------------------------------------------------------------------
@@ -102,6 +116,7 @@ function EditModal:createChildren()
     self.kindCombo:addOption("free")
     self.kindCombo:addOption("currency")
     self.kindCombo:addOption("self")
+    self.kindCombo:addOption("items")
     if self.priceDef then
         local kind = self.priceDef.kind or "free"
         if kind == "free" then
@@ -110,6 +125,8 @@ function EditModal:createChildren()
             self.kindCombo.selected = 2
         elseif kind == "self" then
             self.kindCombo.selected = 3
+        elseif kind == "items" then
+            self.kindCombo.selected = 4
         end
     end
     self:addChild(self.kindCombo)
@@ -191,6 +208,65 @@ function EditModal:createChildren()
         UIFont.Small, true)
     self.maxHint:initialise()
     self:addChild(self.maxHint)
+    y = y + FONT_HGT_SMALL + PAD
+
+    -- Item entry (for kind="items")
+    self.itemLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Item"), 1, 1, 1, 1, UIFont.Small, true)
+    self.itemLabel:initialise()
+    self:addChild(self.itemLabel)
+
+    local itemDefault = ""
+    if self.priceDef and self.priceDef.item then
+        itemDefault = self.priceDef.item
+    elseif self.priceDef and self.priceDef.items and self.priceDef.items[1] then
+        itemDefault = self.priceDef.items[1].item or ""
+    end
+    self.itemEntry = ISTextEntryBox:new(itemDefault, x + labelW, y, w - labelW, ROW_H)
+    self.itemEntry:initialise()
+    self.itemEntry:instantiate()
+    self:addChild(self.itemEntry)
+    y = y + ROW_H + 2
+
+    self.itemHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_ItemKey"), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+    self.itemHint:initialise()
+    self:addChild(self.itemHint)
+    y = y + FONT_HGT_SMALL + PAD
+
+    -- Inherit entry
+    self.inheritLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Inherit"), 1, 1, 1, 1, UIFont.Small, true)
+    self.inheritLabel:initialise()
+    self:addChild(self.inheritLabel)
+
+    local inheritDefault = self.priceDef and self.priceDef.inherit or ""
+    self.inheritEntry = ISTextEntryBox:new(inheritDefault, x + labelW, y, w - labelW, ROW_H)
+    self.inheritEntry:initialise()
+    self.inheritEntry:instantiate()
+    self:addChild(self.inheritEntry)
+    y = y + ROW_H + 2
+
+    self.inheritHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_InheritKey"), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+    self.inheritHint:initialise()
+    self:addChild(self.inheritHint)
+    y = y + FONT_HGT_SMALL + PAD
+
+    -- Factor entry
+    self.factorLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Factor"), 1, 1, 1, 1, UIFont.Small, true)
+    self.factorLabel:initialise()
+    self:addChild(self.factorLabel)
+
+    local factorDefault = ""
+    if self.priceDef and self.priceDef.factor and self.priceDef.factor ~= 1 then
+        factorDefault = tostring(self.priceDef.factor)
+    end
+    self.factorEntry = ISTextEntryBox:new(factorDefault, x + labelW, y, w - labelW, ROW_H)
+    self.factorEntry:initialise()
+    self.factorEntry:instantiate()
+    self:addChild(self.factorEntry)
+    y = y + ROW_H + 2
+
+    self.factorHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Factor"), 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+    self.factorHint:initialise()
+    self:addChild(self.factorHint)
     y = y + FONT_HGT_SMALL + PAD * 2
 
     -- Buttons
@@ -214,15 +290,19 @@ function EditModal:onKindChanged()
     local kind = self.kindCombo:getSelectedText()
     local isCurrency = kind == "currency"
     local isFree = kind == "free"
+    local isItems = kind == "items"
 
     self.poolLabel:setVisible(isCurrency)
     self.poolCombo:setVisible(isCurrency)
     self.amountLabel:setVisible(not isFree)
     self.amountEntry:setVisible(not isFree)
     self.amountHint:setVisible(isCurrency)
-    self.maxLabel:setVisible(not isFree)
-    self.maxEntry:setVisible(not isFree)
-    self.maxHint:setVisible(not isFree)
+    self.maxLabel:setVisible(not isFree and not isItems)
+    self.maxEntry:setVisible(not isFree and not isItems)
+    self.maxHint:setVisible(not isFree and not isItems)
+    self.itemLabel:setVisible(isItems)
+    self.itemEntry:setVisible(isItems)
+    self.itemHint:setVisible(isItems)
 end
 
 function EditModal:onApply()
@@ -275,6 +355,28 @@ function EditModal:onApply()
             return
         end
         def.amount = math.floor(amt + 0.5)
+    elseif kind == "items" then
+        local itemKey = self.itemEntry:getText()
+        if not itemKey or itemKey == "" then
+            return
+        end
+        def.item = itemKey
+        local amt = tonumber(self.amountEntry:getText())
+        if amt then
+            def.amount = math.floor(amt + 0.5)
+        end
+    end
+
+    -- Inherit (optional, any kind)
+    local inherit = self.inheritEntry:getText()
+    if inherit and inherit ~= "" then
+        def.inherit = inherit
+    end
+
+    -- Factor (optional, any kind)
+    local factor = tonumber(self.factorEntry:getText())
+    if factor and factor ~= 1 then
+        def.factor = factor
     end
 
     if self.cb then
@@ -295,7 +397,7 @@ end
 
 function EditModal:new(priceKey, priceDef, isNew, cb)
     local modalW = math.floor(320 * FONT_SCALE)
-    local modalH = PAD * 10 + FONT_HGT_MEDIUM + ROW_H * 6 + FONT_HGT_SMALL * 2 + PAD * 2
+    local modalH = PAD * 10 + FONT_HGT_MEDIUM + ROW_H * 9 + FONT_HGT_SMALL * 5 + PAD * 5
     local core = getCore()
     local sx = (core:getScreenWidth() - modalW) / 2
     local sy = (core:getScreenHeight() - modalH) / 2
@@ -377,8 +479,10 @@ local function savePriceDef(self, key, def)
         key = key,
         def = def
     })
-    -- Optimistically update local defs so the list refreshes immediately
-    if Core.defs and Core.defs.prices then
+    -- In SP, skip optimistic update: shared Lua state means the server-side
+    -- recompile will update Core.defs directly, and mutating it here would
+    -- poison the diff in upsertDefinition (it compares against Core.defs).
+    if not Core.isLocal and Core.defs and Core.defs.prices then
         Core.defs.prices[key] = def
     end
     self:refreshPrices()

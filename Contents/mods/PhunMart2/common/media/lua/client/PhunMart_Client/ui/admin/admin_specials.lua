@@ -490,7 +490,7 @@ local function saveSpecialDef(self, key, def)
         key = key,
         def = def
     })
-    if Core.defs and Core.defs.specials then
+    if not Core.isLocal and Core.defs and Core.defs.specials then
         Core.defs.specials[key] = def
     end
     self:refreshSpecials()

@@ -313,7 +313,7 @@ function UI.OnEditItem(player, itemKey)
     if not def then return end
     local modal = EditModal:new(itemKey, def, false, function(key, editedDef)
         sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = editedDef})
-        if Core.defs and Core.defs.items then
+        if not Core.isLocal and Core.defs and Core.defs.items then
             Core.defs.items[key] = editedDef
         end
         local inst = UI.instances[player:getPlayerNum()]
@@ -355,7 +355,7 @@ end
 
 local function saveItemDef(self, key, def)
     sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = def})
-    if Core.defs and Core.defs.items then
+    if not Core.isLocal and Core.defs and Core.defs.items then
         Core.defs.items[key] = def
     end
     self:refreshItems()

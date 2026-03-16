@@ -174,6 +174,24 @@ function ServerSystem:rerollAll()
     end
 end
 
+function ServerSystem:restockAll()
+    local now = GameTime:getInstance():getWorldAgeHours()
+    -- Stamp global ModData so unloaded-chunk shops restock when their chunk loads
+    local md = ModData.getOrCreate("PhunMart")
+    md.forceRestockAt = now
+
+    -- Immediately restock every loaded shop object
+    local count = 0
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj then
+            obj:restock()
+            count = count + 1
+        end
+    end
+    Core.debugLn("restockAll: restocked " .. tostring(count) .. " loaded shops at " .. tostring(now))
+end
+
 function ServerSystem:openShop(player, args, forceRestock)
     local shop = self:getLuaObjectAt(args.x, args.y, args.z)
 

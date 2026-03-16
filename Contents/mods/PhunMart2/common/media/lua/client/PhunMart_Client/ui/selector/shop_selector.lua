@@ -285,6 +285,24 @@ function UI:createChildren()
     self.controls.btnCompile = btnCompile;
     self.controls._controlPanel:addChild(btnCompile);
 
+    local btnRestockAll = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
+        local w = 300
+        local h = 150
+        local modal = ISModalDialog:new(
+            getCore():getScreenWidth() / 2 - w / 2,
+            getCore():getScreenHeight() / 2 - h / 2,
+            w, h,
+            getText("IGUI_PhunMart_Confirm_RestockAll"),
+            true, self, self.onConfirmRestockAll)
+        modal:initialise()
+        modal:addToUIManager()
+    end);
+    btnRestockAll.internal = "RESTOCKALL";
+    btnRestockAll:initialise();
+    btnRestockAll:instantiate();
+    self.controls.btnRestockAll = btnRestockAll;
+    self.controls._controlPanel:addChild(btnRestockAll);
+
 
     local btnPrices = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Prices"), self, function()
         Core.ui.admin_prices.OnOpenPanel(self.player)
@@ -351,6 +369,12 @@ function UI:onEdit(item)
     end
 end
 
+function UI:onConfirmRestockAll(button)
+    if button.internal == "YES" then
+        sendClientCommand(Core.name, Core.commands.restockAllShops, {})
+    end
+end
+
 function UI:prerender()
     ISCollapsableWindowJoypad.prerender(self)
 
@@ -393,6 +417,7 @@ function UI:prerender()
     self.controls.btnWallet:setVisible(isAdminUser)
     self.controls.btnRewards:setVisible(isAdminUser)
     self.controls.btnCompile:setVisible(isAdminUser)
+    self.controls.btnRestockAll:setVisible(isAdminUser)
     if isAdminUser then
         self.controls.btnConfig:setX(10)
         self.controls.btnConfig:setEnable(self.controls.list.selected > 0)
@@ -404,6 +429,7 @@ function UI:prerender()
         self.controls.btnWallet:setX(self.controls.btnPrices.x + self.controls.btnPrices.width + 10)
         self.controls.btnRewards:setX(self.controls.btnWallet.x + self.controls.btnWallet.width + 10)
         self.controls.btnCompile:setX(self.controls.btnRewards.x + self.controls.btnRewards.width + 10)
+        self.controls.btnRestockAll:setX(self.controls.btnCompile.x + self.controls.btnCompile.width + 10)
     end
 
 end

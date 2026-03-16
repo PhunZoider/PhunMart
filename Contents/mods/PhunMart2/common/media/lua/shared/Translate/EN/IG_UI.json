@@ -280,6 +280,10 @@
   "IGUI_PhunMart_Hint_TokenAmount": "Token amount (integer)",
   "IGUI_PhunMart_Hint_EnterDollars": "Enter as dollars (e.g. 5.00)",
   "IGUI_PhunMart_Hint_EnterWholeNumber": "Enter whole number",
+  "IGUI_PhunMart_Hint_ItemKey": "e.g. Base.Money",
+  "IGUI_PhunMart_Hint_InheritKey": "Parent price key (optional)",
+  "IGUI_PhunMart_Hint_Factor": "Multiplier (blank = 1)",
+  "IGUI_PhunMart_Lbl_Factor": "Factor:",
 
   "IGUI_PhunMart_Admin_PanelBtn": "** PhunMart **",
 
@@ -302,6 +306,8 @@
   "IGUI_PhunMart_Title_EditReward": "Edit Milestone",
   "IGUI_PhunMart_Title_AddReward": "Add Milestone",
   "IGUI_PhunMart_Btn_Rewards": "Rewards",
+  "IGUI_PhunMart_Btn_RestockAll": "Restock All",
+  "IGUI_PhunMart_Confirm_RestockAll": "Force restock ALL shops? This rebuilds every shop's inventory immediately.",
   "IGUI_PhunMart_Btn_Delete": "Delete",
   "IGUI_PhunMart_Btn_Save": "Save",
   "IGUI_PhunMart_Col_Category": "Category",

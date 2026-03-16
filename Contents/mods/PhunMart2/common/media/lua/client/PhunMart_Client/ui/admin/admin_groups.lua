@@ -455,7 +455,7 @@ function UI.OnEditGroup(player, groupKey)
     if not def then return end
     local modal = EditModal:new(groupKey, def, false, function(key, editedDef)
         sendClientCommand(Core.name, Core.commands.upsertGroupDef, {key = key, def = editedDef})
-        if Core.defs and Core.defs.groups then
+        if not Core.isLocal and Core.defs and Core.defs.groups then
             Core.defs.groups[key] = editedDef
         end
         -- Refresh open list panel if any
@@ -497,7 +497,7 @@ end
 
 local function saveGroupDef(self, key, def)
     sendClientCommand(Core.name, Core.commands.upsertGroupDef, {key = key, def = def})
-    if Core.defs and Core.defs.groups then
+    if not Core.isLocal and Core.defs and Core.defs.groups then
         Core.defs.groups[key] = def
     end
     self:refreshGroups()

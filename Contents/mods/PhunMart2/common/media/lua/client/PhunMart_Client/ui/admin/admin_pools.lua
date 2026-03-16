@@ -415,7 +415,7 @@ end
 
 local function savePoolDef(key, def)
     sendClientCommand(Core.name, Core.commands.upsertPoolDef, {key = key, def = def})
-    if Core.defs and Core.defs.pools then
+    if not Core.isLocal and Core.defs and Core.defs.pools then
         Core.defs.pools[key] = def
     end
 end

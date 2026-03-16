@@ -511,7 +511,7 @@ function AdminShops.OnOpenPanel(player, shopKey)
     local modal = EditModal:new(shopKey, shopDef, function(key, def)
         def.type = key
         sendClientCommand(Core.name, Core.commands.upsertShopDefinition, def)
-        if Core.defs and Core.defs.shops then
+        if not Core.isLocal and Core.defs and Core.defs.shops then
             Core.defs.shops[key] = def
         end
         print("[PhunMart] Shop updated: " .. key)
