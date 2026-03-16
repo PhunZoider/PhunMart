@@ -4,6 +4,7 @@ end
 
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
+local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 
 local PAD = ListPanel.PAD
@@ -50,211 +51,145 @@ local function formatRewards(entry)
 end
 
 ---------------------------------------------------------------------------
--- Edit / Add Modal
+-- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
-local EditModal = ISCollapsableWindowJoypad:derive("PhunRewardEditModal")
 
-function EditModal:createChildren()
-    ISCollapsableWindowJoypad.createChildren(self)
+local function resolveItemDisplay(itemKey)
+    if not itemKey then return getText("IGUI_PhunMart_Lbl_None") end
+    local si = getScriptManager():getItem(itemKey)
+    return si and si:getDisplayName() or itemKey
+end
 
-    local th = self:titleBarHeight()
-    local x = PAD
-    local y = th + PAD
-    local w = self.width - PAD * 2
-    local labelW = getTextManager():MeasureStringX(UIFont.Small, "Threshold: ") + 8
+local function formatItemList(keys)
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
+    local names = {}
+    local limit = math.min(#keys, 3)
+    for i = 1, limit do
+        names[i] = resolveItemDisplay(keys[i])
+    end
+    local text = table.concat(names, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
+end
 
-    -- Category combo
-    self.categoryLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Category"), 1, 1, 1, 1, UIFont.Small, true)
-    self.categoryLabel:initialise()
-    self:addChild(self.categoryLabel)
+local function updateThresholdHint(form, cat)
+    if cat == "playtime" then
+        form:setHintText("threshold", getText("IGUI_PhunMart_Hint_PlaytimeMinutes"))
+    else
+        form:setHintText("threshold", getText("IGUI_PhunMart_Hint_KillCount"))
+    end
+end
 
-    self.categoryCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H, self, EditModal.onCategoryChanged)
-    self.categoryCombo:initialise()
-    local selectedCat = 1
-    for i, cat in ipairs(CATEGORIES) do
-        self.categoryCombo:addOption(cat)
-        if self.category == cat then
-            selectedCat = i
+local function createEditModal(category, entry, editIndex, isNew, cb)
+    category = category or "playtime"
+
+    -- Pre-compute defaults from entry
+    local threshDefault = ""
+    if entry then
+        threshDefault = tostring(entry[thresholdKey(category)] or "")
+    end
+
+    -- Collect selected items from existing rewards
+    local selectedItems = {}
+    if entry and entry.rewards then
+        for _, r in ipairs(entry.rewards) do
+            if r.item then table.insert(selectedItems, r.item) end
         end
     end
-    self.categoryCombo.selected = selectedCat
-    if not self.isNew then
-        self.categoryCombo:setEditable(false)
-    end
-    self:addChild(self.categoryCombo)
-    y = y + ROW_H + PAD
-
-    -- Threshold entry
-    self.thresholdLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Threshold"), 1, 1, 1, 1, UIFont.Small,
-        true)
-    self.thresholdLabel:initialise()
-    self:addChild(self.thresholdLabel)
-
-    local threshDefault = ""
-    if self.entry then
-        threshDefault = tostring(self.entry[thresholdKey(self.category)] or "")
-    end
-    self.thresholdEntry = ISTextEntryBox:new(threshDefault, x + labelW, y, w - labelW, ROW_H)
-    self.thresholdEntry:initialise()
-    self.thresholdEntry:instantiate()
-    self.thresholdEntry:setOnlyNumbers(true)
-    self:addChild(self.thresholdEntry)
-    y = y + ROW_H + 2
-
-    self.thresholdHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
-    self.thresholdHint:initialise()
-    self:addChild(self.thresholdHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Item (picker)
-    self.itemLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Item"), 1, 1, 1, 1, UIFont.Small, true)
-    self.itemLabel:initialise()
-    self:addChild(self.itemLabel)
-
-    self._selectedItem = nil
-    if self.entry and self.entry.rewards and self.entry.rewards[1] then
-        self._selectedItem = self.entry.rewards[1].item
-    end
-
-    local pickBtnW = math.max(math.floor(60 * FONT_SCALE),
-        getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Pick")) + PAD * 2)
-    self.itemPickBtn = ISButton:new(x + w - pickBtnW, y, pickBtnW, ROW_H, getText("IGUI_PhunMart_Btn_Pick"), self, EditModal.onPickItem)
-    self.itemPickBtn:initialise()
-    self:addChild(self.itemPickBtn)
-
-    self.itemDisplay = ISLabel:new(x + labelW, y, ROW_H, "", 0.8, 0.8, 0.8, 1, UIFont.Small, true)
-    self.itemDisplay:initialise()
-    self:addChild(self.itemDisplay)
-    self:refreshItemDisplay()
-    y = y + ROW_H + PAD
-
-    -- Amount entry
-    self.amountLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_RewardAmount"), 1, 1, 1, 1, UIFont.Small,
-        true)
-    self.amountLabel:initialise()
-    self:addChild(self.amountLabel)
 
     local amountDefault = ""
-    if self.entry and self.entry.rewards and self.entry.rewards[1] then
-        amountDefault = tostring(self.entry.rewards[1].amount or 1)
+    if entry and entry.rewards and entry.rewards[1] then
+        amountDefault = tostring(entry.rewards[1].amount or 1)
     end
-    self.amountEntry = ISTextEntryBox:new(amountDefault, x + labelW, y, w - labelW, ROW_H)
-    self.amountEntry:initialise()
-    self.amountEntry:instantiate()
-    self.amountEntry:setOnlyNumbers(true)
-    self:addChild(self.amountEntry)
-    y = y + ROW_H + 2
-
-    self.amountHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_RewardAmount"), 0.5, 0.5,
-        0.5, 1, UIFont.Small, true)
-    self.amountHint:initialise()
-    self:addChild(self.amountHint)
-    y = y + FONT_HGT_SMALL + PAD * 2
-
-    -- Buttons
-    local btnW = math.floor(80 * FONT_SCALE)
-    local btnGap = PAD
-    local totalBtnW = btnW * 2 + btnGap
-    local btnX = (self.width - totalBtnW) / 2
-
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
-    self.applyBtn:initialise()
-    self:addChild(self.applyBtn)
-
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
-        EditModal.onCancel)
-    self.cancelBtn:initialise()
-    if self.cancelBtn.enableCancelColor then
-        self.cancelBtn:enableCancelColor()
-    end
-    self:addChild(self.cancelBtn)
-
-    self:onCategoryChanged()
-end
-
-function EditModal:onCategoryChanged()
-    local cat = self.categoryCombo:getSelectedText()
-    if cat == "playtime" then
-        self.thresholdHint:setName(getText("IGUI_PhunMart_Hint_PlaytimeMinutes"))
-    else
-        self.thresholdHint:setName(getText("IGUI_PhunMart_Hint_KillCount"))
-    end
-end
-
-function EditModal:refreshItemDisplay()
-    if self._selectedItem then
-        local si = getScriptManager():getItem(self._selectedItem)
-        local name = si and si:getDisplayName() or self._selectedItem
-        self.itemDisplay:setName(name)
-    else
-        self.itemDisplay:setName(getText("IGUI_PhunMart_Lbl_None"))
-    end
-end
-
-function EditModal:onPickItem()
-    local modal = self
-    local initial = self._selectedItem and {self._selectedItem} or {}
-    local picker = ItemPicker.open(getSpecificPlayer(0), initial, function(key)
-        modal._selectedItem = key
-        modal:refreshItemDisplay()
-    end)
-    picker.singleSelect = true
-end
-
-function EditModal:onApply()
-    local cat = self.categoryCombo:getSelectedText()
-    local threshold = tonumber(self.thresholdEntry:getText())
-    local item = self._selectedItem
-    local amount = tonumber(self.amountEntry:getText())
-
-    if not threshold or threshold <= 0 or not item or item == "" or not amount or amount <= 0 then
-        return
-    end
-
-    local newEntry = {
-        rewards = {{
-            item = item,
-            amount = math.floor(amount)
-        }}
-    }
-    if cat == "playtime" then
-        newEntry.atMinutes = math.floor(threshold)
-    else
-        newEntry.kills = math.floor(threshold)
-    end
-
-    if self.cb then
-        self.cb(cat, newEntry, self.editIndex)
-    end
-
-    self:close()
-end
-
-function EditModal:onCancel()
-    self:close()
-end
-
-function EditModal:new(category, entry, editIndex, isNew, cb)
-    local modalW = math.floor(380 * FONT_SCALE)
-    local modalH = PAD * 9 + FONT_HGT_MEDIUM + ROW_H * 4 + FONT_HGT_SMALL * 3 + PAD * 2
-    local core = getCore()
-    local sx = (core:getScreenWidth() - modalW) / 2
-    local sy = (core:getScreenHeight() - modalH) / 2
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddReward") or
                           getText("IGUI_PhunMart_Title_EditReward")
 
-    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
-    setmetatable(o, self)
-    self.__index = self
-    o.category = category or "playtime"
-    o.entry = entry
-    o.editIndex = editIndex
-    o.isNew = isNew
-    o.cb = cb
-    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0.8}
-    o:setTitle(titleText)
-    return o
+    local form = FormPanel:new({
+        width = math.floor(380 * FONT_SCALE),
+        title = titleText,
+        onApply = function(f)
+            local cat = f:getFieldValue("category")
+            local threshold = f:getFieldNumber("threshold")
+            local items = f:getFieldValue("items")
+            local amount = f:getFieldNumber("amount")
+
+            if not threshold or threshold <= 0 or not items or #items == 0 or not amount or amount <= 0 then
+                return
+            end
+
+            local rewards = {}
+            for _, item in ipairs(items) do
+                table.insert(rewards, { item = item, amount = math.floor(amount) })
+            end
+
+            local newEntry = {
+                rewards = rewards
+            }
+            if cat == "playtime" then
+                newEntry.atMinutes = math.floor(threshold)
+            else
+                newEntry.kills = math.floor(threshold)
+            end
+
+            if cb then
+                cb(cat, newEntry, editIndex)
+            end
+
+            f:close()
+        end,
+    })
+
+    form:addComboField("category", getText("IGUI_PhunMart_Lbl_Category"), {
+        options = CATEGORIES,
+        selected = category,
+        editable = isNew,
+        onChange = function(f)
+            local cat = f:getFieldValue("category")
+            updateThresholdHint(f, cat)
+        end,
+    })
+    form:addTextField("threshold", getText("IGUI_PhunMart_Lbl_Threshold"), {
+        default = threshDefault,
+        numbersOnly = true,
+        hint = " ",  -- placeholder; updated after initialise
+    })
+    form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Item"), {
+        value = selectedItems,
+        display = formatItemList(selectedItems),
+        onPick = function(f, field)
+            ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
+                selectedItems = keys or {}
+                f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
+            end)
+        end,
+    })
+    form:addTextField("amount", getText("IGUI_PhunMart_Lbl_RewardAmount"), {
+        default = amountDefault,
+        numbersOnly = true,
+        hint = getText("IGUI_PhunMart_Hint_RewardAmount"),
+    })
+
+    form:initialise()
+
+    -- Set initial threshold hint based on category
+    updateThresholdHint(form, category)
+
+    -- If editing, disable the category combo
+    if not isNew then
+        local catField = form._fieldsByKey["category"]
+        if catField and catField._combo then
+            catField._combo:setEditable(false)
+        end
+    end
+
+    form:addToUIManager()
+    form:bringToTop()
+    return form
 end
 
 ---------------------------------------------------------------------------
@@ -371,12 +306,9 @@ local function applyEdit(self, cat, newEntry, editIndex)
 end
 
 function UI:onAddClick()
-    local modal = EditModal:new(nil, nil, nil, true, function(cat, newEntry, _editIndex)
+    createEditModal(nil, nil, nil, true, function(cat, newEntry, _editIndex)
         applyEdit(self, cat, newEntry, nil)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:onEditClick()
@@ -388,12 +320,9 @@ function UI:onEditClick()
         return
     end
     local data = selectedItem.item
-    local modal = EditModal:new(data.category, data.entry, data.entryIndex, false, function(cat, newEntry, editIndex)
+    createEditModal(data.category, data.entry, data.entryIndex, false, function(cat, newEntry, editIndex)
         applyEdit(self, cat, newEntry, editIndex)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:onDeleteClick()
@@ -414,12 +343,9 @@ function UI:onDeleteClick()
 end
 
 function UI:onDoubleClick(item)
-    local modal = EditModal:new(item.category, item.entry, item.entryIndex, false, function(cat, newEntry, editIndex)
+    createEditModal(item.category, item.entry, item.entryIndex, false, function(cat, newEntry, editIndex)
         applyEdit(self, cat, newEntry, editIndex)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:close()

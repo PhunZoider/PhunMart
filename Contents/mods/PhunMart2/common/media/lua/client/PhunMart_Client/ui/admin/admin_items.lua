@@ -4,6 +4,7 @@ end
 
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
+local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -48,215 +49,95 @@ local function formatEnabled(itemDef)
 end
 
 ---------------------------------------------------------------------------
--- Edit / Add Modal
+-- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
-local EditModal = ISCollapsableWindowJoypad:derive("PhunItemEditModal")
 
-function EditModal:createChildren()
-    ISCollapsableWindowJoypad.createChildren(self)
+local function createEditModal(itemKey, itemDef, isNew, cb)
+    local def = itemDef or {}
 
-    local th = self:titleBarHeight()
-    local x = PAD
-    local y = th + PAD
-    local w = self.width - PAD * 2
-    local labelW = getTextManager():MeasureStringX(UIFont.Small, "Reward: ") + 8
-
-    -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
-    self.keyLabel:initialise()
-    self:addChild(self.keyLabel)
-
-    self.keyEntry = ISTextEntryBox:new(self.itemKey or "", x + labelW, y, w - labelW, ROW_H)
-    self.keyEntry:initialise()
-    self.keyEntry:instantiate()
-    if not self.isNew then
-        self.keyEntry:setEditable(false)
-    end
-    self:addChild(self.keyEntry)
-    y = y + ROW_H + PAD
-
-    -- Price combo
-    self.priceLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Price"), 1, 1, 1, 1, UIFont.Small, true)
-    self.priceLabel:initialise()
-    self:addChild(self.priceLabel)
-
-    self.priceCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.priceCombo:initialise()
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-    local priceKeys = getSortedKeys(prices)
-    local selectedPriceIdx = 1
-    for i, pk in ipairs(priceKeys) do
-        self.priceCombo:addOption(pk)
-        if self.itemDef and self.itemDef.price == pk then
-            selectedPriceIdx = i
-        end
-    end
-    self.priceCombo.selected = selectedPriceIdx
-    self:addChild(self.priceCombo)
-    y = y + ROW_H + PAD
+    local priceKeys = {""}
+    for _, pk in ipairs(getSortedKeys(prices)) do table.insert(priceKeys, pk) end
 
-    -- Special combo
-    self.specialLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Special"), 1, 1, 1, 1, UIFont.Small, true)
-    self.specialLabel:initialise()
-    self:addChild(self.specialLabel)
-
-    self.specialCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.specialCombo:initialise()
     local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
-    local specialKeys = getSortedKeys(specials)
-    local selectedSpecialIdx = 1
-    for i, rk in ipairs(specialKeys) do
-        self.specialCombo:addOption(rk)
-        if self.itemDef and self.itemDef.reward == rk then
-            selectedSpecialIdx = i
-        end
-    end
-    self.specialCombo.selected = selectedSpecialIdx
-    self:addChild(self.specialCombo)
-    y = y + ROW_H + PAD
-
-    -- Weight entry
-    self.weightLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Weight"), 1, 1, 1, 1, UIFont.Small, true)
-    self.weightLabel:initialise()
-    self:addChild(self.weightLabel)
+    local specialKeys = {""}
+    for _, sk in ipairs(getSortedKeys(specials)) do table.insert(specialKeys, sk) end
 
     local weightDefault = "1.0"
-    if self.itemDef and self.itemDef.offer and self.itemDef.offer.weight then
-        weightDefault = tostring(self.itemDef.offer.weight)
+    if def.offer and def.offer.weight then
+        weightDefault = tostring(def.offer.weight)
     end
-    self.weightEntry = ISTextEntryBox:new(weightDefault, x + labelW, y, w - labelW, ROW_H)
-    self.weightEntry:initialise()
-    self.weightEntry:instantiate()
-    self:addChild(self.weightEntry)
-    y = y + ROW_H + PAD
-
-    -- Stock min entry
-    self.stockMinLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_StockMin"), 1, 1, 1, 1, UIFont.Small, true)
-    self.stockMinLabel:initialise()
-    self:addChild(self.stockMinLabel)
 
     local stockMinDefault = ""
-    if self.itemDef and self.itemDef.offer and self.itemDef.offer.stock then
-        stockMinDefault = tostring(self.itemDef.offer.stock.min or "")
-    end
-    self.stockMinEntry = ISTextEntryBox:new(stockMinDefault, x + labelW, y, w - labelW, ROW_H)
-    self.stockMinEntry:initialise()
-    self.stockMinEntry:instantiate()
-    self:addChild(self.stockMinEntry)
-    y = y + ROW_H + PAD
-
-    -- Stock max entry
-    self.stockMaxLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_StockMax"), 1, 1, 1, 1, UIFont.Small, true)
-    self.stockMaxLabel:initialise()
-    self:addChild(self.stockMaxLabel)
-
     local stockMaxDefault = ""
-    if self.itemDef and self.itemDef.offer and self.itemDef.offer.stock then
-        stockMaxDefault = tostring(self.itemDef.offer.stock.max or "")
-    end
-    self.stockMaxEntry = ISTextEntryBox:new(stockMaxDefault, x + labelW, y, w - labelW, ROW_H)
-    self.stockMaxEntry:initialise()
-    self.stockMaxEntry:instantiate()
-    self:addChild(self.stockMaxEntry)
-    y = y + ROW_H + 2
-
-    self.stockHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_UnlimitedStock"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.stockHint:initialise()
-    self:addChild(self.stockHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Enabled checkbox
-    self.enabledCheck = ISTickBox:new(x, y, w, ROW_H, "")
-    self.enabledCheck:initialise()
-    self.enabledCheck:instantiate()
-    self.enabledCheck:addOption(getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), nil)
-    local isEnabled = not self.itemDef or self.itemDef.enabled ~= false
-    self.enabledCheck:setSelected(1, isEnabled)
-    self:addChild(self.enabledCheck)
-    y = y + ROW_H + PAD * 2
-
-    -- Buttons
-    local btnW = math.floor(80 * FONT_SCALE)
-    local btnGap = PAD
-    local totalBtnW = btnW * 2 + btnGap
-    local btnX = (self.width - totalBtnW) / 2
-
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
-    self.applyBtn:initialise()
-    self:addChild(self.applyBtn)
-
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
-        EditModal.onCancel)
-    self.cancelBtn:initialise()
-    if self.cancelBtn.enableCancelColor then
-        self.cancelBtn:enableCancelColor()
-    end
-    self:addChild(self.cancelBtn)
-end
-
-function EditModal:onApply()
-    local key = self.keyEntry:getText()
-    if not key or key == "" then
-        return
+    if def.offer and def.offer.stock then
+        stockMinDefault = tostring(def.offer.stock.min or "")
+        stockMaxDefault = tostring(def.offer.stock.max or "")
     end
 
-    local def = {
-        price = self.priceCombo:getSelectedText(),
-        reward = self.specialCombo:getSelectedText(),
-        offer = {}
-    }
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddItem") or getText("IGUI_PhunMart_Title_EditX", itemKey or "")
 
-    local weight = tonumber(self.weightEntry:getText())
-    if weight then
-        def.offer.weight = weight
-    else
-        def.offer.weight = 1.0
-    end
+    local form = FormPanel:new({
+        width = math.floor(380 * FONT_SCALE),
+        title = titleText,
+        onApply = function(f)
+            local key = f:getFieldValue("key")
+            if not key or key == "" then return end
 
-    local stockMin = tonumber(self.stockMinEntry:getText())
-    local stockMax = tonumber(self.stockMaxEntry:getText())
-    if stockMin and stockMax then
-        def.offer.stock = {
-            min = math.floor(stockMin),
-            max = math.floor(stockMax)
-        }
-    end
+            local result = {
+                price = f:getFieldValue("price"),
+                reward = f:getFieldValue("special"),
+                offer = {}
+            }
 
-    if not self.enabledCheck:isSelected(1) then
-        def.enabled = false
-    end
+            local weight = f:getFieldNumber("weight")
+            result.offer.weight = weight or 1.0
 
-    if self.cb then
-        self.cb(key, def)
-    end
+            local stockMin, stockMax = f:getFieldRange("stock")
+            if stockMin and stockMax then
+                result.offer.stock = {
+                    min = math.floor(stockMin),
+                    max = math.floor(stockMax)
+                }
+            end
 
-    self:close()
-end
+            if not f:getFieldValue("enabled") then
+                result.enabled = false
+            end
 
-function EditModal:onCancel()
-    self:close()
-end
+            if cb then cb(key, result) end
+            f:close()
+        end,
+    })
 
-function EditModal:new(itemKey, itemDef, isNew, cb)
-    local modalW = math.floor(380 * FONT_SCALE)
-    local modalH = PAD * 12 + FONT_HGT_MEDIUM + ROW_H * 8 + FONT_HGT_SMALL + PAD * 2
-    local core = getCore()
-    local sx = (core:getScreenWidth() - modalW) / 2
-    local sy = (core:getScreenHeight() - modalH) / 2
+    form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
+        default = itemKey or "", editable = isNew,
+    })
+    form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
+        options = priceKeys, selected = def.price or priceKeys[1],
+        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+    })
+    form:addComboField("special", getText("IGUI_PhunMart_Lbl_Special"), {
+        options = specialKeys, selected = def.reward or specialKeys[1],
+        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+    })
+    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+        default = weightDefault,
+        hint = getText("IGUI_PhunMart_Hint_Weight"),
+    })
+    form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
+        min = stockMinDefault, max = stockMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
+        checked = def.enabled ~= false,
+        text = getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"),
+    })
 
-    local titleText = isNew and getText("IGUI_PhunMart_Title_AddItem") or getText("IGUI_PhunMart_Title_EditX", itemKey)
-
-    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
-    setmetatable(o, self)
-    self.__index = self
-    o.itemKey = itemKey or ""
-    o.itemDef = itemDef
-    o.isNew = isNew
-    o.cb = cb
-    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0.8}
-    o:setTitle(titleText)
-    return o
+    form:initialise()
+    form:addToUIManager()
+    form:bringToTop()
+    return form
 end
 
 ---------------------------------------------------------------------------
@@ -294,7 +175,7 @@ function UI.OnEditItem(player, itemKey)
     if not def then
         return
     end
-    local modal = EditModal:new(itemKey, def, false, function(key, editedDef)
+    createEditModal(itemKey, def, false, function(key, editedDef)
         sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = editedDef})
         if not Core.isLocal and Core.defs and Core.defs.items then
             Core.defs.items[key] = editedDef
@@ -304,9 +185,6 @@ function UI.OnEditItem(player, itemKey)
             inst:refreshItems()
         end
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:createChildren()
@@ -362,12 +240,9 @@ local function saveItemDef(self, key, def)
 end
 
 function UI:onAddClick()
-    local modal = EditModal:new(nil, nil, true, function(key, def)
+    createEditModal(nil, nil, true, function(key, def)
         saveItemDef(self, key, def)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:onEditClick()
@@ -379,21 +254,15 @@ function UI:onEditClick()
         return
     end
     local data = selectedItem.item
-    local modal = EditModal:new(data.key, data.def, false, function(key, def)
+    createEditModal(data.key, data.def, false, function(key, def)
         saveItemDef(self, key, def)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:onDoubleClick(item)
-    local modal = EditModal:new(item.key, item.def, false, function(key, def)
+    createEditModal(item.key, item.def, false, function(key, def)
         saveItemDef(self, key, def)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:close()

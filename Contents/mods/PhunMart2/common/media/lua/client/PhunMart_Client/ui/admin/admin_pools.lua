@@ -2,11 +2,10 @@ if isServer() then
     return
 end
 
-require "ISUI/ISCollapsableWindowJoypad"
-
 local Core = PhunMart
-local tools = require "PhunMart_Client/ui/ui_utils"
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
+local FormPanel = require "PhunMart_Client/ui/base/form_panel"
+local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -65,24 +64,6 @@ local function formatZones(def)
     return ""
 end
 
--- Parse a comma-separated string into a trimmed array. Returns nil for empty input.
-local function parseCSV(text)
-    if not text or text == "" then
-        return nil
-    end
-    local result = {}
-    for s in text:gmatch("[^,]+") do
-        s = s:match("^%s*(.-)%s*$")
-        if s ~= "" then
-            table.insert(result, s)
-        end
-    end
-    if #result == 0 then
-        return nil
-    end
-    return result
-end
-
 -- Parse a comma-separated string of numbers into an integer array. Returns nil for empty input.
 local function parseCSVNumbers(text)
     if not text or text == "" then
@@ -103,253 +84,175 @@ local function parseCSVNumbers(text)
 end
 
 ---------------------------------------------------------------------------
--- Edit / Add Modal
+-- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
-local EditModal = ISCollapsableWindowJoypad:derive("PhunPoolEditModal")
 
-function EditModal:createChildren()
-    ISCollapsableWindowJoypad.createChildren(self)
-
-    local th = self:titleBarHeight()
-    local x = PAD
-    local y = th + PAD
-    local w = self.width - PAD * 2
-    local labelW = getTextManager():MeasureStringX(UIFont.Small, "Fallback Category: ") + 8
-
-    -- Key entry
-    self.keyLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Key"), 1, 1, 1, 1, UIFont.Small, true)
-    self.keyLabel:initialise()
-    self:addChild(self.keyLabel)
-
-    self.keyEntry = ISTextEntryBox:new(self.poolKey or "", x + labelW, y, w - labelW, ROW_H)
-    self.keyEntry:initialise()
-    self.keyEntry:instantiate()
-    if not self.isNew then
-        self.keyEntry:setEditable(false)
+-- Format a key list as "key1, key2, key3 +X more" or "(none)".
+local function formatKeyList(keys, limit)
+    limit = limit or 3
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
     end
-    self:addChild(self.keyEntry)
-    y = y + ROW_H + PAD
+    local show = math.min(#keys, limit)
+    local parts = {}
+    for i = 1, show do
+        table.insert(parts, keys[i])
+    end
+    local text = table.concat(parts, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
+end
 
-    -- Default Price combo
-    self.priceLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Price"), 1, 1, 1, 1, UIFont.Small, true)
-    self.priceLabel:initialise()
-    self:addChild(self.priceLabel)
-
-    self.priceCombo = ISComboBox:new(x + labelW, y, w - labelW, ROW_H)
-    self.priceCombo:initialise()
-    self.priceCombo:addOption("")
-    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-    local priceKeys = getSortedKeys(prices)
-    local selectedPriceIdx = 1
-    for i, pk in ipairs(priceKeys) do
-        self.priceCombo:addOption(pk)
-        if self.poolDef and self.poolDef.defaults and self.poolDef.defaults.price == pk then
-            selectedPriceIdx = i + 1
+-- Collect unique special categories from special defs.
+local function getSpecialCategories()
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local catSet = {}
+    for _, def in pairs(specials) do
+        if def.category and def.category ~= "" then
+            catSet[def.category] = true
         end
     end
-    self.priceCombo.selected = selectedPriceIdx
-    self:addChild(self.priceCombo)
-    y = y + ROW_H + 2
-
-    self.priceHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_FallbackPrice"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.priceHint:initialise()
-    self:addChild(self.priceHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Source Groups (comma-separated)
-    self.groupsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Groups"), 1, 1, 1, 1, UIFont.Small, true)
-    self.groupsLabel:initialise()
-    self:addChild(self.groupsLabel)
-
-    local groupsDefault = ""
-    if self.poolDef and self.poolDef.sources and self.poolDef.sources.groups then
-        groupsDefault = table.concat(self.poolDef.sources.groups, ", ")
+    local sorted = {}
+    for cat in pairs(catSet) do
+        table.insert(sorted, cat)
     end
-    self.groupsEntry = ISTextEntryBox:new(groupsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.groupsEntry:initialise()
-    self.groupsEntry:instantiate()
-    self:addChild(self.groupsEntry)
-    y = y + ROW_H + 2
+    table.sort(sorted)
+    return sorted
+end
 
-    self.groupsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Groups"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.groupsHint:initialise()
-    self:addChild(self.groupsHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Source Specials (comma-separated)
-    self.specialsLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Specials"), 1, 1, 1, 1, UIFont.Small, true)
-    self.specialsLabel:initialise()
-    self:addChild(self.specialsLabel)
-
-    local specialsDefault = ""
-    if self.poolDef and self.poolDef.sources and self.poolDef.sources.specials then
-        specialsDefault = table.concat(self.poolDef.sources.specials, ", ")
-    end
-    self.specialsEntry = ISTextEntryBox:new(specialsDefault, x + labelW, y, w - labelW, ROW_H)
-    self.specialsEntry:initialise()
-    self.specialsEntry:instantiate()
-    self:addChild(self.specialsEntry)
-    y = y + ROW_H + 2
-
-    self.specialsHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Specials"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.specialsHint:initialise()
-    self:addChild(self.specialsHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Zones Difficulty (comma-separated numbers)
-    self.zonesLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Zones"), 1, 1, 1, 1, UIFont.Small, true)
-    self.zonesLabel:initialise()
-    self:addChild(self.zonesLabel)
+local function createEditModal(poolKey, poolDef, isNew, cb)
+    local def = poolDef or {}
 
     local zonesDefault = ""
-    if self.poolDef and self.poolDef.zones and self.poolDef.zones.difficulty then
+    if def.zones and def.zones.difficulty then
         local nums = {}
-        for _, d in ipairs(self.poolDef.zones.difficulty) do
+        for _, d in ipairs(def.zones.difficulty) do
             table.insert(nums, tostring(d))
         end
         zonesDefault = table.concat(nums, ", ")
     end
-    self.zonesEntry = ISTextEntryBox:new(zonesDefault, x + labelW, y, w - labelW, ROW_H)
-    self.zonesEntry:initialise()
-    self.zonesEntry:instantiate()
-    self:addChild(self.zonesEntry)
-    y = y + ROW_H + 2
 
-    self.zonesHint = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, getText("IGUI_PhunMart_Hint_Zones"), 0.5, 0.5, 0.5, 1,
-        UIFont.Small, true)
-    self.zonesHint:initialise()
-    self:addChild(self.zonesHint)
-    y = y + FONT_HGT_SMALL + PAD
-
-    -- Fallback Texture
-    self.fbTexLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_FallbackTexture"), 1, 1, 1, 1, UIFont.Small, true)
-    self.fbTexLabel:initialise()
-    self:addChild(self.fbTexLabel)
-
-    local fbTexDefault = (self.poolDef and self.poolDef.fallbackTexture) or ""
-    self.fbTexEntry = ISTextEntryBox:new(fbTexDefault, x + labelW, y, w - labelW, ROW_H)
-    self.fbTexEntry:initialise()
-    self.fbTexEntry:instantiate()
-    self:addChild(self.fbTexEntry)
-    y = y + ROW_H + PAD
-
-    -- Fallback Category
-    self.fbCatLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_FallbackCategory"), 1, 1, 1, 1, UIFont.Small, true)
-    self.fbCatLabel:initialise()
-    self:addChild(self.fbCatLabel)
-
-    local fbCatDefault = (self.poolDef and self.poolDef.fallbackCategory) or ""
-    self.fbCatEntry = ISTextEntryBox:new(fbCatDefault, x + labelW, y, w - labelW, ROW_H)
-    self.fbCatEntry:initialise()
-    self.fbCatEntry:instantiate()
-    self:addChild(self.fbCatEntry)
-    y = y + ROW_H + PAD * 2
-
-    -- Buttons
-    local btnW = math.floor(80 * FONT_SCALE)
-    local btnGap = PAD
-    local totalBtnW = btnW * 2 + btnGap
-    local btnX = (self.width - totalBtnW) / 2
-
-    self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
-    self.applyBtn:initialise()
-    self:addChild(self.applyBtn)
-
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
-    self.cancelBtn:initialise()
-    self:addChild(self.cancelBtn)
-end
-
-function EditModal:onApply()
-    local key = self.keyEntry:getText()
-    if not key or key == "" then
-        return
+    -- Build price combo options: blank + sorted price keys
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local priceKeys = getSortedKeys(prices)
+    local priceOptions = {""}
+    for _, pk in ipairs(priceKeys) do
+        table.insert(priceOptions, pk)
+    end
+    local selectedPrice = ""
+    if def.defaults and def.defaults.price then
+        selectedPrice = def.defaults.price
     end
 
-    local def = {}
-
-    -- Price (optional)
-    local priceText = self.priceCombo:getSelectedText()
-    if priceText ~= "" then
-        def.defaults = def.defaults or {}
-        def.defaults.price = priceText
+    -- Copy arrays for picker mutations
+    local selectedGroups = {}
+    if def.sources and def.sources.groups then
+        for _, g in ipairs(def.sources.groups) do table.insert(selectedGroups, g) end
+    end
+    local selectedSpecials = {}
+    if def.sources and def.sources.specials then
+        for _, s in ipairs(def.sources.specials) do table.insert(selectedSpecials, s) end
     end
 
-    -- Sources
-    local groups = parseCSV(self.groupsEntry:getText())
-    local specials = parseCSV(self.specialsEntry:getText())
-    if groups or specials then
-        def.sources = {}
-        if groups then
-            def.sources.groups = groups
-        end
-        if specials then
-            def.sources.specials = specials
-        end
-    end
+    -- Collect available group keys and special categories for pickers
+    local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
+    local groupOptions = getSortedKeys(groups)
+    local specialCatOptions = getSpecialCategories()
 
-    -- Zones (optional)
-    local zones = parseCSVNumbers(self.zonesEntry:getText())
-    if zones then
-        def.zones = {
-            difficulty = zones
-        }
-    end
-
-    -- Fallback Texture (optional)
-    local fbTex = self.fbTexEntry:getText()
-    if fbTex and fbTex ~= "" then
-        def.fallbackTexture = fbTex
-    end
-
-    -- Fallback Category (optional)
-    local fbCat = self.fbCatEntry:getText()
-    if fbCat and fbCat ~= "" then
-        def.fallbackCategory = fbCat
-    end
-
-    if self.cb then
-        self.cb(key, def)
-    end
-
-    self:close()
-end
-
-function EditModal:onCancel()
-    self:close()
-end
-
-function EditModal:close()
-    ISCollapsableWindowJoypad.close(self)
-end
-
-function EditModal:new(poolKey, poolDef, isNew, cb)
-    local modalW = math.floor(520 * FONT_SCALE)
-    local modalH = PAD * 13 + FONT_HGT_MEDIUM + ROW_H * 8 + FONT_HGT_SMALL * 4 + PAD * 4
-    local core = getCore()
-    local sx = (core:getScreenWidth() - modalW) / 2
-    local sy = (core:getScreenHeight() - modalH) / 2
-
-    local o = ISCollapsableWindowJoypad:new(sx, sy, modalW, modalH)
-    setmetatable(o, self)
-    self.__index = self
-    o.poolKey = poolKey or ""
-    o.poolDef = poolDef
-    o.isNew = isNew
-    o.cb = cb
-    o.backgroundColor = {
-        r = 0.1,
-        g = 0.1,
-        b = 0.1,
-        a = 0.95
-    }
-    o.resizable = false
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", poolKey or "")
-    o:setTitle(titleText)
-    return o
+
+    local form = FormPanel:new({
+        width = math.floor(520 * FONT_SCALE),
+        title = titleText,
+        onApply = function(f)
+            local key = f:getFieldValue("key")
+            if not key or key == "" then return end
+
+            local result = {}
+
+            -- Price (optional)
+            local priceText = f:getFieldValue("price")
+            if priceText and priceText ~= "" then
+                result.defaults = { price = priceText }
+            end
+
+            -- Sources (from pickers)
+            local hasGroups = #selectedGroups > 0
+            local hasSpecials = #selectedSpecials > 0
+            if hasGroups or hasSpecials then
+                result.sources = {}
+                if hasGroups then result.sources.groups = selectedGroups end
+                if hasSpecials then result.sources.specials = selectedSpecials end
+            end
+
+            -- Zones (optional)
+            local zones = parseCSVNumbers(f:getFieldValue("zones"))
+            if zones then
+                result.zones = { difficulty = zones }
+            end
+
+            -- Fallback Texture (optional)
+            local fbTex = f:getFieldValue("fallbackTexture")
+            if fbTex and fbTex ~= "" then
+                result.fallbackTexture = fbTex
+            end
+
+            -- Fallback Category (optional)
+            local fbCat = f:getFieldValue("fallbackCategory")
+            if fbCat and fbCat ~= "" then
+                result.fallbackCategory = fbCat
+            end
+
+            if cb then cb(key, result) end
+            f:close()
+        end,
+    })
+
+    form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
+        default = poolKey or "", editable = isNew,
+    })
+    form:addPickerField("groups", getText("IGUI_PhunMart_Lbl_Groups"), {
+        value = selectedGroups, display = formatKeyList(selectedGroups),
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), groupOptions, selectedGroups, function(keys)
+                selectedGroups = keys or {}
+                f:setPickerValue("groups", selectedGroups, formatKeyList(selectedGroups))
+            end, { title = getText("IGUI_PhunMart_Admin_PickGroups") })
+        end,
+    })
+    form:addPickerField("specials", getText("IGUI_PhunMart_Lbl_Specials"), {
+        value = selectedSpecials, display = formatKeyList(selectedSpecials),
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecials, function(keys)
+                selectedSpecials = keys or {}
+                f:setPickerValue("specials", selectedSpecials, formatKeyList(selectedSpecials))
+            end, { title = getText("IGUI_PhunMart_Admin_PickSpecialCats") })
+        end,
+    })
+    form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
+        default = zonesDefault,
+        hint = getText("IGUI_PhunMart_Hint_Zones"),
+    })
+    form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+        options = priceOptions,
+        selected = selectedPrice,
+        hint = getText("IGUI_PhunMart_Hint_FallbackPrice"),
+    })
+    form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_FallbackTexture"), {
+        default = def.fallbackTexture or "",
+        hint = getText("IGUI_PhunMart_Hint_FallbackTexture"),
+    })
+    form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_FallbackCategory"), {
+        default = def.fallbackCategory or "",
+        hint = getText("IGUI_PhunMart_Hint_FallbackCategory"),
+    })
+
+    form:initialise()
+    form:addToUIManager()
+    form:bringToTop()
+    return form
 end
 
 ---------------------------------------------------------------------------
@@ -433,13 +336,10 @@ function UI:refreshPools()
 end
 
 function UI:onAddClick()
-    local modal = EditModal:new(nil, nil, true, function(key, def)
+    createEditModal(nil, nil, true, function(key, def)
         savePoolDef(key, def)
         self:refreshPools()
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:onViewClick()
@@ -466,24 +366,18 @@ function UI:onEditClick()
         return
     end
     local data = selectedItem.item
-    local modal = EditModal:new(data.key, data.def, false, function(key, def)
+    createEditModal(data.key, data.def, false, function(key, def)
         savePoolDef(key, def)
         self:refreshPools()
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:GridDoubleClick(item)
     local data = item
-    local modal = EditModal:new(data.key, data.def, false, function(key, def)
+    createEditModal(data.key, data.def, false, function(key, def)
         savePoolDef(key, def)
         self:refreshPools()
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
 
 function UI:drawDatas(y, item, alt)
@@ -555,11 +449,8 @@ function UI.OnEditPool(player, poolKey)
         end
         isNew = false
     end
-    local modal = EditModal:new(poolKey, poolDef, isNew, function(key, def)
+    createEditModal(poolKey, poolDef, isNew, function(key, def)
         savePoolDef(key, def)
         print("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
     end)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:bringToTop()
 end
