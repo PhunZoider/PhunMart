@@ -8,11 +8,13 @@ return {
         unpoweredSprites = {"phunmart_01_12", "phunmart_01_13", "phunmart_01_14", "phunmart_01_15"},
         roll = { mode = "weighted", count = { min = 6, max = 9 } },
         poolSets = {{
+            price = "currency_low",
             keys = {{
                 key = "pool_goodphoods",
                 weight = 1.0
             }}
         }, {
+            price = "currency_low",
             keys = {{
                 key = "pool_phatphoods",
                 weight = 1.0
@@ -28,6 +30,7 @@ return {
         unpoweredSprites = {"phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_mid",
             keys = {{
                 key = "pool_pittythetool",
                 weight = 1.0
@@ -43,24 +46,28 @@ return {
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
         poolSets = {{
+            price = "currency_mid",
             roll = { mode = "weighted", count = { min = 2, max = 3 } },
             keys = {{
                 key = "pool_finalamendment_melee",
                 weight = 1.0
             }}
         }, {
+            price = "currency_low",
             roll = { mode = "weighted", count = { min = 4, max = 7 } },
             keys = {{
                 key = "pool_finalamendment_ammo",
                 weight = 1.0
             }}
         }, {
+            price = "currency_high",
             roll = { mode = "weighted", count = { min = 3, max = 5 } },
             keys = {{
                 key = "pool_finalamendment_guns",
                 weight = 1.0
             }}
         }, {
+            price = "currency_high",
             roll = { mode = "weighted", count = { min = 1, max = 3 } },
             keys = {{
                 key = "pool_finalamendment_explosives",
@@ -105,6 +112,7 @@ return {
         unpoweredSprites = {"phunmart_01_52", "phunmart_01_53", "phunmart_01_54", "phunmart_01_55"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_low",
             keys = {{
                 key = "pool_michellescrafts",
                 weight = 1.0
@@ -120,6 +128,7 @@ return {
         unpoweredSprites = {"phunmart_01_60", "phunmart_01_61", "phunmart_01_62", "phunmart_01_63"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_mid",
             keys = {{
                 key = "pool_caraparts",
                 weight = 1.0
@@ -135,12 +144,14 @@ return {
         sprites = {"phunmart_02_0", "phunmart_02_1", "phunmart_02_2", "phunmart_02_3"},
         unpoweredSprites = {"phunmart_02_4", "phunmart_02_5", "phunmart_02_6", "phunmart_02_7"},
         poolSets = {{
+            price = "tokens_mid",
             roll = { mode = "weighted", count = { min = 3, max = 6 } },
             keys = {{
                 key = "pool_traiter_good",
                 weight = 1.0
             }}
         }, {
+            price = "tokens_mid",
             roll = { mode = "weighted", count = { min = 3, max = 5 } },
             keys = {{
                 key = "pool_traiter_bad_removal",
@@ -178,6 +189,7 @@ return {
         unpoweredSprites = {"phunmart_02_20", "phunmart_02_21", "phunmart_02_22", "phunmart_02_23"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_mid",
             keys = {{
                 key = "pool_radiohacks",
                 weight = 1.0
@@ -193,6 +205,7 @@ return {
         unpoweredSprites = {"phunmart_02_28", "phunmart_02_29", "phunmart_02_30", "phunmart_02_31"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_low",
             keys = {{
                 key = "pool_phish4u",
                 weight = 1.0
@@ -208,6 +221,7 @@ return {
         unpoweredSprites = {"phunmart_02_36", "phunmart_02_37", "phunmart_02_38", "phunmart_02_39"},
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {{
+            price = "currency_low",
             keys = {{
                 key = "pool_hoesnmoes",
                 weight = 1.0

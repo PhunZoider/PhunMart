@@ -27,14 +27,6 @@ local function getSortedKeys(tbl)
     return keys
 end
 
--- Format the price column.
-local function formatPrice(def)
-    if def.defaults and def.defaults.price then
-        return def.defaults.price
-    end
-    return ""
-end
-
 -- Format sources summary.
 local function formatSources(def)
     local parts = {}
@@ -134,18 +126,6 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         zonesDefault = table.concat(nums, ", ")
     end
 
-    -- Build price combo options: blank + sorted price keys
-    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-    local priceKeys = getSortedKeys(prices)
-    local priceOptions = {""}
-    for _, pk in ipairs(priceKeys) do
-        table.insert(priceOptions, pk)
-    end
-    local selectedPrice = ""
-    if def.defaults and def.defaults.price then
-        selectedPrice = def.defaults.price
-    end
-
     -- Copy arrays for picker mutations
     local selectedGroups = {}
     if def.sources and def.sources.groups then
@@ -171,12 +151,6 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             if not key or key == "" then return end
 
             local result = {}
-
-            -- Price (optional)
-            local priceText = f:getFieldValue("price")
-            if priceText and priceText ~= "" then
-                result.defaults = { price = priceText }
-            end
 
             -- Sources (from pickers)
             local hasGroups = #selectedGroups > 0
@@ -235,11 +209,6 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         default = zonesDefault,
         hint = getText("IGUI_PhunMart_Hint_Zones"),
     })
-    form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
-        options = priceOptions,
-        selected = selectedPrice,
-        hint = getText("IGUI_PhunMart_Hint_FallbackPrice"),
-    })
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_FallbackTexture"), {
         default = def.fallbackTexture or "",
         hint = getText("IGUI_PhunMart_Hint_FallbackTexture"),
@@ -290,10 +259,9 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    -- Columns: Key, Price, Sources, Zones
+    -- Columns: Key, Sources, Zones
     self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.30)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.50)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.40)
     self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.80)
 
     -- Custom row renderer
@@ -309,7 +277,7 @@ function UI:createChildren()
 end
 
 function UI:getFilterText(itemData)
-    return (itemData.key or "") .. " " .. (itemData.price or "") .. " " .. (itemData.sources or "")
+    return (itemData.key or "") .. " " .. (itemData.sources or "")
 end
 
 function UI:refreshPools()
@@ -327,7 +295,6 @@ function UI:refreshPools()
         local def = pools[key]
         self:addListItem(key, {
             key = key,
-            price = formatPrice(def),
             sources = formatSources(def),
             zones = formatZones(def),
             def = def
@@ -403,7 +370,6 @@ function UI:drawDatas(y, item, alt)
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size
     local col3X = self.columns[3].size
-    local col4X = self.columns[4].size
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
@@ -412,19 +378,14 @@ function UI:drawDatas(y, item, alt)
     self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
     self:clearStencilRect()
 
-    -- Price column
-    self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
-    self:drawText(data.price, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
     -- Sources column
-    self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
-    self:drawText(data.sources, col3X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
+    self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
+    self:drawText(data.sources, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
 
     -- Zones column
     if data.zones ~= "" then
-        self:drawText(data.zones, col4X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
+        self:drawText(data.zones, col3X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
     end
 
     self.itemsHeight = y + self.itemheight

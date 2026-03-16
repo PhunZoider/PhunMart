@@ -4,9 +4,6 @@ return {
     -- GoodPhoods  (health food, ingredients, cooking supplies)
     -- =========================================================
     pool_goodphoods = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"food_fresh", "food_cooking_utensils"}
         }
@@ -16,9 +13,6 @@ return {
     -- PhatPhoods  (junk food, candy, booze)
     -- =========================================================
     pool_phatphoods = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"food_junk", "food_alcohol"}
         }
@@ -28,9 +22,6 @@ return {
     -- PittyTheTool  (tools, hardware)
     -- =========================================================
     pool_pittythetool = {
-        defaults = {
-            price = "currency_mid"
-        },
         sources = {
             groups = {"tools_general"}
         }
@@ -40,26 +31,17 @@ return {
     -- FinalAmendment  (guns, ammo, explosives)
     -- =========================================================
     pool_finalamendment_melee = {
-        defaults = {
-            price = "currency_mid"
-        },
         sources = {
             groups = {"weapons_melee"}
         }
     },
 
     pool_finalamendment_ammo = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"ammo_all"}
         }
     },
     pool_finalamendment_guns = {
-        defaults = {
-            price = "currency_high"
-        },
         zones = {
             difficulty = {3, 4}
         },
@@ -68,9 +50,6 @@ return {
         }
     },
     pool_finalamendment_explosives = {
-        defaults = {
-            price = "currency_high"
-        },
         zones = {
             difficulty = {4}
         },
@@ -111,9 +90,6 @@ return {
     -- MichellesCrafts  (arts, crafts, paint, materials)
     -- =========================================================
     pool_michellescrafts = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"crafts_paint", "crafts_materials", "crafts_sewing"}
         }
@@ -123,9 +99,6 @@ return {
     -- CarAParts  (vehicle maintenance)
     -- =========================================================
     pool_caraparts = {
-        defaults = {
-            price = "currency_mid"
-        },
         sources = {
             groups = {"vehicle_parts"}
         }
@@ -136,9 +109,6 @@ return {
     -- Sources use reward `category` field, not game item groups.
     -- =========================================================
     pool_traiter_good = {
-        defaults = {
-            price = "tokens_mid"
-        },
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Positive Traits",
         sources = {
@@ -146,9 +116,6 @@ return {
         }
     },
     pool_traiter_bad_removal = {
-        defaults = {
-            price = "tokens_mid"
-        },
         fallbackTexture = "Item_Notebook",
         fallbackCategory = "Remove Negative Traits",
         sources = {
@@ -198,9 +165,6 @@ return {
     -- RadioHacks  (electronics, communications)
     -- =========================================================
     pool_radiohacks = {
-        defaults = {
-            price = "currency_mid"
-        },
         sources = {
             groups = {"electronics_all"}
         }
@@ -210,9 +174,6 @@ return {
     -- Phish4U  (fishing, sports, camping)
     -- =========================================================
     pool_phish4u = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"fishing_gear", "sports_gear", "camping_gear"}
         }
@@ -222,9 +183,6 @@ return {
     -- HoesNMoes  (gardening, animals, trapping)
     -- =========================================================
     pool_hoesnmoes = {
-        defaults = {
-            price = "currency_low"
-        },
         sources = {
             groups = {"gardening_all", "animal_supplies", "trapping_gear"}
         }

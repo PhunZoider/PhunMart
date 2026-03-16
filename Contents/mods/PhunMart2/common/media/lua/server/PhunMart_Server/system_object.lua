@@ -299,7 +299,7 @@ function ServerObject:buildOffers()
             offers[offerId] = {
                 id = offerDef.id,
                 item = offerDef.item,
-                price = bakePrice(offerDef.price, offerDef.item), -- price amounts resolved from ranges
+                price = bakePrice(offerDef.price or poolSet.price, offerDef.item), -- poolSet price as fallback
                 reward = offerDef.reward,
                 offer = {
                     qty = srcOffer.qty or 1, -- items given per purchase

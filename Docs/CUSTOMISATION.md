@@ -42,7 +42,7 @@ then rolls a random subset from that merged set. The number of items to roll is 
 by a `roll` field that can live on the pool set or on the shop (as a default for all its
 pool sets). Separate pool sets produce independent shelves; multiple pools in the same set
 blend together into a single menu.
-That's the full chain: machine -> pool set -> pool -> offers -> special / cost / conditions.
+That's the full chain: machine -> pool set (pricing, roll) -> pool -> offers -> special / cost / conditions.
 
 The config files exist because each of those concepts is reusable. Prices are named so the
 same `currency_25` applies to a hundred offers without repeating it. Conditions are named so
@@ -56,39 +56,42 @@ Reading bottom-up shows how data flows; top-down shows how to design a new shop.
 
 ```
 SHOP  (PhunMart_Shops.lua)
-  Which machine sprite, which pool sets to blend
+  Which machine sprite, which pool sets to blend, default pricing
   │
-  └─► POOL  (PhunMart_Pools.lua)
-        What's eligible; where to get items from
+  └─► POOL SET  (defined inline on the shop)
+        Roll count, default price for this shelf
         │
-        ├─► GROUP  (PhunMart_Groups.lua)
-        │     Which game items to include; default price & weight
-        │     │
-        │     └─► game item catalogue  (auto-populated from PZ item scripts)
-        │
-        └─► SPECIALS  (used by trait/XP/vehicle pools)
-              Pulls all specials whose category field matches
+        └─► POOL  (PhunMart_Pools.lua)
+              What's eligible; where to get items from
               │
-              └─► SPECIAL  (PhunMart_Specials.lua)
-                    What the player receives on purchase
+              ├─► GROUP  (PhunMart_Groups.lua)
+              │     Which game items to include; default price & weight
+              │     │
+              │     └─► game item catalogue  (auto-populated from PZ item scripts)
               │
-              └─► ITEM / OFFER  (PhunMart_Items.lua)
-                    Per-offer overrides: price, weight, stock, conditions
+              └─► SPECIALS  (used by trait/XP/vehicle pools)
+                    Pulls all specials whose category field matches
                     │
-                    ├─► PRICE  (PhunMart_Prices.lua)
-                    │     How much it costs (change / tokens / barter items)
+                    └─► SPECIAL  (PhunMart_Specials.lua)
+                          What the player receives on purchase
                     │
-                    └─► CONDITIONS  (PhunMart_Conditions.lua)
-                          Rules that must pass before a player can buy
+                    └─► ITEM / OFFER  (PhunMart_Items.lua)
+                          Per-offer overrides: price, weight, stock, conditions
+                          │
+                          ├─► PRICE  (PhunMart_Prices.lua)
+                          │     How much it costs (change / tokens / barter items)
+                          │
+                          └─► CONDITIONS  (PhunMart_Conditions.lua)
+                                Rules that must pass before a player can buy
 ```
 
 ### What each layer controls
 
-| Layer          | Controls                                       | Lives in                  |
-| -------------- | ---------------------------------------------- | ------------------------- |
-| **Shop**       | Machine sprite, pool sets, default roll count  | `PhunMart_Shops.lua`      |
-| **Pool**       | Item sourcing strategy; zone gating            | `PhunMart_Pools.lua`      |
-| **Group**      | Which game items are eligible; default price   | `PhunMart_Groups.lua`     |
+| Layer          | Controls                                              | Lives in                  |
+| -------------- | ----------------------------------------------------- | ------------------------- |
+| **Shop**       | Machine sprite, pool sets, pricing, default roll count | `PhunMart_Shops.lua`      |
+| **Pool**       | Item sourcing strategy; zone gating                    | `PhunMart_Pools.lua`      |
+| **Group**      | Which game items are eligible; default price           | `PhunMart_Groups.lua`     |
 | **Special**    | What the player actually receives              | `PhunMart_Specials.lua`   |
 | **Item/Offer** | Per-offer weight, stock, price, conditions     | `PhunMart_Items.lua`      |
 | **Price**      | Cost in change, tokens, or inventory items     | `PhunMart_Prices.lua`     |
@@ -224,7 +227,8 @@ return {
         unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
         roll = { mode = "weighted", count = { min = 5, max = 8 } },  -- 5-8 items per restock
         poolSets = {
-            { keys = {{ key = "pool_bobshardware", weight = 1.0 }} },
+            { price = "tools_normal",   -- default cost for all offers in this set
+              keys = {{ key = "pool_bobshardware", weight = 1.0 }} },
         }
     },
 }
@@ -270,7 +274,7 @@ Each override file must `return {}` with your changes as a Lua table.
 
 File: `PhunMart_Prices.lua`
 
-Named price definitions. Referenced by pools (as `defaults.price`) and individual offers (as `price`).
+Named price definitions. Referenced by pool sets (as `price`) on shops, by groups (as `defaults.price`), and by individual offers (as `price`).
 
 ```lua
 return {
@@ -519,7 +523,7 @@ return {
 | `offer.stock.max`          | int      | Maximum stock on restock (default 1)              |
 | `offer.stock.restockHours` | number   | In-game hours between restocks                    |
 
-Pools can also supply `defaults` that apply to all items sourced from a group -- see [Pools](#9-pools).
+Pool sets on shops supply a default `price` that applies to all offers rolled from that set -- see [Shops](#10-shops). Groups can also set `defaults.price` for their items.
 
 ---
 
@@ -613,17 +617,14 @@ return {
 File: `PhunMart_Pools.lua`
 
 Pools define _what's on the menu_ -- a set of eligible offers drawn from groups or special
-categories. Pools are pure curation: they control which items can appear, not how many.
-The number of items shown per restock is controlled by `roll` on the pool set or shop level
+categories. Pools are pure curation: they control which items can appear, not how many or
+how much they cost. Roll counts and pricing live on the **pool set** or **shop** level
 (see [Shops](#10-shops)).
 
 ```lua
 return {
 
     pool_goodphoods = {
-        defaults = {
-            price = "currency_05"  -- overrides group defaults for items in this pool
-        },
         sources = {
             groups = { "food_fresh", "food_cooking_utensils" }  -- pull from Groups
         }
@@ -645,7 +646,6 @@ return {
 
 | Field              | Description                                                                                                                                                                                                    |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defaults.price`   | Price key applied to every item drawn from this pool                                                                                                                                                           |
 | `sources.groups`   | Array of Group keys to pull items from                                                                                                                                                                         |
 | `sources.specials` | Array of special category strings -- pulls all items whose special has a matching `category` field                                                                                                              |
 | `fallbackTexture`  | Icon to use when an offer has no icon                                                                                                                                                                          |
@@ -683,7 +683,8 @@ Shops bind a machine sprite to one or more pools. Each shop key is a unique mach
 ```lua
 return {
 
-    -- Simple shop: one pool set, shop-level roll applies to all sets
+    -- Simple shop: one pool set, shop-level roll applies to all sets.
+    -- The pool set's `price` sets the default cost for all offers in that set.
     PittyTheTool = {
         category         = "Tool",
         background       = "machine-pity-the-tool.png",
@@ -691,26 +692,31 @@ return {
         unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
         roll = { mode = "weighted", count = { min = 5, max = 8 } },
         poolSets = {
-            { keys = {{ key = "pool_pittythetool", weight = 1.0 }} },
+            { price = "currency_mid",
+              keys = {{ key = "pool_pittythetool", weight = 1.0 }} },
         }
     },
 
-    -- Multiple pool sets with per-set roll overrides.
+    -- Multiple pool sets with per-set roll and price overrides.
     -- Each set is an independent shelf; all shelves contribute to the shop.
-    -- Per-set roll overrides the shop-level roll for that shelf.
+    -- Per-set roll/price override the shop-level defaults for that shelf.
     FinalAmendment = {
         category   = "Weapon",
         background = "machine-final-amendment.png",
         sprites    = { "phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35" },
         unpoweredSprites = { "phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39" },
         poolSets = {
-            { roll = { mode = "weighted", count = { min = 2, max = 3 } },
+            { price = "currency_mid",
+              roll = { mode = "weighted", count = { min = 2, max = 3 } },
               keys = {{ key = "pool_finalamendment_melee", weight = 1.0 }} },
-            { roll = { mode = "weighted", count = { min = 4, max = 7 } },
+            { price = "currency_low",
+              roll = { mode = "weighted", count = { min = 4, max = 7 } },
               keys = {{ key = "pool_finalamendment_ammo",  weight = 1.0 }} },
-            { roll = { mode = "weighted", count = { min = 3, max = 5 } },
+            { price = "currency_high",
+              roll = { mode = "weighted", count = { min = 3, max = 5 } },
               keys = {{ key = "pool_finalamendment_guns",  weight = 1.0 }} },
-            { roll = { mode = "weighted", count = { min = 1, max = 3 } },
+            { price = "currency_high",
+              roll = { mode = "weighted", count = { min = 1, max = 3 } },
               keys = {{ key = "pool_finalamendment_explosives", weight = 1.0 }} },
         }
     },
@@ -766,7 +772,7 @@ return {
 | `unpoweredSprites` | 4-element array of sprite names shown when machine is unpowered                                                                                                        |
 | `defaultView`      | `"grid"` (default) or `"list"` -- layout mode for the shop UI                                                                                                           |
 | `roll`             | Default roll for all pool sets: `{ mode = "weighted", count = { min = N, max = M } }`. Can be overridden per pool set.                                                 |
-| `poolSets`         | Array of pool sets. Each set has a `keys` array and an optional `roll` override                                                                                        |
+| `poolSets`         | Array of pool sets. Each set has a `keys` array, an optional `price` key, and an optional `roll` override                                                              |
 | `probability`      | Relative weight in the placement lottery (default `1`). Set to `0` to disable automatic placement. Higher values make the shop appear more often.                      |
 | `minDistance`      | Minimum tile distance from any other machine of the same shop type (overrides `DefaultDistance` sandbox setting). Useful for keeping rare shops spread across the map. |
 | `restockFrequency` | In-game hours between automatic restocks (default: server setting). Overrides the global restock timer for this shop type only -- e.g. `168` for weekly.                |
@@ -778,6 +784,10 @@ rolls a random subset using the set's `roll` config. The `weight` on each key en
 that pool's offer weights -- it acts as a rarity multiplier, not a selection probability.
 If the same item appears in multiple pools within a set, it is deduplicated (first
 occurrence wins).
+
+**Pricing:** The `price` field on a pool set is the default cost for every offer rolled from
+that set. Individual offers and groups can still override with their own `price` -- the
+precedence chain is: `item price` > `group defaults.price` > `poolSet.price`.
 
 **Roll fallback chain:** `poolSet.roll` > `shop.roll` > global default `{min=5, max=8}`.
 You only need to set `roll` on the pool set if it differs from the shop default.

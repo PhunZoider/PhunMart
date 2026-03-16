@@ -677,11 +677,18 @@ local function normalizeOffer(offer)
     return offer
 end
 
--- Apply precedence: pool.defaults -> group.defaults -> item
+-- Apply precedence: group.defaults -> item  (pricing lives at poolSet level, not pool)
 local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, itemDef, logger)
     local merged = {}
 
-    merged = deepMerge(merged, poolDef.defaults or {})
+    -- Pool defaults (excluding price/prices, which now live at the poolSet level on shops)
+    local poolDefaults = poolDef.defaults
+    if poolDefaults then
+        local stripped = shallowCopy(poolDefaults)
+        stripped.price = nil
+        stripped.prices = nil
+        merged = deepMerge(merged, stripped)
+    end
     merged = deepMerge(merged, (groupDef and groupDef.defaults) or {})
     merged = deepMerge(merged, itemDef or {})
 
@@ -1019,9 +1026,25 @@ function Compiler.compileAll(ctx)
         runtime.conditionsDefs[k] = v
     end
 
-    -- Compile shops (mostly pass-through + gating)
+    -- Compile shops (pass-through + gating + resolve poolSet prices)
     for shopKey, shopDef in pairs(resolved.shops) do
         if not gatedOut(shopDef) and shopDef.template ~= true then
+            -- Resolve poolSet-level prices so buildOffers can use them directly
+            local compiledPoolSets
+            if shopDef.poolSets then
+                compiledPoolSets = {}
+                for _, poolSet in ipairs(shopDef.poolSets) do
+                    local ps = {
+                        keys = poolSet.keys,
+                        roll = poolSet.roll
+                    }
+                    if poolSet.price then
+                        ps.price = resolvePrice(resolved.prices, poolSet.price, logger)
+                    end
+                    table.insert(compiledPoolSets, ps)
+                end
+            end
+
             runtime.shops[shopKey] = {
                 key = shopKey,
                 category = shopDef.category,
@@ -1029,7 +1052,7 @@ function Compiler.compileAll(ctx)
                 unpoweredSprites = shopDef.unpoweredSprites,
                 powered = shopDef.powered,
                 roll = shopDef.roll,
-                poolSets = shopDef.poolSets,
+                poolSets = compiledPoolSets,
                 throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,
                 background = shopDef.background,

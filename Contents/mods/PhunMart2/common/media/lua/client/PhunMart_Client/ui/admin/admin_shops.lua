@@ -48,9 +48,8 @@ local function copySet(set)
     if set.roll and set.roll.count then
         copy.roll = { mode = "weighted", count = { min = set.roll.count.min, max = set.roll.count.max } }
     end
-    if set.defaults then
-        copy.defaults = {}
-        if set.defaults.price then copy.defaults.price = set.defaults.price end
+    if type(set.price) == "string" then
+        copy.price = set.price
     end
     for _, entry in ipairs(set.keys or {}) do
         table.insert(copy.keys, { key = entry.key, weight = entry.weight or 1.0 })
@@ -69,21 +68,8 @@ local function copyPoolSets(poolSets)
 end
 
 -- Resolve the effective price for a pool set row.
--- Checks set.defaults.price first, then falls back to the first pool's defaults.price.
 local function resolveSetPrice(set)
-    local price = set.defaults and set.defaults.price
-    if price and price ~= "" then
-        return price
-    end
-    -- Fallback: look up pool-level default price from first pool key
-    local pools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
-    for _, entry in ipairs(set.keys or {}) do
-        local poolDef = pools[entry.key]
-        if poolDef and poolDef.defaults and poolDef.defaults.price then
-            return poolDef.defaults.price
-        end
-    end
-    return nil
+    return set.price or nil
 end
 
 -- Format a pool set into column cells: {pools, price, roll}
@@ -99,8 +85,9 @@ local function formatSetColumns(set)
     end
     local poolsText = table.concat(poolParts, ", ")
 
-    -- Price column
-    local price = resolveSetPrice(set) or ""
+    -- Price column (may be a string key or a resolved table from runtime; display the key)
+    local rawPrice = resolveSetPrice(set)
+    local price = type(rawPrice) == "string" and rawPrice or ""
 
     -- Roll column
     local rollText = ""
@@ -132,7 +119,7 @@ local function createSetEditForm(setData, isNew, cb)
         rollMaxDefault = tostring(set.roll.count.max or "")
     end
 
-    local currentPrice = (set.defaults and set.defaults.price) or ""
+    local currentPrice = type(set.price) == "string" and set.price or ""
 
     -- Collect selected pool keys
     local selectedPools = {}
@@ -183,7 +170,7 @@ local function createSetEditForm(setData, isNew, cb)
 
             local price = f:getFieldValue("price")
             if price and price ~= "" then
-                result.defaults = { price = price }
+                result.price = price
             end
 
             local defaultWeight = f:getFieldNumber("weight") or 1.0
@@ -383,11 +370,17 @@ end
 ---------------------------------------------------------------------------
 
 function AdminShops.OnOpenPanel(player, shopKey)
-    local shops = Core.runtime and Core.runtime.shops
-    if not shops or not shops[shopKey] then
+    -- Read from defs (uncompiled) so poolSet.price is still a string key.
+    -- Fall back to runtime for fields not in defs (backwards compat).
+    local defs = Core.defs and Core.defs.shops
+    local shopDef = defs and defs[shopKey]
+    if not shopDef then
+        local runtime = Core.runtime and Core.runtime.shops
+        shopDef = runtime and runtime[shopKey]
+    end
+    if not shopDef then
         return
     end
-    local shopDef = shops[shopKey]
 
     createEditModal(shopKey, shopDef, function(key, def)
         def.type = key
