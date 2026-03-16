@@ -77,8 +77,8 @@ function UI:refreshData()
     local sv = SandboxVars.PhunMart
     for poolKey, poolDef in pairs(Core.wallet.pools or {}) do
         -- skip disabled pools
-        if (poolKey == "change" and sv and sv.EnableChangePool == false)
-        or (poolKey == "tokens" and sv and sv.EnableTokenPool == false) then
+        if (poolKey == "change" and sv and sv.EnableChangePool == false) or
+            (poolKey == "tokens" and sv and sv.EnableTokenPool == false) then
             -- skip
         else
             -- Find a representative coin texture for this pool
@@ -89,15 +89,17 @@ function UI:refreshData()
                     if scriptItem then
                         texture = scriptItem:getNormalTexture()
                         -- prefer the highest-value coin as representative
-                        if cur.value >= 25 then break end
+                        if cur.value >= 25 then
+                            break
+                        end
                     end
                 end
             end
             self.datas:addItem(poolKey, {
-                label   = poolDef.label or poolKey,
-                format  = poolDef.format,
-                bound   = poolDef.bound == true,
-                texture = texture,
+                label = poolDef.label or poolKey,
+                format = poolDef.format,
+                bound = poolDef.bound == true,
+                texture = texture
             })
         end
     end
@@ -299,8 +301,27 @@ local function addCharacterPageTab(tabName, pageType, label)
     end
 end
 
-local _sv = SandboxVars.PhunMart
-if not _sv or _sv.EnableChangePool ~= false or _sv.EnableTokenPool ~= false then
-    addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
-end
+Events[Core.events.OnReady].Add(function()
+
+    local change = Core.getOption("EnableChangePool")
+    local tokens = Core.getOption("EnableTokenPool")
+    if change ~= false or tokens ~= false then
+        print("PhunMart: Adding character info tab")
+        addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
+
+        -- The window may already exist if OnReady fires after character creation.
+        -- Retroactively add the tab to any existing instances.
+        local viewName = "PhunWalletView"
+        for playerNum = 0, 3 do
+            local charInfo = getPlayerInfoPanel(playerNum)
+            if charInfo and charInfo.panel and not charInfo[viewName] then
+                charInfo[viewName] = PhunWalletUI:new(0, 8, charInfo.width, charInfo.height - 8, playerNum)
+                charInfo[viewName]:initialise()
+                charInfo[viewName].infoText = getText("UI_PhunWalletPanel")
+                charInfo.panel:addView(getText("IGUI_PhunMart_Btn_Wallet"), charInfo[viewName])
+                moveEntry(charInfo.panel.viewList, #charInfo.panel.viewList, 4)
+            end
+        end
+    end
+end)
 
