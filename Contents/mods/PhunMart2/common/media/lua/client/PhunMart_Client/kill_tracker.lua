@@ -19,6 +19,10 @@ Events.OnZombieDead.Add(function(zombie)
         return
     end
 
+    if Core.getOption("EnableTokenPool") == false then
+        return
+    end
+
     if checkSprinters == nil then
         -- Check if the isSprinter() method exists on zombies. It was added in 41.62.
         checkSprinters = PhunSprinters ~= nil

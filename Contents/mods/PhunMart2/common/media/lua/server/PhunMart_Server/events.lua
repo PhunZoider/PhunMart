@@ -106,6 +106,10 @@ Events.OnZombieDead.Add(function(character)
         return
     end
 
+    if Core.getOption("EnableChangePool") == false then
+        return
+    end
+
     local chance, minCents, maxCents = Core.getCoinChance(character)
 
     if ZombRand(100) >= math.floor(chance * 100) then

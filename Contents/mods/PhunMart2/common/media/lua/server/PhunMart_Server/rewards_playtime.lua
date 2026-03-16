@@ -55,6 +55,7 @@ end
 
 -- Check and grant any unclaimed playtime milestone rewards for a player.
 function R:checkPlaytimeRewards(player)
+    if Core.getOption("EnableTokenPool") == false then return end
     local username = player:getUsername()
     local pd = self:getPlayerData(username)
     local cfg = Core.tokenRewardsCfg and Core.tokenRewardsCfg.playtime

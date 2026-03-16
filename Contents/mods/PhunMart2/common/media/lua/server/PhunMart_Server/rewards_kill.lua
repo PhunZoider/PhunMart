@@ -74,6 +74,7 @@ end
 -- sprinter: count of sprinter zombies killed this batch
 function R:reportKills(player, normal, sprinter)
     if not self.loaded then return end
+    if Core.getOption("EnableTokenPool") == false then return end
     local username = player:getUsername()
     local pd = self:getPlayerData(username)
 
