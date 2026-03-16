@@ -1,30 +1,14 @@
-# PhunMart — Using an Item as Currency
+# PhunMart - Using an Item as Currency
 
-By default PhunMart uses its own **change** wallet (coins stored as cents) to price items.
-If you'd rather price everything in a physical inventory item — `Base.Money`, `Base.Nails`,
-or anything else players can loot — you can do that with a single edit to the base price
-definition. Every shop that inherits from that price will pick up the change automatically.
-
----
-
-## How it works
-
-Most of the built-in prices inherit from `currency_base`. That key ships as:
-
-```lua
-currency_base = { kind = "currency", pool = "change", amount = 1, factor = 1 }
-```
-
-Child prices like `currency_25`, `currency_50`, `currency_150` etc. inherit the `kind`,
-`pool`, and `factor` from `currency_base` and override only the `amount`. Changing
-`currency_base` to `kind = "items"` flips the entire inheritance tree in one step — every
-child price becomes an item-barter cost instead of a wallet deduction.
+By default PhunMart uses its own currency called **change** to price items.
+If you'd rather price everything in a physical inventory item like `Base.Money`, `Base.Nails`, `Base.Jewels`
+or anything else players can loot — you can do that with a single edit to the base price.
 
 ---
 
-## Step-by-step: in-game admin editor
+## Step-by-step example: Use Base.Money as main currency
 
-1. Open any shop and click **Admin Tools** (bottom-left).
+1. Open the shop admin window by clicking the `PhunMart` button on the Admin Panel or Debug Panel. There you can click **Admin Tools** (bottom-left).
 2. Click **Prices** to open the price definitions list.
 3. Find and select **`currency_base`**, then click **Edit** (or double-click the row).
 4. In the edit modal, change the following fields:
@@ -47,9 +31,26 @@ instead of N cents from the wallet. The factor scales the inherited `amount` val
 reasonable item counts — `currency_50` with `amount = 50` and `factor = 0.04` resolves to
 `ceil(50 * 0.04) = 2` of `Base.Money`.
 
+> Note: Changes will only come into effect when the shop restocks. Click Restock All option from the admin window
+
 ---
 
-## Step-by-step: override file
+## How it all works
+
+Most of the built-in prices inherit from `currency_base`. That key ships as:
+
+```lua
+currency_base = { kind = "currency", pool = "change", amount = 1, factor = 1 }
+```
+
+Child prices like `currency_25`, `currency_50`, `currency_150` etc. inherit the `kind`,
+`pool`, and `factor` from `currency_base` and override only the `amount`. Changing
+`currency_base` to `kind = "items"` flips the entire inheritance tree in one step — every
+child price becomes an item-barter cost instead of a wallet deduction.
+
+---
+
+## Override file
 
 If you prefer to set this up outside the game, create or edit `PhunMart_Prices.lua` in your
 server's `Zomboid/Lua/` folder:
