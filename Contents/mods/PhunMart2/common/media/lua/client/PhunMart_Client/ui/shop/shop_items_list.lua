@@ -602,9 +602,17 @@ function UI:renderGrid()
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
 
                 -- price/OOS badge bottom-right
-                local badge = isOOS and getText("IGUI_PhunMart_Msg_OutBadge") or formatPrice(e.offer)
+                local badge, badgeTex
+                if isOOS then
+                    badge = getText("IGUI_PhunMart_Msg_OutBadge")
+                else
+                    badge, badgeTex = formatPrice(e.offer)
+                end
                 if badge then
-                    local bw = getTextManager():MeasureStringX(UIFont.Small, badge)
+                    local iconSz = badgeTex and FONT_SM or 0
+                    local gap = badgeTex and 1 or 0
+                    local textW = getTextManager():MeasureStringX(UIFont.Small, badge)
+                    local bw = textW + gap + iconSz
                     local bx = cx + cs - bw - 3
                     local by = cy + cs - FONT_SM - 2
                     self:drawRect(bx - 1, by - 1, bw + 2, FONT_SM + 2, 0.75, 0, 0, 0)
@@ -619,6 +627,9 @@ function UI:renderGrid()
                         tr, tg, tb = 0.92, 0.88, 0.30
                     end
                     self:drawText(badge, bx, by, tr, tg, tb, 1, UIFont.Small)
+                    if badgeTex then
+                        self:drawTextureScaledAspect(badgeTex, bx + textW + gap, by, iconSz, iconSz, 1, 1, 1, 1)
+                    end
                 end
             end
         end
@@ -685,8 +696,15 @@ function UI:renderList()
                 end
 
                 -- price/OOS badge (compute width first so name can avoid it)
-                local badge = isOOS and getText("IGUI_PhunMart_Msg_OutBadge") or formatPrice(e.offer)
-                local badgeW = badge and (getTextManager():MeasureStringX(font, badge) + PAD_EDGE) or 0
+                local badge, badgeTex
+                if isOOS then
+                    badge = getText("IGUI_PhunMart_Msg_OutBadge")
+                else
+                    badge, badgeTex = formatPrice(e.offer)
+                end
+                local badgeIconSz = badgeTex and fontH or 0
+                local badgeGap = badgeTex and 1 or 0
+                local badgeW = badge and (getTextManager():MeasureStringX(font, badge) + badgeGap + badgeIconSz + PAD_EDGE) or 0
 
                 -- name (truncated to avoid badge)
                 local availW = (PAD_EDGE + rowW) - nameX - badgeW - PAD_EDGE
@@ -709,6 +727,11 @@ function UI:renderList()
                         tr, tg, tb = 0.92, 0.88, 0.30
                     end
                     self:drawText(badge, bx, by, tr, tg, tb, 1, font)
+                    if badgeTex then
+                        local textW = getTextManager():MeasureStringX(font, badge)
+                        local iconY = ry + math.floor((rowH - badgeIconSz) / 2)
+                        self:drawTextureScaledAspect(badgeTex, bx + textW + badgeGap, iconY, badgeIconSz, badgeIconSz, 1, 1, 1, 1)
+                    end
                 end
             end
         end

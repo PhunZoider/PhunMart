@@ -27,6 +27,12 @@
   "Sandbox_PhunMart_TokenCap": "Token Balance Cap",
   "Sandbox_PhunMart_TokenCap_tooltip": "Maximum number of special tokens a player can carry.",
 
+  "Sandbox_PhunMart_EnableChangePool": "Enable Change Pool",
+  "Sandbox_PhunMart_EnableChangePool_tooltip": "Show the change (coin) currency pool in the shop UI and wallet tab. Disabling hides it from players but does not delete balances.",
+
+  "Sandbox_PhunMart_EnableTokenPool": "Enable Token Pool",
+  "Sandbox_PhunMart_EnableTokenPool_tooltip": "Show the token currency pool in the shop UI and wallet tab. Disabling hides it from players but does not delete balances.",
+
   "Sandbox_PhunMart_DefaultHoursToRestock": "Default hours between restocking",
   "Sandbox_PhunMart_DefaultHoursToRestock_tooltip": "The default number of hours between restocking a shop. 0 would mean that (by default) the shops are only ever stocked once",
 

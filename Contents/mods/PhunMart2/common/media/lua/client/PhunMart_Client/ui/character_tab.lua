@@ -74,25 +74,32 @@ end
 
 function UI:refreshData()
     self.datas:clear()
+    local sv = SandboxVars.PhunMart
     for poolKey, poolDef in pairs(Core.wallet.pools or {}) do
-        -- Find a representative coin texture for this pool
-        local texture = nil
-        for itemKey, cur in pairs(Core.wallet.currencies or {}) do
-            if cur.pool == poolKey then
-                local scriptItem = getScriptManager():getItem(itemKey)
-                if scriptItem then
-                    texture = scriptItem:getNormalTexture()
-                    -- prefer the highest-value coin as representative
-                    if cur.value >= 25 then break end
+        -- skip disabled pools
+        if (poolKey == "change" and sv and sv.EnableChangePool == false)
+        or (poolKey == "tokens" and sv and sv.EnableTokenPool == false) then
+            -- skip
+        else
+            -- Find a representative coin texture for this pool
+            local texture = nil
+            for itemKey, cur in pairs(Core.wallet.currencies or {}) do
+                if cur.pool == poolKey then
+                    local scriptItem = getScriptManager():getItem(itemKey)
+                    if scriptItem then
+                        texture = scriptItem:getNormalTexture()
+                        -- prefer the highest-value coin as representative
+                        if cur.value >= 25 then break end
+                    end
                 end
             end
+            self.datas:addItem(poolKey, {
+                label   = poolDef.label or poolKey,
+                format  = poolDef.format,
+                bound   = poolDef.bound == true,
+                texture = texture,
+            })
         end
-        self.datas:addItem(poolKey, {
-            label   = poolDef.label or poolKey,
-            format  = poolDef.format,
-            bound   = poolDef.bound == true,
-            texture = texture,
-        })
     end
 end
 
@@ -292,5 +299,8 @@ local function addCharacterPageTab(tabName, pageType, label)
     end
 end
 
-addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
+local _sv = SandboxVars.PhunMart
+if not _sv or _sv.EnableChangePool ~= false or _sv.EnableTokenPool ~= false then
+    addCharacterPageTab("PhunWallet", PhunWalletUI, getText("IGUI_PhunMart_Btn_Wallet"))
+end
 

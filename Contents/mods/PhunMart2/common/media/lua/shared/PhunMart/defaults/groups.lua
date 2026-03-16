@@ -6,7 +6,7 @@ return {
 
     food_fresh = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -57,7 +57,7 @@ return {
 
     food_cooking_utensils = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.5
             }
@@ -74,7 +74,7 @@ return {
 
     food_junk = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -101,7 +101,7 @@ return {
 
     food_alcohol = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.8
             }
@@ -119,7 +119,7 @@ return {
 
     tools_general = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -135,7 +135,7 @@ return {
 
     ammo_all = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -149,7 +149,7 @@ return {
 
     weapons_firearms = {
         defaults = {
-            price = "coin_high",
+            price = "currency_high",
             offer = {
                 weight = 0.5
             }
@@ -165,7 +165,7 @@ return {
 
     weapons_melee = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -178,7 +178,7 @@ return {
 
     weapons_parts = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -190,7 +190,7 @@ return {
 
     explosives = {
         defaults = {
-            price = "coin_high",
+            price = "currency_high",
             offer = {
                 weight = 0.3
             }
@@ -206,7 +206,7 @@ return {
 
     vehicle_parts = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -226,7 +226,7 @@ return {
     -- Tier 1: widely available wound care items (high spawn weight in PZ loot)
     medical_cheap = {
         defaults = {
-            price = "coin_xlow",
+            price = "currency_xlow",
             offer = {
                 weight = 1.0
             }
@@ -240,7 +240,7 @@ return {
     -- Tier 2: tools and general pills (medium spawn weight)
     medical_standard = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -255,7 +255,7 @@ return {
     -- B42 script names: PillsAntiDep / PillsBeta / PillsSleepingTablets (NOT Antidepressants etc.)
     medical_rare = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 0.7
             }
@@ -274,7 +274,7 @@ return {
     -- Tier 1: all civilian and work clothing (DisplayCategory = Clothing, ~481 items in B42)
     hardwear_clothing = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -288,7 +288,7 @@ return {
     -- Zone-gated to zones 2+ at the pool level so military/SWAT gear only appears in harder areas.
     hardwear_protective = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -301,7 +301,7 @@ return {
     -- Tier 3: bags, backpacks, cases (DisplayCategory = Container)
     hardwear_bags = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 0.2
             }
@@ -317,7 +317,7 @@ return {
 
     electronics_all = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 1.0
             }
@@ -334,7 +334,7 @@ return {
 
     fishing_gear = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -347,7 +347,7 @@ return {
 
     sports_gear = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -359,7 +359,7 @@ return {
 
     camping_gear = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 0.5
             }
@@ -375,7 +375,7 @@ return {
 
     gardening_all = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -387,7 +387,7 @@ return {
 
     animal_supplies = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.8
             }
@@ -399,7 +399,7 @@ return {
 
     trapping_gear = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.8
             }
@@ -415,7 +415,7 @@ return {
 
     clothing_all = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -427,7 +427,7 @@ return {
 
     protective_gear = {
         defaults = {
-            price = "coin_mid",
+            price = "currency_mid",
             offer = {
                 weight = 0.8
             }
@@ -449,7 +449,7 @@ return {
 
     skill_books_t1 = {
         defaults = {
-            price = "change_50",
+            price = "currency_50",
             offer = {
                 weight = 1.0
             }
@@ -465,7 +465,7 @@ return {
 
     skill_books_t2 = {
         defaults = {
-            price = "change_100",
+            price = "currency_100",
             offer = {
                 weight = 1.0
             }
@@ -481,7 +481,7 @@ return {
 
     skill_books_t3 = {
         defaults = {
-            price = "change_200",
+            price = "currency_200",
             offer = {
                 weight = 1.0
             }
@@ -497,7 +497,7 @@ return {
 
     skill_books_t4 = {
         defaults = {
-            price = "change_500",
+            price = "currency_500",
             offer = {
                 weight = 1.0
             }
@@ -519,7 +519,7 @@ return {
 
     skill_books_misc = {
         defaults = {
-            price = "change_25",
+            price = "currency_25",
             offer = {
                 weight = 0.7
             }
@@ -535,7 +535,7 @@ return {
 
     crafts_paint = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 1.0
             }
@@ -547,7 +547,7 @@ return {
 
     crafts_materials = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.8
             }
@@ -562,7 +562,7 @@ return {
 
     crafts_sewing = {
         defaults = {
-            price = "coin_low",
+            price = "currency_low",
             offer = {
                 weight = 0.8
             }

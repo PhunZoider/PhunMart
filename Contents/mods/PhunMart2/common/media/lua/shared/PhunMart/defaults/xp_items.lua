@@ -39,25 +39,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Cooking_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Cooking_t1",
         conditions = {"perk_Cooking_lt3"}
     },
     xp_Cooking_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Cooking_t2",
         conditions = {"perk_Cooking_mid"}
     },
     xp_Cooking_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Cooking_t3",
         conditions = {"perk_Cooking_high"}
     },
     boost_Cooking = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Cooking"
     },
 
@@ -66,25 +66,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Fitness_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Fitness_t1",
         conditions = {"perk_Fitness_lt3"}
     },
     xp_Fitness_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Fitness_t2",
         conditions = {"perk_Fitness_mid"}
     },
     xp_Fitness_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Fitness_t3",
         conditions = {"perk_Fitness_high"}
     },
     boost_Fitness = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Fitness"
     },
 
@@ -93,25 +93,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Strength_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Strength_t1",
         conditions = {"perk_Strength_lt3"}
     },
     xp_Strength_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Strength_t2",
         conditions = {"perk_Strength_mid"}
     },
     xp_Strength_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Strength_t3",
         conditions = {"perk_Strength_high"}
     },
     boost_Strength = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Strength"
     },
 
@@ -120,25 +120,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Blunt_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Blunt_t1",
         conditions = {"perk_Blunt_lt3"}
     },
     xp_Blunt_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Blunt_t2",
         conditions = {"perk_Blunt_mid"}
     },
     xp_Blunt_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Blunt_t3",
         conditions = {"perk_Blunt_high"}
     },
     boost_Blunt = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Blunt"
     },
 
@@ -147,25 +147,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Axe_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Axe_t1",
         conditions = {"perk_Axe_lt3"}
     },
     xp_Axe_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Axe_t2",
         conditions = {"perk_Axe_mid"}
     },
     xp_Axe_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Axe_t3",
         conditions = {"perk_Axe_high"}
     },
     boost_Axe = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Axe"
     },
 
@@ -174,25 +174,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Lightfoot_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Lightfoot_t1",
         conditions = {"perk_Lightfoot_lt3"}
     },
     xp_Lightfoot_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Lightfoot_t2",
         conditions = {"perk_Lightfoot_mid"}
     },
     xp_Lightfoot_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Lightfoot_t3",
         conditions = {"perk_Lightfoot_high"}
     },
     boost_Lightfoot = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Lightfoot"
     },
 
@@ -201,25 +201,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Nimble_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Nimble_t1",
         conditions = {"perk_Nimble_lt3"}
     },
     xp_Nimble_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Nimble_t2",
         conditions = {"perk_Nimble_mid"}
     },
     xp_Nimble_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Nimble_t3",
         conditions = {"perk_Nimble_high"}
     },
     boost_Nimble = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Nimble"
     },
 
@@ -228,25 +228,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Sprinting_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Sprinting_t1",
         conditions = {"perk_Sprinting_lt3"}
     },
     xp_Sprinting_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Sprinting_t2",
         conditions = {"perk_Sprinting_mid"}
     },
     xp_Sprinting_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Sprinting_t3",
         conditions = {"perk_Sprinting_high"}
     },
     boost_Sprinting = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Sprinting"
     },
 
@@ -255,25 +255,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Sneak_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Sneak_t1",
         conditions = {"perk_Sneak_lt3"}
     },
     xp_Sneak_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Sneak_t2",
         conditions = {"perk_Sneak_mid"}
     },
     xp_Sneak_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Sneak_t3",
         conditions = {"perk_Sneak_high"}
     },
     boost_Sneak = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Sneak"
     },
 
@@ -282,25 +282,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Woodwork_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Woodwork_t1",
         conditions = {"perk_Woodwork_lt3"}
     },
     xp_Woodwork_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Woodwork_t2",
         conditions = {"perk_Woodwork_mid"}
     },
     xp_Woodwork_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Woodwork_t3",
         conditions = {"perk_Woodwork_high"}
     },
     boost_Woodwork = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Woodwork"
     },
 
@@ -309,25 +309,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Aiming_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Aiming_t1",
         conditions = {"perk_Aiming_lt3"}
     },
     xp_Aiming_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Aiming_t2",
         conditions = {"perk_Aiming_mid"}
     },
     xp_Aiming_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Aiming_t3",
         conditions = {"perk_Aiming_high"}
     },
     boost_Aiming = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Aiming"
     },
 
@@ -336,25 +336,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Reloading_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Reloading_t1",
         conditions = {"perk_Reloading_lt3"}
     },
     xp_Reloading_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Reloading_t2",
         conditions = {"perk_Reloading_mid"}
     },
     xp_Reloading_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Reloading_t3",
         conditions = {"perk_Reloading_high"}
     },
     boost_Reloading = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Reloading"
     },
 
@@ -363,25 +363,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Farming_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Farming_t1",
         conditions = {"perk_Farming_lt3"}
     },
     xp_Farming_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Farming_t2",
         conditions = {"perk_Farming_mid"}
     },
     xp_Farming_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Farming_t3",
         conditions = {"perk_Farming_high"}
     },
     boost_Farming = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Farming"
     },
 
@@ -390,25 +390,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Fishing_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Fishing_t1",
         conditions = {"perk_Fishing_lt3"}
     },
     xp_Fishing_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Fishing_t2",
         conditions = {"perk_Fishing_mid"}
     },
     xp_Fishing_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Fishing_t3",
         conditions = {"perk_Fishing_high"}
     },
     boost_Fishing = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Fishing"
     },
 
@@ -417,25 +417,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Trapping_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Trapping_t1",
         conditions = {"perk_Trapping_lt3"}
     },
     xp_Trapping_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Trapping_t2",
         conditions = {"perk_Trapping_mid"}
     },
     xp_Trapping_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Trapping_t3",
         conditions = {"perk_Trapping_high"}
     },
     boost_Trapping = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Trapping"
     },
 
@@ -444,25 +444,25 @@ return {
     ---------------------------------------------------------------------------
     xp_PlantScavenging_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_PlantScavenging_t1",
         conditions = {"perk_PlantScavenging_lt3"}
     },
     xp_PlantScavenging_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_PlantScavenging_t2",
         conditions = {"perk_PlantScavenging_mid"}
     },
     xp_PlantScavenging_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_PlantScavenging_t3",
         conditions = {"perk_PlantScavenging_high"}
     },
     boost_PlantScavenging = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_PlantScavenging"
     },
 
@@ -471,25 +471,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Doctor_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Doctor_t1",
         conditions = {"perk_Doctor_lt3"}
     },
     xp_Doctor_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Doctor_t2",
         conditions = {"perk_Doctor_mid"}
     },
     xp_Doctor_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Doctor_t3",
         conditions = {"perk_Doctor_high"}
     },
     boost_Doctor = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Doctor"
     },
 
@@ -498,25 +498,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Electricity_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Electricity_t1",
         conditions = {"perk_Electricity_lt3"}
     },
     xp_Electricity_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Electricity_t2",
         conditions = {"perk_Electricity_mid"}
     },
     xp_Electricity_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Electricity_t3",
         conditions = {"perk_Electricity_high"}
     },
     boost_Electricity = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Electricity"
     },
 
@@ -525,25 +525,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Blacksmith_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Blacksmith_t1",
         conditions = {"perk_Blacksmith_lt3"}
     },
     xp_Blacksmith_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Blacksmith_t2",
         conditions = {"perk_Blacksmith_mid"}
     },
     xp_Blacksmith_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Blacksmith_t3",
         conditions = {"perk_Blacksmith_high"}
     },
     boost_Blacksmith = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Blacksmith"
     },
 
@@ -552,25 +552,25 @@ return {
     ---------------------------------------------------------------------------
     xp_MetalWelding_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_MetalWelding_t1",
         conditions = {"perk_MetalWelding_lt3"}
     },
     xp_MetalWelding_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_MetalWelding_t2",
         conditions = {"perk_MetalWelding_mid"}
     },
     xp_MetalWelding_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_MetalWelding_t3",
         conditions = {"perk_MetalWelding_high"}
     },
     boost_MetalWelding = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_MetalWelding"
     },
 
@@ -579,25 +579,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Mechanics_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Mechanics_t1",
         conditions = {"perk_Mechanics_lt3"}
     },
     xp_Mechanics_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Mechanics_t2",
         conditions = {"perk_Mechanics_mid"}
     },
     xp_Mechanics_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Mechanics_t3",
         conditions = {"perk_Mechanics_high"}
     },
     boost_Mechanics = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Mechanics"
     },
 
@@ -606,25 +606,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Spear_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Spear_t1",
         conditions = {"perk_Spear_lt3"}
     },
     xp_Spear_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Spear_t2",
         conditions = {"perk_Spear_mid"}
     },
     xp_Spear_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Spear_t3",
         conditions = {"perk_Spear_high"}
     },
     boost_Spear = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Spear"
     },
 
@@ -633,25 +633,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Maintenance_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Maintenance_t1",
         conditions = {"perk_Maintenance_lt3"}
     },
     xp_Maintenance_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Maintenance_t2",
         conditions = {"perk_Maintenance_mid"}
     },
     xp_Maintenance_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Maintenance_t3",
         conditions = {"perk_Maintenance_high"}
     },
     boost_Maintenance = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Maintenance"
     },
 
@@ -660,25 +660,25 @@ return {
     ---------------------------------------------------------------------------
     xp_SmallBlade_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_SmallBlade_t1",
         conditions = {"perk_SmallBlade_lt3"}
     },
     xp_SmallBlade_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_SmallBlade_t2",
         conditions = {"perk_SmallBlade_mid"}
     },
     xp_SmallBlade_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_SmallBlade_t3",
         conditions = {"perk_SmallBlade_high"}
     },
     boost_SmallBlade = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_SmallBlade"
     },
 
@@ -687,25 +687,25 @@ return {
     ---------------------------------------------------------------------------
     xp_LongBlade_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_LongBlade_t1",
         conditions = {"perk_LongBlade_lt3"}
     },
     xp_LongBlade_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_LongBlade_t2",
         conditions = {"perk_LongBlade_mid"}
     },
     xp_LongBlade_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_LongBlade_t3",
         conditions = {"perk_LongBlade_high"}
     },
     boost_LongBlade = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_LongBlade"
     },
 
@@ -714,25 +714,25 @@ return {
     ---------------------------------------------------------------------------
     xp_SmallBlunt_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_SmallBlunt_t1",
         conditions = {"perk_SmallBlunt_lt3"}
     },
     xp_SmallBlunt_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_SmallBlunt_t2",
         conditions = {"perk_SmallBlunt_mid"}
     },
     xp_SmallBlunt_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_SmallBlunt_t3",
         conditions = {"perk_SmallBlunt_high"}
     },
     boost_SmallBlunt = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_SmallBlunt"
     },
 
@@ -741,25 +741,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Tailoring_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Tailoring_t1",
         conditions = {"perk_Tailoring_lt3"}
     },
     xp_Tailoring_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Tailoring_t2",
         conditions = {"perk_Tailoring_mid"}
     },
     xp_Tailoring_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Tailoring_t3",
         conditions = {"perk_Tailoring_high"}
     },
     boost_Tailoring = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Tailoring"
     },
 
@@ -768,25 +768,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Tracking_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Tracking_t1",
         conditions = {"perk_Tracking_lt3"}
     },
     xp_Tracking_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Tracking_t2",
         conditions = {"perk_Tracking_mid"}
     },
     xp_Tracking_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Tracking_t3",
         conditions = {"perk_Tracking_high"}
     },
     boost_Tracking = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Tracking"
     },
 
@@ -795,25 +795,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Husbandry_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Husbandry_t1",
         conditions = {"perk_Husbandry_lt3"}
     },
     xp_Husbandry_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Husbandry_t2",
         conditions = {"perk_Husbandry_mid"}
     },
     xp_Husbandry_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Husbandry_t3",
         conditions = {"perk_Husbandry_high"}
     },
     boost_Husbandry = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Husbandry"
     },
 
@@ -822,25 +822,25 @@ return {
     ---------------------------------------------------------------------------
     xp_FlintKnapping_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_FlintKnapping_t1",
         conditions = {"perk_FlintKnapping_lt3"}
     },
     xp_FlintKnapping_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_FlintKnapping_t2",
         conditions = {"perk_FlintKnapping_mid"}
     },
     xp_FlintKnapping_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_FlintKnapping_t3",
         conditions = {"perk_FlintKnapping_high"}
     },
     boost_FlintKnapping = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_FlintKnapping"
     },
 
@@ -849,25 +849,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Masonry_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Masonry_t1",
         conditions = {"perk_Masonry_lt3"}
     },
     xp_Masonry_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Masonry_t2",
         conditions = {"perk_Masonry_mid"}
     },
     xp_Masonry_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Masonry_t3",
         conditions = {"perk_Masonry_high"}
     },
     boost_Masonry = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Masonry"
     },
 
@@ -876,25 +876,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Pottery_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Pottery_t1",
         conditions = {"perk_Pottery_lt3"}
     },
     xp_Pottery_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Pottery_t2",
         conditions = {"perk_Pottery_mid"}
     },
     xp_Pottery_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Pottery_t3",
         conditions = {"perk_Pottery_high"}
     },
     boost_Pottery = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Pottery"
     },
 
@@ -903,25 +903,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Carving_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Carving_t1",
         conditions = {"perk_Carving_lt3"}
     },
     xp_Carving_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Carving_t2",
         conditions = {"perk_Carving_mid"}
     },
     xp_Carving_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Carving_t3",
         conditions = {"perk_Carving_high"}
     },
     boost_Carving = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Carving"
     },
 
@@ -930,25 +930,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Butchering_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Butchering_t1",
         conditions = {"perk_Butchering_lt3"}
     },
     xp_Butchering_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Butchering_t2",
         conditions = {"perk_Butchering_mid"}
     },
     xp_Butchering_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Butchering_t3",
         conditions = {"perk_Butchering_high"}
     },
     boost_Butchering = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Butchering"
     },
 
@@ -957,25 +957,25 @@ return {
     ---------------------------------------------------------------------------
     xp_Glassmaking_t1 = {
         inherit = "xp_t1_base",
-        price = "coin_low",
+        price = "currency_low",
         reward = "skill_Glassmaking_t1",
         conditions = {"perk_Glassmaking_lt3"}
     },
     xp_Glassmaking_t2 = {
         inherit = "xp_t2_base",
-        price = "coin_mid",
+        price = "currency_mid",
         reward = "skill_Glassmaking_t2",
         conditions = {"perk_Glassmaking_mid"}
     },
     xp_Glassmaking_t3 = {
         inherit = "xp_t3_base",
-        price = "coin_high",
+        price = "currency_high",
         reward = "skill_Glassmaking_t3",
         conditions = {"perk_Glassmaking_high"}
     },
     boost_Glassmaking = {
         inherit = "boost_base_xp",
-        price = "coin_boost",
+        price = "currency_boost",
         reward = "boost_Glassmaking"
     },
 
@@ -984,177 +984,177 @@ return {
     ---------------------------------------------------------------------------
     boost_Cooking_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Cooking_t2"
     },
     boost_Fitness_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Fitness_t2"
     },
     boost_Strength_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Strength_t2"
     },
     boost_Blunt_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Blunt_t2"
     },
     boost_Axe_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Axe_t2"
     },
     boost_Lightfoot_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Lightfoot_t2"
     },
     boost_Nimble_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Nimble_t2"
     },
     boost_Sprinting_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Sprinting_t2"
     },
     boost_Sneak_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Sneak_t2"
     },
     boost_Woodwork_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Woodwork_t2"
     },
     boost_Aiming_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Aiming_t2"
     },
     boost_Reloading_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Reloading_t2"
     },
     boost_Farming_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Farming_t2"
     },
     boost_Fishing_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Fishing_t2"
     },
     boost_Trapping_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Trapping_t2"
     },
     boost_PlantScavenging_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_PlantScavenging_t2"
     },
     boost_Doctor_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Doctor_t2"
     },
     boost_Electricity_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Electricity_t2"
     },
     boost_Blacksmith_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Blacksmith_t2"
     },
     boost_MetalWelding_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_MetalWelding_t2"
     },
     boost_Mechanics_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Mechanics_t2"
     },
     boost_Spear_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Spear_t2"
     },
     boost_Maintenance_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Maintenance_t2"
     },
     boost_SmallBlade_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_SmallBlade_t2"
     },
     boost_LongBlade_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_LongBlade_t2"
     },
     boost_SmallBlunt_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_SmallBlunt_t2"
     },
     boost_Tailoring_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Tailoring_t2"
     },
     boost_Tracking_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Tracking_t2"
     },
     boost_Husbandry_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Husbandry_t2"
     },
     boost_FlintKnapping_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_FlintKnapping_t2"
     },
     boost_Masonry_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Masonry_t2"
     },
     boost_Pottery_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Pottery_t2"
     },
     boost_Carving_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Carving_t2"
     },
     boost_Butchering_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Butchering_t2"
     },
     boost_Glassmaking_t2 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t2",
+        price = "currency_boost_t2",
         reward = "boost_Glassmaking_t2"
     },
 
@@ -1163,177 +1163,177 @@ return {
     ---------------------------------------------------------------------------
     boost_Cooking_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Cooking_t3"
     },
     boost_Fitness_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Fitness_t3"
     },
     boost_Strength_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Strength_t3"
     },
     boost_Blunt_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Blunt_t3"
     },
     boost_Axe_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Axe_t3"
     },
     boost_Lightfoot_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Lightfoot_t3"
     },
     boost_Nimble_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Nimble_t3"
     },
     boost_Sprinting_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Sprinting_t3"
     },
     boost_Sneak_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Sneak_t3"
     },
     boost_Woodwork_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Woodwork_t3"
     },
     boost_Aiming_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Aiming_t3"
     },
     boost_Reloading_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Reloading_t3"
     },
     boost_Farming_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Farming_t3"
     },
     boost_Fishing_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Fishing_t3"
     },
     boost_Trapping_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Trapping_t3"
     },
     boost_PlantScavenging_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_PlantScavenging_t3"
     },
     boost_Doctor_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Doctor_t3"
     },
     boost_Electricity_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Electricity_t3"
     },
     boost_Blacksmith_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Blacksmith_t3"
     },
     boost_MetalWelding_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_MetalWelding_t3"
     },
     boost_Mechanics_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Mechanics_t3"
     },
     boost_Spear_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Spear_t3"
     },
     boost_Maintenance_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Maintenance_t3"
     },
     boost_SmallBlade_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_SmallBlade_t3"
     },
     boost_LongBlade_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_LongBlade_t3"
     },
     boost_SmallBlunt_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_SmallBlunt_t3"
     },
     boost_Tailoring_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Tailoring_t3"
     },
     boost_Tracking_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Tracking_t3"
     },
     boost_Husbandry_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Husbandry_t3"
     },
     boost_FlintKnapping_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_FlintKnapping_t3"
     },
     boost_Masonry_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Masonry_t3"
     },
     boost_Pottery_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Pottery_t3"
     },
     boost_Carving_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Carving_t3"
     },
     boost_Butchering_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Butchering_t3"
     },
     boost_Glassmaking_t3 = {
         inherit = "boost_base_xp",
-        price = "coin_boost_t3",
+        price = "currency_boost_t3",
         reward = "boost_Glassmaking_t3"
     }
 

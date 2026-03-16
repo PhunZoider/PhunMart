@@ -5,7 +5,7 @@ return {
     -- =========================================================
     pool_goodphoods = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"food_fresh", "food_cooking_utensils"}
@@ -17,7 +17,7 @@ return {
     -- =========================================================
     pool_phatphoods = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"food_junk", "food_alcohol"}
@@ -29,7 +29,7 @@ return {
     -- =========================================================
     pool_pittythetool = {
         defaults = {
-            price = "coin_mid"
+            price = "currency_mid"
         },
         sources = {
             groups = {"tools_general"}
@@ -41,7 +41,7 @@ return {
     -- =========================================================
     pool_finalamendment_melee = {
         defaults = {
-            price = "coin_mid"
+            price = "currency_mid"
         },
         sources = {
             groups = {"weapons_melee"}
@@ -50,7 +50,7 @@ return {
 
     pool_finalamendment_ammo = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"ammo_all"}
@@ -58,7 +58,7 @@ return {
     },
     pool_finalamendment_guns = {
         defaults = {
-            price = "coin_high"
+            price = "currency_high"
         },
         zones = {
             difficulty = {3, 4}
@@ -69,7 +69,7 @@ return {
     },
     pool_finalamendment_explosives = {
         defaults = {
-            price = "coin_high"
+            price = "currency_high"
         },
         zones = {
             difficulty = {4}
@@ -112,7 +112,7 @@ return {
     -- =========================================================
     pool_michellescrafts = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"crafts_paint", "crafts_materials", "crafts_sewing"}
@@ -124,7 +124,7 @@ return {
     -- =========================================================
     pool_caraparts = {
         defaults = {
-            price = "coin_mid"
+            price = "currency_mid"
         },
         sources = {
             groups = {"vehicle_parts"}
@@ -199,7 +199,7 @@ return {
     -- =========================================================
     pool_radiohacks = {
         defaults = {
-            price = "coin_mid"
+            price = "currency_mid"
         },
         sources = {
             groups = {"electronics_all"}
@@ -211,7 +211,7 @@ return {
     -- =========================================================
     pool_phish4u = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"fishing_gear", "sports_gear", "camping_gear"}
@@ -223,7 +223,7 @@ return {
     -- =========================================================
     pool_hoesnmoes = {
         defaults = {
-            price = "coin_low"
+            price = "currency_low"
         },
         sources = {
             groups = {"gardening_all", "animal_supplies", "trapping_gear"}

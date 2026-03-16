@@ -938,38 +938,47 @@ function UI:render()
         local pad = 6
         local iconSz = FONT_SM
         local rowH = iconSz + 4
+        local s = Core.settings
         local poolOrder = {"change", "tokens"}
         local rows = {}
         for _, pool in ipairs(poolOrder) do
-            local def = Core.wallet.pools[pool]
-            if def then
-                table.insert(rows, {
-                    label = def.label,
-                    amount = fmtBalance(pool, Core.wallet:getBalance(self.player, pool)),
-                    tex = self._poolIcons[pool] and self._poolIcons[pool].tex
-                })
+            -- skip disabled pools
+            if (pool == "change" and s.EnableChangePool == false)
+            or (pool == "tokens" and s.EnableTokenPool == false) then
+                -- skip
+            else
+                local def = Core.wallet.pools[pool]
+                if def then
+                    table.insert(rows, {
+                        label = def.label,
+                        amount = fmtBalance(pool, Core.wallet:getBalance(self.player, pool)),
+                        tex = self._poolIcons[pool] and self._poolIcons[pool].tex
+                    })
+                end
             end
         end
 
-        -- "Balance" header + divider
-        self:drawText(getText("IGUI_PhunMart_Balance"), bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
-        local divY = bz.y + pad + FONT_SM + 2
-        self:drawRect(bz.x + pad, divY, bz.w - pad * 2, 1, 0.35, 0.30, 0.30, 0.40)
+        if #rows > 0 then
+            -- "Balance" header + divider
+            self:drawText(getText("IGUI_PhunMart_Balance"), bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
+            local divY = bz.y + pad + FONT_SM + 2
+            self:drawRect(bz.x + pad, divY, bz.w - pad * 2, 1, 0.35, 0.30, 0.30, 0.40)
 
-        -- Rows: [icon] label ... amount
-        local headerH = pad + FONT_SM + 2 + 1 + 2 -- pad + text + gap + divider + gap
-        local contentH = #rows * rowH + math.max(0, #rows - 1) * 3
-        local startY = math.floor(bz.y + headerH + (bz.h - headerH - contentH) / 2) - 6
-        for _, row in ipairs(rows) do
-            local ry = startY
-            local mid = ry + math.floor((iconSz - FONT_SM) / 2)
-            if row.tex then
-                self:drawTextureScaledAspect(row.tex, bz.x + pad, ry, iconSz, iconSz, 0.85, 1, 1, 1)
+            -- Rows: [icon] label ... amount
+            local headerH = pad + FONT_SM + 2 + 1 + 2 -- pad + text + gap + divider + gap
+            local contentH = #rows * rowH + math.max(0, #rows - 1) * 3
+            local startY = math.floor(bz.y + headerH + (bz.h - headerH - contentH) / 2) - 6
+            for _, row in ipairs(rows) do
+                local ry = startY
+                local mid = ry + math.floor((iconSz - FONT_SM) / 2)
+                if row.tex then
+                    self:drawTextureScaledAspect(row.tex, bz.x + pad, ry, iconSz, iconSz, 0.85, 1, 1, 1)
+                end
+                self:drawText(row.label, bz.x + pad + iconSz + 4, mid, 0.72, 0.72, 0.76, 0.90, UIFont.Small)
+                local aw = getTextManager():MeasureStringX(UIFont.Small, row.amount)
+                self:drawText(row.amount, bz.x + bz.w - aw - pad, mid, 0.88, 0.88, 0.50, 1, UIFont.Small)
+                startY = startY + rowH + 3
             end
-            self:drawText(row.label, bz.x + pad + iconSz + 4, mid, 0.72, 0.72, 0.76, 0.90, UIFont.Small)
-            local aw = getTextManager():MeasureStringX(UIFont.Small, row.amount)
-            self:drawText(row.amount, bz.x + bz.w - aw - pad, mid, 0.88, 0.88, 0.50, 1, UIFont.Small)
-            startY = startY + rowH + 3
         end
     end
 
@@ -1039,6 +1048,7 @@ function UI:renderDetails(z)
     local price = offer.price
     local fmtCents = tools.formatCents
     local priceText
+    local priceItemTex
     local isCollector = price and price.selfPay == true
     if not price then
         priceText = getText("IGUI_PhunMart_PriceUnknown")
@@ -1068,12 +1078,19 @@ function UI:renderDetails(z)
         local si = getScriptManager and getScriptManager():FindItem(itemName)
         if si then
             itemName = si:getDisplayName() or itemName
+            priceItemTex = si:getNormalTexture()
         end
         priceText = getText("IGUI_PhunMart_BringItems", amt, itemName)
     elseif price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
-        priceText = getText("IGUI_PhunMart_PriceItems", amt, pi.item or "?")
+        local itemName = pi.item or "?"
+        local si = getScriptManager and getScriptManager():FindItem(itemName)
+        if si then
+            itemName = si:getDisplayName() or itemName
+            priceItemTex = si:getNormalTexture()
+        end
+        priceText = getText("IGUI_PhunMart_PriceItems", amt, itemName)
     else
         priceText = getText("IGUI_PhunMart_PriceUnknown")
     end
@@ -1097,7 +1114,14 @@ function UI:renderDetails(z)
     if isCollector then
         pr, pg, pb = 0.30, 0.85, 0.85 -- cyan for collector "Bring:" line
     end
-    self:drawText(truncate(priceText, maxW, UIFont.Small), x, y, pr, pg, pb, 1, UIFont.Small)
+    local priceIconSz = lh - 3
+    local priceIconRoom = priceItemTex and (priceIconSz + 4) or 0
+    local truncatedPrice = truncate(priceText, maxW - priceIconRoom, UIFont.Small)
+    self:drawText(truncatedPrice, x, y, pr, pg, pb, 1, UIFont.Small)
+    if priceItemTex then
+        local textW = getTextManager():MeasureStringX(UIFont.Small, truncatedPrice)
+        self:drawTextureScaledAspect(priceItemTex, x + textW + 2, y, priceIconSz, priceIconSz, 1, 1, 1, 1)
+    end
     y = y + lh + 4
 
     -- For collector offers, show what the player receives on the next line.

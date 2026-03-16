@@ -97,6 +97,22 @@ option PhunMart.TokenCap
     translation = PhunMart_TokenCap,
 }
 
+option PhunMart.EnableChangePool
+{
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMart_EnableChangePool,
+}
+
+option PhunMart.EnableTokenPool
+{
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMart_EnableTokenPool,
+}
+
 option PhunMart.DefaultHoursToRestock
 {
     type = integer,

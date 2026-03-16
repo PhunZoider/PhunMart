@@ -152,7 +152,8 @@ function tools.resolveOfferDisplayName(offer)
 end
 
 -- Format a price for compact display (grid badges, list rows).
--- Returns a short string like "FREE", "$1.50", "3t", "2x", or nil.
+-- Returns (text, texture) — text is a short string like "FREE", "$1.50", "3t", "25";
+-- texture is the item icon for kind="items" (nil otherwise).
 function tools.formatPriceShort(offer)
     local price = offer and offer.price
     if not price then
@@ -179,7 +180,12 @@ function tools.formatPriceShort(offer)
     if price.kind == "items" and price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
-        return tostring(amt) .. "x"
+        local tex
+        if pi.item then
+            local si = getScriptManager():FindItem(pi.item)
+            tex = si and si:getNormalTexture()
+        end
+        return tostring(amt), tex
     end
     return nil
 end

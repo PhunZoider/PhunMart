@@ -17,8 +17,8 @@ Core.compiler = Compiler
 
 -- Canonical merge utilities from shared utils
 local shallowCopy = Core.utils.shallowClone
-local isSequence  = Core.utils.isSequence
-local deepMerge   = Core.utils.deepMerge
+local isSequence = Core.utils.isSequence
+local deepMerge = Core.utils.deepMerge
 
 -- -----------------------------
 -- Utility: logging
@@ -43,11 +43,15 @@ end
 -- isArray: returns true for non-empty tables with only numeric keys (not necessarily contiguous).
 -- Used for conditions normalization where {1="a", 2="b"} should be detected as array-like.
 local function isArray(t)
-    if type(t) ~= "table" then return false end
+    if type(t) ~= "table" then
+        return false
+    end
     local hasAnyKey = false
     for k in pairs(t) do
         hasAnyKey = true
-        if type(k) ~= "number" then return false end
+        if type(k) ~= "number" then
+            return false
+        end
     end
     return hasAnyKey
 end
@@ -349,6 +353,39 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
         return nil
     end
 
+    -- Apply factor scaling (default 1). Factor multiplies all amounts in the price entry.
+    -- Defined on a base price and inherited by children; useful as a global economy knob
+    -- or when switching currency kind (e.g. change → physical item).
+    local factor = p.factor
+    if factor and factor ~= 1 then
+        -- Scale top-level amount (number or {min,max})
+        if type(p.amount) == "number" then
+            p.amount = math.ceil(p.amount * factor)
+            if p.amount < 1 then
+                p.amount = 1
+            end
+        elseif type(p.amount) == "table" and p.amount.min and p.amount.max then
+            p.amount = {
+                min = math.max(1, math.ceil(p.amount.min * factor)),
+                max = math.max(1, math.ceil(p.amount.max * factor))
+            }
+        end
+        -- Scale items list amounts (kind="items")
+        if type(p.items) == "table" then
+            for _, line in ipairs(p.items) do
+                if type(line.amount) == "number" then
+                    line.amount = math.max(1, math.ceil(line.amount * factor))
+                elseif type(line.amount) == "table" and line.amount.min and line.amount.max then
+                    line.amount = {
+                        min = math.max(1, math.ceil(line.amount.min * factor)),
+                        max = math.max(1, math.ceil(line.amount.max * factor))
+                    }
+                end
+            end
+        end
+    end
+    p.factor = nil -- strip from resolved output
+
     -- FREE
     if p.kind == "free" then
         return {
@@ -413,10 +450,31 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
         return p
     end
 
+    -- Normalize shorthand: item (singular string) → items list
+    if type(p.item) == "string" and p.items == nil then
+        p.items = {{
+            item = p.item
+        }}
+        p.item = nil
+    end
+
     local items = p.items
     if type(items) ~= "table" then
-        logger:error("Price has no 'items' list")
+        logger:error("Price has no 'items' list (or 'item' string)")
         return nil
+    end
+
+    -- Bridge top-level amount into item lines that have no explicit amount.
+    -- This allows inherited prices like { inherit="currency_base", amount=25 }
+    -- to work when the base switches to kind="items".
+    local topAmount = p.amount
+    if topAmount ~= nil then
+        for _, line in ipairs(items) do
+            if line.amount == nil then
+                line.amount = topAmount
+            end
+        end
+        p.amount = nil
     end
 
     local normalized = {}
