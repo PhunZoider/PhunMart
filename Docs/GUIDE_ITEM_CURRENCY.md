@@ -22,7 +22,7 @@ or anything else players can loot — you can do that with a single edit to the 
 
    Leave **Inherit** blank.
 
-   ![Edit currency_base](Images/ChangeToBaseMoney.png)
+   ![Edit currency_base](https://github.com/PhunZoider/PhunMart/blob/main/Docs/images/ChangeToBaseMoney.png)
 
 5. Click **Apply**.
 
