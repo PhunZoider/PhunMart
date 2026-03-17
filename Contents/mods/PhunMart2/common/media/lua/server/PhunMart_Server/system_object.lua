@@ -239,8 +239,10 @@ function ServerObject:buildOffers()
 
         -- Merge candidates from ALL eligible pools in this poolSet.
         -- Pool weight scales offer weights (acts as rarity multiplier between pools).
+        -- Sticky pools have all offers included unconditionally; non-sticky pools are rolled.
         local candidates = {}
-        local seenItems = {} -- dedup: first occurrence by item key wins (highest scaled weight)
+        local stickyOffers = {}
+        local seenItems = {} -- dedup: first occurrence by item key wins
 
         for _, poolRef in ipairs(poolSet.keys or {}) do
             local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
@@ -253,22 +255,50 @@ function ServerObject:buildOffers()
             else
                 for offerId, offer in pairs(pool.offers or {}) do
                     if not excluded[offer.item] then
-                        local offerWeight = (offer.offer and offer.offer.weight or 1.0) * poolWeight
                         local itemKey = offer.item
                         if not seenItems[itemKey] then
                             seenItems[itemKey] = true
-                            table.insert(candidates, {
-                                id = offerId,
-                                offer = offer,
-                                scaledWeight = offerWeight
-                            })
+                            if pool.sticky then
+                                table.insert(stickyOffers, {
+                                    id = offerId,
+                                    offer = offer
+                                })
+                            else
+                                local offerWeight = (offer.offer and offer.offer.weight or 1.0) * poolWeight
+                                table.insert(candidates, {
+                                    id = offerId,
+                                    offer = offer,
+                                    scaledWeight = offerWeight
+                                })
+                            end
                         end
                     end
                 end
             end
         end
 
-        -- select which offers appear this restock cycle
+        -- Bake sticky offers: always included, unlimited stock
+        for _, sel in ipairs(stickyOffers) do
+            local offerDef = sel.offer
+            local srcOffer = offerDef.offer or {}
+            offers[sel.id] = {
+                id = offerDef.id,
+                item = offerDef.item,
+                price = bakePrice(offerDef.price or poolSet.price, offerDef.item),
+                reward = offerDef.reward,
+                offer = {
+                    qty = srcOffer.qty or 1,
+                    weight = srcOffer.weight or 1.0,
+                    stockQty = -1,
+                    restockHours = nil
+                },
+                conditions = offerDef.conditions,
+                meta = offerDef.meta,
+                sticky = true
+            }
+        end
+
+        -- Select which non-sticky offers appear this restock cycle
         local selected
         if mode == "all" then
             selected = candidates
@@ -278,7 +308,7 @@ function ServerObject:buildOffers()
             selected = weightedPickN(candidates, count)
         end
 
-        -- bake each selected offer: resolve price ranges and stock quantities
+        -- Bake each selected offer: resolve price ranges and stock quantities
         for _, sel in ipairs(selected) do
             local offerId = sel.id
             local offerDef = sel.offer

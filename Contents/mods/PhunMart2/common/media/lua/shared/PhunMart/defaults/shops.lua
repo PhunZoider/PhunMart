@@ -458,13 +458,6 @@ return {
         background = "machine-prawn-stars.png",
         sprites = {"phunmart_03_32", "phunmart_03_33", "phunmart_03_34", "phunmart_03_35"},
         unpoweredSprites = {"phunmart_03_36", "phunmart_03_37", "phunmart_03_38", "phunmart_03_39"},
-        roll = {
-            mode = "weighted",
-            count = {
-                min = 99,
-                max = 99
-            }
-        },
         poolSets = {{
             keys = {{
                 key = "pool_prawnstars",

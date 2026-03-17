@@ -203,6 +203,7 @@ return {
     -- PrawnStars  (pawn shop: jewelry & valuables → change)
     -- =========================================================
     pool_prawnstars = {
+        sticky = true,
         sources = {
             groups = {"pawn_jackpot", "pawn_premium", "pawn_good", "pawn_standard", "pawn_budget"}
         }

@@ -896,6 +896,7 @@ function Compiler.compileAll(ctx)
         if not gatedOut(poolDef) and poolDef.template ~= true then
             local poolRuntime = {
                 key = poolKey,
+                sticky = poolDef.sticky == true,
                 gate = poolDef.gate,
                 zones = poolDef.zones,
                 offers = {}
@@ -1018,6 +1019,18 @@ function Compiler.compileAll(ctx)
             end
 
             runtime.pools[poolKey] = poolRuntime
+
+            -- Warn if a sticky pool exceeds the configured max
+            if poolRuntime.sticky then
+                local maxSticky = (SandboxVars and SandboxVars.PhunMart and SandboxVars.PhunMart.MaxStickyItems) or 10
+                local count = 0
+                for _ in pairs(poolRuntime.offers) do count = count + 1 end
+                if count > maxSticky then
+                    logger:warn("Sticky pool '" .. poolKey .. "' has " .. count
+                        .. " offers (max " .. maxSticky .. "). Sticky pools should be small."
+                        .. " Increase MaxStickyItems in sandbox settings if this is intentional.")
+                end
+            end
         end
     end
 

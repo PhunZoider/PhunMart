@@ -274,11 +274,28 @@ function UI:setData(data)
             offer = offer,
             displayName = displayName,
             texture = texture,
-            overlay = overlay
+            overlay = overlay,
+            sticky = offer.sticky or false
         })
     end
 
+    -- Determine which categories contain sticky items (for sort priority)
+    local stickyCategories = {}
+    for cat, items in pairs(byCategory) do
+        for _, e in ipairs(items) do
+            if e.sticky then
+                stickyCategories[cat] = true
+                break
+            end
+        end
+    end
+
     table.sort(order, function(a, b)
+        local aSticky = stickyCategories[a] or false
+        local bSticky = stickyCategories[b] or false
+        if aSticky ~= bSticky then
+            return aSticky
+        end
         if a == "Other" then
             return false
         end
@@ -291,6 +308,9 @@ function UI:setData(data)
     for _, cat in ipairs(order) do
         local items = byCategory[cat]
         table.sort(items, function(a, b)
+            if a.sticky ~= b.sticky then
+                return a.sticky
+            end
             return a.displayName < b.displayName
         end)
         table.insert(self.groups, {
