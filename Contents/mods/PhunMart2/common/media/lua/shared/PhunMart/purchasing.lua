@@ -17,10 +17,10 @@ function Core:canAfford(player, price)
         return Core.wallet:getBalance(player, price.pool) >= price.amount
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do
-            local count = player:getInventory():getItemCountRecursive(entry.item)
+            local count = player:getInventory():getItemCountRecurse(entry.item)
             if entry.substitutes then
                 for _, sub in ipairs(entry.substitutes) do
-                    count = count + player:getInventory():getItemCountRecursive(sub)
+                    count = count + player:getInventory():getItemCountRecurse(sub)
                 end
             end
             if count < entry.amount then
@@ -56,20 +56,22 @@ function Core:deduct(player, price)
         for _, entry in ipairs(price.items or {}) do
             local remaining = entry.amount
             -- Remove from primary item first
-            local primaryCount = player:getInventory():getItemCountRecursive(entry.item)
+            local primaryCount = player:getInventory():getItemCountRecurse(entry.item)
             local fromPrimary = math.min(remaining, primaryCount)
             if fromPrimary > 0 then
-                player:getInventory():RemoveItemAmount(entry.item, fromPrimary)
+                player:getInventory():RemoveAll(entry.item, fromPrimary)
                 remaining = remaining - fromPrimary
             end
             -- Then from substitutes
             if remaining > 0 and entry.substitutes then
                 for _, sub in ipairs(entry.substitutes) do
-                    if remaining <= 0 then break end
-                    local subCount = player:getInventory():getItemCountRecursive(sub)
+                    if remaining <= 0 then
+                        break
+                    end
+                    local subCount = player:getInventory():getItemCountRecurse(sub)
                     local fromSub = math.min(remaining, subCount)
                     if fromSub > 0 then
-                        player:getInventory():RemoveItemAmount(sub, fromSub)
+                        player:getInventory():RemoveAll(sub, fromSub)
                         remaining = remaining - fromSub
                     end
                 end
