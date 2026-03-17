@@ -1061,7 +1061,41 @@ return {
             type = "grantBoundTokens",
             amount = 3
         }}
-    }
+    },
+
+    -- ── Pawn rewards (adjustBalance) ───────────────────────────────────────
+    -- Used by pawn pools (PrawnStars). The displayed item IS the price; the
+    -- reward is change credited to the player's wallet.
+
+    change_payout_budget = {
+        kind = "pawn",
+        display = { texture = "Item_Money" },
+        actions = {{ type = "adjustBalance", pool = "change", amount = 100 }}
+    },
+
+    change_payout_standard = {
+        kind = "pawn",
+        display = { texture = "Item_Money" },
+        actions = {{ type = "adjustBalance", pool = "change", amount = 500 }}
+    },
+
+    change_payout_good = {
+        kind = "pawn",
+        display = { texture = "Item_Money" },
+        actions = {{ type = "adjustBalance", pool = "change", amount = 1000 }}
+    },
+
+    change_payout_premium = {
+        kind = "pawn",
+        display = { texture = "Item_Money" },
+        actions = {{ type = "adjustBalance", pool = "change", amount = 2500 }}
+    },
+
+    change_payout_jackpot = {
+        kind = "pawn",
+        display = { texture = "Item_Money" },
+        actions = {{ type = "adjustBalance", pool = "change", amount = 5000 }}
+    },
 
     -- XP rewards defined in PhunMart_XP_Rewards.lua (generated file)
     -- Each follows pattern: skill_<Perk>_t1, skill_<Perk>_t2, skill_<Perk>_t3

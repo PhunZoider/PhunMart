@@ -401,13 +401,15 @@ Only one level of inheritance is supported.
 
 ### Special kinds
 
-| `kind`    | What it does                                                        |
-| --------- | ------------------------------------------------------------------- |
-| `item`    | Spawns an inventory item. Uses `actions[].type = "giveItem"`.       |
-| `trait`   | Adds or removes a character trait. Uses `addTrait` / `removeTrait`. |
-| `skill`   | Grants XP to a perk. Uses `type = "giveXP"`.                        |
-| `boost`   | Applies a temporary XP multiplier. Uses `type = "applyBoost"`.      |
-| `vehicle` | Spawns a vehicle nearby. Uses `type = "spawnVehicle"`.              |
+| `kind`      | What it does                                                          |
+| ----------- | --------------------------------------------------------------------- |
+| `item`      | Spawns an inventory item. Uses `actions[].type = "giveItem"`.         |
+| `trait`     | Adds or removes a character trait. Uses `addTrait` / `removeTrait`.   |
+| `skill`     | Grants XP to a perk. Uses `type = "giveXP"`.                         |
+| `boost`     | Applies a temporary XP multiplier. Uses `type = "applyBoost"`.        |
+| `vehicle`   | Spawns a vehicle nearby. Uses `type = "spawnVehicle"`.                |
+| `collector` | Grants bound tokens. Uses `type = "grantBoundTokens"`.               |
+| `pawn`      | Credits change to the player's wallet. Uses `type = "adjustBalance"`. |
 
 See [Reference: special kinds](#14-reference-special-kinds) for full action schemas.
 
@@ -751,6 +753,21 @@ return {
         }}
     },
 
+    -- Buyback shop: players sell items for change. Uses self-pay prices (player
+    -- hands over the displayed item) and pawn specials (adjustBalance reward).
+    -- Roll set to 99 so every eligible item always appears; the machine never
+    -- restocks because there's no randomisation needed.
+    PrawnStars = {
+        category    = "PrawnStars",
+        background  = "machine-prawn-stars.png",
+        sprites     = { "phunmart_03_32", "phunmart_03_33", "phunmart_03_34", "phunmart_03_35" },
+        unpoweredSprites = { "phunmart_03_36", "phunmart_03_37", "phunmart_03_38", "phunmart_03_39" },
+        roll = { mode = "weighted", count = { min = 99, max = 99 } },
+        poolSets = {{
+            keys = {{ key = "pool_prawnstars", weight = 1.0 }}
+        }}
+    },
+
     -- Zone-gated pools: each pool has a zones.difficulty filter. At restock,
     -- only pools matching the machine's zone are merged into the candidate set.
     WrentAWreck = {
@@ -969,3 +986,25 @@ actions = { {
 
 Use `scripts` (array) to pick randomly from multiple variants, or `script` (string) for a single type.
 Vehicle script names come from the game's vehicle script database -- use `/dumppz vehicles` to list them.
+
+### `kind = "collector"` -- grant bound tokens
+
+```lua
+actions = { { type = "grantBoundTokens", amount = 2 } }
+```
+
+Used by the Collectors machine. The displayed item IS the price (the player hands over
+game items); the reward is bound tokens credited to both the current and death-restored
+wallet pools. Collector offers use `kind = "self"` prices so the item icon shown in the
+shop grid is the item the player must bring.
+
+### `kind = "pawn"` -- credit change to the wallet
+
+```lua
+actions = { { type = "adjustBalance", pool = "change", amount = 500 } }
+```
+
+Used by the PrawnStars machine. Same flow as collectors -- the player hands over items
+and receives currency in return. The `pool` field defaults to `"change"` but can be set
+to `"tokens"` if needed. The `amount` is in cents (500 = $5.00). Like collectors, pawn
+offers use `kind = "self"` prices.

@@ -778,6 +778,85 @@ return {
         }
     },
 
+    -- =========================================================
+    -- PrawnStars  (pawn shop: jewelry & precious items → change)
+    -- Player sells items for $1.00 each.
+    -- =========================================================
+
+    -- Jackpot tier ($50)
+    pawn_jackpot = {
+        label = "Pawn - Jackpot",
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_jackpot",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {"Diamond"}
+        }
+    },
+
+    -- Premium tier ($25)
+    pawn_premium = {
+        label = "Pawn - Premium",
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_premium",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {"GoldBar", "Ruby", "Sapphire", "Emerald"}
+        }
+    },
+
+    -- Good tier ($10)
+    pawn_good = {
+        label = "Pawn - Good",
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_good",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {"SmallGoldBar", "Amethyst", "GoldCoin", "Pocketwatch"}
+        }
+    },
+
+    -- Standard tier ($5)
+    pawn_standard = {
+        label = "Pawn - Standard",
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_standard",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {
+                "Bracelet_BangleLeftGold", "Bracelet_BangleRightGold",
+                "Bracelet_ChainLeftGold", "Bracelet_ChainRightGold",
+                "Goblet_Gold", "GoldCup", "Fork_Gold", "Spoon_Gold", "ButterKnife_Gold",
+                "Locket", "SilverCoin", "GoldSheet"
+            }
+        }
+    },
+
+    -- Budget tier ($1)
+    pawn_budget = {
+        label = "Pawn - Budget",
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_budget",
+            offer = { weight = 1.0 }
+        },
+        include = {
+            items = {
+                "Bracelet_BangleLeftSilver", "Bracelet_BangleRightSilver",
+                "Bracelet_ChainLeftSilver", "Bracelet_ChainRightSilver",
+                "GoldScrap", "MoneyBundle", "Money"
+            }
+        }
+    },
+
     -- Premium tier: luxury, sports, race cars (gold 20-40)
     vehicles_luxury = {
         label = "Luxury & Sports Cars",

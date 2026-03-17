@@ -124,6 +124,11 @@ function Core:grantReward(player, action, qty, context)
         Core.wallet:adjustByPool(player, "current", "tokens", amt)
         Core.wallet:adjustByPool(player, "bound", "tokens", amt)
 
+    elseif t == "adjustBalance" then
+        -- Credit a wallet pool (e.g. change from pawn shop sales).
+        local amt = (action.amount or 0) * qty
+        Core.wallet:adjustByPool(player, "current", action.pool or "change", amt)
+
     else
         Core.debugLn("grantReward: unknown action type '" .. tostring(t) .. "'")
     end

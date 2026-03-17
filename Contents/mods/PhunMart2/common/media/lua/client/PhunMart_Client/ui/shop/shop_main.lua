@@ -1136,11 +1136,16 @@ function UI:renderDetails(z)
     end
     y = y + lh + 4
 
-    -- For collector offers, show what the player receives on the next line.
+    -- For collector/pawn offers, show what the player receives on the next line.
     if isCollector and offer.reward and offer.reward.actions then
         for _, action in ipairs(offer.reward.actions) do
             if action.type == "grantBoundTokens" then
                 local receiveText = getText("IGUI_PhunMart_ReceiveTokens", tostring(action.amount or 1))
+                self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
+                y = y + lh + 4
+                break
+            elseif action.type == "adjustBalance" then
+                local receiveText = getText("IGUI_PhunMart_ReceiveChange", fmtCents(action.amount or 0))
                 self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
                 y = y + lh + 4
                 break

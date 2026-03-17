@@ -200,6 +200,15 @@ return {
     },
 
     -- =========================================================
+    -- PrawnStars  (pawn shop: jewelry & valuables → change)
+    -- =========================================================
+    pool_prawnstars = {
+        sources = {
+            groups = {"pawn_jackpot", "pawn_premium", "pawn_good", "pawn_standard", "pawn_budget"}
+        }
+    },
+
+    -- =========================================================
     -- XPerience  (XP grants - one pool per tier, sources use reward category)
     -- Defined in PhunMart_XP_Items.lua and PhunMart_XP_Conditions.lua
     --

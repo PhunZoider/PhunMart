@@ -52,6 +52,8 @@ local function formatAction(def)
         return "vehicle:" .. (act.script or (act.scripts and act.scripts[1]) or "")
     elseif act.type == "grantBoundTokens" then
         return tostring(act.amount or 0) .. " tokens"
+    elseif act.type == "adjustBalance" then
+        return tostring(act.amount or 0) .. " " .. (act.pool or "change")
     end
     return act.type or ""
 end
@@ -60,8 +62,8 @@ end
 -- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
 
-local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens"}
-local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector"}
+local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens", "adjustBalance"}
+local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector", "pawn"}
 
 local function getActionArgHint(actionType)
     if actionType == "addTrait" or actionType == "removeTrait" then
@@ -70,6 +72,8 @@ local function getActionArgHint(actionType)
         return getText("IGUI_PhunMart_Hint_ScriptNames")
     elseif actionType == "grantBoundTokens" then
         return getText("IGUI_PhunMart_Hint_TokenAmount")
+    elseif actionType == "adjustBalance" then
+        return getText("IGUI_PhunMart_Hint_ChangeAmount")
     end
     return ""
 end

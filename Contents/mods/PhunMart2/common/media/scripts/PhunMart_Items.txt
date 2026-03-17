@@ -217,4 +217,14 @@ module PhunMart
         WorldObjectSprite = phunmart_03_24,
     }
 
+    item PrawnStars
+    {
+        DisplayCategory   = Furniture,
+        ItemType          = base:moveable,
+        Icon              = VendingMachine,
+        Weight            = 250,
+        DisplayName       = PrawnStars Vending Machine,
+        WorldObjectSprite = phunmart_03_32,
+    }    
+
 }

@@ -27,6 +27,8 @@
   "IGUI_PhunMart_Shop_HardWear_tooltip": "The finest in protective gear and clothing to weather the apocalypse in style",
   "IGUI_PhunMart_Shop_Collectors": "Collectors",
   "IGUI_PhunMart_Shop_Collectors_tooltip": "We buy rare and unique items",
+  "IGUI_PhunMart_Shop_PrawnStars": "Prawn Stars",
+  "IGUI_PhunMart_Shop_PrawnStars_tooltip": "Got gold? We'll give you cash for your jewelry and precious items",
   "IGUI_PhunMart_Shop_ShedsAndCommoners": "Sheds & Commoners",
   "IGUI_PhunMart_Shop_ShedsAndCommoners_tooltip": "Books, magazines and more to keep you entertained during the apocalypse",
 
@@ -82,6 +84,7 @@
   "IGUI_PhunMart_PriceItems": "Price: %1x %2",
   "IGUI_PhunMart_BringItems": "Bring: %1x %2",
   "IGUI_PhunMart_ReceiveTokens": "Receive: %1 token(s)",
+  "IGUI_PhunMart_ReceiveChange": "Receive: %1",
 
   "IGUI_PhunMart_Msg_OutBadge": "OUT",
   "IGUI_PhunMart_Msg_RestockReady": "Restock ready",
@@ -300,6 +303,7 @@
   "IGUI_PhunMart_Hint_TraitKey": "Trait key (e.g. base:brave)",
   "IGUI_PhunMart_Hint_ScriptNames": "Script name(s), comma-separated",
   "IGUI_PhunMart_Hint_TokenAmount": "Token amount (integer)",
+  "IGUI_PhunMart_Hint_ChangeAmount": "Change amount in cents (integer)",
   "IGUI_PhunMart_Hint_EnterDollars": "Enter as dollars (e.g. 5.00)",
   "IGUI_PhunMart_Hint_EnterWholeNumber": "Enter whole number",
   "IGUI_PhunMart_Hint_ItemKey": "e.g. Base.Money",
