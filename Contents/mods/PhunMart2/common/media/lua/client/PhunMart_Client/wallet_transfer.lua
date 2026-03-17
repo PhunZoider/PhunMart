@@ -58,12 +58,14 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                     end
                 end
             else
-                -- MP: let server merge wallet balances and sync back.
+                -- MP: server merges wallet balances and removes wallet item.
                 sendClientCommand(Core.name, Core.commands.consumeDroppedWallet, {
                     walletData = wallet.wallet
                 })
             end
-            consumeItem(item)
+            if Core.isLocal then
+                consumeItem(item)
+            end
             getSoundManager():PlaySound("PhunMart_WalletPickup", false, 0):setVolume(0.50)
         end)
     elseif Wallet:isCurrency(itemType) then
@@ -76,14 +78,13 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                     if not adjusted then
                         return
                     end
-                end
-                if not Core.isLocal then
-                    -- MP: let server adjust wallet and sync back.
+                    consumeItem(item)
+                else
+                    -- MP: server adjusts wallet and removes coin.
                     sendClientCommand(Core.name, Core.commands.consumeCoin, {
                         itemType = itemType
                     })
                 end
-                consumeItem(item)
             end
         end)
     end

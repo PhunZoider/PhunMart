@@ -213,7 +213,7 @@ function UI:createChildren()
         target.selected = row
         target:ensureVisible(row)
         local item = target.items[row].item
-        self:onRowContextMenu(item, target:getAbsoluteX() + x, target:getAbsoluteY() + y)
+        self:onRowContextMenu(item, getMouseX(), getMouseY())
     end
     list.drawBorder = true;
     list.onMouseMove = self.doOnMouseMove

@@ -411,14 +411,21 @@ Commands[Core.commands.getShopData] = function(playerObj, args)
     end
 end
 
--- Player picked up a coin in MP — adjust wallet and sync back.
--- Item removal is handled client-side via sendRemoveItemFromContainer.
+-- Player picked up a coin in MP — adjust wallet, remove coin, and sync back.
 Commands[Core.commands.consumeCoin] = function(playerObj, args)
     local itemType = args and args.itemType
     if not itemType or not Core.wallet:isCurrency(itemType) then return end
 
-    Core.wallet:adjust(playerObj, itemType, 1)
+    local adjusted = Core.wallet:adjust(playerObj, itemType, 1)
+    if not adjusted then return end
     Core.wallet:save()
+
+    -- Remove one coin of this type from player inventory
+    local inv = playerObj:getInventory()
+    local coin = inv:getFirstTypeRecurse(itemType)
+    if coin then
+        inv:Remove(coin)
+    end
 
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
         username = playerObj:getUsername(),
@@ -426,8 +433,7 @@ Commands[Core.commands.consumeCoin] = function(playerObj, args)
     })
 end
 
--- Player picked up a DroppedWallet in MP — merge balances and sync back.
--- Item removal is handled client-side via sendRemoveItemFromContainer.
+-- Player picked up a DroppedWallet in MP — merge balances, remove item, and sync back.
 Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
     local walletData = args and args.walletData
     if not walletData then return end
@@ -444,6 +450,13 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
     end
 
     Core.wallet:save()
+
+    -- Remove the dropped wallet item from player inventory
+    local inv = playerObj:getInventory()
+    local walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
+    if walletItem then
+        inv:Remove(walletItem)
+    end
 
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
         username = playerObj:getUsername(),
