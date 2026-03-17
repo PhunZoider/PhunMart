@@ -45,7 +45,7 @@ Events.OnPreFillWorldObjectContextMenu.Add(function(playerObj, context, worldobj
 end)
 
 Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobjects, test)
-    if isAdmin() or isDebugEnabled() then
+    if Core.utils.isAdmin(playerObj) then
         return
     end
     for _, obj in ipairs(worldobjects) do

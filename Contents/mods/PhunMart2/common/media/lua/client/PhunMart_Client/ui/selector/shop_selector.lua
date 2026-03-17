@@ -267,7 +267,7 @@ function UI:onRowContextMenu(item, screenX, screenY)
     context:addOption(getText("IGUI_PhunMart_Btn_Locations"), self, function()
         Core.ui.shop_instances.open(self.player, item.type)
     end)
-    if isAdmin() or isDebugEnabled() then
+    if Core.utils.isAdmin(self.player) then
         context:addOption(getText("IGUI_PhunMart_Btn_Config"), self, function()
             Core.ui.admin_shops.OnOpenPanel(self.player, item.type)
         end)
@@ -347,7 +347,7 @@ function UI:prerender()
     self.controls.btnClose:setX(self.controls.btnClose.parent.width - self.controls.btnClose.width - 10)
 
     -- left side: Admin Tools (admin only)
-    local isAdminUser = isAdmin() or isDebugEnabled()
+    local isAdminUser = Core.utils.isAdmin(self.player)
     self.controls.btnAdmin:setVisible(isAdminUser)
     if isAdminUser then
         self.controls.btnAdmin:setX(10)

@@ -250,7 +250,7 @@ function UI:createChildren()
     self._closeBtn = closeBtn
 
     -- Edit Pool button (admin only, right side next to Close)
-    if isAdmin() or isDebugEnabled() then
+    if Core.utils.isAdmin(self.player) then
         local editBtnW = math.max(math.floor(70 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, getText(
             "IGUI_PhunMart_Admin_EditPool")) + PAD * 2)
         self.editPoolBtn = ISButton:new(0, PAD, editBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Admin_EditPool"), self,
