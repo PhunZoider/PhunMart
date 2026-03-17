@@ -297,7 +297,14 @@ local function addCharacterPageTab(tabName, pageType, label)
         if not layout.tabs then
             layout.tabs = ""
         end
-        layout.tabs = layout.tabs .. table.concat(tabs, ',')
+        local extra = table.concat(tabs, ',')
+        if extra ~= "" then
+            if layout.tabs ~= "" then
+                layout.tabs = layout.tabs .. "," .. extra
+            else
+                layout.tabs = extra
+            end
+        end
     end
 end
 
