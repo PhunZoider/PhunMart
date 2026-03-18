@@ -29,19 +29,10 @@ end
 
 -- Format sources summary.
 local function formatSources(def)
-    local parts = {}
-    if def.sources then
-        if def.sources.groups then
-            table.insert(parts, getText("IGUI_PhunMart_NGroups", tostring(#def.sources.groups)))
-        end
-        if def.sources.specials then
-            table.insert(parts, getText("IGUI_PhunMart_NSpecials", tostring(#def.sources.specials)))
-        end
+    if def.sources and def.sources.groups then
+        return getText("IGUI_PhunMart_NGroups", tostring(#def.sources.groups))
     end
-    if #parts == 0 then
-        return ""
-    end
-    return table.concat(parts, " + ")
+    return ""
 end
 
 -- Format zones summary.
@@ -97,21 +88,17 @@ local function formatKeyList(keys, limit)
     return text
 end
 
--- Collect unique special categories from special defs.
-local function getSpecialCategories()
-    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
-    local catSet = {}
-    for _, def in pairs(specials) do
-        if def.category and def.category ~= "" then
-            catSet[def.category] = true
+-- Collect sorted price keys for combo.
+local function getPriceKeys()
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local keys = {}
+    for k, v in pairs(prices) do
+        if not v.template then
+            table.insert(keys, k)
         end
     end
-    local sorted = {}
-    for cat in pairs(catSet) do
-        table.insert(sorted, cat)
-    end
-    table.sort(sorted)
-    return sorted
+    table.sort(keys)
+    return keys
 end
 
 local function createEditModal(poolKey, poolDef, isNew, cb)
@@ -131,15 +118,14 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     if def.sources and def.sources.groups then
         for _, g in ipairs(def.sources.groups) do table.insert(selectedGroups, g) end
     end
-    local selectedSpecials = {}
-    if def.sources and def.sources.specials then
-        for _, s in ipairs(def.sources.specials) do table.insert(selectedSpecials, s) end
-    end
 
-    -- Collect available group keys and special categories for pickers
+    -- Collect available group keys for picker
     local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
     local groupOptions = getSortedKeys(groups)
-    local specialCatOptions = getSpecialCategories()
+
+    -- Price combo options
+    local priceKeys = getPriceKeys()
+    local currentPrice = def.defaults and def.defaults.price or ""
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", poolKey or "")
 
@@ -152,13 +138,16 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
             local result = {}
 
-            -- Sources (from pickers)
-            local hasGroups = #selectedGroups > 0
-            local hasSpecials = #selectedSpecials > 0
-            if hasGroups or hasSpecials then
-                result.sources = {}
-                if hasGroups then result.sources.groups = selectedGroups end
-                if hasSpecials then result.sources.specials = selectedSpecials end
+            -- Sources (groups only)
+            if #selectedGroups > 0 then
+                result.sources = { groups = selectedGroups }
+            end
+
+            -- Defaults price (optional)
+            local priceVal = f:getFieldValue("defaultsPrice")
+            if priceVal and priceVal ~= "" then
+                result.defaults = result.defaults or {}
+                result.defaults.price = priceVal
             end
 
             -- Zones (optional)
@@ -179,6 +168,16 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 result.fallbackCategory = fbCat
             end
 
+            -- Sticky
+            if f:getFieldValue("sticky") then
+                result.sticky = true
+            end
+
+            -- Enabled
+            if not f:getFieldValue("enabled") then
+                result.enabled = false
+            end
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -186,6 +185,10 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = poolKey or "", editable = isNew,
+    })
+    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
+        checked = def.sticky == true,
+        text = getText("IGUI_PhunMart_Hint_Sticky"),
     })
     form:addPickerField("groups", getText("IGUI_PhunMart_Lbl_Groups"), {
         value = selectedGroups, display = formatKeyList(selectedGroups),
@@ -196,26 +199,23 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickGroups") })
         end,
     })
-    form:addPickerField("specials", getText("IGUI_PhunMart_Lbl_Specials"), {
-        value = selectedSpecials, display = formatKeyList(selectedSpecials),
-        onPick = function(f, field)
-            KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecials, function(keys)
-                selectedSpecials = keys or {}
-                f:setPickerValue("specials", selectedSpecials, formatKeyList(selectedSpecials))
-            end, { title = getText("IGUI_PhunMart_Admin_PickSpecialCats") })
-        end,
-    })
     form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
         default = zonesDefault,
         hint = getText("IGUI_PhunMart_Hint_Zones"),
     })
-    form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_FallbackTexture"), {
-        default = def.fallbackTexture or "",
-        hint = getText("IGUI_PhunMart_Hint_FallbackTexture"),
+    form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+        options = priceKeys, default = currentPrice, allowEmpty = true,
     })
-    form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_FallbackCategory"), {
+    form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
+        default = def.fallbackTexture or "",
+        hint = getText("IGUI_PhunMart_Hint_DefaultTexture"),
+    })
+    form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_DefaultCategory"), {
         default = def.fallbackCategory or "",
-        hint = getText("IGUI_PhunMart_Hint_FallbackCategory"),
+        hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
     })
 
     form:initialise()
@@ -277,7 +277,11 @@ function UI:createChildren()
 end
 
 function UI:getFilterText(itemData)
-    return (itemData.key or "") .. " " .. (itemData.sources or "")
+    local text = (itemData.key or "") .. " " .. (itemData.sources or "")
+    if itemData.sticky then
+        text = text .. " sticky"
+    end
+    return text
 end
 
 function UI:refreshPools()
@@ -293,8 +297,14 @@ function UI:refreshPools()
 
     for _, key in ipairs(keys) do
         local def = pools[key]
+        local displayKey = key
+        if def.sticky then displayKey = displayKey .. " [S]" end
+        if def.enabled == false then displayKey = displayKey .. " [off]" end
         self:addListItem(key, {
             key = key,
+            displayKey = displayKey,
+            sticky = def.sticky == true,
+            enabled = def.enabled ~= false,
             sources = formatSources(def),
             zones = formatZones(def),
             def = def
@@ -373,9 +383,15 @@ function UI:drawDatas(y, item, alt)
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
-    -- Key column
+    -- Key column (sticky = gold, disabled = dimmed)
     self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
+    if not data.enabled then
+        self:drawText(data.displayKey, xoffset, textY, 0.5, 0.5, 0.5, a, self.font)
+    elseif data.sticky then
+        self:drawText(data.displayKey, xoffset, textY, 0.9, 0.85, 0.3, a, self.font)
+    else
+        self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
+    end
     self:clearStencilRect()
 
     -- Sources column

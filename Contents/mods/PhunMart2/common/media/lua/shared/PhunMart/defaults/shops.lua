@@ -463,6 +463,11 @@ return {
                 key = "pool_prawnstars",
                 weight = 1.0
             }}
+        }, {
+            keys = {{
+                key = "pool_prawnstars_core",
+                weight = 1.0
+            }}
         }}
     }
 

@@ -789,7 +789,9 @@ return {
         defaults = {
             price = "self_1",
             reward = "change_payout_jackpot",
-            offer = { weight = 1.0 }
+            offer = {
+                weight = 1.0
+            }
         },
         include = {
             items = {"Diamond"}
@@ -802,7 +804,9 @@ return {
         defaults = {
             price = "self_1",
             reward = "change_payout_premium",
-            offer = { weight = 1.0 }
+            offer = {
+                weight = 1.0
+            }
         },
         include = {
             items = {"GoldBar", "Ruby", "Sapphire", "Emerald"}
@@ -815,7 +819,9 @@ return {
         defaults = {
             price = "self_1",
             reward = "change_payout_good",
-            offer = { weight = 1.0 }
+            offer = {
+                weight = 1.0
+            }
         },
         include = {
             items = {"SmallGoldBar", "Amethyst", "GoldCoin", "Pocketwatch"}
@@ -828,15 +834,14 @@ return {
         defaults = {
             price = "self_1",
             reward = "change_payout_standard",
-            offer = { weight = 1.0 }
+            offer = {
+                weight = 1.0
+            }
         },
         include = {
-            items = {
-                "Bracelet_BangleLeftGold", "Bracelet_BangleRightGold",
-                "Bracelet_ChainLeftGold", "Bracelet_ChainRightGold",
-                "Goblet_Gold", "GoldCup", "Fork_Gold", "Spoon_Gold", "ButterKnife_Gold",
-                "Locket", "SilverCoin", "GoldSheet"
-            }
+            items = {"Bracelet_BangleLeftGold", "Bracelet_BangleRightGold", "Bracelet_ChainLeftGold",
+                     "Bracelet_ChainRightGold", "Goblet_Gold", "GoldCup", "Fork_Gold", "Spoon_Gold", "ButterKnife_Gold",
+                     "Locket", "SilverCoin", "GoldSheet"}
         }
     },
 
@@ -846,14 +851,13 @@ return {
         defaults = {
             price = "self_1",
             reward = "change_payout_budget",
-            offer = { weight = 1.0 }
+            offer = {
+                weight = 1.0
+            }
         },
         include = {
-            items = {
-                "Bracelet_BangleLeftSilver", "Bracelet_BangleRightSilver",
-                "Bracelet_ChainLeftSilver", "Bracelet_ChainRightSilver",
-                "GoldScrap", "MoneyBundle", "Money"
-            }
+            items = {"Bracelet_BangleLeftSilver", "Bracelet_BangleRightSilver", "Bracelet_ChainLeftSilver",
+                     "Bracelet_ChainRightSilver", "GoldScrap", "MoneyBundle"}
         }
     },
 
@@ -871,6 +875,73 @@ return {
         include = {
             items = {"CarLuxury", "SportsCar", "SportsCar_ez", "RaceCar12", "RaceCar34", "RaceCar58"}
         }
+    },
+
+    -- =========================================================
+    -- Special-category groups  (wrap specials by category)
+    -- These replace pool-level sources.specials with group-level include.specials
+    -- =========================================================
+
+    traits_add = {
+        label = "Positive Traits",
+        fallbackTexture = "media/textures/icons/trait_add.png",
+        fallbackCategory = "Positive Traits",
+        include = { specials = {"trait_add"} }
+    },
+
+    traits_remove = {
+        label = "Remove Negative Traits",
+        fallbackTexture = "media/textures/icons/trait_remove.png",
+        fallbackCategory = "Remove Negative Traits",
+        include = { specials = {"trait_remove"} }
+    },
+
+    xp_t1 = {
+        label = "Skills (Basic)",
+        fallbackTexture = "media/textures/icons/xp_t1.png",
+        fallbackCategory = "Skills",
+        include = { specials = {"xp_t1"} }
+    },
+
+    xp_t2 = {
+        label = "Skills (Intermediate)",
+        fallbackTexture = "media/textures/icons/xp_t2.png",
+        fallbackCategory = "Skills",
+        include = { specials = {"xp_t2"} }
+    },
+
+    xp_t3 = {
+        label = "Skills (Advanced)",
+        fallbackTexture = "media/textures/icons/xp_t3.png",
+        fallbackCategory = "Skills",
+        include = { specials = {"xp_t3"} }
+    },
+
+    boost_t1 = {
+        label = "Boosts (Basic)",
+        fallbackTexture = "media/textures/icons/boost.png",
+        fallbackCategory = "Boosts",
+        include = { specials = {"boost_t1"} }
+    },
+
+    boost_t2 = {
+        label = "Boosts (Enhanced)",
+        fallbackTexture = "media/textures/icons/boost.png",
+        fallbackCategory = "Boosts",
+        include = { specials = {"boost_t2"} }
+    },
+
+    boost_t3 = {
+        label = "Boosts (Superior)",
+        fallbackTexture = "media/textures/icons/boost.png",
+        fallbackCategory = "Boosts",
+        include = { specials = {"boost_t3"} }
+    },
+
+    pawn_core = {
+        label = "Pawn - Cash",
+        include = { items = {"Base.Money"} },
+        defaults = { reward = "change_payout_budget" }
     }
 
 }

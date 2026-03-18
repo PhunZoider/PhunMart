@@ -78,6 +78,21 @@ local function getActionArgHint(actionType)
     return ""
 end
 
+-- Collect sorted price keys for combo.
+local function getPriceKeys()
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local keys = {""}
+    local sorted = {}
+    for k, v in pairs(prices) do
+        if not v.template then
+            table.insert(sorted, k)
+        end
+    end
+    table.sort(sorted)
+    for _, k in ipairs(sorted) do table.insert(keys, k) end
+    return keys
+end
+
 local function createEditModal(specialKey, specialDef, isNew, cb)
     local def = specialDef or {}
     local isTpl = def.template or false
@@ -184,6 +199,32 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     end
                     result.actions = {action}
                 end
+
+                -- Price (optional)
+                local priceVal = f:getFieldValue("price")
+                if priceVal and priceVal ~= "" then
+                    result.price = priceVal
+                end
+
+                -- Offer: weight and stock
+                local weightVal = f:getFieldNumber("weight")
+                local stockMin = f:getFieldNumber("stockMin")
+                local stockMax = f:getFieldNumber("stockMax")
+                if weightVal or stockMin or stockMax then
+                    result.offer = {}
+                    if weightVal then result.offer.weight = weightVal end
+                    if stockMin or stockMax then
+                        result.offer.stock = {}
+                        if stockMin then result.offer.stock.min = math.floor(stockMin) end
+                        if stockMax then result.offer.stock.max = math.floor(stockMax) end
+                    end
+                end
+
+                -- Enabled
+                local enabledVal = f:getFieldValue("enabled")
+                if not enabledVal then
+                    result.enabled = false
+                end
             end
 
             if cb then cb(key, result) end
@@ -232,7 +273,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         selected = inheritSelected,
         group = "instance",
     })
-    form:addTextField("displayText", getText("IGUI_PhunMart_Lbl_Display"), {
+    form:addTextField("displayText", getText("IGUI_PhunMart_Lbl_Label"), {
         default = (def.display and def.display.text) or "",
         group = "instance",
     })
@@ -248,6 +289,29 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
         default = argDefault,
         hint = getActionArgHint(curAction and curAction.type or ACTION_TYPES[1]),
+        group = "instance",
+    })
+    form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
+        options = getPriceKeys(), default = def.price or "",
+        allowEmpty = true, group = "instance",
+    })
+    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+        default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
+        hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
+        group = "instance",
+    })
+    form:addTextField("stockMin", getText("IGUI_PhunMart_Lbl_StockMin"), {
+        default = (def.offer and def.offer.stock and def.offer.stock.min) and tostring(def.offer.stock.min) or "",
+        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+        group = "instance",
+    })
+    form:addTextField("stockMax", getText("IGUI_PhunMart_Lbl_StockMax"), {
+        default = (def.offer and def.offer.stock and def.offer.stock.max) and tostring(def.offer.stock.max) or "",
+        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+        group = "instance",
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
         group = "instance",
     })
 
@@ -324,13 +388,19 @@ function UI:refreshSpecials()
 
     for _, key in ipairs(keys) do
         local def = specials[key]
-        self:addListItem(key, {
-            key = key,
-            typeCol = formatType(def),
-            display = formatDisplay(def),
-            action = formatAction(def),
-            def = def
-        })
+        if not def.template then
+            local displayKey = key
+            if def.enabled == false then displayKey = displayKey .. " [off]" end
+            self:addListItem(key, {
+                key = key,
+                displayKey = displayKey,
+                enabled = def.enabled ~= false,
+                typeCol = formatType(def),
+                display = formatDisplay(def),
+                action = formatAction(def),
+                def = def
+            })
+        end
     end
 end
 
@@ -398,14 +468,13 @@ function UI:drawRow(y, item, alt)
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
-    -- Key column (gold for templates)
-    local isTemplate = data.def and data.def.template
-    local keyR, keyG, keyB = 1, 1, 1
-    if isTemplate then
-        keyR, keyG, keyB = 0.9, 0.7, 0.3
-    end
+    -- Key column (disabled = dimmed)
     self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    self:drawText(data.key, xoffset, textY, keyR, keyG, keyB, a, self.font)
+    if not data.enabled then
+        self:drawText(data.displayKey, xoffset, textY, 0.5, 0.5, 0.5, a, self.font)
+    else
+        self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
+    end
     self:clearStencilRect()
 
     -- Type column

@@ -197,18 +197,18 @@ local function createSetEditForm(setData, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickPools") })
         end,
     })
+    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+        default = "1.0",
+        hint = getText("IGUI_PhunMart_Hint_PoolWeight"),
+    })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceKeys,
         selected = currentPrice,
         hint = getText("IGUI_PhunMart_Hint_SetPrice"),
     })
-    form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_SetRoll"), {
+    form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_DefaultRoll"), {
         min = rollMinDefault, max = rollMaxDefault,
-        hint = getText("IGUI_PhunMart_Hint_SetRoll"),
-    })
-    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
-        default = "1.0",
-        hint = getText("IGUI_PhunMart_Hint_PoolWeight"),
+        hint = getText("IGUI_PhunMart_Hint_DefaultRoll"),
     })
 
     form:initialise()

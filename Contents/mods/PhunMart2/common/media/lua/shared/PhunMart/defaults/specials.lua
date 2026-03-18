@@ -95,6 +95,10 @@ return {
 
     add_brave = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Brave"
         },
@@ -105,6 +109,10 @@ return {
     },
     add_fasthealer = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Fast Healer"
         },
@@ -115,6 +123,10 @@ return {
     },
     add_strong = {
         inherit = "trait_add_base",
+        price = "token_30",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Strong"
         },
@@ -125,6 +137,10 @@ return {
     },
     add_stout = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Gain: Stout"
         },
@@ -135,6 +151,10 @@ return {
     },
     add_athletic = {
         inherit = "trait_add_base",
+        price = "token_30",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Athletic"
         },
@@ -145,6 +165,10 @@ return {
     },
     add_fit = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Gain: Fit"
         },
@@ -155,6 +179,10 @@ return {
     },
     add_gymnast = {
         inherit = "trait_add_base",
+        price = "token_15",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Gymnast"
         },
@@ -165,6 +193,10 @@ return {
     },
     add_organized = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Organized"
         },
@@ -175,6 +207,10 @@ return {
     },
     add_dextrous = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Dextrous"
         },
@@ -185,6 +221,10 @@ return {
     },
     add_graceful = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Graceful"
         },
@@ -195,6 +235,10 @@ return {
     },
     add_keenhearing = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Keen Hearing"
         },
@@ -205,6 +249,10 @@ return {
     },
     add_eagleeyed = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Eagle Eyed"
         },
@@ -215,6 +263,10 @@ return {
     },
     add_thickskinned = {
         inherit = "trait_add_base",
+        price = "token_24",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Thick-skinned"
         },
@@ -225,6 +277,10 @@ return {
     },
     add_irongut = {
         inherit = "trait_add_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Iron Gut"
         },
@@ -235,6 +291,10 @@ return {
     },
     add_resilient = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Resilient"
         },
@@ -245,6 +305,10 @@ return {
     },
     add_fastlearner = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Gain: Fast Learner"
         },
@@ -255,6 +319,10 @@ return {
     },
     add_crafty = {
         inherit = "trait_add_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Crafty"
         },
@@ -265,6 +333,10 @@ return {
     },
     add_inconspicuous = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Inconspicuous"
         },
@@ -275,6 +347,10 @@ return {
     },
     add_fastreader = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Fast Reader"
         },
@@ -285,6 +361,10 @@ return {
     },
     add_lighteater = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Light Eater"
         },
@@ -295,6 +375,10 @@ return {
     },
     add_lowthirst = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Low Thirst"
         },
@@ -305,6 +389,10 @@ return {
     },
     add_needslesssleep = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Wakeful"
         },
@@ -315,6 +403,10 @@ return {
     },
     add_jogger = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Runner"
         },
@@ -325,6 +417,10 @@ return {
     },
     add_brawler = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Brawler"
         },
@@ -335,6 +431,10 @@ return {
     },
     add_hiker = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Hiker"
         },
@@ -345,6 +445,10 @@ return {
     },
     add_formerscout = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Gain: Former Scout"
         },
@@ -355,6 +459,10 @@ return {
     },
     add_outdoorsman = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Outdoorsy"
         },
@@ -365,6 +473,10 @@ return {
     },
     add_herbalist = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Herbalist"
         },
@@ -375,6 +487,10 @@ return {
     },
     add_hunter = {
         inherit = "trait_add_base",
+        price = "token_24",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Hunter"
         },
@@ -385,6 +501,10 @@ return {
     },
     add_fishing = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Angler"
         },
@@ -395,6 +515,10 @@ return {
     },
     add_cook = {
         inherit = "trait_add_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Keen Cook"
         },
@@ -405,6 +529,10 @@ return {
     },
     add_nutritionist = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Nutritionist"
         },
@@ -415,6 +543,10 @@ return {
     },
     add_firstaid = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: First Aider"
         },
@@ -425,6 +557,10 @@ return {
     },
     add_handy = {
         inherit = "trait_add_base",
+        price = "token_24",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Handy"
         },
@@ -435,6 +571,10 @@ return {
     },
     add_mechanic = {
         inherit = "trait_add_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Vehicle Knowledge"
         },
@@ -445,6 +585,10 @@ return {
     },
     add_tailor = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Sewer"
         },
@@ -455,6 +599,10 @@ return {
     },
     add_blacksmith = {
         inherit = "trait_add_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Gain: Blacksmith"
         },
@@ -465,6 +613,10 @@ return {
     },
     add_mason = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Mason"
         },
@@ -475,6 +627,10 @@ return {
     },
     add_whittler = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Whittler"
         },
@@ -485,6 +641,10 @@ return {
     },
     add_adrenalinejunkie = {
         inherit = "trait_add_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Gain: Adrenaline Junkie"
         },
@@ -495,6 +655,10 @@ return {
     },
     add_nightvision = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Cat's Eyes"
         },
@@ -505,6 +669,10 @@ return {
     },
     add_speeddemon = {
         inherit = "trait_add_base",
+        price = "token_3",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Speed Demon"
         },
@@ -515,6 +683,10 @@ return {
     },
     add_inventive = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Inventive"
         },
@@ -525,6 +697,10 @@ return {
     },
     add_wildernessknowledge = {
         inherit = "trait_add_base",
+        price = "token_24",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Gain: Wilderness Knowledge"
         },
@@ -535,6 +711,10 @@ return {
     },
     add_gardener = {
         inherit = "trait_add_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Gain: Gardener"
         },
@@ -550,6 +730,10 @@ return {
 
     remove_slowlearner = {
         inherit = "trait_remove_base",
+        price = "token_18",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Slow Learner"
         },
@@ -560,6 +744,10 @@ return {
     },
     remove_clumsy = {
         inherit = "trait_remove_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Clumsy"
         },
@@ -570,6 +758,10 @@ return {
     },
     remove_weakstomach = {
         inherit = "trait_remove_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Weak Stomach"
         },
@@ -580,6 +772,10 @@ return {
     },
     remove_slowhealer = {
         inherit = "trait_remove_base",
+        price = "token_9",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Slow Healer"
         },
@@ -590,6 +786,10 @@ return {
     },
     remove_insomniac = {
         inherit = "trait_remove_base",
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Restless Sleeper"
         },
@@ -600,6 +800,10 @@ return {
     },
     remove_highthirst = {
         inherit = "trait_remove_base",
+        price = "token_3",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: High Thirst"
         },
@@ -610,6 +814,10 @@ return {
     },
     remove_shortsighted = {
         inherit = "trait_remove_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Short Sighted"
         },
@@ -620,6 +828,10 @@ return {
     },
     remove_conspicuous = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Conspicuous"
         },
@@ -630,6 +842,10 @@ return {
     },
     remove_cowardly = {
         inherit = "trait_remove_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Cowardly"
         },
@@ -640,6 +856,10 @@ return {
     },
     remove_disorganized = {
         inherit = "trait_remove_base",
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Disorganized"
         },
@@ -650,6 +870,10 @@ return {
     },
     remove_heartyappetite = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Hearty Appetite"
         },
@@ -660,6 +884,10 @@ return {
     },
     remove_pacifist = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Reluctant Fighter"
         },
@@ -670,6 +898,10 @@ return {
     },
     remove_slowreader = {
         inherit = "trait_remove_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Slow Reader"
         },
@@ -680,6 +912,10 @@ return {
     },
     remove_thinskinned = {
         inherit = "trait_remove_base",
+        price = "token_24",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Remove: Thin-skinned"
         },
@@ -690,6 +926,11 @@ return {
     },
     remove_outofshape = {
         inherit = "trait_remove_base",
+        enabled = false,
+        price = "token_18",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Out of Shape"
         },
@@ -700,6 +941,10 @@ return {
     },
     remove_hardofhearing = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Hard of Hearing"
         },
@@ -710,6 +955,10 @@ return {
     },
     remove_allthumbs = {
         inherit = "trait_remove_base",
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: All Thumbs"
         },
@@ -720,6 +969,10 @@ return {
     },
     remove_hemophobic = {
         inherit = "trait_remove_base",
+        price = "token_15",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Remove: Fear of Blood"
         },
@@ -730,6 +983,10 @@ return {
     },
     remove_needsmoresleep = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Sleepyhead"
         },
@@ -740,6 +997,10 @@ return {
     },
     remove_asthmatic = {
         inherit = "trait_remove_base",
+        price = "token_15",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Remove: Short of Breath"
         },
@@ -750,6 +1011,11 @@ return {
     },
     remove_smoker = {
         inherit = "trait_remove_base",
+        enabled = false,
+        price = "token_6",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Smoker"
         },
@@ -760,6 +1026,10 @@ return {
     },
     remove_feeble = {
         inherit = "trait_remove_base",
+        price = "token_18",
+        offer = {
+            weight = 0.7
+        },
         display = {
             text = "Remove: Weak"
         },
@@ -770,6 +1040,10 @@ return {
     },
     remove_pronetoillness = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Prone to Illness"
         },
@@ -780,6 +1054,10 @@ return {
     },
     remove_claustrophobic = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Claustrophobic"
         },
@@ -790,6 +1068,10 @@ return {
     },
     remove_agoraphobic = {
         inherit = "trait_remove_base",
+        price = "token_12",
+        offer = {
+            weight = 0.8
+        },
         display = {
             text = "Remove: Agoraphobic"
         },
@@ -800,6 +1082,11 @@ return {
     },
     remove_unfit = {
         inherit = "trait_remove_base",
+        enabled = false,
+        price = "token_30",
+        offer = {
+            weight = 0.5
+        },
         display = {
             text = "Remove: Unfit"
         },
@@ -810,6 +1097,10 @@ return {
     },
     remove_sundaydriver = {
         inherit = "trait_remove_base",
+        price = "token_3",
+        offer = {
+            weight = 1.0
+        },
         display = {
             text = "Remove: Sunday Driver"
         },
@@ -826,6 +1117,14 @@ return {
 
     vehicle_smallcar = {
         inherit = "vehicle_base",
+        price = "vehicle_common",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Small Car Key"
         },
@@ -846,6 +1145,14 @@ return {
     },
     vehicle_normalcar = {
         inherit = "vehicle_base",
+        price = "vehicle_uncommon",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Car Key"
         },
@@ -866,6 +1173,14 @@ return {
     },
     vehicle_stationwagon = {
         inherit = "vehicle_base",
+        price = "vehicle_uncommon",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Station Wagon Key"
         },
@@ -886,6 +1201,14 @@ return {
     },
     vehicle_luxury = {
         inherit = "vehicle_base",
+        price = "vehicle_rare",
+        offer = {
+            weight = 0.5,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Luxury Car Key"
         },
@@ -906,6 +1229,14 @@ return {
     },
     vehicle_sportscar = {
         inherit = "vehicle_base",
+        price = "vehicle_rare",
+        offer = {
+            weight = 0.5,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Sports Car Key"
         },
@@ -926,6 +1257,14 @@ return {
     },
     vehicle_suv = {
         inherit = "vehicle_base",
+        price = "vehicle_uncommon",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "SUV Key"
         },
@@ -946,6 +1285,14 @@ return {
     },
     vehicle_offroad = {
         inherit = "vehicle_base",
+        price = "vehicle_uncommon",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Off-Road Key"
         },
@@ -966,6 +1313,14 @@ return {
     },
     vehicle_pickup = {
         inherit = "vehicle_base",
+        price = "vehicle_uncommon",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Pickup Truck Key"
         },
@@ -986,6 +1341,14 @@ return {
     },
     vehicle_van = {
         inherit = "vehicle_base",
+        price = "vehicle_common",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Van Key"
         },
@@ -1006,6 +1369,14 @@ return {
     },
     vehicle_stepvan = {
         inherit = "vehicle_base",
+        price = "vehicle_common",
+        offer = {
+            weight = 1.0,
+            stock = {
+                min = 1,
+                max = 1
+            }
+        },
         display = {
             text = "Step Van Key"
         },
@@ -1069,33 +1440,63 @@ return {
 
     change_payout_budget = {
         kind = "pawn",
-        display = { texture = "Item_Money" },
-        actions = {{ type = "adjustBalance", pool = "change", amount = 100 }}
+        display = {
+            texture = "Item_Money"
+        },
+        actions = {{
+            type = "adjustBalance",
+            pool = "change",
+            amount = 100
+        }}
     },
 
     change_payout_standard = {
         kind = "pawn",
-        display = { texture = "Item_Money" },
-        actions = {{ type = "adjustBalance", pool = "change", amount = 500 }}
+        display = {
+            texture = "Item_Money"
+        },
+        actions = {{
+            type = "adjustBalance",
+            pool = "change",
+            amount = 500
+        }}
     },
 
     change_payout_good = {
         kind = "pawn",
-        display = { texture = "Item_Money" },
-        actions = {{ type = "adjustBalance", pool = "change", amount = 1000 }}
+        display = {
+            texture = "Item_Money"
+        },
+        actions = {{
+            type = "adjustBalance",
+            pool = "change",
+            amount = 1000
+        }}
     },
 
     change_payout_premium = {
         kind = "pawn",
-        display = { texture = "Item_Money" },
-        actions = {{ type = "adjustBalance", pool = "change", amount = 2500 }}
+        display = {
+            texture = "Item_Money"
+        },
+        actions = {{
+            type = "adjustBalance",
+            pool = "change",
+            amount = 2500
+        }}
     },
 
     change_payout_jackpot = {
         kind = "pawn",
-        display = { texture = "Item_Money" },
-        actions = {{ type = "adjustBalance", pool = "change", amount = 5000 }}
-    },
+        display = {
+            texture = "Item_Money"
+        },
+        actions = {{
+            type = "adjustBalance",
+            pool = "change",
+            amount = 5000
+        }}
+    }
 
     -- XP rewards defined in PhunMart_XP_Rewards.lua (generated file)
     -- Each follows pattern: skill_<Perk>_t1, skill_<Perk>_t2, skill_<Perk>_t3

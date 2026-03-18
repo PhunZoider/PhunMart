@@ -583,7 +583,7 @@ local function getItemCategoryCache()
     return itemCategoryCache
 end
 
-local function expandGroupItems(groupDef, logger)
+local function expandGroupItems(groupDef, resolvedSpecials, logger)
     local outSet = {}
     local include = groupDef.include or {}
 
@@ -605,6 +605,17 @@ local function expandGroupItems(groupDef, logger)
                 end
             else
                 logger:warn("Group include.categories: no items found for category '" .. tostring(cat) .. "'")
+            end
+        end
+    end
+
+    -- specials-based discovery: include all non-template specials whose category matches
+    if type(include.specials) == "table" and resolvedSpecials then
+        for _, cat in ipairs(include.specials) do
+            for specialKey, specialDef in pairs(resolvedSpecials) do
+                if specialDef.template ~= true and specialDef.enabled ~= false and specialDef.category == cat then
+                    outSet[specialKey] = true
+                end
             end
         end
     end
@@ -677,19 +688,30 @@ local function normalizeOffer(offer)
     return offer
 end
 
--- Apply precedence: group.defaults -> item  (pricing lives at poolSet level, not pool)
+-- Apply precedence: pool.defaults → group.defaults → special fields → itemDef override
 local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, itemDef, logger)
     local merged = {}
 
-    -- Pool defaults (excluding price/prices, which now live at the poolSet level on shops)
+    -- Pool defaults (price is now a valid fallback in the merge chain)
     local poolDefaults = poolDef.defaults
     if poolDefaults then
-        local stripped = shallowCopy(poolDefaults)
-        stripped.price = nil
-        stripped.prices = nil
-        merged = deepMerge(merged, stripped)
+        merged = deepMerge(merged, poolDefaults)
     end
     merged = deepMerge(merged, (groupDef and groupDef.defaults) or {})
+
+    -- Inject special-level fields (price, offer) between group defaults and item override.
+    -- Full precedence: pool.defaults → group.defaults → special fields → itemDef override
+    local rewardKey = merged.reward
+    local specialDef = type(rewardKey) == "string" and ctx.specials[rewardKey] or nil
+    if specialDef then
+        if specialDef.price and not merged.price then
+            merged.price = specialDef.price
+        end
+        if type(specialDef.offer) == "table" then
+            merged.offer = deepMerge(merged.offer or {}, specialDef.offer)
+        end
+    end
+
     merged = deepMerge(merged, itemDef or {})
 
     -- backward compat: pools might still use "prices"
@@ -697,9 +719,11 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         merged.price = merged.prices
     end
 
-    -- conditions merge (AND)
-    merged.conditions = mergeConditions(mergeConditions(poolDef.defaults and poolDef.defaults.conditions,
-        groupDef and groupDef.defaults and groupDef.defaults.conditions), itemDef and itemDef.conditions)
+    -- conditions merge (AND): pool → group → special → item
+    merged.conditions = mergeConditions(mergeConditions(mergeConditions(poolDef.defaults and poolDef.defaults.conditions,
+        groupDef and groupDef.defaults and groupDef.defaults.conditions),
+        specialDef and specialDef.conditions or nil),
+        itemDef and itemDef.conditions)
 
     merged.offer = normalizeOffer(merged.offer)
 
@@ -830,7 +854,7 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         conditions = offerConditions,
         meta = {
             sourceGroup = groupDef and groupDef.__key or nil,
-            category = (groupDef and groupDef.label) or poolDef.fallbackCategory or nil,
+            category = (groupDef and groupDef.label) or (groupDef and groupDef.fallbackCategory) or poolDef.fallbackCategory or nil,
             fallbackTexture = (groupDef and groupDef.fallbackTexture) or poolDef.fallbackTexture or nil
         }
     }
@@ -920,7 +944,7 @@ function Compiler.compileAll(ctx)
                             logger:error("Pool '" .. poolKey .. "' references group '" .. groupKey ..
                                              "' but it is a template.")
                         else
-                            local expanded = expandGroupItems(groupDef, logger)
+                            local expanded = expandGroupItems(groupDef, resolved.specials, logger)
                             for _, itemType in ipairs(expanded) do
                                 itemsSet[itemType] = {
                                     fromGroup = groupDef,
@@ -932,8 +956,9 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- direct items
+            -- direct items (deprecated — use groups with include.items instead)
             if type(sources.items) == "table" then
+                logger:warn("Pool '" .. poolKey .. "' uses sources.items (deprecated). Use groups with include.items instead.")
                 for _, itemType in ipairs(sources.items) do
                     itemsSet[itemType] = itemsSet[itemType] or {
                         fromGroup = nil,
@@ -942,9 +967,9 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- specials-based items: include all non-template items whose resolved
-            -- special has a matching category (inherited from special templates).
+            -- specials-based items (deprecated — use groups with include.specials instead)
             if type(sources.specials) == "table" then
+                logger:warn("Pool '" .. poolKey .. "' uses sources.specials (deprecated). Use groups with include.specials instead.")
                 local catSet = {}
                 for _, cat in ipairs(sources.specials) do
                     catSet[cat] = true

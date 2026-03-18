@@ -109,17 +109,13 @@ return {
     -- Sources use reward `category` field, not game item groups.
     -- =========================================================
     pool_traiter_good = {
-        fallbackTexture = "Item_Notebook",
-        fallbackCategory = "Positive Traits",
         sources = {
-            specials = {"trait_add"}
+            groups = {"traits_add"}
         }
     },
     pool_traiter_bad_removal = {
-        fallbackTexture = "Item_Notebook",
-        fallbackCategory = "Remove Negative Traits",
         sources = {
-            specials = {"trait_remove"}
+            groups = {"traits_remove"}
         }
     },
 
@@ -203,9 +199,18 @@ return {
     -- PrawnStars  (pawn shop: jewelry & valuables → change)
     -- =========================================================
     pool_prawnstars = {
-        sticky = true,
         sources = {
-            groups = {"pawn_jackpot", "pawn_premium", "pawn_good", "pawn_standard", "pawn_budget"}
+            groups = {"pawn_premium", "pawn_good", "pawn_standard", "pawn_budget"}
+        }
+    },
+    pool_prawnstars_core = {
+        sticky = true,
+        defaults = {
+            price = "self_1",
+            reward = "change_payout_budget"
+        },
+        sources = {
+            groups = {"pawn_core"}
         }
     },
 
@@ -224,60 +229,48 @@ return {
         zones = {
             difficulty = {0, 1, 2}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Skills",
         sources = {
-            specials = {"xp_t1"}
+            groups = {"xp_t1"}
         }
     },
     pool_xp_gifted = {
         zones = {
             difficulty = {2, 3}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Skills",
         sources = {
-            specials = {"xp_t2"}
+            groups = {"xp_t2"}
         }
     },
     pool_xp_luxury = {
         zones = {
             difficulty = {3, 4}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Skills",
         sources = {
-            specials = {"xp_t3"}
+            groups = {"xp_t3"}
         }
     },
     pool_boost_budget = {
         zones = {
             difficulty = {1, 2}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Boosts",
         sources = {
-            specials = {"boost_t1"}
+            groups = {"boost_t1"}
         }
     },
     pool_boost_gifted = {
         zones = {
             difficulty = {2, 3}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Boosts",
         sources = {
-            specials = {"boost_t2"}
+            groups = {"boost_t2"}
         }
     },
     pool_boost_luxury = {
         zones = {
             difficulty = {3, 4}
         },
-        fallbackTexture = "Item_Book",
-        fallbackCategory = "Boosts",
         sources = {
-            specials = {"boost_t3"}
+            groups = {"boost_t3"}
         }
     },
 

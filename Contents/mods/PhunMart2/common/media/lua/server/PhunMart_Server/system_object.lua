@@ -244,32 +244,41 @@ function ServerObject:buildOffers()
         local stickyOffers = {}
         local seenItems = {} -- dedup: first occurrence by item key wins
 
-        for _, poolRef in ipairs(poolSet.keys or {}) do
-            local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
-            local poolWeight = type(poolRef) == "table" and poolRef.weight or 1.0
-            local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
-            if not pool then
-                Core.debugLn("buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
-            elseif not poolPassesZoneFilter(pool, self.x, self.y) then
-                -- pool excluded by zone difficulty at this location; skip silently
-            else
-                for offerId, offer in pairs(pool.offers or {}) do
-                    if not excluded[offer.item] then
-                        local itemKey = offer.item
-                        if not seenItems[itemKey] then
-                            seenItems[itemKey] = true
-                            if pool.sticky then
-                                table.insert(stickyOffers, {
-                                    id = offerId,
-                                    offer = offer
-                                })
-                            else
-                                local offerWeight = (offer.offer and offer.offer.weight or 1.0) * poolWeight
-                                table.insert(candidates, {
-                                    id = offerId,
-                                    offer = offer,
-                                    scaledWeight = offerWeight
-                                })
+        -- Two passes: sticky pools first so their items always win the dedup,
+        -- then non-sticky pools collect rollable candidates from the remainder.
+        for pass = 1, 2 do
+            local wantSticky = (pass == 1)
+            for _, poolRef in ipairs(poolSet.keys or {}) do
+                local poolKey = type(poolRef) == "table" and poolRef.key or poolRef
+                local poolWeight = type(poolRef) == "table" and poolRef.weight or 1.0
+                local pool = Core.runtime.pools and Core.runtime.pools[poolKey]
+                if not pool then
+                    if pass == 1 then
+                        Core.debugLn("buildOffers: pool '" .. tostring(poolKey) .. "' not in runtime")
+                    end
+                elseif (pool.sticky == true) ~= wantSticky then
+                    -- wrong pass; skip
+                elseif not poolPassesZoneFilter(pool, self.x, self.y) then
+                    -- pool excluded by zone difficulty at this location; skip silently
+                else
+                    for offerId, offer in pairs(pool.offers or {}) do
+                        if not excluded[offer.item] then
+                            local itemKey = offer.item
+                            if not seenItems[itemKey] then
+                                seenItems[itemKey] = true
+                                if pool.sticky then
+                                    table.insert(stickyOffers, {
+                                        id = offerId,
+                                        offer = offer
+                                    })
+                                else
+                                    local offerWeight = (offer.offer and offer.offer.weight or 1.0) * poolWeight
+                                    table.insert(candidates, {
+                                        id = offerId,
+                                        offer = offer,
+                                        scaledWeight = offerWeight
+                                    })
+                                end
                             end
                         end
                     end

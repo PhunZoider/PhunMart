@@ -37,7 +37,7 @@ local function formatPrice(def)
     return ""
 end
 
--- Format the include summary: categories + item count.
+-- Format the include summary: categories + items + specials count.
 local function formatInclude(def)
     local parts = {}
     if def.include then
@@ -47,11 +47,31 @@ local function formatInclude(def)
         if def.include.items then
             table.insert(parts, getText("IGUI_PhunMart_NItems", tostring(#def.include.items)))
         end
+        if def.include.specials then
+            table.insert(parts, getText("IGUI_PhunMart_NSpecials", tostring(#def.include.specials)))
+        end
     end
     if #parts == 0 then
         return ""
     end
     return table.concat(parts, " + ")
+end
+
+-- Collect unique special categories from special defs.
+local function getSpecialCategories()
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local catSet = {}
+    for _, def in pairs(specials) do
+        if def.category and def.category ~= "" then
+            catSet[def.category] = true
+        end
+    end
+    local sorted = {}
+    for cat in pairs(catSet) do
+        table.insert(sorted, cat)
+    end
+    table.sort(sorted)
+    return sorted
 end
 
 -- Format the blacklist summary.
@@ -138,6 +158,9 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     if include.categories then for _, c in ipairs(include.categories) do table.insert(selectedCats, c) end end
     local selectedItems = {}
     if include.items then for _, item in ipairs(include.items) do table.insert(selectedItems, item) end end
+    local selectedSpecialCats = {}
+    if include.specials then for _, s in ipairs(include.specials) do table.insert(selectedSpecialCats, s) end end
+    local specialCatOptions = getSpecialCategories()
     local selectedBlItems = {}
     if def.blacklist then for _, item in ipairs(def.blacklist) do table.insert(selectedBlItems, item) end end
     local selectedBlCats = {}
@@ -169,14 +192,26 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
             local cats = #selectedCats > 0 and selectedCats or nil
             local items = #selectedItems > 0 and selectedItems or nil
-            if cats or items then
+            local specialsInc = #selectedSpecialCats > 0 and selectedSpecialCats or nil
+            if cats or items or specialsInc then
                 result.include = {}
                 if cats then result.include.categories = cats end
                 if items then result.include.items = items end
+                if specialsInc then result.include.specials = specialsInc end
             end
+
+            local fbTex = f:getFieldValue("fallbackTexture")
+            if fbTex and fbTex ~= "" then result.fallbackTexture = fbTex end
+            local fbCat = f:getFieldValue("fallbackCategory")
+            if fbCat and fbCat ~= "" then result.fallbackCategory = fbCat end
 
             if #selectedBlItems > 0 then result.blacklist = selectedBlItems end
             if #selectedBlCats > 0 then result.blacklistCategories = selectedBlCats end
+
+            -- Enabled
+            if not f:getFieldValue("enabled") then
+                result.enabled = false
+            end
 
             if cb then cb(key, result) end
             f:close()
@@ -190,24 +225,14 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         default = def.label or "",
         hint = getText("IGUI_PhunMart_Hint_Label"),
     })
-    form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
-        options = priceOpts, selected = defaults.price or "",
-        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
-    })
-    form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Special"), {
-        value = selectedSpecial, display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
-        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+    form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
+        value = selectedItems, display = formatItemList(selectedItems),
         onPick = function(f, field)
-            local initial = selectedSpecial and {selectedSpecial} or {}
-            KeyPicker.open(getSpecificPlayer(0), specialKeys, initial, function(key)
-                selectedSpecial = key
-                f:setPickerValue("special", selectedSpecial, selectedSpecial or getText("IGUI_PhunMart_Lbl_None"))
-            end, { title = getText("IGUI_PhunMart_Admin_PickSpecials"), singleSelect = true })
+            ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
+                selectedItems = keys or {}
+                f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
+            end)
         end,
-    })
-    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
-        default = tostring(offer.weight or "1.0"),
-        hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
     })
     form:addPickerField("cats", getText("IGUI_PhunMart_Lbl_Categories"), {
         value = selectedCats, display = formatCatList(selectedCats),
@@ -218,13 +243,13 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end)
         end,
     })
-    form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
-        value = selectedItems, display = formatItemList(selectedItems),
+    form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_Specials"), {
+        value = selectedSpecialCats, display = formatCatList(selectedSpecialCats),
         onPick = function(f, field)
-            ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
-                selectedItems = keys or {}
-                f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
-            end)
+            KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecialCats, function(keys)
+                selectedSpecialCats = keys or {}
+                f:setPickerValue("specialCats", selectedSpecialCats, formatCatList(selectedSpecialCats))
+            end, { title = getText("IGUI_PhunMart_Admin_PickSpecialCats") })
         end,
     })
     form:addPickerField("blItems", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
@@ -244,6 +269,36 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 f:setPickerValue("blCats", selectedBlCats, formatCatList(selectedBlCats))
             end)
         end,
+    })
+    form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+        options = priceOpts, selected = defaults.price or "",
+        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+    })
+    form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Special"), {
+        value = selectedSpecial, display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
+        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+        onPick = function(f, field)
+            local initial = selectedSpecial and {selectedSpecial} or {}
+            KeyPicker.open(getSpecificPlayer(0), specialKeys, initial, function(key)
+                selectedSpecial = key
+                f:setPickerValue("special", selectedSpecial, selectedSpecial or getText("IGUI_PhunMart_Lbl_None"))
+            end, { title = getText("IGUI_PhunMart_Admin_PickSpecials"), singleSelect = true })
+        end,
+    })
+    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+        default = tostring(offer.weight or "1.0"),
+        hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
+    })
+    form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
+        default = def.fallbackTexture or "",
+        hint = getText("IGUI_PhunMart_Hint_DefaultTexture"),
+    })
+    form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_DefaultCategory"), {
+        default = def.fallbackCategory or "",
+        hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
     })
 
     form:initialise()
@@ -330,8 +385,12 @@ function UI:refreshGroups()
 
     for _, key in ipairs(keys) do
         local def = groups[key]
+        local displayKey = key
+        if def.enabled == false then displayKey = displayKey .. " [off]" end
         self:addListItem(key, {
             key = key,
+            displayKey = displayKey,
+            enabled = def.enabled ~= false,
             price = formatPrice(def),
             include = formatInclude(def),
             blacklist = formatBlacklist(def),
@@ -408,9 +467,13 @@ function UI:drawRow(y, item, alt)
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
-    -- Key column
+    -- Key column (disabled = dimmed)
     self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
+    if not data.enabled then
+        self:drawText(data.displayKey, xoffset, textY, 0.5, 0.5, 0.5, a, self.font)
+    else
+        self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
+    end
     self:clearStencilRect()
 
     -- Price column
