@@ -64,7 +64,9 @@ return {
     skill_Cooking_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Cooking_lt3"},
         display = {
             text = "Cooking XP (small)"
@@ -78,7 +80,9 @@ return {
     skill_Cooking_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Cooking_mid"},
         display = {
             text = "Cooking XP (medium)"
@@ -92,7 +96,9 @@ return {
     skill_Cooking_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Cooking_high"},
         display = {
             text = "Cooking XP (large)"
@@ -106,7 +112,14 @@ return {
     boost_Cooking = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Cooking Boost (basic)"
         },
@@ -124,7 +137,9 @@ return {
     skill_Fitness_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Fitness_lt3"},
         display = {
             text = "Fitness XP (small)"
@@ -138,7 +153,9 @@ return {
     skill_Fitness_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Fitness_mid"},
         display = {
             text = "Fitness XP (medium)"
@@ -152,7 +169,9 @@ return {
     skill_Fitness_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Fitness_high"},
         display = {
             text = "Fitness XP (large)"
@@ -166,7 +185,14 @@ return {
     boost_Fitness = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fitness Boost (basic)"
         },
@@ -184,7 +210,9 @@ return {
     skill_Strength_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Strength_lt3"},
         display = {
             text = "Strength XP (small)"
@@ -198,7 +226,9 @@ return {
     skill_Strength_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Strength_mid"},
         display = {
             text = "Strength XP (medium)"
@@ -212,7 +242,9 @@ return {
     skill_Strength_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Strength_high"},
         display = {
             text = "Strength XP (large)"
@@ -226,7 +258,14 @@ return {
     boost_Strength = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Strength Boost (basic)"
         },
@@ -244,7 +283,9 @@ return {
     skill_Blunt_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Blunt_lt3"},
         display = {
             text = "Long Blunt XP (small)"
@@ -258,7 +299,9 @@ return {
     skill_Blunt_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Blunt_mid"},
         display = {
             text = "Long Blunt XP (medium)"
@@ -272,7 +315,9 @@ return {
     skill_Blunt_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Blunt_high"},
         display = {
             text = "Long Blunt XP (large)"
@@ -286,7 +331,14 @@ return {
     boost_Blunt = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Long Blunt Boost (basic)"
         },
@@ -304,7 +356,9 @@ return {
     skill_Axe_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Axe_lt3"},
         display = {
             text = "Axe XP (small)"
@@ -318,7 +372,9 @@ return {
     skill_Axe_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Axe_mid"},
         display = {
             text = "Axe XP (medium)"
@@ -332,7 +388,9 @@ return {
     skill_Axe_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Axe_high"},
         display = {
             text = "Axe XP (large)"
@@ -346,7 +404,14 @@ return {
     boost_Axe = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Axe Boost (basic)"
         },
@@ -364,7 +429,9 @@ return {
     skill_Lightfoot_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Lightfoot_lt3"},
         display = {
             text = "Lightfooted XP (small)"
@@ -378,7 +445,9 @@ return {
     skill_Lightfoot_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Lightfoot_mid"},
         display = {
             text = "Lightfooted XP (medium)"
@@ -392,7 +461,9 @@ return {
     skill_Lightfoot_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Lightfoot_high"},
         display = {
             text = "Lightfooted XP (large)"
@@ -406,7 +477,14 @@ return {
     boost_Lightfoot = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Lightfooted Boost (basic)"
         },
@@ -424,7 +502,9 @@ return {
     skill_Nimble_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Nimble_lt3"},
         display = {
             text = "Nimble XP (small)"
@@ -438,7 +518,9 @@ return {
     skill_Nimble_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Nimble_mid"},
         display = {
             text = "Nimble XP (medium)"
@@ -452,7 +534,9 @@ return {
     skill_Nimble_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Nimble_high"},
         display = {
             text = "Nimble XP (large)"
@@ -466,7 +550,14 @@ return {
     boost_Nimble = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Nimble Boost (basic)"
         },
@@ -484,7 +575,9 @@ return {
     skill_Sprinting_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Sprinting_lt3"},
         display = {
             text = "Running XP (small)"
@@ -498,7 +591,9 @@ return {
     skill_Sprinting_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Sprinting_mid"},
         display = {
             text = "Running XP (medium)"
@@ -512,7 +607,9 @@ return {
     skill_Sprinting_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Sprinting_high"},
         display = {
             text = "Running XP (large)"
@@ -526,7 +623,14 @@ return {
     boost_Sprinting = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Running Boost (basic)"
         },
@@ -544,7 +648,9 @@ return {
     skill_Sneak_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Sneak_lt3"},
         display = {
             text = "Sneaking XP (small)"
@@ -558,7 +664,9 @@ return {
     skill_Sneak_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Sneak_mid"},
         display = {
             text = "Sneaking XP (medium)"
@@ -572,7 +680,9 @@ return {
     skill_Sneak_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Sneak_high"},
         display = {
             text = "Sneaking XP (large)"
@@ -586,7 +696,14 @@ return {
     boost_Sneak = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Sneaking Boost (basic)"
         },
@@ -604,7 +721,9 @@ return {
     skill_Woodwork_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Woodwork_lt3"},
         display = {
             text = "Carpentry XP (small)"
@@ -618,7 +737,9 @@ return {
     skill_Woodwork_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Woodwork_mid"},
         display = {
             text = "Carpentry XP (medium)"
@@ -632,7 +753,9 @@ return {
     skill_Woodwork_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Woodwork_high"},
         display = {
             text = "Carpentry XP (large)"
@@ -646,7 +769,14 @@ return {
     boost_Woodwork = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Carpentry Boost (basic)"
         },
@@ -664,7 +794,9 @@ return {
     skill_Aiming_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Aiming_lt3"},
         display = {
             text = "Aiming XP (small)"
@@ -678,7 +810,9 @@ return {
     skill_Aiming_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Aiming_mid"},
         display = {
             text = "Aiming XP (medium)"
@@ -692,7 +826,9 @@ return {
     skill_Aiming_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Aiming_high"},
         display = {
             text = "Aiming XP (large)"
@@ -706,7 +842,14 @@ return {
     boost_Aiming = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Aiming Boost (basic)"
         },
@@ -724,7 +867,9 @@ return {
     skill_Reloading_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Reloading_lt3"},
         display = {
             text = "Reloading XP (small)"
@@ -738,7 +883,9 @@ return {
     skill_Reloading_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Reloading_mid"},
         display = {
             text = "Reloading XP (medium)"
@@ -752,7 +899,9 @@ return {
     skill_Reloading_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Reloading_high"},
         display = {
             text = "Reloading XP (large)"
@@ -766,7 +915,14 @@ return {
     boost_Reloading = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Reloading Boost (basic)"
         },
@@ -784,7 +940,9 @@ return {
     skill_Farming_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Farming_lt3"},
         display = {
             text = "Agriculture XP (small)"
@@ -798,7 +956,9 @@ return {
     skill_Farming_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Farming_mid"},
         display = {
             text = "Agriculture XP (medium)"
@@ -812,7 +972,9 @@ return {
     skill_Farming_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Farming_high"},
         display = {
             text = "Agriculture XP (large)"
@@ -826,7 +988,14 @@ return {
     boost_Farming = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Agriculture Boost (basic)"
         },
@@ -844,7 +1013,9 @@ return {
     skill_Fishing_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Fishing_lt3"},
         display = {
             text = "Fishing XP (small)"
@@ -858,7 +1029,9 @@ return {
     skill_Fishing_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Fishing_mid"},
         display = {
             text = "Fishing XP (medium)"
@@ -872,7 +1045,9 @@ return {
     skill_Fishing_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Fishing_high"},
         display = {
             text = "Fishing XP (large)"
@@ -886,7 +1061,14 @@ return {
     boost_Fishing = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fishing Boost (basic)"
         },
@@ -904,7 +1086,9 @@ return {
     skill_Trapping_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Trapping_lt3"},
         display = {
             text = "Trapping XP (small)"
@@ -918,7 +1102,9 @@ return {
     skill_Trapping_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Trapping_mid"},
         display = {
             text = "Trapping XP (medium)"
@@ -932,7 +1118,9 @@ return {
     skill_Trapping_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Trapping_high"},
         display = {
             text = "Trapping XP (large)"
@@ -946,7 +1134,14 @@ return {
     boost_Trapping = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Trapping Boost (basic)"
         },
@@ -964,7 +1159,9 @@ return {
     skill_PlantScavenging_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_PlantScavenging_lt3"},
         display = {
             text = "Foraging XP (small)"
@@ -978,7 +1175,9 @@ return {
     skill_PlantScavenging_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_PlantScavenging_mid"},
         display = {
             text = "Foraging XP (medium)"
@@ -992,7 +1191,9 @@ return {
     skill_PlantScavenging_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_PlantScavenging_high"},
         display = {
             text = "Foraging XP (large)"
@@ -1006,7 +1207,14 @@ return {
     boost_PlantScavenging = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Foraging Boost (basic)"
         },
@@ -1024,7 +1232,9 @@ return {
     skill_Doctor_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Doctor_lt3"},
         display = {
             text = "First Aid XP (small)"
@@ -1038,7 +1248,9 @@ return {
     skill_Doctor_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Doctor_mid"},
         display = {
             text = "First Aid XP (medium)"
@@ -1052,7 +1264,9 @@ return {
     skill_Doctor_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Doctor_high"},
         display = {
             text = "First Aid XP (large)"
@@ -1066,7 +1280,14 @@ return {
     boost_Doctor = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "First Aid Boost (basic)"
         },
@@ -1084,7 +1305,9 @@ return {
     skill_Electricity_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Electricity_lt3"},
         display = {
             text = "Electrical XP (small)"
@@ -1098,7 +1321,9 @@ return {
     skill_Electricity_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Electricity_mid"},
         display = {
             text = "Electrical XP (medium)"
@@ -1112,7 +1337,9 @@ return {
     skill_Electricity_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Electricity_high"},
         display = {
             text = "Electrical XP (large)"
@@ -1126,7 +1353,14 @@ return {
     boost_Electricity = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Electrical Boost (basic)"
         },
@@ -1144,7 +1378,9 @@ return {
     skill_Blacksmith_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Blacksmith_lt3"},
         display = {
             text = "Blacksmithing XP (small)"
@@ -1158,7 +1394,9 @@ return {
     skill_Blacksmith_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Blacksmith_mid"},
         display = {
             text = "Blacksmithing XP (medium)"
@@ -1172,7 +1410,9 @@ return {
     skill_Blacksmith_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Blacksmith_high"},
         display = {
             text = "Blacksmithing XP (large)"
@@ -1186,7 +1426,14 @@ return {
     boost_Blacksmith = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Blacksmithing Boost (basic)"
         },
@@ -1204,7 +1451,9 @@ return {
     skill_MetalWelding_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_MetalWelding_lt3"},
         display = {
             text = "Welding XP (small)"
@@ -1218,7 +1467,9 @@ return {
     skill_MetalWelding_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_MetalWelding_mid"},
         display = {
             text = "Welding XP (medium)"
@@ -1232,7 +1483,9 @@ return {
     skill_MetalWelding_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_MetalWelding_high"},
         display = {
             text = "Welding XP (large)"
@@ -1246,7 +1499,14 @@ return {
     boost_MetalWelding = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Welding Boost (basic)"
         },
@@ -1264,7 +1524,9 @@ return {
     skill_Mechanics_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Mechanics_lt3"},
         display = {
             text = "Mechanics XP (small)"
@@ -1278,7 +1540,9 @@ return {
     skill_Mechanics_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Mechanics_mid"},
         display = {
             text = "Mechanics XP (medium)"
@@ -1292,7 +1556,9 @@ return {
     skill_Mechanics_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Mechanics_high"},
         display = {
             text = "Mechanics XP (large)"
@@ -1306,7 +1572,14 @@ return {
     boost_Mechanics = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Mechanics Boost (basic)"
         },
@@ -1324,7 +1597,9 @@ return {
     skill_Spear_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Spear_lt3"},
         display = {
             text = "Spear XP (small)"
@@ -1338,7 +1613,9 @@ return {
     skill_Spear_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Spear_mid"},
         display = {
             text = "Spear XP (medium)"
@@ -1352,7 +1629,9 @@ return {
     skill_Spear_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Spear_high"},
         display = {
             text = "Spear XP (large)"
@@ -1366,7 +1645,14 @@ return {
     boost_Spear = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Spear Boost (basic)"
         },
@@ -1384,7 +1670,9 @@ return {
     skill_Maintenance_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Maintenance_lt3"},
         display = {
             text = "Maintenance XP (small)"
@@ -1398,7 +1686,9 @@ return {
     skill_Maintenance_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Maintenance_mid"},
         display = {
             text = "Maintenance XP (medium)"
@@ -1412,7 +1702,9 @@ return {
     skill_Maintenance_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Maintenance_high"},
         display = {
             text = "Maintenance XP (large)"
@@ -1426,7 +1718,14 @@ return {
     boost_Maintenance = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Maintenance Boost (basic)"
         },
@@ -1444,7 +1743,9 @@ return {
     skill_SmallBlade_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_SmallBlade_lt3"},
         display = {
             text = "Short Blade XP (small)"
@@ -1458,7 +1759,9 @@ return {
     skill_SmallBlade_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_SmallBlade_mid"},
         display = {
             text = "Short Blade XP (medium)"
@@ -1472,7 +1775,9 @@ return {
     skill_SmallBlade_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_SmallBlade_high"},
         display = {
             text = "Short Blade XP (large)"
@@ -1486,7 +1791,14 @@ return {
     boost_SmallBlade = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blade Boost (basic)"
         },
@@ -1504,7 +1816,9 @@ return {
     skill_LongBlade_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_LongBlade_lt3"},
         display = {
             text = "Long Blade XP (small)"
@@ -1518,7 +1832,9 @@ return {
     skill_LongBlade_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_LongBlade_mid"},
         display = {
             text = "Long Blade XP (medium)"
@@ -1532,7 +1848,9 @@ return {
     skill_LongBlade_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_LongBlade_high"},
         display = {
             text = "Long Blade XP (large)"
@@ -1546,7 +1864,14 @@ return {
     boost_LongBlade = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Long Blade Boost (basic)"
         },
@@ -1564,7 +1889,9 @@ return {
     skill_SmallBlunt_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_SmallBlunt_lt3"},
         display = {
             text = "Short Blunt XP (small)"
@@ -1578,7 +1905,9 @@ return {
     skill_SmallBlunt_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_SmallBlunt_mid"},
         display = {
             text = "Short Blunt XP (medium)"
@@ -1592,7 +1921,9 @@ return {
     skill_SmallBlunt_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_SmallBlunt_high"},
         display = {
             text = "Short Blunt XP (large)"
@@ -1606,7 +1937,14 @@ return {
     boost_SmallBlunt = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blunt Boost (basic)"
         },
@@ -1624,7 +1962,9 @@ return {
     skill_Tailoring_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Tailoring_lt3"},
         display = {
             text = "Tailoring XP (small)"
@@ -1638,7 +1978,9 @@ return {
     skill_Tailoring_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Tailoring_mid"},
         display = {
             text = "Tailoring XP (medium)"
@@ -1652,7 +1994,9 @@ return {
     skill_Tailoring_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Tailoring_high"},
         display = {
             text = "Tailoring XP (large)"
@@ -1666,7 +2010,14 @@ return {
     boost_Tailoring = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tailoring Boost (basic)"
         },
@@ -1684,7 +2035,9 @@ return {
     skill_Tracking_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Tracking_lt3"},
         display = {
             text = "Tracking XP (small)"
@@ -1698,7 +2051,9 @@ return {
     skill_Tracking_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Tracking_mid"},
         display = {
             text = "Tracking XP (medium)"
@@ -1712,7 +2067,9 @@ return {
     skill_Tracking_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Tracking_high"},
         display = {
             text = "Tracking XP (large)"
@@ -1726,7 +2083,14 @@ return {
     boost_Tracking = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tracking Boost (basic)"
         },
@@ -1744,7 +2108,9 @@ return {
     skill_Husbandry_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Husbandry_lt3"},
         display = {
             text = "Animal Care XP (small)"
@@ -1758,7 +2124,9 @@ return {
     skill_Husbandry_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Husbandry_mid"},
         display = {
             text = "Animal Care XP (medium)"
@@ -1772,7 +2140,9 @@ return {
     skill_Husbandry_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Husbandry_high"},
         display = {
             text = "Animal Care XP (large)"
@@ -1786,7 +2156,14 @@ return {
     boost_Husbandry = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Animal Care Boost (basic)"
         },
@@ -1804,7 +2181,9 @@ return {
     skill_FlintKnapping_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_FlintKnapping_lt3"},
         display = {
             text = "Knapping XP (small)"
@@ -1818,7 +2197,9 @@ return {
     skill_FlintKnapping_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_FlintKnapping_mid"},
         display = {
             text = "Knapping XP (medium)"
@@ -1832,7 +2213,9 @@ return {
     skill_FlintKnapping_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_FlintKnapping_high"},
         display = {
             text = "Knapping XP (large)"
@@ -1846,7 +2229,14 @@ return {
     boost_FlintKnapping = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Knapping Boost (basic)"
         },
@@ -1864,7 +2254,9 @@ return {
     skill_Masonry_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Masonry_lt3"},
         display = {
             text = "Masonry XP (small)"
@@ -1878,7 +2270,9 @@ return {
     skill_Masonry_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Masonry_mid"},
         display = {
             text = "Masonry XP (medium)"
@@ -1892,7 +2286,9 @@ return {
     skill_Masonry_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Masonry_high"},
         display = {
             text = "Masonry XP (large)"
@@ -1906,7 +2302,14 @@ return {
     boost_Masonry = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Masonry Boost (basic)"
         },
@@ -1924,7 +2327,9 @@ return {
     skill_Pottery_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Pottery_lt3"},
         display = {
             text = "Pottery XP (small)"
@@ -1938,7 +2343,9 @@ return {
     skill_Pottery_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Pottery_mid"},
         display = {
             text = "Pottery XP (medium)"
@@ -1952,7 +2359,9 @@ return {
     skill_Pottery_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Pottery_high"},
         display = {
             text = "Pottery XP (large)"
@@ -1966,7 +2375,14 @@ return {
     boost_Pottery = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Pottery Boost (basic)"
         },
@@ -1984,7 +2400,9 @@ return {
     skill_Carving_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Carving_lt3"},
         display = {
             text = "Carving XP (small)"
@@ -1998,7 +2416,9 @@ return {
     skill_Carving_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Carving_mid"},
         display = {
             text = "Carving XP (medium)"
@@ -2012,7 +2432,9 @@ return {
     skill_Carving_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Carving_high"},
         display = {
             text = "Carving XP (large)"
@@ -2026,7 +2448,14 @@ return {
     boost_Carving = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Carving Boost (basic)"
         },
@@ -2044,7 +2473,9 @@ return {
     skill_Butchering_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Butchering_lt3"},
         display = {
             text = "Butchering XP (small)"
@@ -2058,7 +2489,9 @@ return {
     skill_Butchering_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Butchering_mid"},
         display = {
             text = "Butchering XP (medium)"
@@ -2072,7 +2505,9 @@ return {
     skill_Butchering_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Butchering_high"},
         display = {
             text = "Butchering XP (large)"
@@ -2086,7 +2521,14 @@ return {
     boost_Butchering = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Butchering Boost (basic)"
         },
@@ -2104,7 +2546,9 @@ return {
     skill_Glassmaking_t1 = {
         inherit = "xp_reward_t1_base",
         price = "currency_low",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Glassmaking_lt3"},
         display = {
             text = "Glassmaking XP (small)"
@@ -2118,7 +2562,9 @@ return {
     skill_Glassmaking_t2 = {
         inherit = "xp_reward_t2_base",
         price = "currency_mid",
-        offer = { weight = 1.0 },
+        offer = {
+            weight = 1.0
+        },
         conditions = {"perk_Glassmaking_mid"},
         display = {
             text = "Glassmaking XP (medium)"
@@ -2132,7 +2578,9 @@ return {
     skill_Glassmaking_t3 = {
         inherit = "xp_reward_t3_base",
         price = "currency_high",
-        offer = { weight = 0.8 },
+        offer = {
+            weight = 0.8
+        },
         conditions = {"perk_Glassmaking_high"},
         display = {
             text = "Glassmaking XP (large)"
@@ -2146,7 +2594,14 @@ return {
     boost_Glassmaking = {
         inherit = "boost_reward_t1_base",
         price = "currency_boost",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Glassmaking Boost (basic)"
         },
@@ -2163,7 +2618,14 @@ return {
     boost_Cooking_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Cooking Boost (enhanced)"
         },
@@ -2176,7 +2638,14 @@ return {
     boost_Fitness_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fitness Boost (enhanced)"
         },
@@ -2189,7 +2658,14 @@ return {
     boost_Strength_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Strength Boost (enhanced)"
         },
@@ -2202,7 +2678,14 @@ return {
     boost_Blunt_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Blunt Boost (enhanced)"
         },
@@ -2215,7 +2698,14 @@ return {
     boost_Axe_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Axe Boost (enhanced)"
         },
@@ -2228,7 +2718,14 @@ return {
     boost_Lightfoot_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Lightfoot Boost (enhanced)"
         },
@@ -2241,7 +2738,14 @@ return {
     boost_Nimble_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Nimble Boost (enhanced)"
         },
@@ -2254,7 +2758,14 @@ return {
     boost_Sprinting_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Sprinting Boost (enhanced)"
         },
@@ -2267,7 +2778,14 @@ return {
     boost_Sneak_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Sneak Boost (enhanced)"
         },
@@ -2280,7 +2798,14 @@ return {
     boost_Woodwork_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Woodwork Boost (enhanced)"
         },
@@ -2293,7 +2818,14 @@ return {
     boost_Aiming_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Aiming Boost (enhanced)"
         },
@@ -2306,7 +2838,14 @@ return {
     boost_Reloading_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Reloading Boost (enhanced)"
         },
@@ -2319,7 +2858,14 @@ return {
     boost_Farming_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Farming Boost (enhanced)"
         },
@@ -2332,7 +2878,14 @@ return {
     boost_Fishing_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fishing Boost (enhanced)"
         },
@@ -2345,7 +2898,14 @@ return {
     boost_Trapping_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Trapping Boost (enhanced)"
         },
@@ -2358,7 +2918,14 @@ return {
     boost_PlantScavenging_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Foraging Boost (enhanced)"
         },
@@ -2371,7 +2938,14 @@ return {
     boost_Doctor_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "First Aid Boost (enhanced)"
         },
@@ -2384,7 +2958,14 @@ return {
     boost_Electricity_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Electrical Boost (enhanced)"
         },
@@ -2397,7 +2978,14 @@ return {
     boost_Blacksmith_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Blacksmithing Boost (enhanced)"
         },
@@ -2410,7 +2998,14 @@ return {
     boost_MetalWelding_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Welding Boost (enhanced)"
         },
@@ -2423,7 +3018,14 @@ return {
     boost_Mechanics_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Mechanics Boost (enhanced)"
         },
@@ -2436,7 +3038,14 @@ return {
     boost_Spear_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Spear Boost (enhanced)"
         },
@@ -2449,7 +3058,14 @@ return {
     boost_Maintenance_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Maintenance Boost (enhanced)"
         },
@@ -2462,7 +3078,14 @@ return {
     boost_SmallBlade_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blade Boost (enhanced)"
         },
@@ -2475,7 +3098,14 @@ return {
     boost_LongBlade_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Long Blade Boost (enhanced)"
         },
@@ -2488,7 +3118,14 @@ return {
     boost_SmallBlunt_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blunt Boost (enhanced)"
         },
@@ -2501,7 +3138,14 @@ return {
     boost_Tailoring_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tailoring Boost (enhanced)"
         },
@@ -2514,7 +3158,14 @@ return {
     boost_Tracking_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tracking Boost (enhanced)"
         },
@@ -2527,7 +3178,14 @@ return {
     boost_Husbandry_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Husbandry Boost (enhanced)"
         },
@@ -2540,7 +3198,14 @@ return {
     boost_FlintKnapping_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Knapping Boost (enhanced)"
         },
@@ -2553,7 +3218,14 @@ return {
     boost_Masonry_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Masonry Boost (enhanced)"
         },
@@ -2566,7 +3238,14 @@ return {
     boost_Pottery_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Pottery Boost (enhanced)"
         },
@@ -2579,7 +3258,14 @@ return {
     boost_Carving_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Carving Boost (enhanced)"
         },
@@ -2592,7 +3278,14 @@ return {
     boost_Butchering_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Butchering Boost (enhanced)"
         },
@@ -2605,7 +3298,14 @@ return {
     boost_Glassmaking_t2 = {
         inherit = "boost_reward_t2_base",
         price = "currency_boost_t2",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Glassmaking Boost (enhanced)"
         },
@@ -2622,7 +3322,14 @@ return {
     boost_Cooking_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Cooking Boost (superior)"
         },
@@ -2635,7 +3342,14 @@ return {
     boost_Fitness_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fitness Boost (superior)"
         },
@@ -2648,7 +3362,14 @@ return {
     boost_Strength_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Strength Boost (superior)"
         },
@@ -2661,7 +3382,14 @@ return {
     boost_Blunt_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Blunt Boost (superior)"
         },
@@ -2674,7 +3402,14 @@ return {
     boost_Axe_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Axe Boost (superior)"
         },
@@ -2687,7 +3422,14 @@ return {
     boost_Lightfoot_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Lightfoot Boost (superior)"
         },
@@ -2700,7 +3442,14 @@ return {
     boost_Nimble_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Nimble Boost (superior)"
         },
@@ -2713,7 +3462,14 @@ return {
     boost_Sprinting_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Sprinting Boost (superior)"
         },
@@ -2726,7 +3482,14 @@ return {
     boost_Sneak_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Sneak Boost (superior)"
         },
@@ -2739,7 +3502,14 @@ return {
     boost_Woodwork_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Woodwork Boost (superior)"
         },
@@ -2752,7 +3522,14 @@ return {
     boost_Aiming_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Aiming Boost (superior)"
         },
@@ -2765,7 +3542,14 @@ return {
     boost_Reloading_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Reloading Boost (superior)"
         },
@@ -2778,7 +3562,14 @@ return {
     boost_Farming_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Farming Boost (superior)"
         },
@@ -2791,7 +3582,14 @@ return {
     boost_Fishing_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Fishing Boost (superior)"
         },
@@ -2804,7 +3602,14 @@ return {
     boost_Trapping_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Trapping Boost (superior)"
         },
@@ -2817,7 +3622,14 @@ return {
     boost_PlantScavenging_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Foraging Boost (superior)"
         },
@@ -2830,7 +3642,14 @@ return {
     boost_Doctor_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "First Aid Boost (superior)"
         },
@@ -2843,7 +3662,14 @@ return {
     boost_Electricity_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Electrical Boost (superior)"
         },
@@ -2856,7 +3682,14 @@ return {
     boost_Blacksmith_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Blacksmithing Boost (superior)"
         },
@@ -2869,7 +3702,14 @@ return {
     boost_MetalWelding_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Welding Boost (superior)"
         },
@@ -2882,7 +3722,14 @@ return {
     boost_Mechanics_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Mechanics Boost (superior)"
         },
@@ -2895,7 +3742,14 @@ return {
     boost_Spear_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Spear Boost (superior)"
         },
@@ -2908,7 +3762,14 @@ return {
     boost_Maintenance_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Maintenance Boost (superior)"
         },
@@ -2921,7 +3782,14 @@ return {
     boost_SmallBlade_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blade Boost (superior)"
         },
@@ -2934,7 +3802,14 @@ return {
     boost_LongBlade_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Long Blade Boost (superior)"
         },
@@ -2947,7 +3822,14 @@ return {
     boost_SmallBlunt_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Short Blunt Boost (superior)"
         },
@@ -2960,7 +3842,14 @@ return {
     boost_Tailoring_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tailoring Boost (superior)"
         },
@@ -2973,7 +3862,14 @@ return {
     boost_Tracking_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Tracking Boost (superior)"
         },
@@ -2986,7 +3882,14 @@ return {
     boost_Husbandry_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Husbandry Boost (superior)"
         },
@@ -2999,7 +3902,14 @@ return {
     boost_FlintKnapping_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Knapping Boost (superior)"
         },
@@ -3012,7 +3922,14 @@ return {
     boost_Masonry_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Masonry Boost (superior)"
         },
@@ -3025,7 +3942,14 @@ return {
     boost_Pottery_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Pottery Boost (superior)"
         },
@@ -3038,7 +3962,14 @@ return {
     boost_Carving_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Carving Boost (superior)"
         },
@@ -3051,7 +3982,14 @@ return {
     boost_Butchering_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Butchering Boost (superior)"
         },
@@ -3064,7 +4002,14 @@ return {
     boost_Glassmaking_t3 = {
         inherit = "boost_reward_t3_base",
         price = "currency_boost_t3",
-        offer = { weight = 0.4, stock = { min = 1, max = 1, restockHours = 48 } },
+        offer = {
+            weight = 0.4,
+            stock = {
+                min = 1,
+                max = 1,
+                restockHours = 48
+            }
+        },
         display = {
             text = "Glassmaking Boost (superior)"
         },

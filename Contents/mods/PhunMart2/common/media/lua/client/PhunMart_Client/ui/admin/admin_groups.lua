@@ -37,19 +37,20 @@ local function formatPrice(def)
     return ""
 end
 
--- Format the include summary: categories + items + specials count.
+-- Format the include summary: categories + items + specials + specialCategories.
 local function formatInclude(def)
     local parts = {}
-    if def.include then
-        if def.include.categories then
-            table.insert(parts, table.concat(def.include.categories, ", "))
-        end
-        if def.include.items then
-            table.insert(parts, getText("IGUI_PhunMart_NItems", tostring(#def.include.items)))
-        end
-        if def.include.specials then
-            table.insert(parts, getText("IGUI_PhunMart_NSpecials", tostring(#def.include.specials)))
-        end
+    if def.categories then
+        table.insert(parts, table.concat(def.categories, ", "))
+    end
+    if def.items then
+        table.insert(parts, getText("IGUI_PhunMart_NItems", tostring(#def.items)))
+    end
+    if def.specials then
+        table.insert(parts, getText("IGUI_PhunMart_NItems", tostring(#def.specials)) .. " specials")
+    end
+    if def.specialCategories then
+        table.insert(parts, getText("IGUI_PhunMart_NSpecials", tostring(#def.specialCategories)))
     end
     if #parts == 0 then
         return ""
@@ -140,7 +141,6 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local def = groupDef or {}
     local defaults = def.defaults or {}
     local offer = defaults.offer or {}
-    local include = def.include or {}
 
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceOpts = {""}
@@ -155,11 +155,13 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
     -- Copy arrays so picker mutations don't affect original defs
     local selectedCats = {}
-    if include.categories then for _, c in ipairs(include.categories) do table.insert(selectedCats, c) end end
+    if def.categories then for _, c in ipairs(def.categories) do table.insert(selectedCats, c) end end
     local selectedItems = {}
-    if include.items then for _, item in ipairs(include.items) do table.insert(selectedItems, item) end end
+    if def.items then for _, item in ipairs(def.items) do table.insert(selectedItems, item) end end
+    local selectedSpecialItems = {}
+    if def.specials then for _, s in ipairs(def.specials) do table.insert(selectedSpecialItems, s) end end
     local selectedSpecialCats = {}
-    if include.specials then for _, s in ipairs(include.specials) do table.insert(selectedSpecialCats, s) end end
+    if def.specialCategories then for _, s in ipairs(def.specialCategories) do table.insert(selectedSpecialCats, s) end end
     local specialCatOptions = getSpecialCategories()
     local selectedBlItems = {}
     if def.blacklist then for _, item in ipairs(def.blacklist) do table.insert(selectedBlItems, item) end end
@@ -190,15 +192,10 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             local labelText = f:getFieldValue("label")
             if labelText ~= "" then result.label = labelText end
 
-            local cats = #selectedCats > 0 and selectedCats or nil
-            local items = #selectedItems > 0 and selectedItems or nil
-            local specialsInc = #selectedSpecialCats > 0 and selectedSpecialCats or nil
-            if cats or items or specialsInc then
-                result.include = {}
-                if cats then result.include.categories = cats end
-                if items then result.include.items = items end
-                if specialsInc then result.include.specials = specialsInc end
-            end
+            if #selectedCats > 0 then result.categories = selectedCats end
+            if #selectedItems > 0 then result.items = selectedItems end
+            if #selectedSpecialItems > 0 then result.specials = selectedSpecialItems end
+            if #selectedSpecialCats > 0 then result.specialCategories = selectedSpecialCats end
 
             local fbTex = f:getFieldValue("fallbackTexture")
             if fbTex and fbTex ~= "" then result.fallbackTexture = fbTex end
@@ -243,7 +240,16 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end)
         end,
     })
-    form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_Specials"), {
+    form:addPickerField("specialItems", getText("IGUI_PhunMart_Lbl_SpecialItems"), {
+        value = selectedSpecialItems, display = formatItemList(selectedSpecialItems),
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), specialKeys, selectedSpecialItems, function(keys)
+                selectedSpecialItems = keys or {}
+                f:setPickerValue("specialItems", selectedSpecialItems, formatItemList(selectedSpecialItems))
+            end, { title = getText("IGUI_PhunMart_Admin_PickSpecials") })
+        end,
+    })
+    form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_SpecialCats"), {
         value = selectedSpecialCats, display = formatCatList(selectedSpecialCats),
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecialCats, function(keys)

@@ -11,9 +11,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Food"}
-        },
+        categories = {"Food"},
         -- Remove junk, candy, alcohol, soda so only wholesome food remains
         blacklist = { -- Chips / savoury snacks
         "Base.Crisps", "Base.Crisps2", "Base.Crisps3", "Base.Crisps4", "Base.TortillaChips", "Base.TortillaChipsBaked",
@@ -62,9 +60,7 @@ return {
                 weight = 0.5
             }
         },
-        include = {
-            categories = {"Cooking"}
-        },
+        categories = {"Cooking"},
         blacklist = {"Base.BoxOfJars"}
     },
 
@@ -79,24 +75,22 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Base.Crisps", "Base.Crisps2", "Base.Crisps3", "Base.Crisps4", "Base.TortillaChips",
-                     "Base.PorkRinds", "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses",
-                     "Base.CandyNovapops", "Base.Candycane", "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes",
-                     "Base.HardCandies", "Base.LicoriceBlack", "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy",
-                     "Base.Peppermint", "Base.RockCandy", "Base.CandyFruitSlices", "Base.CandyCaramels",
-                     "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy", "Base.Chocolate_Crackle",
-                     "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy", "Base.Chocolate_Smirkers",
-                     "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks", "Base.Chocolate_HeartBox",
-                     "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted", "Base.DoughnutJelly",
-                     "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle", "Base.SodaCan",
-                     "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza", "Base.PizzaWhole",
-                     "Base.TVDinner", "Base.Corndog", "Base.FrenchFries", "Base.Fries", "Base.Frozen_FrenchFries",
-                     "Base.TatoDots", "Base.Frozen_TatoDots", "Base.Crackers", "Base.GrahamCrackers", "Base.Popcorn",
-                     "Base.Popsicle", "Base.Icecream", "Base.IcecreamSandwich", "Base.FudgeePop", "Base.GranolaBar",
-                     "Base.CrispyRiceSquare", "Base.QuaggaCakes", "Base.ScoutCookies", "Base.CookieChocolateChip",
-                     "Base.CookiesChocolate", "Base.CookiesOatmeal", "Base.CookiesShortbread", "Base.CookiesSugar"}
-        }
+        items = {"Base.Crisps", "Base.Crisps2", "Base.Crisps3", "Base.Crisps4", "Base.TortillaChips",
+                 "Base.PorkRinds", "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses",
+                 "Base.CandyNovapops", "Base.Candycane", "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes",
+                 "Base.HardCandies", "Base.LicoriceBlack", "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy",
+                 "Base.Peppermint", "Base.RockCandy", "Base.CandyFruitSlices", "Base.CandyCaramels",
+                 "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy", "Base.Chocolate_Crackle",
+                 "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy", "Base.Chocolate_Smirkers",
+                 "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks", "Base.Chocolate_HeartBox",
+                 "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted", "Base.DoughnutJelly",
+                 "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle", "Base.SodaCan",
+                 "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza", "Base.PizzaWhole",
+                 "Base.TVDinner", "Base.Corndog", "Base.FrenchFries", "Base.Fries", "Base.Frozen_FrenchFries",
+                 "Base.TatoDots", "Base.Frozen_TatoDots", "Base.Crackers", "Base.GrahamCrackers", "Base.Popcorn",
+                 "Base.Popsicle", "Base.Icecream", "Base.IcecreamSandwich", "Base.FudgeePop", "Base.GranolaBar",
+                 "Base.CrispyRiceSquare", "Base.QuaggaCakes", "Base.ScoutCookies", "Base.CookieChocolateChip",
+                 "Base.CookiesChocolate", "Base.CookiesOatmeal", "Base.CookiesShortbread", "Base.CookiesSugar"}
     },
 
     food_alcohol = {
@@ -106,11 +100,9 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            items = {"Base.BeerBottle", "Base.BeerCan", "Base.BeerImported", "Base.Whiskey", "Base.Rum", "Base.Vodka",
-                     "Base.Gin", "Base.Tequila", "Base.Brandy", "Base.Scotch", "Base.Port", "Base.Sherry", "Base.Wine",
-                     "Base.Wine2", "Base.WineAged", "Base.WineScrewtop", "Base.Champagne", "Base.Cider"}
-        }
+        items = {"Base.BeerBottle", "Base.BeerCan", "Base.BeerImported", "Base.Whiskey", "Base.Rum", "Base.Vodka",
+                 "Base.Gin", "Base.Tequila", "Base.Brandy", "Base.Scotch", "Base.Port", "Base.Sherry", "Base.Wine",
+                 "Base.Wine2", "Base.WineAged", "Base.WineScrewtop", "Base.Champagne", "Base.Cider"}
     },
 
     -- =========================================================
@@ -124,9 +116,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Tool", "ToolWeapon"}
-        }
+        categories = {"Tool", "ToolWeapon"}
     },
 
     -- =========================================================
@@ -140,9 +130,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Ammo"}
-        },
+        categories = {"Ammo"},
         blacklist = {"Base.Bullets357Box", "Base.ShotgunShellsBox", "Base.Bullets9mmBox", "Base.3030Box",
                      "Base.Bullets44Box", "Base.Bullets38Box", "Base.308Box", "Base.556Box", "Base.Bullets45Box"}
     },
@@ -154,9 +142,7 @@ return {
                 weight = 0.5
             }
         },
-        include = {
-            categories = {"Weapon"}
-        },
+        categories = {"Weapon"},
         -- Remove melee-only sub-categories to keep firearms focus
         blacklistCategories = {"WeaponCrafted", "WeaponImprovised", "CookingWeapon", "FishingWeapon", "GardeningWeapon",
                                "HouseholdWeapon", "InstrumentWeapon", "JunkWeapon", "MaterialWeapon", "SportsWeapon",
@@ -170,10 +156,8 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"WeaponCrafted", "WeaponImprovised", "CookingWeapon", "HouseholdWeapon", "InstrumentWeapon",
-                          "JunkWeapon", "MaterialWeapon", "AnimalPartWeapon"}
-        }
+        categories = {"WeaponCrafted", "WeaponImprovised", "CookingWeapon", "HouseholdWeapon", "InstrumentWeapon",
+                      "JunkWeapon", "MaterialWeapon", "AnimalPartWeapon"}
     },
 
     weapons_parts = {
@@ -183,9 +167,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"WeaponPart"}
-        }
+        categories = {"WeaponPart"}
     },
 
     explosives = {
@@ -195,9 +177,7 @@ return {
                 weight = 0.3
             }
         },
-        include = {
-            categories = {"Explosives"}
-        }
+        categories = {"Explosives"}
     },
 
     -- =========================================================
@@ -211,9 +191,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"VehicleMaintenance", "VehicleMaintenanceWeapon"}
-        }
+        categories = {"VehicleMaintenance", "VehicleMaintenanceWeapon"}
     },
 
     -- =========================================================
@@ -231,10 +209,8 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Bandage", "Bandaid", "BandageDirty", "AlcoholBandage", "AlcoholRippedSheets", "AlcoholWipes",
-                     "AlcoholedCottonBalls", "CottonBalls", "Coldpack", "Disinfectant"}
-        }
+        items = {"Bandage", "Bandaid", "BandageDirty", "AlcoholBandage", "AlcoholRippedSheets", "AlcoholWipes",
+                 "AlcoholedCottonBalls", "CottonBalls", "Coldpack", "Disinfectant"}
     },
 
     -- Tier 2: tools and general pills (medium spawn weight)
@@ -245,10 +221,8 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"SutureNeedle", "SutureNeedleHolder", "Tweezers", "Forceps_Forged", "ScissorsBluntMedical",
-                     "Splint", "Pills", "PillsVitamins", "Stethoscope"}
-        }
+        items = {"SutureNeedle", "SutureNeedleHolder", "Tweezers", "Forceps_Forged", "ScissorsBluntMedical",
+                 "Splint", "Pills", "PillsVitamins", "Stethoscope"}
     },
 
     -- Tier 3: prescription/controlled drugs — rare in PZ loot, zone-gated to 2+.
@@ -260,9 +234,7 @@ return {
                 weight = 0.7
             }
         },
-        include = {
-            items = {"Antibiotics", "PillsAntiDep", "PillsBeta", "PillsSleepingTablets"}
-        }
+        items = {"Antibiotics", "PillsAntiDep", "PillsBeta", "PillsSleepingTablets"}
     },
 
     -- =========================================================
@@ -279,9 +251,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Clothing"}
-        }
+        categories = {"Clothing"}
     },
 
     -- Tier 2: helmets, vests, pads, and tactical equipment (DisplayCategory = ProtectiveGear, ~290 items in B42)
@@ -293,9 +263,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"ProtectiveGear"}
-        }
+        categories = {"ProtectiveGear"}
     },
 
     -- Tier 3: bags, backpacks, cases (DisplayCategory = Container)
@@ -306,9 +274,7 @@ return {
                 weight = 0.2
             }
         },
-        include = {
-            categories = {"Container"}
-        }
+        categories = {"Container"}
     },
 
     -- =========================================================
@@ -322,9 +288,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Electronics", "Communications"}
-        },
+        categories = {"Electronics", "Communications"},
         blacklist = {"Base.BatteryBox", "Base.LightBulbBox"}
     },
 
@@ -339,9 +303,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Fishing", "FishingWeapon"}
-        },
+        categories = {"Fishing", "FishingWeapon"},
         blacklist = {"Base.FishingHookBox"}
     },
 
@@ -352,9 +314,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Sports", "SportsWeapon"}
-        }
+        categories = {"Sports", "SportsWeapon"}
     },
 
     camping_gear = {
@@ -364,9 +324,7 @@ return {
                 weight = 0.5
             }
         },
-        include = {
-            categories = {"Camping"}
-        }
+        categories = {"Camping"}
     },
 
     -- =========================================================
@@ -380,9 +338,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Gardening", "GardeningWeapon"}
-        }
+        categories = {"Gardening", "GardeningWeapon"}
     },
 
     animal_supplies = {
@@ -392,9 +348,7 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            categories = {"Animal"}
-        }
+        categories = {"Animal"}
     },
 
     trapping_gear = {
@@ -404,9 +358,7 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            categories = {"Trapping"}
-        }
+        categories = {"Trapping"}
     },
 
     -- =========================================================
@@ -420,9 +372,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Clothing", "Appearance"}
-        }
+        categories = {"Clothing", "Appearance"}
     },
 
     protective_gear = {
@@ -432,9 +382,7 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            categories = {"ProtectiveGear"}
-        }
+        categories = {"ProtectiveGear"}
     },
 
     -- =========================================================
@@ -454,13 +402,11 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"BookAiming1", "BookBlacksmith1", "BookButchering1", "BookCarpentry1", "BookCarving1",
-                     "BookCooking1", "BookElectrician1", "BookFancy1", "BookFarming1", "BookFirstAid1", "BookFishing1",
-                     "BookFlintKnapping1", "BookForaging1", "BookGlassmaking1", "BookHusbandry1", "BookLongBlade1",
-                     "BookMaintenance1", "BookMasonry1", "BookMechanic1", "BookMetalWelding1", "BookPottery1",
-                     "BookReloading1", "BookTailoring1", "BookTracking1", "BookTrapping1"}
-        }
+        items = {"BookAiming1", "BookBlacksmith1", "BookButchering1", "BookCarpentry1", "BookCarving1",
+                 "BookCooking1", "BookElectrician1", "BookFancy1", "BookFarming1", "BookFirstAid1", "BookFishing1",
+                 "BookFlintKnapping1", "BookForaging1", "BookGlassmaking1", "BookHusbandry1", "BookLongBlade1",
+                 "BookMaintenance1", "BookMasonry1", "BookMechanic1", "BookMetalWelding1", "BookPottery1",
+                 "BookReloading1", "BookTailoring1", "BookTracking1", "BookTrapping1"}
     },
 
     skill_books_t2 = {
@@ -470,13 +416,11 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"BookAiming2", "BookBlacksmith2", "BookButchering2", "BookCarpentry2", "BookCarving2",
-                     "BookCooking2", "BookElectrician2", "BookFancy2", "BookFarming2", "BookFirstAid2", "BookFishing2",
-                     "BookFlintKnapping2", "BookForaging2", "BookGlassmaking2", "BookHusbandry2", "BookLongBlade2",
-                     "BookMaintenance2", "BookMasonry2", "BookMechanic2", "BookMetalWelding2", "BookPottery2",
-                     "BookReloading2", "BookTailoring2", "BookTracking2", "BookTrapping2"}
-        }
+        items = {"BookAiming2", "BookBlacksmith2", "BookButchering2", "BookCarpentry2", "BookCarving2",
+                 "BookCooking2", "BookElectrician2", "BookFancy2", "BookFarming2", "BookFirstAid2", "BookFishing2",
+                 "BookFlintKnapping2", "BookForaging2", "BookGlassmaking2", "BookHusbandry2", "BookLongBlade2",
+                 "BookMaintenance2", "BookMasonry2", "BookMechanic2", "BookMetalWelding2", "BookPottery2",
+                 "BookReloading2", "BookTailoring2", "BookTracking2", "BookTrapping2"}
     },
 
     skill_books_t3 = {
@@ -486,13 +430,11 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"BookAiming3", "BookBlacksmith3", "BookButchering3", "BookCarpentry3", "BookCarving3",
-                     "BookCooking3", "BookElectrician3", "BookFancy3", "BookFarming3", "BookFirstAid3", "BookFishing3",
-                     "BookFlintKnapping3", "BookForaging3", "BookGlassmaking3", "BookHusbandry3", "BookLongBlade3",
-                     "BookMaintenance3", "BookMasonry3", "BookMechanic3", "BookMetalWelding3", "BookPottery3",
-                     "BookReloading3", "BookTailoring3", "BookTracking3", "BookTrapping3"}
-        }
+        items = {"BookAiming3", "BookBlacksmith3", "BookButchering3", "BookCarpentry3", "BookCarving3",
+                 "BookCooking3", "BookElectrician3", "BookFancy3", "BookFarming3", "BookFirstAid3", "BookFishing3",
+                 "BookFlintKnapping3", "BookForaging3", "BookGlassmaking3", "BookHusbandry3", "BookLongBlade3",
+                 "BookMaintenance3", "BookMasonry3", "BookMechanic3", "BookMetalWelding3", "BookPottery3",
+                 "BookReloading3", "BookTailoring3", "BookTracking3", "BookTrapping3"}
     },
 
     skill_books_t4 = {
@@ -502,19 +444,17 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = { -- Vol 4 (levels 7-8)
-            "BookAiming4", "BookBlacksmith4", "BookButchering4", "BookCarpentry4", "BookCarving4", "BookCooking4",
-            "BookElectrician4", "BookFancy4", "BookFarming4", "BookFirstAid4", "BookFishing4", "BookFlintKnapping4",
-            "BookForaging4", "BookGlassmaking4", "BookHusbandry4", "BookLongBlade4", "BookMaintenance4", "BookMasonry4",
-            "BookMechanic4", "BookMetalWelding4", "BookPottery4", "BookReloading4", "BookTailoring4", "BookTracking4",
-            "BookTrapping4", -- Vol 5 (levels 9-10)
-            "BookAiming5", "BookBlacksmith5", "BookButchering5", "BookCarpentry5", "BookCarving5", "BookCooking5",
-            "BookElectrician5", "BookFancy5", "BookFarming5", "BookFirstAid5", "BookFishing5", "BookFlintKnapping5",
-            "BookForaging5", "BookGlassmaking5", "BookHusbandry5", "BookLongBlade5", "BookMaintenance5", "BookMasonry5",
-            "BookMechanic5", "BookMetalWelding5", "BookPottery5", "BookReloading5", "BookTailoring5", "BookTracking5",
-            "BookTrapping5"}
-        }
+        items = { -- Vol 4 (levels 7-8)
+        "BookAiming4", "BookBlacksmith4", "BookButchering4", "BookCarpentry4", "BookCarving4", "BookCooking4",
+        "BookElectrician4", "BookFancy4", "BookFarming4", "BookFirstAid4", "BookFishing4", "BookFlintKnapping4",
+        "BookForaging4", "BookGlassmaking4", "BookHusbandry4", "BookLongBlade4", "BookMaintenance4", "BookMasonry4",
+        "BookMechanic4", "BookMetalWelding4", "BookPottery4", "BookReloading4", "BookTailoring4", "BookTracking4",
+        "BookTrapping4", -- Vol 5 (levels 9-10)
+        "BookAiming5", "BookBlacksmith5", "BookButchering5", "BookCarpentry5", "BookCarving5", "BookCooking5",
+        "BookElectrician5", "BookFancy5", "BookFarming5", "BookFirstAid5", "BookFishing5", "BookFlintKnapping5",
+        "BookForaging5", "BookGlassmaking5", "BookHusbandry5", "BookLongBlade5", "BookMaintenance5", "BookMasonry5",
+        "BookMechanic5", "BookMetalWelding5", "BookPottery5", "BookReloading5", "BookTailoring5", "BookTracking5",
+        "BookTrapping5"}
     },
 
     skill_books_misc = {
@@ -524,9 +464,7 @@ return {
                 weight = 0.7
             }
         },
-        include = {
-            categories = {"Literature", "RecipeResource"}
-        }
+        categories = {"Literature", "RecipeResource"}
     },
 
     -- =========================================================
@@ -540,9 +478,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            categories = {"Paint"}
-        }
+        categories = {"Paint"}
     },
 
     crafts_materials = {
@@ -552,9 +488,7 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            categories = {"Material"}
-        },
+        categories = {"Material"},
         -- Note: Material is large (386 items) and includes leathers, fabrics, clay, metals.
         -- Admins may want to blacklist industrial/weapon components for a purer crafts feel.
         blacklist = {"Base.NailsBox", "Base.AdhesiveTapeBox", "Base.PaperclipBox", "Base.DuctTapeBox", "Base.ScrewsBox"}
@@ -567,10 +501,8 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            items = {"Base.Scissors", "Base.Needle", "Base.Thread", "Base.DenimStrips", "Base.LeatherStrips",
-                     "Base.SewingPattern"}
-        }
+        items = {"Base.Scissors", "Base.Needle", "Base.Thread", "Base.DenimStrips", "Base.LeatherStrips",
+                 "Base.SewingPattern"}
     },
 
     -- =========================================================
@@ -588,9 +520,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"SmallCar", "SmallCar02", "CarNormal", "CarTaxi", "CarTaxi2", "CarStationWagon", "CarStationWagon2"}
-        }
+        items = {"SmallCar", "SmallCar02", "CarNormal", "CarTaxi", "CarTaxi2", "CarStationWagon", "CarStationWagon2"}
     },
 
     -- Budget tier: panel vans, step vans, pickup vans (gold 5-10)
@@ -604,37 +534,35 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = { -- Generic vans
-            "Van", "VanSeats", "VanMail", "VanMechanic", "VanBuilder", "VanUtility", "VanRadio", "VanAmbulance",
-            "VanSpiffo", -- Branded transit/work vans
-            "Van_Transit", "Van_Leather", "Van_CraftSupplies", "Van_VoltMojo", "Van_BugWipers", "Van_Masonry",
-            "Van_Glass", "Van_MassGenFac", "Van_LectroMax", "Van_Locksmith", "Van_KnoxDisti", "Van_Perfick_Potato",
-            "Van_HeritageTailors", "Van_Blacksmith", -- Branded company vans
-            "VanKnoxCom", "VanMooreMechanics", "VanMetalworker", "VanMeltingPointMetal", "VanMetalheads",
-            "VanKorshunovs", "VanJonesFabrication", "VanDeerValley", "VanPluggedInElectrics", "VanOldMill",
-            "VanPennSHam", "VanMicheles", "VanGreenes", "VanGardenGods", "VanCarpenter", "VanGardener",
-            "VanRiversideFabrication", "VanOvoFarm", "VanLouisvilleLandscaping", "VanCoastToCoast",
-            "VanSchwabSheetMetal", "VanUncloggers", "VanTreyBaines", "VanPlattAuto", "VanMobileMechanics",
-            "VanBrewsterHarbin", "VanBeckmans", "VanMccoy", "VanJohnMcCoy", "VanKnobCreekGas", "VanFossoil",
-            "VanKerrHomes", "VanWPCarpentry", "VanRosewoodworking", -- Van seats variants
-            "VanSeats_Trippy", "VanSeats_Space", "VanSeats_Mural", "VanSeats_Creature", "VanSeats_LadyDelighter",
-            "VanSeats_Valkyrie", "VanSeats_Prison", "VanSeatsAirportShuttle", "VanRadio_3N",
-            -- Step vans (large cargo vans)
-            "StepVan", "StepVanMail", "StepVanAirportCatering", "StepVan_Citr8", "StepVan_CompleteRepairShop",
-            "StepVan_LouisvilleSWAT", "StepVan_LouisvilleMotorShop", "StepVan_SmartKut", "StepVan_HuangsLaundry",
-            "StepVan_Blacksmith", "StepVan_Glass", "StepVan_MarineBites", "StepVan_SouthEasternHosp", "StepVan_Propane",
-            "StepVan_Zippee", "StepVan_Genuine_Beer", "StepVan_Heralds", "StepVan_SouthEasternPaint",
-            "StepVan_MobileLibrary", "StepVan_Jorgensen", "StepVan_Plonkies", "StepVan_Florist", "StepVan_Butchers",
-            "StepVan_Mechanic", "StepVan_Masonry", "StepVan_Cereal", "StepVan_RandisPlants", "StepVan_Scarlet",
-            "StepVan_USL", -- Pickup vans (light cargo)
-            "PickUpVan", "PickUpVanMccoy", "PickUpVanYingsWood", "PickUpVanMarchRidgeConstruction", "PickUpVanBuilder",
-            "PickUpVanWeldingbyCamille", "PickUpVanKimbleKonstruction", "PickUpVanMetalworker",
-            "PickUpVanHeltonMetalWorking", "PickUpVanBrickingIt", "PickUpVanCallowayLandscaping", "PickUpVan_Camo",
-            "PickUpVanLightsRanger", "PickUpVanLightsPolice", "PickUpVanLightsStatePolice", "PickUpVanLightsFire",
-            "PickUpVanLightsFossoil", "PickUpVanLightsCarpenter", "PickUpVanLightsLouisvilleCounty",
-            "PickUpVanLightsKentuckyLumber"}
-        }
+        items = { -- Generic vans
+        "Van", "VanSeats", "VanMail", "VanMechanic", "VanBuilder", "VanUtility", "VanRadio", "VanAmbulance",
+        "VanSpiffo", -- Branded transit/work vans
+        "Van_Transit", "Van_Leather", "Van_CraftSupplies", "Van_VoltMojo", "Van_BugWipers", "Van_Masonry",
+        "Van_Glass", "Van_MassGenFac", "Van_LectroMax", "Van_Locksmith", "Van_KnoxDisti", "Van_Perfick_Potato",
+        "Van_HeritageTailors", "Van_Blacksmith", -- Branded company vans
+        "VanKnoxCom", "VanMooreMechanics", "VanMetalworker", "VanMeltingPointMetal", "VanMetalheads",
+        "VanKorshunovs", "VanJonesFabrication", "VanDeerValley", "VanPluggedInElectrics", "VanOldMill",
+        "VanPennSHam", "VanMicheles", "VanGreenes", "VanGardenGods", "VanCarpenter", "VanGardener",
+        "VanRiversideFabrication", "VanOvoFarm", "VanLouisvilleLandscaping", "VanCoastToCoast",
+        "VanSchwabSheetMetal", "VanUncloggers", "VanTreyBaines", "VanPlattAuto", "VanMobileMechanics",
+        "VanBrewsterHarbin", "VanBeckmans", "VanMccoy", "VanJohnMcCoy", "VanKnobCreekGas", "VanFossoil",
+        "VanKerrHomes", "VanWPCarpentry", "VanRosewoodworking", -- Van seats variants
+        "VanSeats_Trippy", "VanSeats_Space", "VanSeats_Mural", "VanSeats_Creature", "VanSeats_LadyDelighter",
+        "VanSeats_Valkyrie", "VanSeats_Prison", "VanSeatsAirportShuttle", "VanRadio_3N",
+        -- Step vans (large cargo vans)
+        "StepVan", "StepVanMail", "StepVanAirportCatering", "StepVan_Citr8", "StepVan_CompleteRepairShop",
+        "StepVan_LouisvilleSWAT", "StepVan_LouisvilleMotorShop", "StepVan_SmartKut", "StepVan_HuangsLaundry",
+        "StepVan_Blacksmith", "StepVan_Glass", "StepVan_MarineBites", "StepVan_SouthEasternHosp", "StepVan_Propane",
+        "StepVan_Zippee", "StepVan_Genuine_Beer", "StepVan_Heralds", "StepVan_SouthEasternPaint",
+        "StepVan_MobileLibrary", "StepVan_Jorgensen", "StepVan_Plonkies", "StepVan_Florist", "StepVan_Butchers",
+        "StepVan_Mechanic", "StepVan_Masonry", "StepVan_Cereal", "StepVan_RandisPlants", "StepVan_Scarlet",
+        "StepVan_USL", -- Pickup vans (light cargo)
+        "PickUpVan", "PickUpVanMccoy", "PickUpVanYingsWood", "PickUpVanMarchRidgeConstruction", "PickUpVanBuilder",
+        "PickUpVanWeldingbyCamille", "PickUpVanKimbleKonstruction", "PickUpVanMetalworker",
+        "PickUpVanHeltonMetalWorking", "PickUpVanBrickingIt", "PickUpVanCallowayLandscaping", "PickUpVan_Camo",
+        "PickUpVanLightsRanger", "PickUpVanLightsPolice", "PickUpVanLightsStatePolice", "PickUpVanLightsFire",
+        "PickUpVanLightsFossoil", "PickUpVanLightsCarpenter", "PickUpVanLightsLouisvilleCounty",
+        "PickUpVanLightsKentuckyLumber"}
     },
 
     -- Standard tier: modern/mid-range cars (gold 10-20)
@@ -648,11 +576,9 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"ModernCar", "ModernCar02", "ModernCar_Martin", "CarLightsKST", "CarLightsLouisvilleCounty",
-                     "CarLightsRanger", "CarLightsPolice", "CarLightsBulletinSheriff", "CarLightsMuldraughPolice",
-                     "ModernCarLightsCityLouisvillePD", "ModernCarLightsMeadeSheriff", "ModernCarLightsWestPoint"}
-        }
+        items = {"ModernCar", "ModernCar02", "ModernCar_Martin", "CarLightsKST", "CarLightsLouisvilleCounty",
+                 "CarLightsRanger", "CarLightsPolice", "CarLightsBulletinSheriff", "CarLightsMuldraughPolice",
+                 "ModernCarLightsCityLouisvillePD", "ModernCarLightsMeadeSheriff", "ModernCarLightsWestPoint"}
     },
 
     -- Standard tier: pickup trucks (gold 10-20)
@@ -666,11 +592,9 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"PickUpTruck", "PickUpTruck_Camo", "PickUpTruckMccoy", "PickUpTruckLightsFossoil",
-                     "PickUpTruckLightsRanger", "PickUpTruckLightsAirportSecurity", "PickUpTruckLightsAirport",
-                     "PickUpTruckJPLandscaping", "PickUpTruckLightsFire"}
-        }
+        items = {"PickUpTruck", "PickUpTruck_Camo", "PickUpTruckMccoy", "PickUpTruckLightsFossoil",
+                 "PickUpTruckLightsRanger", "PickUpTruckLightsAirportSecurity", "PickUpTruckLightsAirport",
+                 "PickUpTruckJPLandscaping", "PickUpTruckLightsFire"}
     },
 
     -- Standard tier: off-road / SUV (gold 10-20)
@@ -684,9 +608,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"OffRoad", "SUV"}
-        }
+        items = {"OffRoad", "SUV"}
     },
 
     -- =========================================================
@@ -704,10 +626,8 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Dice_00", "Dice_4", "Dice_6", "Dice_8", "Dice_10", "Dice_12", "Dice_20", "ToyCar", "ToyPlane",
-                     "Doll", "Yoyo", "Bricktoys", "Cube", "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox"}
-        }
+        items = {"Dice_00", "Dice_4", "Dice_6", "Dice_8", "Dice_10", "Dice_12", "Dice_20", "ToyCar", "ToyPlane",
+                 "Doll", "Yoyo", "Bricktoys", "Cube", "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox"}
     },
 
     -- Tier 1b: Curios — common collectibles and antiques (weight 5-100). Bring 2 → 1 token.
@@ -719,17 +639,15 @@ return {
                 weight = 0.8
             }
         },
-        include = {
-            items = { -- Gemstones (thematically valuable despite common spawn)
-            "Ruby", "Sapphire", "Emerald", "Diamond", -- Vessels and antiques
-            "Goblet", "Goblet_Wood", "Locket", "Pocketwatch", "Crystal_Large", -- Trophies and medals
-            "TrophyBronze", "TrophySilver", "TrophyGold", "Medal_Bronze", "Medal_Silver", "Medal_Gold", -- Curiosities
-            "SnowGlobe", "TarotCardDeck", "OujaBoard", "MilitaryMedal", "SuspiciousPackage", "Katana_Handle",
-            -- Specimen jars
-            "Specimen_Minerals", "Specimen_Brain", "Specimen_Tapeworm", "Specimen_MonkeyHead", "Specimen_FetalPiglet",
-            "Specimen_FetalLamb", "Specimen_FetalCalf", "Specimen_Octopus", -- Skulls
-            "Hominid_Skull", "Hominid_Skull_Partial", "Hominid_Skull_Fragment"}
-        }
+        items = { -- Gemstones (thematically valuable despite common spawn)
+        "Ruby", "Sapphire", "Emerald", "Diamond", -- Vessels and antiques
+        "Goblet", "Goblet_Wood", "Locket", "Pocketwatch", "Crystal_Large", -- Trophies and medals
+        "TrophyBronze", "TrophySilver", "TrophyGold", "Medal_Bronze", "Medal_Silver", "Medal_Gold", -- Curiosities
+        "SnowGlobe", "TarotCardDeck", "OujaBoard", "MilitaryMedal", "SuspiciousPackage", "Katana_Handle",
+        -- Specimen jars
+        "Specimen_Minerals", "Specimen_Brain", "Specimen_Tapeworm", "Specimen_MonkeyHead", "Specimen_FetalPiglet",
+        "Specimen_FetalLamb", "Specimen_FetalCalf", "Specimen_Octopus", -- Skulls
+        "Hominid_Skull", "Hominid_Skull_Partial", "Hominid_Skull_Fragment"}
     },
 
     -- Tier 2: Rare — scarce items (weight <5, naturally spawnable). Bring 1 → 2 tokens.
@@ -741,17 +659,15 @@ return {
                 weight = 0.5
             }
         },
-        include = {
-            items = { -- Fine vessels
-            "Crystal", "Goblet_Silver", "Goblet_Gold", -- Character portraits (weight ~0.23 each)
-            "BobPic", "CaseyPic", "ChrisPic", "HankPic", "JamesPic", "KatePic", "MariannePic", "CortmanPic",
-            -- Rare wearables
-            "Hat_ArmyWWII", "Hat_Stovepipe_UncleSam", "Glasses_MonocleLeft", "Glasses_Cosmetic_MonocleLeft",
-            -- Novelties
-            "Necklace_Teeth", "KeyRing_Spiffos", "Lunchbox2", -- Halloween masks (weight ~2.4 each, seasonal)
-            "Hat_HalloweenMaskWitch", "Hat_HalloweenMaskVampire", "Hat_HalloweenMaskSkeleton",
-            "Hat_HalloweenMaskPumpkin", "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil", "Hat_Witch"}
-        }
+        items = { -- Fine vessels
+        "Crystal", "Goblet_Silver", "Goblet_Gold", -- Character portraits (weight ~0.23 each)
+        "BobPic", "CaseyPic", "ChrisPic", "HankPic", "JamesPic", "KatePic", "MariannePic", "CortmanPic",
+        -- Rare wearables
+        "Hat_ArmyWWII", "Hat_Stovepipe_UncleSam", "Glasses_MonocleLeft", "Glasses_Cosmetic_MonocleLeft",
+        -- Novelties
+        "Necklace_Teeth", "KeyRing_Spiffos", "Lunchbox2", -- Halloween masks (weight ~2.4 each, seasonal)
+        "Hat_HalloweenMaskWitch", "Hat_HalloweenMaskVampire", "Hat_HalloweenMaskSkeleton",
+        "Hat_HalloweenMaskPumpkin", "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil", "Hat_Witch"}
     },
 
     -- Tier 3: Legendary — near-zero or zero spawn weight; event/admin drops. Bring 1 → 3 tokens.
@@ -763,19 +679,17 @@ return {
                 weight = 0.2
             }
         },
-        include = {
-            items = { -- Band merchandise (weight ~0.03)
-            "Jacket_LeatherWildRacoons", "Jacket_LeatherIronRodent", "Jacket_LeatherBarrelDogs",
-            "Vest_Leather_WildRaccoons", "Vest_Leather_IronRodents", "Vest_Leather_BarrelDogs", "Vest_Leather_Biker",
-            "Vest_Leather_Veteran", -- Ultra-rare event / loot (weight <0.01 or not in tables)
-            "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing",
-            "LargeMeteorite", -- Spiffo collectibles (zero spawn — admin/event only)
-            "SpiffoSuit", "Hat_Spiffo", "Hat_Jay", "Hat_GoldStar", "HobbyHorse", "Hat_Cowboy_Plastic",
-            "Hat_BaseballCap_Spiffos", "Hat_BaseballCap_Spiffos_Reverse", "Hat_BaseballCap_SpiffosLogo",
-            "Hat_BaseballCap_SpiffosLogo_Reverse", -- Racing keyrings (zero spawn — admin/event only)
-            "KeyRing_Racing12", "KeyRing_Racing34", "KeyRing_Racing58", -- Dog tags (zero spawn variants)
-            "Necklace_DogTag_Male", "Necklace_DogTag_Female"}
-        }
+        items = { -- Band merchandise (weight ~0.03)
+        "Jacket_LeatherWildRacoons", "Jacket_LeatherIronRodent", "Jacket_LeatherBarrelDogs",
+        "Vest_Leather_WildRaccoons", "Vest_Leather_IronRodents", "Vest_Leather_BarrelDogs", "Vest_Leather_Biker",
+        "Vest_Leather_Veteran", -- Ultra-rare event / loot (weight <0.01 or not in tables)
+        "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing",
+        "LargeMeteorite", -- Spiffo collectibles (zero spawn — admin/event only)
+        "SpiffoSuit", "Hat_Spiffo", "Hat_Jay", "Hat_GoldStar", "HobbyHorse", "Hat_Cowboy_Plastic",
+        "Hat_BaseballCap_Spiffos", "Hat_BaseballCap_Spiffos_Reverse", "Hat_BaseballCap_SpiffosLogo",
+        "Hat_BaseballCap_SpiffosLogo_Reverse", -- Racing keyrings (zero spawn — admin/event only)
+        "KeyRing_Racing12", "KeyRing_Racing34", "KeyRing_Racing58", -- Dog tags (zero spawn variants)
+        "Necklace_DogTag_Male", "Necklace_DogTag_Female"}
     },
 
     -- =========================================================
@@ -793,9 +707,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Diamond"}
-        }
+        items = {"Diamond"}
     },
 
     -- Premium tier ($25)
@@ -808,9 +720,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"GoldBar", "Ruby", "Sapphire", "Emerald"}
-        }
+        items = {"GoldBar", "Ruby", "Sapphire", "Emerald"}
     },
 
     -- Good tier ($10)
@@ -823,9 +733,7 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"SmallGoldBar", "Amethyst", "GoldCoin", "Pocketwatch"}
-        }
+        items = {"SmallGoldBar", "Amethyst", "GoldCoin", "Pocketwatch"}
     },
 
     -- Standard tier ($5)
@@ -838,11 +746,9 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Bracelet_BangleLeftGold", "Bracelet_BangleRightGold", "Bracelet_ChainLeftGold",
-                     "Bracelet_ChainRightGold", "Goblet_Gold", "GoldCup", "Fork_Gold", "Spoon_Gold", "ButterKnife_Gold",
-                     "Locket", "SilverCoin", "GoldSheet"}
-        }
+        items = {"Bracelet_BangleLeftGold", "Bracelet_BangleRightGold", "Bracelet_ChainLeftGold",
+                 "Bracelet_ChainRightGold", "Goblet_Gold", "GoldCup", "Fork_Gold", "Spoon_Gold", "ButterKnife_Gold",
+                 "Locket", "SilverCoin", "GoldSheet"}
     },
 
     -- Budget tier ($1)
@@ -855,10 +761,8 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"Bracelet_BangleLeftSilver", "Bracelet_BangleRightSilver", "Bracelet_ChainLeftSilver",
-                     "Bracelet_ChainRightSilver", "GoldScrap", "MoneyBundle"}
-        }
+        items = {"Bracelet_BangleLeftSilver", "Bracelet_BangleRightSilver", "Bracelet_ChainLeftSilver",
+                 "Bracelet_ChainRightSilver", "GoldScrap", "MoneyBundle"}
     },
 
     -- Premium tier: luxury, sports, race cars (gold 20-40)
@@ -872,75 +776,72 @@ return {
                 weight = 1.0
             }
         },
-        include = {
-            items = {"CarLuxury", "SportsCar", "SportsCar_ez", "RaceCar12", "RaceCar34", "RaceCar58"}
-        }
+        items = {"CarLuxury", "SportsCar", "SportsCar_ez", "RaceCar12", "RaceCar34", "RaceCar58"}
     },
 
     -- =========================================================
     -- Special-category groups  (wrap specials by category)
-    -- These replace pool-level sources.specials with group-level include.specials
     -- =========================================================
 
     traits_add = {
         label = "Positive Traits",
         fallbackTexture = "media/textures/icons/trait_add.png",
         fallbackCategory = "Positive Traits",
-        include = { specials = {"trait_add"} }
+        specialCategories = {"trait_add"}
     },
 
     traits_remove = {
         label = "Remove Negative Traits",
         fallbackTexture = "media/textures/icons/trait_remove.png",
         fallbackCategory = "Remove Negative Traits",
-        include = { specials = {"trait_remove"} }
+        specialCategories = {"trait_remove"}
     },
 
     xp_t1 = {
         label = "Skills (Basic)",
         fallbackTexture = "media/textures/icons/xp_t1.png",
         fallbackCategory = "Skills",
-        include = { specials = {"xp_t1"} }
+        specialCategories = {"xp_t1"}
     },
 
     xp_t2 = {
         label = "Skills (Intermediate)",
         fallbackTexture = "media/textures/icons/xp_t2.png",
         fallbackCategory = "Skills",
-        include = { specials = {"xp_t2"} }
+        specialCategories = {"xp_t2"}
     },
 
     xp_t3 = {
         label = "Skills (Advanced)",
         fallbackTexture = "media/textures/icons/xp_t3.png",
         fallbackCategory = "Skills",
-        include = { specials = {"xp_t3"} }
+        specialCategories = {"xp_t3"}
     },
 
     boost_t1 = {
         label = "Boosts (Basic)",
         fallbackTexture = "media/textures/icons/boost.png",
         fallbackCategory = "Boosts",
-        include = { specials = {"boost_t1"} }
+        specialCategories = {"boost_t1"}
     },
 
     boost_t2 = {
         label = "Boosts (Enhanced)",
         fallbackTexture = "media/textures/icons/boost.png",
         fallbackCategory = "Boosts",
-        include = { specials = {"boost_t2"} }
+        specialCategories = {"boost_t2"}
     },
 
     boost_t3 = {
         label = "Boosts (Superior)",
         fallbackTexture = "media/textures/icons/boost.png",
         fallbackCategory = "Boosts",
-        include = { specials = {"boost_t3"} }
+        specialCategories = {"boost_t3"}
     },
 
     pawn_core = {
         label = "Pawn - Cash",
-        include = { items = {"Base.Money"} },
+        items = {"Base.Money"},
         defaults = { reward = "change_payout_budget" }
     }
 

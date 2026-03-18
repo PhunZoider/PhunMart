@@ -237,6 +237,8 @@
   "IGUI_PhunMart_Lbl_Price": "Price:",
   "IGUI_PhunMart_Lbl_Groups": "Groups:",
   "IGUI_PhunMart_Lbl_Specials": "Specials:",
+  "IGUI_PhunMart_Lbl_SpecialItems": "Specials (by key):",
+  "IGUI_PhunMart_Lbl_SpecialCats": "Special Categories:",
   "IGUI_PhunMart_Lbl_RollMode": "Roll Mode:",
   "IGUI_PhunMart_Lbl_RollMin": "Roll Min:",
   "IGUI_PhunMart_Lbl_RollMax": "Roll Max:",

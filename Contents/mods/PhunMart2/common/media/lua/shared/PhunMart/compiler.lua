@@ -538,7 +538,7 @@ local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemTyp
 end
 
 -- -----------------------------
--- Group expansion (include items/categories/tags)
+-- Group expansion (items/categories/specials/specialCategories)
 -- -----------------------------
 local function itemExists(itemType)
     -- Server-side in PZ: getScriptManager():FindItem(itemType)
@@ -552,7 +552,7 @@ local function itemExists(itemType)
 end
 
 -- Builds a map of displayCategory -> set of fullItemName, cached for the compile run.
--- Only called if any group uses include.categories.
+-- Only called if any group uses categories.
 local itemCategoryCache = nil
 local function getItemCategoryCache()
     if itemCategoryCache then
@@ -585,33 +585,44 @@ end
 
 local function expandGroupItems(groupDef, resolvedSpecials, logger)
     local outSet = {}
-    local include = groupDef.include or {}
 
     -- explicit items
-    if type(include.items) == "table" then
-        for _, itemType in ipairs(include.items) do
+    if type(groupDef.items) == "table" then
+        for _, itemType in ipairs(groupDef.items) do
             outSet[itemType] = true
         end
     end
 
     -- category-based discovery: include all game items whose displayCategory matches
-    if type(include.categories) == "table" and #include.categories > 0 then
+    if type(groupDef.categories) == "table" and #groupDef.categories > 0 then
         local catCache = getItemCategoryCache()
-        for _, cat in ipairs(include.categories) do
+        for _, cat in ipairs(groupDef.categories) do
             local catItems = catCache[cat]
             if catItems then
                 for id, _ in pairs(catItems) do
                     outSet[id] = true
                 end
             else
-                logger:warn("Group include.categories: no items found for category '" .. tostring(cat) .. "'")
+                logger:warn("Group categories: no items found for category '" .. tostring(cat) .. "'")
             end
         end
     end
 
-    -- specials-based discovery: include all non-template specials whose category matches
-    if type(include.specials) == "table" and resolvedSpecials then
-        for _, cat in ipairs(include.specials) do
+    -- explicit specials by key
+    if type(groupDef.specials) == "table" and resolvedSpecials then
+        for _, specialKey in ipairs(groupDef.specials) do
+            local specialDef = resolvedSpecials[specialKey]
+            if specialDef and specialDef.template ~= true and specialDef.enabled ~= false then
+                outSet[specialKey] = true
+            else
+                logger:warn("Group specials: special key '" .. tostring(specialKey) .. "' not found or disabled")
+            end
+        end
+    end
+
+    -- specials by category: include all non-template specials whose category matches
+    if type(groupDef.specialCategories) == "table" and resolvedSpecials then
+        for _, cat in ipairs(groupDef.specialCategories) do
             for specialKey, specialDef in pairs(resolvedSpecials) do
                 if specialDef.template ~= true and specialDef.enabled ~= false and specialDef.category == cat then
                     outSet[specialKey] = true
@@ -620,14 +631,14 @@ local function expandGroupItems(groupDef, resolvedSpecials, logger)
         end
     end
 
-    -- blacklist (items)
+    -- blacklist (items or special keys)
     if type(groupDef.blacklist) == "table" then
         for _, itemType in ipairs(groupDef.blacklist) do
             outSet[itemType] = nil
         end
     end
 
-    -- blacklist.categories: remove all items of these display categories
+    -- blacklistCategories: remove all items of these display categories
     if type(groupDef.blacklistCategories) == "table" and #groupDef.blacklistCategories > 0 then
         local catCache = getItemCategoryCache()
         for _, cat in ipairs(groupDef.blacklistCategories) do
@@ -701,7 +712,14 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
 
     -- Inject special-level fields (price, offer) between group defaults and item override.
     -- Full precedence: pool.defaults → group.defaults → special fields → itemDef override
+    -- Auto-link: when the item key IS a special key (e.g. xp/boost/trait entries pulled
+    -- via specials/specialCategories in a group), treat it as its own reward so the special's
+    -- price/offer/conditions are injected into the merge chain.
     local rewardKey = merged.reward
+    if rewardKey == nil and ctx.specials[itemType] ~= nil then
+        rewardKey = itemType
+        merged.reward = itemType
+    end
     local specialDef = type(rewardKey) == "string" and ctx.specials[rewardKey] or nil
     if specialDef then
         if specialDef.price and not merged.price then
@@ -956,9 +974,9 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- direct items (deprecated — use groups with include.items instead)
+            -- direct items (deprecated — use groups with 'items' field instead)
             if type(sources.items) == "table" then
-                logger:warn("Pool '" .. poolKey .. "' uses sources.items (deprecated). Use groups with include.items instead.")
+                logger:warn("Pool '" .. poolKey .. "' uses sources.items (deprecated). Use groups with 'items' field instead.")
                 for _, itemType in ipairs(sources.items) do
                     itemsSet[itemType] = itemsSet[itemType] or {
                         fromGroup = nil,
@@ -967,9 +985,9 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- specials-based items (deprecated — use groups with include.specials instead)
+            -- specials-based items (deprecated — use groups with 'specialCategories' field instead)
             if type(sources.specials) == "table" then
-                logger:warn("Pool '" .. poolKey .. "' uses sources.specials (deprecated). Use groups with include.specials instead.")
+                logger:warn("Pool '" .. poolKey .. "' uses sources.specials (deprecated). Use groups with 'specialCategories' field instead.")
                 local catSet = {}
                 for _, cat in ipairs(sources.specials) do
                     catSet[cat] = true
