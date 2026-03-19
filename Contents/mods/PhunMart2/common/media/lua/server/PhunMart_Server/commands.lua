@@ -649,4 +649,120 @@ Commands[Core.commands.moveOffers] = function(playerObj, args)
     end
 end
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Auction House commands
+-- ─────────────────────────────────────────────────────────────────────────────
+
+local AH = Core.auctionHouse
+
+Commands[Core.commands.ahCreateListing] = function(playerObj, args)
+    local listing, err = AH:createListing(playerObj, args)
+    if not listing then
+        if Core.isLocal then
+            triggerEvent(Core.events.OnAHListingUpdate, { error = err })
+        else
+            sendServerCommand(playerObj, Core.name, Core.commands.ahCreateListing, { error = err })
+        end
+        return
+    end
+    local result = {
+        listing = listing,
+        myListings = AH:myListings(listing.seller)
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHListingUpdate, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahCreateListing, result)
+    end
+end
+
+Commands[Core.commands.ahBuyNow] = function(playerObj, args)
+    local listing, err = AH:buyNow(playerObj, args.listingId)
+    if not listing then
+        if Core.isLocal then
+            triggerEvent(Core.events.OnAHListingUpdate, { error = err })
+        else
+            sendServerCommand(playerObj, Core.name, Core.commands.ahBuyNow, { error = err })
+        end
+        return
+    end
+    local wallet = Core.wallet:get(playerObj)
+    local result = {
+        listing = listing,
+        wallet = wallet
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHListingUpdate, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahBuyNow, result)
+    end
+end
+
+Commands[Core.commands.ahCancel] = function(playerObj, args)
+    local listing, err = AH:cancelListing(playerObj, args.listingId)
+    if not listing then
+        if Core.isLocal then
+            triggerEvent(Core.events.OnAHListingUpdate, { error = err })
+        else
+            sendServerCommand(playerObj, Core.name, Core.commands.ahCancel, { error = err })
+        end
+        return
+    end
+    local username = Core.isLocal and "0" or playerObj:getUsername()
+    local result = {
+        listing = listing,
+        myListings = AH:myListings(username),
+        collection = AH:getCollection(username)
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHListingUpdate, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahCancel, result)
+    end
+end
+
+Commands[Core.commands.ahCollect] = function(playerObj, args)
+    local granted, remaining = AH:collectAll(playerObj)
+    local wallet = Core.wallet:get(playerObj)
+    local result = {
+        granted = granted,
+        collection = remaining,
+        wallet = wallet
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHCollectionUpdate, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahCollect, result)
+    end
+end
+
+Commands[Core.commands.ahGetCollection] = function(playerObj, args)
+    local username = Core.isLocal and "0" or playerObj:getUsername()
+    local collection = AH:getCollection(username)
+    local result = {
+        collection = collection
+    }
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHCollectionUpdate, result)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahGetCollection, result)
+    end
+end
+
+Commands[Core.commands.ahBrowse] = function(playerObj, args)
+    local username = Core.isLocal and "0" or playerObj:getUsername()
+    local filters = args or {}
+    if filters.seller == "mine" then
+        filters.seller = username
+    end
+    local browseResult = AH:browse(filters)
+    browseResult.myListings = AH:myListings(username)
+    browseResult.collection = AH:getCollection(username)
+    if Core.isLocal then
+        triggerEvent(Core.events.OnAHBrowseResult, browseResult)
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.ahBrowse, browseResult)
+    end
+end
+
 return Commands

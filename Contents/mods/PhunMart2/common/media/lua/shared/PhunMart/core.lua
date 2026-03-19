@@ -87,7 +87,15 @@ PhunMart = {
         claimVehicle = "PhunMartClaimVehicle",
         -- Token rewards admin
         getTokenRewards = "PhunMartGetTokenRewards",
-        saveTokenRewards = "PhunMartSaveTokenRewards"
+        saveTokenRewards = "PhunMartSaveTokenRewards",
+        -- Auction House
+        ahBrowse = "PhunMartAHBrowse",
+        ahCreateListing = "PhunMartAHCreateListing",
+        ahBuyNow = "PhunMartAHBuyNow",
+        ahCancel = "PhunMartAHCancel",
+        ahCollect = "PhunMartAHCollect",
+        ahGetCollection = "PhunMartAHGetCollection",
+        ahListingUpdate = "PhunMartAHListingUpdate"
     },
     events = {
         OnReady = "OnPhunMartOnReady",
@@ -96,7 +104,10 @@ PhunMart = {
         OnPurchaseComplete = "OnPhunMartPurchaseComplete",
         OnApplyTraitReward = "OnPhunMartApplyTraitReward",
         OnRewardGranted = "OnPhunMartRewardGranted",
-        OnDefsUpdated = "OnPhunMartDefsUpdated"
+        OnDefsUpdated = "OnPhunMartDefsUpdated",
+        OnAHListingUpdate = "OnPhunMartAHListingUpdate",
+        OnAHCollectionUpdate = "OnPhunMartAHCollectionUpdate",
+        OnAHBrowseResult = "OnPhunMartAHBrowseResult"
     },
     utils = require "PhunMart/utils",
     settings = {},

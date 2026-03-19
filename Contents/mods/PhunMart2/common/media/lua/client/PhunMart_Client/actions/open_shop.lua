@@ -56,9 +56,26 @@ function action:start()
     self.uiOpened = false
     self.waitTicks = 0
 
-    -- Send the openShop request immediately so server processing overlaps
-    -- with the animation.  The response will arrive in Core.pendingShopData.
-    Core.ClientSystem.instance:openShop(self.character, self.shopObj)
+    -- Check if this is an AuctionHouse machine
+    local shopDef = Core.shops and Core.shops[self.shopObj.type]
+    self.isAuctionHouse = shopDef and shopDef.auctionHouse == true
+
+    if self.isAuctionHouse then
+        -- AH doesn't need per-machine inventory from the server.
+        -- Send a browse request so listings are ready when the UI opens.
+        if Core.isLocal then
+            local Commands = require "PhunMart_Server/commands"
+            if Commands[Core.commands.ahBrowse] then
+                Commands[Core.commands.ahBrowse](self.character, {})
+            end
+        else
+            sendClientCommand(Core.name, Core.commands.ahBrowse, {})
+        end
+    else
+        -- Send the openShop request immediately so server processing overlaps
+        -- with the animation.  The response will arrive in Core.pendingShopData.
+        Core.ClientSystem.instance:openShop(self.character, self.shopObj)
+    end
 end
 
 -- ── update ────────────────────────────────────────────────────────────────────
@@ -73,18 +90,25 @@ function action:update()
 
     -- 2. Poll for the server response stored by client_commands.lua.
     if not self.shopData then
-        local pending = Core.pendingShopData
-        if pending then
-            local key = self.shopObj:getKey()
-            local data = pending[key]
-            if data then
-                pending[key] = nil
-                if data.error then
-                    -- Server rejected (e.g. power cut between click and response)
-                    self:forceStop()
-                    return
+        if self.isAuctionHouse then
+            -- AH data arrives via Core._ahData.browse
+            if Core._ahData and Core._ahData.browse then
+                self.shopData = Core._ahData.browse
+            end
+        else
+            local pending = Core.pendingShopData
+            if pending then
+                local key = self.shopObj:getKey()
+                local data = pending[key]
+                if data then
+                    pending[key] = nil
+                    if data.error then
+                        -- Server rejected (e.g. power cut between click and response)
+                        self:forceStop()
+                        return
+                    end
+                    self.shopData = data
                 end
-                self.shopData = data
             end
         end
     end
@@ -94,7 +118,11 @@ function action:update()
     if self.animDone and self.shopData then
         if not self.uiOpened then
             self.uiOpened = true
-            Core.ui.client.shop.open(self.character, self.shopData)
+            if self.isAuctionHouse then
+                Core.ui.client.auctionHouse.open(self.character, self.shopData)
+            else
+                Core.ui.client.shop.open(self.character, self.shopData)
+            end
         end
         return -- do NOT call resetJobDelta(); perform() will fire next
     end
@@ -120,7 +148,11 @@ function action:perform()
     -- delta first hit maxTime, before update() had a chance to set uiOpened.
     if not self.uiOpened and self.shopData then
         self.uiOpened = true
-        Core.ui.client.shop.open(self.character, self.shopData)
+        if self.isAuctionHouse then
+            Core.ui.client.auctionHouse.open(self.character, self.shopData)
+        else
+            Core.ui.client.shop.open(self.character, self.shopData)
+        end
     end
     ISBaseTimedAction.perform(self)
 end
@@ -129,9 +161,15 @@ end
 
 function action:stop()
     -- Remove any pending data so it doesn't accidentally open a future action.
-    local key = self.shopObj and self.shopObj:getKey()
-    if key and Core.pendingShopData then
-        Core.pendingShopData[key] = nil
+    if self.isAuctionHouse then
+        if Core._ahData then
+            Core._ahData.browse = nil
+        end
+    else
+        local key = self.shopObj and self.shopObj:getKey()
+        if key and Core.pendingShopData then
+            Core.pendingShopData[key] = nil
+        end
     end
     ISBaseTimedAction.stop(self)
 end

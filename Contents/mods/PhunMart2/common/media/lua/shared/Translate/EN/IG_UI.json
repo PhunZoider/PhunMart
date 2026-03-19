@@ -31,6 +31,8 @@
   "IGUI_PhunMart_Shop_PrawnStars_tooltip": "Got gold? We'll give you cash for your jewelry and precious items",
   "IGUI_PhunMart_Shop_ShedsAndCommoners": "Sheds & Commoners",
   "IGUI_PhunMart_Shop_ShedsAndCommoners_tooltip": "Books, magazines and more to keep you entertained during the apocalypse",
+  "IGUI_PhunMart_Shop_AuctionHouse": "Auction House",
+  "IGUI_PhunMart_Shop_AuctionHouse_tooltip": "Buy and sell items with other survivors",
 
   "IGUI_PhunMart_Open_X": "View %1",
   "IGUI_PhunMart_Open_X_nopower_tooltip": "The %1 vending machine requires power",

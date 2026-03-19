@@ -278,4 +278,102 @@ Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, ctx, items)
     end
 end)
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Auction House client handlers
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Store pending AH data for the UI to pick up (same pattern as pendingShopData)
+Core._ahData = Core._ahData or {}
+
+Commands[Core.commands.ahBrowse] = function(args)
+    Core._ahData.browse = args
+    triggerEvent(Core.events.OnAHBrowseResult, args)
+end
+
+Commands[Core.commands.ahCreateListing] = function(args)
+    if args.error then
+        Toast.show({ text = "Listing failed: " .. tostring(args.error) })
+        return
+    end
+    Toast.show({ text = "Item listed!" })
+    triggerEvent(Core.events.OnAHListingUpdate, args)
+end
+
+Commands[Core.commands.ahBuyNow] = function(args)
+    if args.error then
+        Toast.show({ text = "Purchase failed: " .. tostring(args.error) })
+        return
+    end
+    -- Sync wallet
+    if args.wallet then
+        local player = getSpecificPlayer(0)
+        if player then
+            Core.wallet:setPlayerData(player:getUsername(), args.wallet)
+        end
+    end
+    Toast.show({ text = "Item purchased!" })
+    triggerEvent(Core.events.OnAHListingUpdate, args)
+end
+
+Commands[Core.commands.ahCancel] = function(args)
+    if args.error then
+        Toast.show({ text = "Cancel failed: " .. tostring(args.error) })
+        return
+    end
+    Toast.show({ text = "Listing cancelled." })
+    triggerEvent(Core.events.OnAHListingUpdate, args)
+end
+
+Commands[Core.commands.ahCollect] = function(args)
+    -- Sync wallet
+    if args.wallet then
+        local player = getSpecificPlayer(0)
+        if player then
+            Core.wallet:setPlayerData(player:getUsername(), args.wallet)
+        end
+    end
+    Toast.show({ text = "Items collected!" })
+    triggerEvent(Core.events.OnAHCollectionUpdate, args)
+end
+
+Commands[Core.commands.ahGetCollection] = function(args)
+    triggerEvent(Core.events.OnAHCollectionUpdate, args)
+end
+
+Commands[Core.commands.ahListingUpdate] = function(args)
+    -- Notification from server: one of our listings sold/expired
+    local listing = args.listing
+    if listing then
+        if listing.status == "SOLD" then
+            Toast.show({ text = listing.itemName .. " sold!" })
+        elseif listing.status == "EXPIRED" then
+            Toast.show({ text = listing.itemName .. " listing expired." })
+        end
+    end
+    triggerEvent(Core.events.OnAHListingUpdate, args)
+end
+
+-- SP event handlers (same Lua state, no network hop)
+Events[Core.events.OnAHBrowseResult].Add(function(args)
+    if not args then return end
+    Core._ahData.browse = args
+end)
+
+Events[Core.events.OnAHListingUpdate].Add(function(args)
+    -- SP: refresh AH UI if open
+    if not args then return end
+    local ui = Core.ui.client.auctionHouse
+    if ui and ui.instance and ui.instance:isVisible() then
+        ui.instance:refreshData(args)
+    end
+end)
+
+Events[Core.events.OnAHCollectionUpdate].Add(function(args)
+    if not args then return end
+    local ui = Core.ui.client.auctionHouse
+    if ui and ui.instance and ui.instance:isVisible() then
+        ui.instance:refreshCollection(args)
+    end
+end)
+
 return Commands

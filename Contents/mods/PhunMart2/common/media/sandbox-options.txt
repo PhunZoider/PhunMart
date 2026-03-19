@@ -160,3 +160,51 @@ option PhunMart.Debug
     page = PhunMart,
     translation=PhunMart_Debug,
 }
+
+option PhunMart.AHEnabled
+{
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation=PhunMart_AHEnabled,
+}
+
+option PhunMart.AHMaxListings
+{
+    type = integer,
+    default = 10,
+    min = 1,
+    max = 100,
+    page = PhunMart,
+    translation=PhunMart_AHMaxListings,
+}
+
+option PhunMart.AHExpiryHours
+{
+    type = integer,
+    default = 72,
+    min = 1,
+    max = 720,
+    page = PhunMart,
+    translation=PhunMart_AHExpiryHours,
+}
+
+option PhunMart.AHFeePercent
+{
+    type = integer,
+    default = 5,
+    min = 0,
+    max = 50,
+    page = PhunMart,
+    translation=PhunMart_AHFeePercent,
+}
+
+option PhunMart.AHMinPrice
+{
+    type = integer,
+    default = 5,
+    min = 1,
+    max = 9999,
+    page = PhunMart,
+    translation=PhunMart_AHMinPrice,
+}
