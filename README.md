@@ -1,35 +1,16 @@
 # PhunMart
 
-A Project Zomboid (B42) mod that adds 15 themed automated shops to the world - dispensing food, gear, weapons,
-vehicles, skill books, and things you won't find anywhere else. **Traits. XP boosts. Vehicles
-delivered to order.** Stock rotates. Coins come from scavenging. Tokens come from surviving or trading rare items.
+A Project Zomboid (B42) mod that converts vanilla vending machines into 16 themed automated
+shops — dispensing food, gear, weapons, vehicles, skill books, traits, XP boosts, and more.
+Stock rotates on a timer. Coins come from scavenging. Tokens come from surviving.
 
-Shops source from the game's item catalogue by category, so even **modded items can show up
-automatically** - if a mod adds something to the Tool or Clothing category, it's eligible for
-the relevant machine. No config needed.
+Shops source from the game's item catalogue by category, so **modded items show up
+automatically** — no config needed. Right-click a machine, browse the shop UI, and buy with
+**change** (coins found as loot) or **tokens** (earned through milestones and trade-ins).
+Admins can place machines manually and override every aspect of the system through Lua files.
 
-> **Requires:** Project Zomboid Build 42.15+ (multiplayer or singleplayer)
-> **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) — enables zone-difficulty filtering on shop pools
-
----
-
-## What is it?
-
-When the server starts, PhunMart scans the world and probabilistically converts vanilla vending
-machines into one of 15 themed shop types. Each shop has its own sprite, background art, and
-loot pool. Stock rotates on a configurable timer. Rarer shop types spawn less frequently and
-keep a minimum distance from each other.
-
-Players interact with machines by right-clicking — their character walks up, the machine
-connects to the server, and a custom shop UI opens. Items are purchased with **change** (coins
-found in the world) or **tokens** (earned through play milestones and the Collectors machine).
-
-Server admins can also place machines manually (by grabbing them from the admin Item List via
-the admin menu) and configure every aspect of the system through override Lua files.
-
----
-
-## Screenshots
+> **Requires:** Project Zomboid Build 42.15+ (singleplayer or multiplayer)
+> **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) — zone-difficulty filtering on shop pools
 
 ![Shop in the apocolypse](Docs/images/shopping.png)
 
@@ -49,11 +30,12 @@ the admin menu) and configure every aspect of the system through override Lua fi
 | **HoesNMoes**         | Gardening     | Common | Seeds, fertiliser, farming tools. Plan for next season.                                             |
 | **HardWear**          | Clothing      | Common | Civilian clothing at standard weight; military and protective gear at lower odds.                   |
 | **ShedsAndCommoners** | Literature    | Common | All 125 skill books across 25 B42 skills, sorted by volume tier.                                    |
-| **FinalAmendment**   | Weapons       | Rare   | Firearms, ammunition, and explosives. Rare, spread out, and worth hunting down.                     |
+| **FinalAmendment**    | Weapons       | Rare   | Firearms, ammunition, and explosives. Rare, spread out, and worth hunting down.                     |
 | **WrentAWreck**       | Vehicles      | Rare   | Order a car. It spawns nearby. Budget, standard, and premium tiers. Restocks weekly.                |
 | **TraiterJoes**       | Traits        | Rare   | Spend tokens to gain positive traits or remove negative ones. The rarest machine in the world.      |
 | **BudgetXPerience**   | XP / Boosts   | Rare   | Direct skill XP grants and temporary XP multipliers, tiered by power.                               |
 | **Collectors**        | Trade-in      | Rare   | Bring your mementos and collectibles. Trade them in for bound tokens. The more obscure, the better. |
+| **PrawnStars**        | Pawn          | Rare   | Sell jewellery and valuables for change. Five payout tiers from budget ($1) to jackpot ($50).       |
 
 **Common** shops have a 15-in-15 base probability weight and no minimum spacing.
 **Rare** shops have lower probability weights (5–8) and a minimum tile distance (300–500 tiles)
@@ -104,17 +86,9 @@ Exact amounts are configurable — see [Customisation Guide](Docs/CUSTOMISATION.
 
 ### Collectors machine (repeatable)
 
-Bring collectible items (toys, antiques, mementos) and trade them in for bound tokens.
-Items are sorted into four tiers based on natural spawn rarity:
-
-| Tier      | Examples                                        | Payout              |
-| --------- | ----------------------------------------------- | ------------------- |
-| Junk      | Common toys, games (weight >100 in loot tables) | 1 token per 3 items |
-| Curios    | Antiques, gemstones (weight 5–100)              | 1 token per 2 items |
-| Rare      | Scarce naturally-spawning items (weight <5)     | 2 tokens per item   |
-| Legendary | Near-zero / event-only drops                    | 3 tokens per item   |
-
-The pool rolls a few items each restock, so the selection changes regularly.
+Bring collectible items (toys, antiques, mementos) to a Collectors machine and trade them in
+for bound tokens. Rarer items pay more — from 1 token per 3 common items up to 3 tokens for
+a legendary find. The selection rotates each restock.
 
 ---
 
@@ -160,29 +134,19 @@ permissive and show all pools.
 ## Customisation
 
 Everything is data-driven and overridable without touching the mod. Drop override files into
-your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token reward
-milestones on top of the built-in defaults.
+your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
+rewards on top of the built-in defaults.
 
-Full reference with worked examples: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)**
-
-Topics covered:
-
-- How prices, specials, conditions, groups, pools, and shops fit together
-- Step-by-step walkthrough: building a new shop from scratch
-- How deep-merge overrides work
-- All condition tests and their arguments
-- All special kinds (item, trait, skill, boost, vehicle)
-- Token reward milestone format
+Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** — common admin recipes,
+deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.
 
 ---
 
 ## Compatibility
 
-- **Build 42** only — not compatible with B41
-- Works in **singleplayer and multiplayer**
-- **Mod-compatible by design** — item shops that source by category automatically include
-  items added by other mods in those categories, no config changes needed
-- No known conflicts; please report issues on [GitHub](https://github.com/PhunZoider/PhunMart/issues)
+Build 42 only. Works in singleplayer and multiplayer. Mod-compatible by design — item shops
+source by category, so modded items appear automatically. No known conflicts; please
+[report issues on GitHub](https://github.com/PhunZoider/PhunMart/issues).
 
 ---
 

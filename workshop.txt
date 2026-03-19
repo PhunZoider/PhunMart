@@ -1,5 +1,5 @@
 version=1
-title=PhunMart 2
+title=PhunMart
 description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 description=
 description=beta testing! Currently play testing and balance tweaking on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
