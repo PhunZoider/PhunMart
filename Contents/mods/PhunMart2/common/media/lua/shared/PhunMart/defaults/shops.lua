@@ -469,18 +469,6 @@ return {
                 weight = 1.0
             }}
         }}
-    },
-
-    AuctionHouse = {
-        probability = 5,
-        minDistance = 500,
-        category = "AuctionHouse",
-        auctionHouse = true,
-        powered = true,
-        background = "machine-auction-house.png",
-        sprites = {"phunmart_03_16", "phunmart_03_17", "phunmart_03_18", "phunmart_03_19"},
-        unpoweredSprites = {"phunmart_03_20", "phunmart_03_21", "phunmart_03_22", "phunmart_03_23"},
-        poolSets = {}
     }
 
 }

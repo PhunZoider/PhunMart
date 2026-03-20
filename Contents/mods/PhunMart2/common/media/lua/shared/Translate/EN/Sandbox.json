@@ -49,20 +49,5 @@
   "Sandbox_PhunMart_DefaultDistance_tooltip": "The minimum distance between similarly grouped machines",
 
   "Sandbox_PhunMart_MaxStickyItems": "Max sticky pool items",
-  "Sandbox_PhunMart_MaxStickyItems_tooltip": "Maximum number of items allowed in a sticky pool before a warning is logged. Sticky pools always show all their items in a shop. Keep this low to avoid cluttered shops.",
-
-  "Sandbox_PhunMart_AHEnabled": "Auction House enabled",
-  "Sandbox_PhunMart_AHEnabled_tooltip": "Enable the Auction House feature, allowing players to list and buy items from each other.",
-
-  "Sandbox_PhunMart_AHMaxListings": "Max active listings per player",
-  "Sandbox_PhunMart_AHMaxListings_tooltip": "Maximum number of active listings a single player can have at one time.",
-
-  "Sandbox_PhunMart_AHExpiryHours": "Listing expiry (hours)",
-  "Sandbox_PhunMart_AHExpiryHours_tooltip": "Number of in-game hours before an unsold listing expires and the item is returned to the seller's collection box.",
-
-  "Sandbox_PhunMart_AHFeePercent": "Sale fee (%)",
-  "Sandbox_PhunMart_AHFeePercent_tooltip": "Percentage of the sale price deducted as a fee when an item sells. Set to 0 for no fee.",
-
-  "Sandbox_PhunMart_AHMinPrice": "Minimum listing price",
-  "Sandbox_PhunMart_AHMinPrice_tooltip": "Minimum price amount for a listing (in cents for change pool, count for tokens)."
+  "Sandbox_PhunMart_MaxStickyItems_tooltip": "Maximum number of items allowed in a sticky pool before a warning is logged. Sticky pools always show all their items in a shop. Keep this low to avoid cluttered shops."
 }

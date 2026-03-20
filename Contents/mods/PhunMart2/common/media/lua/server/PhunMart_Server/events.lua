@@ -2,14 +2,12 @@ if isClient() then
     return
 end
 require "PhunMart/core"
-require "PhunMart_Server/auction_house"
 local Commands = require "PhunMart_Server/commands"
 
 local Core = PhunMart
 
 Events.OnServerStarted.Add(function()
     Core:ini()
-    Core.auctionHouse:load()
 end)
 
 Events.LoadGridsquare.Add(function(square)
@@ -85,12 +83,6 @@ end)
 Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
     Core.wallet:save()
-    -- Auction House: expire listings + purge old completed + save
-    Core.auctionHouse:expireTick()
-    Core.auctionHouse:purgeOldListings()
-    if Core.auctionHouse._dirty then
-        Core.auctionHouse:save()
-    end
 end)
 
 -- Check power state every minute so sprite swaps within ~1 minute of electricity changing.
