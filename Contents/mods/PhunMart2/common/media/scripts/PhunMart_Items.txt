@@ -225,16 +225,6 @@ module PhunMart
         Weight            = 250,
         DisplayName       = PrawnStars Vending Machine,
         WorldObjectSprite = phunmart_03_32,
-    }
-
-    item AuctionHouse
-    {
-        DisplayCategory   = Furniture,
-        ItemType          = base:moveable,
-        Icon              = VendingMachine,
-        Weight            = 250,
-        DisplayName       = Auction House,
-        WorldObjectSprite = phunmart_03_40,
-    }      
+    }    
 
 }
