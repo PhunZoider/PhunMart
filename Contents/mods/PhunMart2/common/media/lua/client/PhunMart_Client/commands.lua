@@ -39,7 +39,6 @@ Commands[Core.commands.openError] = function(args)
     modal:addToUIManager()
 end
 
-
 Commands[Core.commands.serverPurchaseFailed] = function(arguments)
     local player = getSpecificPlayer(arguments.playerIndex)
     local name = player:getUsername()
@@ -58,6 +57,41 @@ Commands[Core.commands.updateHistory] = function(arguments)
     Core.players[player:getUsername()] = arguments.history
 end
 
+-- Remove item-based currency from the player's inventory using the proper
+-- container sync pattern so the inventory UI updates immediately.
+local function removeItemPayment(player, price)
+    if not price or price.kind ~= "items" then
+        return
+    end
+    local inv = player:getInventory()
+    for _, entry in ipairs(price.items or {}) do
+        local remaining = entry.amount
+        -- Remove primary items first, then substitutes
+        local sources = {entry.item}
+        if entry.substitutes then
+            for _, sub in ipairs(entry.substitutes) do
+                table.insert(sources, sub)
+            end
+        end
+        for _, itemType in ipairs(sources) do
+            if remaining <= 0 then
+                break
+            end
+            for i = 1, remaining do
+                local target = inv:getItemFromTypeRecurse(itemType)
+                if not target then
+                    break
+                end
+                local container = target:getContainer()
+                container:Remove(target)
+                sendRemoveItemFromContainer(container, target)
+                remaining = remaining - 1
+            end
+        end
+    end
+    ISInventoryPage.dirtyUI()
+end
+
 Commands[Core.commands.buy] = function(arguments)
     -- Update local wallet copy so balance display stays current
     if arguments.wallet and arguments.wallet.current then
@@ -65,6 +99,11 @@ Commands[Core.commands.buy] = function(arguments)
         if username then
             Core.wallet:setPlayerData(username:getUsername(), arguments.wallet)
         end
+    end
+    -- Remove item-based currency from inventory with proper container sync
+    local player = getSpecificPlayer(arguments.playerIndex or 0)
+    if player then
+        removeItemPayment(player, arguments.price)
     end
     -- Fire event so the open shop window can update stock and buy button
     triggerEvent(Core.events.OnPurchaseComplete, arguments)
@@ -135,6 +174,7 @@ Commands[Core.commands.payWithInventory] = function(arguments)
             target:getContainer():DoRemoveItem(target)
         end
     end
+    ISInventoryPage.dirtyUI()
 end
 
 Commands[Core.commands.onShopChange] = function(args)
@@ -172,9 +212,6 @@ Commands[Core.commands.getInstanceList] = function(args)
         Core.ui.shop_selector.updateInstanceCounts(args.data)
     end
 end
-
-
-
 
 Commands[Core.commands.requestShopDefs] = function(arguments)
     Core.compileWith(arguments.overrides)

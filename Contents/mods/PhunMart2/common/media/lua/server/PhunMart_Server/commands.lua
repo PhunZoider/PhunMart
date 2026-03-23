@@ -198,12 +198,13 @@ Commands[Core.commands.buy] = function(playerObj, args)
     Core.purchases:add(playerObj, offerId, qty)
     Core.purchases:save()
 
-    -- Send confirmation to client
+    -- Send confirmation to client (include price so client can remove inventory items)
     local wallet = Core.wallet:get(playerObj)
     local result = {
         offerId = offerId,
         stockQty = newStockQty,
-        wallet = wallet
+        wallet = wallet,
+        price = price
     }
     if Core.isLocal then
         triggerEvent(Core.events.OnPurchaseComplete, result)

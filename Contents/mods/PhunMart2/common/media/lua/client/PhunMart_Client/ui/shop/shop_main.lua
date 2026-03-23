@@ -568,6 +568,32 @@ function UI:onPurchaseComplete(result)
         end
     end
 
+    -- SP: item removal is deferred to client; in SP the buy command handler
+    -- doesn't run, so we remove items here using the container sync pattern.
+    if Core.isLocal and result.price and result.price.kind == "items" then
+        local inv = self.player:getInventory()
+        for _, entry in ipairs(result.price.items or {}) do
+            local remaining = entry.amount
+            local sources = {entry.item}
+            if entry.substitutes then
+                for _, sub in ipairs(entry.substitutes) do
+                    table.insert(sources, sub)
+                end
+            end
+            for _, itemType in ipairs(sources) do
+                if remaining <= 0 then break end
+                for i = 1, remaining do
+                    local target = inv:getItemFromTypeRecurse(itemType)
+                    if not target then break end
+                    local container = target:getContainer()
+                    container:Remove(target)
+                    remaining = remaining - 1
+                end
+            end
+        end
+        ISInventoryPage.dirtyUI()
+    end
+
     -- Re-evaluate buy button for the still-selected offer
     if self.selectedId == result.offerId then
         -- Record the purchase locally so purchaseCountMax evaluates correctly

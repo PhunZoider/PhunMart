@@ -46,6 +46,8 @@ function Core:canAffordAll(player, prices)
 end
 
 -- Deduct a single price from the player. Returns true on success.
+-- For item-based prices, actual inventory removal is deferred to the client
+-- via sendRemoveItemFromContainer so the container properly syncs to the UI.
 function Core:deduct(player, price)
     if price.kind == "free" then
         return true
@@ -53,30 +55,7 @@ function Core:deduct(player, price)
         Core.wallet:adjustByPool(player, "current", price.pool, -price.amount)
         return true
     elseif price.kind == "items" then
-        for _, entry in ipairs(price.items or {}) do
-            local remaining = entry.amount
-            -- Remove from primary item first
-            local primaryCount = player:getInventory():getItemCountRecurse(entry.item)
-            local fromPrimary = math.min(remaining, primaryCount)
-            if fromPrimary > 0 then
-                player:getInventory():RemoveAll(entry.item, fromPrimary)
-                remaining = remaining - fromPrimary
-            end
-            -- Then from substitutes
-            if remaining > 0 and entry.substitutes then
-                for _, sub in ipairs(entry.substitutes) do
-                    if remaining <= 0 then
-                        break
-                    end
-                    local subCount = player:getInventory():getItemCountRecurse(sub)
-                    local fromSub = math.min(remaining, subCount)
-                    if fromSub > 0 then
-                        player:getInventory():RemoveAll(sub, fromSub)
-                        remaining = remaining - fromSub
-                    end
-                end
-            end
-        end
+        -- Server only validates via canAffordAll; client handles removal.
         return true
     end
     return false
