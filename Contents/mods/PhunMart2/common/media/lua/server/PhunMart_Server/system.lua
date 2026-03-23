@@ -365,6 +365,76 @@ function ServerSystem:upsertDefinition(filename, defsKey, key, def)
     self:recompileShops()
 end
 
+--- Relocate a shop's global object and instance data from old coords to new coords.
+--- Preserves shop type, facing, offers, restock time, etc.
+function ServerSystem:relocateShop(oldX, oldY, oldZ, newX, newY, newZ)
+    local oldObj = self:getLuaObjectAt(oldX, oldY, oldZ)
+    if not oldObj then
+        Core.debugLn("relocateShop: no object at old coords " .. oldX .. "," .. oldY .. "," .. oldZ)
+        return
+    end
+
+    -- Already at the new coords (no-op).
+    if oldX == newX and oldY == newY and oldZ == newZ then
+        return
+    end
+
+    -- Snapshot the state we want to carry over.
+    local saved = {
+        type = oldObj.type,
+        facing = oldObj.facing,
+        created = oldObj.created,
+        lastRestock = oldObj.lastRestock,
+        offers = oldObj.offers
+    }
+
+    -- Remove the stale global object (also clears instance data).
+    self:removeLuaObject(oldObj)
+
+    -- If a global object already exists at the destination (e.g. OnObjectAdded
+    -- already fired), just update it.  Otherwise create a fresh one.
+    local newObj = self:getLuaObjectAt(newX, newY, newZ)
+    if not newObj then
+        newObj = self:newLuaObjectAt(newX, newY, newZ)
+    end
+    if not newObj then
+        Core.debugLn("relocateShop: failed to create object at " .. newX .. "," .. newY .. "," .. newZ)
+        return
+    end
+
+    -- Apply the saved state.
+    newObj.type = saved.type
+    newObj.facing = saved.facing
+    newObj.created = saved.created
+    newObj.lastRestock = saved.lastRestock
+    newObj.offers = saved.offers
+    newObj.x = newX
+    newObj.y = newY
+    newObj.z = newZ
+
+    -- Register new instance data.
+    Core:addInstance({
+        type = saved.type,
+        facing = saved.facing,
+        created = saved.created,
+        lastRestock = saved.lastRestock,
+        x = newX,
+        y = newY,
+        z = newZ
+    })
+
+    -- Sync modData on the IsoObject so clients pick up the new coords.
+    local iso = newObj:getIsoObject()
+    if iso then
+        newObj:toModData(iso:getModData())
+        iso:transmitModData()
+    end
+
+    newObj:updateSprite(true)
+    Core.debugLn("relocateShop: moved from " .. oldX .. "," .. oldY .. "," .. oldZ .. " to " .. newX .. "," .. newY ..
+                     "," .. newZ)
+end
+
 function ServerSystem:checkObjectAdded(obj)
     if not obj or not obj.getSprite then
         return
@@ -450,6 +520,11 @@ function ServerSystem:loadGridsquare(square)
                         local shopname = self:getRandomShop(square:getX(), square:getY())
                         if shopname then
                             local facing = obj:getFacing()
+                            -- hack around some incorrect facing data
+                            if sprite:getName() == "location_shop_accessories_01_31" or sprite:getName() ==
+                                "location_shop_accessories_01_29" then
+                                facing = IsoDirections.N
+                            end
                             square:transmitRemoveItemFromSquare(obj)
                             self.addToWorld(square, shopname, facing)
                         end

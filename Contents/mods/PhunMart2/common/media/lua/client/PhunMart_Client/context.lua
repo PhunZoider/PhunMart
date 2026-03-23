@@ -12,6 +12,39 @@ Core.contexts.open = function(player, context, worldobjects, test)
 
     for _, wObj in ipairs(worldobjects) do -- find object to interact with; code support for controllers
         obj = Core.ClientSystem.instance:getLuaObjectOnSquare(wObj:getSquare())
+
+        -- If the machine was moved (pickup + place), the global object's stored
+        -- coordinates are stale.  Detect the mismatch and fix both sides.
+        if obj then
+            local sq = wObj:getSquare()
+            local sqX, sqY, sqZ = sq:getX(), sq:getY(), sq:getZ()
+            if obj.x ~= sqX or obj.y ~= sqY or obj.z ~= sqZ then
+                local oldX, oldY, oldZ = obj.x, obj.y, obj.z
+                obj.x = sqX
+                obj.y = sqY
+                obj.z = sqZ
+                -- Patch the IsoObject's modData so subsequent reads are correct.
+                local iso = obj:getIsoObject()
+                if iso then
+                    local md = iso:getModData()
+                    md.x = sqX
+                    md.y = sqY
+                    md.z = sqZ
+                end
+                -- Tell the server to migrate its global object + instance data.
+                Core.ClientSystem.instance:sendCommand(playerObj, Core.commands.relocateShop, {
+                    oldX = oldX,
+                    oldY = oldY,
+                    oldZ = oldZ,
+                    newX = sqX,
+                    newY = sqY,
+                    newZ = sqZ
+                })
+                Core.debugLn("context: relocated shop from " .. oldX .. "," .. oldY .. "," .. oldZ .. " to " .. sqX ..
+                                 "," .. sqY .. "," .. sqZ)
+            end
+        end
+
         -- Fallback: if no global object but the IsoObject has a PhunMart sprite,
         -- try to register it on the spot (recovers orphaned machines).
         if not obj then

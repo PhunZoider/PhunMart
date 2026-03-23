@@ -25,8 +25,8 @@ function action:isValidStart()
     local shopDef = Core.defs and Core.defs.shops and Core.defs.shops[self.shopObj.type]
     if shopDef and shopDef.powered then
         local hasPower = self.shopObj:getSquare():haveElectricity() or
-            (SandboxVars.ElecShutModifier > -1 and
-             GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier)
+                             (SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() <
+                                 SandboxVars.ElecShutModifier)
         if not hasPower then
             self.character:Say(getText("IGUI_PhunMart_Open_X_nopower_tooltip",
                 getText("IGUI_PhunMart_Shop_" .. self.shopObj.type)))

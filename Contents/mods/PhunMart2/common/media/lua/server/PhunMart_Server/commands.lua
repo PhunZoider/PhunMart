@@ -20,6 +20,13 @@ Commands[Core.commands.openShop] = function(playerObj, args)
     Core.ServerSystem.instance:openShop(playerObj, args)
 end
 
+Commands[Core.commands.relocateShop] = function(playerObj, args)
+    Core.ServerSystem.instance:relocateShop(
+        args.oldX, args.oldY, args.oldZ,
+        args.newX, args.newY, args.newZ
+    )
+end
+
 Commands[Core.commands.restock] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then return end
     local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)

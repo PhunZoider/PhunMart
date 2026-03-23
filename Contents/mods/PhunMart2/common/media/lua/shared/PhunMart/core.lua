@@ -87,7 +87,8 @@ PhunMart = {
         claimVehicle = "PhunMartClaimVehicle",
         -- Token rewards admin
         getTokenRewards = "PhunMartGetTokenRewards",
-        saveTokenRewards = "PhunMartSaveTokenRewards"
+        saveTokenRewards = "PhunMartSaveTokenRewards",
+        relocateShop = "PhunMartRelocateShop"
     },
     events = {
         OnReady = "OnPhunMartOnReady",

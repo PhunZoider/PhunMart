@@ -1,8 +1,82 @@
 version=1
-title=PhunMart
-description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
+id=3689006725
+title=PhunMart 2
+description=[b]Shop Smart. Shop PhunMart.[/b]
+description=Every server needs an economy. PhunMart gives you one out of the box.
 description=
-description=beta testing! Currently play testing and balance tweaking on [url=https://discord.gg/v2USyAtP6q]PhunZoid Server[/url]
-description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
-tags=Build 42;Items;Multiplayer
+description=Vending machines become fully configurable shops that sell items, skills, traits, vehicles, and more. Players earn currency by surviving. Admins shape the economy without writing a single line of code. Works in Single Player too.
+description=
+description=Sell weapons.
+description=Sell skills.
+description=Sell traits.
+description=Sell vehicles.
+description=Sell rewards for rare items.
+description=Sell whatever your server dreams up.
+description=
+description=[h2]What Makes PhunMart Different[/h2]
+description=PhunMart isn't just a shop mod. It's a [b]complete economy framework[/b] built into vending machines.
+description=[list]
+description=[*][b]Works out of the box[/b]: subscribe, launch, and themed shops appear in the world with no setup required
+description=[*][b]Built-in currency system[/b]: PhunWallet tracks change (looted) and tokens (earned through gameplay) per player
+description=[*][b]Bring your own currency[/b]: use any physical item as payment (cash, gold, tokens from other mods) with a single config line
+description=[*][b]Sell the unsellable[/b]: not just items. XP boosts, traits, vehicles, and custom rewards are all on the menu
+description=[*][b]PrawnStars[/b]: a built-in pawn shop where players sell valuables back for currency
+description=[*][b]Works with modded items[/b]: any item in the game, vanilla or modded, can be stocked and sold
+description=[*][b]Zone gating[/b]: optional PhunZones integration to tie shop availability to map regions and difficulty
+description=[/list]
+description=
+description=[h2]For Players[/h2]
+description=Discover themed vending machines scattered across the map. Each one is different: a gun shop in Louisville, a medical supply vendor at the hospital, a vehicle dealership on the highway, a shady pawn shop that buys your loot.
+description=
+description=Loot the world to earn change. Survive long enough to earn tokens. Spend both at machines that stock rotating inventories. What's available today might be gone tomorrow.
+description=
+description=[h2]For Server Admins[/h2]
+description=Build deep gameplay systems without writing a mod. Everything is configurable through in-game admin tools or simple config files.
+description=
+description=[list]
+description=[*]Create custom shops with their own themes, sprites, loot pools, and pricing
+description=[*]Design progression systems: gate purchases behind skills, traits, professions, or playtime
+description=[*]Build server-wide economies with skill trainers, vehicle dealerships, starter hubs, and late-game vendors
+description=[*]Set up seasonal or event shops that rotate stock on a schedule
+description=[*]Control spawn rates, placement, and conversion of vanilla machines per shop type
+description=[*]Tune every economic lever: earn rates, caps, pricing, restock timers, and more via sandbox settings
+description=[/list]
+description=
+description=[h2]Currency & Economy[/h2]
+description=PhunMart ships with [b]PhunWallet[/b], a built-in dual-currency system:
+description=[list]
+description=[*][b]Change[/b]: found as loot in the world. Think of it as cash.
+description=[*][b]Tokens[/b]: earned by playing: surviving, killing zombies, completing milestones. Bound to the player.
+description=[/list]
+description=
+description=Both pools have configurable caps, earn rates, and death-recovery settings.
+description=
+description=[b]Want to use a different currency?[/b] PhunMart supports [b]any physical item as payment[/b] — cash items, gold bars, tokens from other mods, custom items. If it exists in the game, it can be a currency. See the guide below for setup.
+description=
+description=[h2]Customisation[/h2]
+description=PhunMart is deeply configurable, but to keep this page readable the full guides live here:
+description=
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/CUSTOMISATION.md]PhunMart Customisation Guide[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ITEM_CURRENCY.md]Using a Physical Item as Currency[/url]
+description=
+description=[h2]FAQs[/h2]
+description=[list]
+description=[*][b]Does it work with ExtraMoney / other currency mods?[/b] PhunMart can use any physical item as currency. If your currency mod adds an in-game item (like cash or coins), you can set that item as the payment method. See the currency guide above.
+description=[*][b]Can players sell items?[/b] Yes. The built-in PrawnStars pawn shop lets players sell valuables back for change.
+description=[*][b]Can I create my own shops from scratch?[/b] Yes. Define custom pools, groups, pricing, conditions, and sprites. The admin tools let you do most of this in-game.
+description=[*][b]What happens to my customisations when updating?[/b] All customisations are saved to your file system. They survive restarts, wipes, and version updates.
+description=[*][b]Does it work in Single Player?[/b] Yes. Designed for multiplayer servers but fully functional in SP.
+description=[*][b]Can I add into existing game?[/b] Yes
+description=[*][b]Where can I see it in action?[/b] SP, your own server, or [url=https://discord.gg/v2USyAtP6q]come play on ours[/url].
+description=[/list]
+description=
+description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
+description=
+description=[h2]More Phun Stuff[/h2]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252660][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url] 
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] 
+description=
+description=Coded with love for the awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
+description=
+tags=Build 42;Balance;Clothing/Armor;Food;Framework;Interface;Items;Misc;Multiplayer;Skills;Traits;Vehicles;Weapons
 visibility=public
