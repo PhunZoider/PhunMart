@@ -434,7 +434,9 @@ Commands[Core.commands.consumeCoin] = function(playerObj, args)
     local inv = playerObj:getInventory()
     local coin = inv:getFirstTypeRecurse(itemType)
     if coin then
-        inv:Remove(coin)
+        local container = coin:getContainer()
+        container:Remove(coin)
+        sendRemoveItemFromContainer(container, coin)
     end
 
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
@@ -465,7 +467,9 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
     local inv = playerObj:getInventory()
     local walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
     if walletItem then
-        inv:Remove(walletItem)
+        local container = walletItem:getContainer()
+        container:Remove(walletItem)
+        sendRemoveItemFromContainer(container, walletItem)
     end
 
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {

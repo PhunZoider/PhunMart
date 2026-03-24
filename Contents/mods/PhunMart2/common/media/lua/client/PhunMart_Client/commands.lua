@@ -171,7 +171,9 @@ Commands[Core.commands.payWithInventory] = function(arguments)
         for i = 1, v.value do
             local inv = player:getInventory()
             local target = inv:getItemFromTypeRecurse(v.name)
-            target:getContainer():DoRemoveItem(target)
+            local container = target:getContainer()
+            container:Remove(target)
+            sendRemoveItemFromContainer(container, target)
         end
     end
     ISInventoryPage.dirtyUI()

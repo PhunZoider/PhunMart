@@ -88,6 +88,7 @@ function Core:grantReward(player, action, qty, context)
         if scriptName then
             local item = player:getInventory():AddItem("PhunMart.VehicleKeySpawner")
             if item then
+                sendAddItemToContainer(player:getInventory(), item)
                 local condition = action.args and action.args.condition or nil
                 local vehicleLabel = Core.getVehicleLabel(scriptName) or scriptName
                 item:setName("Vehicle Claim Key: " .. vehicleLabel)

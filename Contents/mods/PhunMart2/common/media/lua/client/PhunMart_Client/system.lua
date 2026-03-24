@@ -61,7 +61,9 @@ function ClientSystem:requestPurchase(obj, itemId, playerObj)
                             for i = 1, remaining do
                                 local invItem = playerObj:getInventory():getItemFromTypeRecurse(a.currency)
                                 if invItem then
-                                    invItem:getContainer():DoRemoveItem(invItem)
+                                    local container = invItem:getContainer()
+                                    container:Remove(invItem)
+                                    sendRemoveItemFromContainer(container, invItem)
                                 end
                             end
                         end
