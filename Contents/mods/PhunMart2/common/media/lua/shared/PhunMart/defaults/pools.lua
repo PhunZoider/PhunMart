@@ -63,7 +63,7 @@ return {
     -- =========================================================
     pool_vehicles_budget = {
         zones = {
-            difficulty = {1, 2}
+            difficulty = {0, 1, 2}
         },
         sources = {
             groups = {"vehicles_small", "vehicles_vans"}

@@ -93,7 +93,7 @@ function Core:grantReward(player, action, qty, context)
                 item:setName("Vehicle Claim Key: " .. vehicleLabel)
                 item:getModData()["vehicleScript"] = scriptName
                 item:getModData()["condition"] = condition
-                -- transmitModData may not exist in B42; send a dedicated command instead
+                sendAddItemToContainer(player:getInventory(), item)
                 sendServerCommand(player, Core.name, Core.commands.spawnVehicle, {
                     itemId = tostring(item:getID()),
                     vehicleScript = scriptName,

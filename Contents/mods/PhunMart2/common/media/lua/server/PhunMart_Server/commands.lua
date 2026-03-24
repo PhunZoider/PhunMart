@@ -361,7 +361,9 @@ Commands[Core.commands.claimVehicle] = function(playerObj, args)
             end
         end
         -- Consume the key (remove from whichever container holds it)
-        keyItem:getContainer():DoRemoveItem(keyItem)
+        local keyContainer = keyItem:getContainer()
+        keyContainer:Remove(keyItem)
+        sendRemoveItemFromContainer(keyContainer, keyItem)
     end
 end
 
