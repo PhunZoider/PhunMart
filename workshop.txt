@@ -58,6 +58,18 @@ description=PhunMart is deeply configurable, but to keep this page readable the 
 description=
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/CUSTOMISATION.md]PhunMart Customisation Guide[/url]
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ITEM_CURRENCY.md]Using a Physical Item as Currency[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ADDING_MODDED_VEHICLE.md]Adding Modded Vehicles to WrentAWreck[/url]
+description=
+description=[h2]Translations[/h2]
+description=[b]Built into the mod:[/b]
+description=[list]
+description=[*]French
+description=[/list]
+description=[b]Community translation mods:[/b]
+description=[list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3692003021]Russian[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3691358964]Chinese (Simplified / Traditional)[/url]
+description=[/list]
 description=
 description=[h2]FAQs[/h2]
 description=[list]

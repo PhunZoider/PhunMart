@@ -140,6 +140,8 @@ rewards on top of the built-in defaults.
 Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** — common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.
 
+**Adding modded vehicles to WrentAWreck:** [Docs/GUIDE_ADDING_MODDED_VEHICLE.md](Docs/GUIDE_ADDING_MODDED_VEHICLE.md) — quick-start in two steps using the in-game admin UI.
+
 ---
 
 ## Compatibility
@@ -154,4 +156,5 @@ source by category, so modded items appear automatically. No known conflicts; pl
 
 - [GitHub Repository](https://github.com/PhunZoider/PhunMart)
 - [Customisation Guide](Docs/CUSTOMISATION.md)
+- [Adding Modded Vehicles](Docs/GUIDE_ADDING_MODDED_VEHICLE.md)
 - [Issue Tracker](https://github.com/PhunZoider/PhunMart/issues)

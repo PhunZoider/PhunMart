@@ -135,6 +135,32 @@ Script names are **case-sensitive**.
 
 ---
 
+## If the vehicle mod is removed (or a script name is wrong)
+
+The purchase will still complete -- currency is deducted and the player receives a
+`Vehicle Claim Key` item in their inventory. PhunMart stores the script name as a string;
+it has no way to validate that the mod is still active at purchase time.
+
+When the player right-clicks the key and chooses **Claim**, the game tries to spawn a vehicle
+using that script name. If the mod is gone (or the name was wrong), the game returns nothing
+and the spawn silently fails:
+
+- No vehicle appears
+- No error is shown to the player
+- **The key is not consumed** -- it stays in inventory permanently
+
+The player is effectively left with a useless item and has already paid. There is no automatic
+refund.
+
+**To avoid this:**
+- Only add a vehicle mod's scripts while that mod is active on the server
+- If you remove a vehicle mod, remove the corresponding special and group entries at the same
+  time so the offer stops appearing at restock
+- Existing held keys become dead items if the mod is removed mid-session; affected players
+  would need manual compensation (return their currency via admin tools)
+
+---
+
 ## How the spawn works (for reference)
 
 When a player buys a vehicle offer:
