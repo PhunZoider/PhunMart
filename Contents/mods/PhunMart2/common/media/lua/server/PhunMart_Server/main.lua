@@ -82,10 +82,27 @@ function Core:grantReward(player, action, qty, context)
         end
 
     elseif t == "spawnVehicle" then
-        -- Use the offer's specific vehicle (context.offerItem) so the player gets
-        -- exactly the vehicle they selected, not a random pick from the reward pool.
+        -- Filter scripts to those confirmed in the vehicle database at grant time.
+        -- Guards against mods removed after the last compile (post-restock window).
         local scripts = action.scripts or (action.script and {action.script}) or {}
-        local scriptName = (context and context.offerItem) or (#scripts > 0 and scripts[ZombRand(#scripts) + 1]) or nil
+        local validScripts = {}
+        for _, s in ipairs(scripts) do
+            if Core.vehicleScriptExists(s) then
+                table.insert(validScripts, s)
+            else
+                Core.debugLn("grantReward: vehicle script '" .. s .. "' not found at grant time -- skipped")
+            end
+        end
+
+        -- Prefer the player's selected script (context.offerItem); validate it too.
+        -- Falls back to a random valid script if the selected one is no longer loaded.
+        local selected = context and context.offerItem
+        local scriptName
+        if selected and Core.vehicleScriptExists(selected) then
+            scriptName = selected
+        elseif #validScripts > 0 then
+            scriptName = validScripts[ZombRand(#validScripts) + 1]
+        end
         if scriptName then
             local item = player:getInventory():AddItem("PhunMart.VehicleKeySpawner")
             if item then

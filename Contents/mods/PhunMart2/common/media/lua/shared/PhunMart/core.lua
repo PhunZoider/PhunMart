@@ -341,6 +341,17 @@ function Core.getAllVehicles(refresh)
     return Core.vehiclesAll
 end
 
+-- Returns true if a vehicle script exists in the game's script database.
+-- Accepts bare names ("CarNormal") or full types ("Base.CarNormal").
+-- Returns true defensively when getScriptManager is unavailable (e.g. early init).
+function Core.vehicleScriptExists(scriptName)
+    if not getScriptManager then return true end
+    local sm = getScriptManager()
+    if not sm or not sm.getVehicle then return true end
+    local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
+    return sm:getVehicle(fullType) ~= nil
+end
+
 -- Returns a human-readable label for a vehicle full type (e.g. "Base.CarNormal").
 -- Populates the cache via getAllVehicles() on first call.
 -- Falls back to the bare script name if no translation exists.

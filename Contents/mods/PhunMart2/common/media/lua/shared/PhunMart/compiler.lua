@@ -551,6 +551,14 @@ local function itemExists(itemType)
     return false
 end
 
+local function vehicleExists(scriptName)
+    if not getScriptManager then return true end
+    local sm = getScriptManager()
+    if not sm or not sm.getVehicle then return true end
+    local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
+    return sm:getVehicle(fullType) ~= nil
+end
+
 -- Builds a map of displayCategory -> set of fullItemName, cached for the compile run.
 -- Only called if any group uses categories.
 local itemCategoryCache = nil
@@ -858,6 +866,35 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                 end
                 if not boostFound then
                     table.insert(offerConditions.all, boostCondKey)
+                end
+            end
+
+            -- Validate vehicle scripts against the game database.
+            -- Strips scripts that aren't loaded; disables the offer entirely if none remain.
+            if action.type == "spawnVehicle" then
+                local scripts = action.scripts or (action.script and {action.script}) or {}
+                if #scripts > 0 then
+                    local validScripts, invalidScripts = {}, {}
+                    for _, s in ipairs(scripts) do
+                        if vehicleExists(s) then
+                            table.insert(validScripts, s)
+                        else
+                            table.insert(invalidScripts, s)
+                        end
+                    end
+                    if #invalidScripts > 0 then
+                        if #validScripts == 0 then
+                            logger:warn("Offer '" .. offerId .. "': no valid vehicle scripts found (" ..
+                                table.concat(invalidScripts, ", ") ..
+                                ") -- offer disabled (mod may not be loaded)")
+                            return offerId, nil
+                        else
+                            logger:warn("Offer '" .. offerId .. "': vehicle script(s) not found, removed from pool: " ..
+                                table.concat(invalidScripts, ", "))
+                            action.scripts = validScripts
+                            action.script = nil
+                        end
+                    end
                 end
             end
         end
