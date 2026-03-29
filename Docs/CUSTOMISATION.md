@@ -142,6 +142,11 @@ return {
 }
 ```
 
+### Add vehicles from another mod
+
+See the dedicated guide: [Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md). The quick-start
+covers it in two steps using the in-game admin UI -- no Lua editing required.
+
 ### Adjust restock timing for a shop
 
 Make WrentAWreck restock weekly instead of using the server default.
@@ -457,6 +462,8 @@ hand-pick.
 
 For non-item shops (traits, XP, boosts, vehicles), groups use `specialCategories` to pull
 specials by their `category` field, or `specials` to include specific special keys directly.
+For adding vehicles from another mod to WrentAWreck, see
+[Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md).
 
 ```lua
 return {
@@ -778,6 +785,9 @@ actions = { {
 
 Use `scripts` (array) to pick randomly from multiple variants, or `script` (string) for a single type.
 Vehicle script names come from the game's vehicle script database -- use `/dumppz vehicles` to list them.
+
+For a step-by-step walkthrough of adding vehicles from another mod, see
+[Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md).
 
 ### `kind = "collector"` -- grant bound tokens
 
