@@ -196,6 +196,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                         local amt = tonumber(argText)
                         if not amt then return end
                         action.amount = math.floor(amt)
+                    elseif actionType == "adjustBalance" then
+                        local amt = tonumber(argText)
+                        if not amt then return end
+                        action.amount = math.floor(amt)
+                        local poolVal = f:getFieldValue("pool")
+                        action.pool = (poolVal and poolVal ~= "") and poolVal or "change"
                     end
                     result.actions = {action}
                 end
@@ -277,19 +283,26 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         default = (def.display and def.display.text) or "",
         group = "instance",
     })
+    local curActionType = curAction and curAction.type or ACTION_TYPES[1]
     form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
         options = ACTION_TYPES,
-        selected = curAction and curAction.type or ACTION_TYPES[1],
+        selected = curActionType,
         group = "instance",
         onChange = function(f, field)
             local actionType = f:getFieldValue("action")
             f:setHintText("actionArg", getActionArgHint(actionType))
+            f:setGroupVisible("adjustBalance", actionType == "adjustBalance")
         end,
     })
     form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
         default = argDefault,
-        hint = getActionArgHint(curAction and curAction.type or ACTION_TYPES[1]),
+        hint = getActionArgHint(curActionType),
         group = "instance",
+    })
+    form:addTextField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
+        default = (curAction and curAction.pool) or "change",
+        hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
+        group = "adjustBalance",
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(), default = def.price or "",
@@ -320,6 +333,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- Apply initial group visibility
     form:setGroupVisible("template", isTpl)
     form:setGroupVisible("instance", not isTpl)
+    form:setGroupVisible("adjustBalance", not isTpl and curActionType == "adjustBalance")
 
     form:addToUIManager()
     form:bringToTop()

@@ -312,6 +312,7 @@
   "IGUI_PhunMart_Hint_ScriptNames": "Script name(s), comma-separated",
   "IGUI_PhunMart_Hint_TokenAmount": "Token amount (integer)",
   "IGUI_PhunMart_Hint_ChangeAmount": "Change amount in cents (integer)",
+  "IGUI_PhunMart_Hint_CurrencyPool": "Currency pool name (e.g. change, tokens)",
   "IGUI_PhunMart_Hint_EnterDollars": "Enter as dollars (e.g. 5.00)",
   "IGUI_PhunMart_Hint_EnterWholeNumber": "Enter whole number",
   "IGUI_PhunMart_Hint_ItemKey": "e.g. Base.Money",

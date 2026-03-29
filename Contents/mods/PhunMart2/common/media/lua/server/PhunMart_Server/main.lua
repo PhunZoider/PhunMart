@@ -27,13 +27,13 @@ function Core.compile()
     -- These are sent to clients via requestShopDefs so they can recompile locally
     -- using their own shared defaults + these overrides (no FS access on clients).
     local overrides = {
-        prices         = overridePatch({"PhunMart_Prices.lua"}),
-        specials       = overridePatch({"PhunMart_Specials.lua", "PhunMart_XP_Rewards.lua"}),
+        prices = overridePatch({"PhunMart_Prices.lua"}),
+        specials = overridePatch({"PhunMart_Specials.lua", "PhunMart_XP_Rewards.lua"}),
         conditionsDefs = overridePatch({"PhunMart_Conditions.lua", "PhunMart_XP_Conditions.lua"}),
-        items          = overridePatch({"PhunMart_Items.lua", "PhunMart_XP_Items.lua"}),
-        groups         = overridePatch({"PhunMart_Groups.lua"}),
-        pools          = overridePatch({"PhunMart_Pools.lua"}),
-        shops          = overridePatch({"PhunMart_Shops.lua"}),
+        items = overridePatch({"PhunMart_Items.lua", "PhunMart_XP_Items.lua"}),
+        groups = overridePatch({"PhunMart_Groups.lua"}),
+        pools = overridePatch({"PhunMart_Pools.lua"}),
+        shops = overridePatch({"PhunMart_Shops.lua"})
     }
     Core._lastOverrides = overrides
     return Core.compileWith(overrides)
@@ -56,20 +56,21 @@ function Core:grantReward(player, action, qty, context)
         end
 
     elseif t == "addTrait" or t == "removeTrait" then
-        -- CharacterTraitDefinition is client-side only. Delegate to the client
-        -- which has the full definition cache and can apply the trait correctly.
-        if Core.isLocal then
-            triggerEvent(Core.events.OnApplyTraitReward, {
-                trait = action.trait,
-                add = (t == "addTrait"),
-                player = player
-            })
+        local Traits = require "PhunMart/traits"
+        local entry = Traits.get(action.trait)
+        if entry and entry.def then
+            local traitType = entry.def:getType()
+            local add = (t == "addTrait")
+            if add then
+                player:getCharacterTraits():add(traitType)
+                player:modifyTraitXPBoost(traitType, false)
+            else
+                player:getCharacterTraits():remove(traitType)
+                player:modifyTraitXPBoost(traitType, true)
+            end
+            SyncXp(player)
         else
-            sendServerCommand(player, Core.name, Core.commands.applyTraitReward, {
-                playerIndex = player:getPlayerNum(),
-                trait = action.trait,
-                add = (t == "addTrait")
-            })
+            Core.debugLn("grantReward: no trait def for '" .. tostring(action.trait) .. "'")
         end
 
     elseif t == "giveXP" then
@@ -212,7 +213,6 @@ function Core:getInstanceDistancesFrom(x, y)
 
     return results
 end
-
 
 function Core:ini()
     self.inied = true
