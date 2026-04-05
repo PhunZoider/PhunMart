@@ -14,7 +14,7 @@ option PhunMart.ChanceToDropChange
 option PhunMart.MinCoinsToDrop
 {
     type = integer,
-    default = 30,
+    default = 5,
     min=5,
     max=1000,
     page = PhunMart,
@@ -24,7 +24,7 @@ option PhunMart.MinCoinsToDrop
 option PhunMart.MaxCoinsToDrop
 {
     type = integer,
-    default = 30,
+    default = 75,
     min=10,
     max=1000,
     page = PhunMart,

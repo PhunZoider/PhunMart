@@ -1,11 +1,9 @@
 local Core = PhunMart
 
 function Core.getCoinChance(zed)
-    local loot = Core.loot or {}
-    local chance = loot.chance or 0.30 -- probability a zombie carries change
-    local minCents = loot.minCents or 5
-    local maxCents = loot.maxCents or 75
-
+    local chance = Core.getOption("ChanceToDropChange") * 0.01
+    local minCents = Core.getOption("MinCoinsToDrop")
+    local maxCents = Core.getOption("MaxCoinsToDrop")
     return chance, minCents, maxCents
 end
 
@@ -65,29 +63,20 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
         end
 
         Core.getCoinChance = function(zed)
-
             local location = PZ.getLocation(zed:getX(), zed:getY())
-            local isSprinter = false
-
-            local loot = Core.loot or {
-                chance = location.coinchance or 30, -- probability a zombie carries change
-                minCents = location.coinmin or 5,
-                maxCents = location.coinmax or 75
-            }
-
-            local chance = loot.chance
-            local minCents = loot.minCents
-            local maxCents = loot.maxCents
+            local chance = (location.coinchance or Core.getOption("ChanceToDropChange")) * 0.01
+            local minCents = location.coinmin or Core.getOption("MinCoinsToDrop")
+            local maxCents = location.coinmax or Core.getOption("MaxCoinsToDrop")
 
             if checkSprinters then
                 if (zed:getModData().PhunSprinters or {}).sprinter then
-                    chance = location.coinsprinterchance or chance
+                    chance = (location.coinsprinterchance or Core.getOption("ChanceToDropChange")) * 0.01
                     minCents = location.coinsprintermin or minCents
                     maxCents = location.coinsprintermax or maxCents
                 end
             end
 
-            return tonumber(chance * 0.01), tonumber(minCents), tonumber(maxCents)
+            return tonumber(chance), tonumber(minCents), tonumber(maxCents)
         end
     end
 end
