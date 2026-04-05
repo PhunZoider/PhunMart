@@ -68,8 +68,11 @@ local function checkMilestones(player, pd, milestones, count, prefix)
         elseif entry.everyKills and entry.everyKills > 0 then
             local key = prefix .. "_every_" .. tostring(entry.everyKills)
             local multiple = math.floor(count / entry.everyKills)
-            if multiple > (pd.claimed[key] or 0) then
-                local gained = multiple - (pd.claimed[key] or 0)
+            if pd.claimed[key] == nil then
+                pd.claimed[key] = multiple
+                Core.debugLn("[KillRewards] " .. username .. " initialized recurring baseline " .. key .. " at " .. multiple)
+            elseif multiple > pd.claimed[key] then
+                local gained = multiple - pd.claimed[key]
                 pd.claimed[key] = multiple
                 for _ = 1, gained do
                     for _, reward in ipairs(entry.rewards or {}) do

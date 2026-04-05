@@ -81,8 +81,11 @@ function R:checkPlaytimeRewards(player)
             local interval = entry.everyMinutes
             local key = "playtime_every_" .. tostring(interval)
             local multiple = math.floor(totalMinutes / interval)
-            if multiple > (pd.claimed[key] or 0) then
-                local gained = multiple - (pd.claimed[key] or 0)
+            if pd.claimed[key] == nil then
+                pd.claimed[key] = multiple
+                Core.debugLn("[PlaytimeRewards] " .. username .. " initialized recurring baseline " .. key .. " at " .. multiple)
+            elseif multiple > pd.claimed[key] then
+                local gained = multiple - pd.claimed[key]
                 pd.claimed[key] = multiple
                 local label = interval .. "m interval"
                 for _ = 1, gained do

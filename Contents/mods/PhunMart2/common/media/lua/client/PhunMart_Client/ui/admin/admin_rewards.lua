@@ -164,7 +164,7 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
         end,
     })
     form:addCheckField("recurring", getText("IGUI_PhunMart_Lbl_Recurring"), {
-        default = recurringDefault,
+        checked = recurringDefault,
     })
     form:addTextField("threshold", getText("IGUI_PhunMart_Lbl_Threshold"), {
         default = threshDefault,
