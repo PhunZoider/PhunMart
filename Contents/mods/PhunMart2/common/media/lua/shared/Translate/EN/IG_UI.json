@@ -359,6 +359,7 @@
   "IGUI_PhunMart_Col_Category": "Category",
   "IGUI_PhunMart_Col_Threshold": "Threshold",
   "IGUI_PhunMart_Col_Item": "Item",
+  "IGUI_PhunMart_Lbl_Recurring": "Recurring:",
   "IGUI_PhunMart_Lbl_Threshold": "Threshold:",
   "IGUI_PhunMart_Lbl_Item": "Item:",
   "IGUI_PhunMart_Lbl_RewardAmount": "Amount:",

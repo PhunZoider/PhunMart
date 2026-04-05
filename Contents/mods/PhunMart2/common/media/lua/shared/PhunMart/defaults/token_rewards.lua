@@ -1,8 +1,12 @@
 -- PhunMart Token Rewards - Default Configuration
 -- This file defines when players automatically earn tokens/rewards for:
---   playtime      - milestone rewards for cumulative online time (one-time each)
---   zombieKills   - cumulative zombie kill milestones (one-time, wipe-persistent)
---   sprinterKills - cumulative sprinter kill milestones (one-time, wipe-persistent)
+--   playtime      - rewards for cumulative online time
+--   zombieKills   - rewards for cumulative zombie kills
+--   sprinterKills - rewards for cumulative sprinter kills
+--
+-- Each entry uses either:
+--   atMinutes / kills  - one-time milestone (fires exactly once per wipe)
+--   everyMinutes / everyKills - recurring (fires every N minutes/kills)
 --
 -- rewards entries: { item="FullItemName", amount=N }
 --   item must be a valid inventory item full name (e.g. "PhunMart.Token")

@@ -63,18 +63,34 @@ function R:checkPlaytimeRewards(player)
         return
     end
 
+    local totalMinutes = (pd.previousHours + player:getHoursSurvived()) * 60
+
     for _, entry in ipairs(cfg) do
-        local threshold = entry.atMinutes
-        if threshold and threshold > 0 then
+        if entry.atMinutes and entry.atMinutes > 0 then
+            local threshold = entry.atMinutes
             local key = "playtime_" .. tostring(threshold)
-            if pd.previousHours + player:getHoursSurvived() >= threshold and not pd.claimed[key] then
+            if totalMinutes >= threshold and not pd.claimed[key] then
                 pd.claimed[key] = true
+                local label = math.floor(threshold / 60) > 0 and (math.floor(threshold / 60) .. "h playtime") or (threshold .. "m playtime")
                 for _, reward in ipairs(entry.rewards or {}) do
-                    local label = math.floor(threshold / 60) > 0 and (math.floor(threshold / 60) .. "h playtime") or
-                                      (threshold .. "m playtime")
                     Core:grantConfigReward(player, reward, label)
                 end
                 Core.debugLn("[PlaytimeRewards] " .. username .. " claimed milestone " .. key)
+            end
+        elseif entry.everyMinutes and entry.everyMinutes > 0 then
+            local interval = entry.everyMinutes
+            local key = "playtime_every_" .. tostring(interval)
+            local multiple = math.floor(totalMinutes / interval)
+            if multiple > (pd.claimed[key] or 0) then
+                local gained = multiple - (pd.claimed[key] or 0)
+                pd.claimed[key] = multiple
+                local label = interval .. "m interval"
+                for _ = 1, gained do
+                    for _, reward in ipairs(entry.rewards or {}) do
+                        Core:grantConfigReward(player, reward, label)
+                    end
+                end
+                Core.debugLn("[PlaytimeRewards] " .. username .. " claimed " .. gained .. "x recurring " .. key)
             end
         end
     end

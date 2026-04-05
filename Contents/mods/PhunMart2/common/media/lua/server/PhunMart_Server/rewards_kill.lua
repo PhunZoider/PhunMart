@@ -54,16 +54,29 @@ end
 -- prefix: string used to key the claim record (e.g. "zombie" or "sprinter")
 local function checkMilestones(player, pd, milestones, count, prefix)
     if not milestones then return end
+    local username = player:getUsername()
     for _, entry in ipairs(milestones) do
-        local threshold = entry.kills
-        if threshold and count >= threshold then
-            local key = prefix .. "_" .. tostring(threshold)
+        if entry.kills and count >= entry.kills then
+            local key = prefix .. "_" .. tostring(entry.kills)
             if not pd.claimed[key] then
                 pd.claimed[key] = true
                 for _, reward in ipairs(entry.rewards or {}) do
-                    Core:grantConfigReward(player, reward, "kill milestone: " .. count .. " " .. prefix .. "s")
+                    Core:grantConfigReward(player, reward, "kill milestone: " .. entry.kills .. " " .. prefix .. "s")
                 end
-                Core.debugLn("[KillRewards] " .. player:getUsername() .. " claimed milestone " .. key)
+                Core.debugLn("[KillRewards] " .. username .. " claimed milestone " .. key)
+            end
+        elseif entry.everyKills and entry.everyKills > 0 then
+            local key = prefix .. "_every_" .. tostring(entry.everyKills)
+            local multiple = math.floor(count / entry.everyKills)
+            if multiple > (pd.claimed[key] or 0) then
+                local gained = multiple - (pd.claimed[key] or 0)
+                pd.claimed[key] = multiple
+                for _ = 1, gained do
+                    for _, reward in ipairs(entry.rewards or {}) do
+                        Core:grantConfigReward(player, reward, "every " .. entry.everyKills .. " " .. prefix .. "s")
+                    end
+                end
+                Core.debugLn("[KillRewards] " .. username .. " claimed " .. gained .. "x recurring " .. key)
             end
         end
     end

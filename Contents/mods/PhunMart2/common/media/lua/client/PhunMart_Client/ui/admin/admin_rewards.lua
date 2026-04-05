@@ -20,24 +20,38 @@ local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 
 local CATEGORIES = {"playtime", "zombieKills", "sprinterKills"}
 
--- Return the threshold field name for a given category.
-local function thresholdKey(category)
+-- Return whether an entry is a recurring reward.
+local function isRecurring(category, entry)
     if category == "playtime" then
-        return "atMinutes"
+        return entry.everyMinutes ~= nil
     end
-    return "kills"
+    return entry.everyKills ~= nil
+end
+
+-- Return the threshold field name for a given category and recurring flag.
+local function thresholdKey(category, recurring)
+    if category == "playtime" then
+        return recurring and "everyMinutes" or "atMinutes"
+    end
+    return recurring and "everyKills" or "kills"
 end
 
 -- Format a threshold value for display.
 local function formatThreshold(category, entry)
+    local recurring = isRecurring(category, entry)
+    local prefix = recurring and "every " or "at "
     if category == "playtime" then
-        local mins = entry.atMinutes or 0
+        local mins = (recurring and entry.everyMinutes or entry.atMinutes) or 0
+        local timeStr
         if mins >= 60 then
-            return string.format("%dh %dm", math.floor(mins / 60), mins % 60)
+            timeStr = string.format("%dh %dm", math.floor(mins / 60), mins % 60)
+        else
+            timeStr = tostring(mins) .. "m"
         end
-        return tostring(mins) .. "m"
+        return prefix .. timeStr
     end
-    return tostring(entry.kills or 0)
+    local count = (recurring and entry.everyKills or entry.kills) or 0
+    return prefix .. tostring(count)
 end
 
 -- Summarise rewards for a milestone row.
@@ -88,9 +102,10 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
     category = category or "playtime"
 
     -- Pre-compute defaults from entry
+    local recurringDefault = entry and isRecurring(category, entry) or false
     local threshDefault = ""
     if entry then
-        threshDefault = tostring(entry[thresholdKey(category)] or "")
+        threshDefault = tostring(entry[thresholdKey(category, recurringDefault)] or "")
     end
 
     -- Collect selected items from existing rewards
@@ -114,6 +129,7 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
         title = titleText,
         onApply = function(f)
             local cat = f:getFieldValue("category")
+            local recurring = f:getFieldValue("recurring")
             local threshold = f:getFieldNumber("threshold")
             local items = f:getFieldValue("items")
             local amount = f:getFieldNumber("amount")
@@ -127,14 +143,8 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
                 table.insert(rewards, { item = item, amount = math.floor(amount) })
             end
 
-            local newEntry = {
-                rewards = rewards
-            }
-            if cat == "playtime" then
-                newEntry.atMinutes = math.floor(threshold)
-            else
-                newEntry.kills = math.floor(threshold)
-            end
+            local newEntry = { rewards = rewards }
+            newEntry[thresholdKey(cat, recurring)] = math.floor(threshold)
 
             if cb then
                 cb(cat, newEntry, editIndex)
@@ -152,6 +162,9 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
             local cat = f:getFieldValue("category")
             updateThresholdHint(f, cat)
         end,
+    })
+    form:addCheckField("recurring", getText("IGUI_PhunMart_Lbl_Recurring"), {
+        default = recurringDefault,
     })
     form:addTextField("threshold", getText("IGUI_PhunMart_Lbl_Threshold"), {
         default = threshDefault,
@@ -272,8 +285,8 @@ function UI:refreshList()
         if a.category ~= b.category then
             return a.category < b.category
         end
-        local aKey = thresholdKey(a.category)
-        local bKey = thresholdKey(b.category)
+        local aKey = thresholdKey(a.category, isRecurring(a.category, a.entry))
+        local bKey = thresholdKey(b.category, isRecurring(b.category, b.entry))
         return (a.entry[aKey] or 0) < (b.entry[bKey] or 0)
     end)
 
