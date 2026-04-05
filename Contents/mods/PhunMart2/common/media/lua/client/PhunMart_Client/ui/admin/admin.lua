@@ -4,8 +4,35 @@ end
 require "DebugUIs/DebugMenu/ISDebugMenu"
 local Core = PhunMart
 
+local function playerHasEditorAccess(player)
+    -- Always allow in singleplayer
+    if Core.isLocal then
+        return true
+    end
+    local required = Core.getOption("EditorRole", "")
+    if not required or required == "" then
+        return true
+    end
+    local role = player and player.getRole and player:getRole()
+    local roleName = role and role.getName and role:getName()
+    if not roleName or roleName == "" then
+        return false
+    end
+    return roleName:lower() == required:lower()
+end
+
 local function showPhunMartConfigs()
-    Core.ClientSystem.instance:openShopList(getPlayer())
+    local player = getPlayer()
+    if not playerHasEditorAccess(player) then
+        local modal = ISModalDialog:new(0, 0, 300, 150, "Insufficient privileges to open the editor.", false, nil, nil,
+            nil, nil, nil)
+        modal:initialise()
+        modal:addToUIManager()
+        modal:setX((getCore():getScreenWidth() - modal:getWidth()) / 2)
+        modal:setY((getCore():getScreenHeight() - modal:getHeight()) / 2)
+        return
+    end
+    Core.ClientSystem.instance:openShopList(player)
 end
 
 local ISDebugMenu_setupButtons = ISDebugMenu.setupButtons;
@@ -28,7 +55,8 @@ function ISAdminPanelUI:create()
     local x = UI_BORDER_SPACING + 1;
     local y = FONT_HGT_MEDIUM + UI_BORDER_SPACING * 2 + 1;
 
-    self.showPhunMartConfigs = ISButton:new(x, y, btnWid, BUTTON_HGT, getText("IGUI_PhunMart_Admin_PanelBtn"), self, showPhunMartConfigs);
+    self.showPhunMartConfigs = ISButton:new(x, y, btnWid, BUTTON_HGT, getText("IGUI_PhunMart_Admin_PanelBtn"), self,
+        showPhunMartConfigs);
     self.showPhunMartConfigs.internal = "";
     self.showPhunMartConfigs:initialise();
     self.showPhunMartConfigs:instantiate();

@@ -49,5 +49,8 @@
   "Sandbox_PhunMart_DefaultDistance_tooltip": "The minimum distance between similarly grouped machines",
 
   "Sandbox_PhunMart_MaxStickyItems": "Max sticky pool items",
-  "Sandbox_PhunMart_MaxStickyItems_tooltip": "Maximum number of items allowed in a sticky pool before a warning is logged. Sticky pools always show all their items in a shop. Keep this low to avoid cluttered shops."
+  "Sandbox_PhunMart_MaxStickyItems_tooltip": "Maximum number of items allowed in a sticky pool before a warning is logged. Sticky pools always show all their items in a shop. Keep this low to avoid cluttered shops.",
+
+  "Sandbox_PhunMart_EditorRole": "Editor Role",
+  "Sandbox_PhunMart_EditorRole_tooltip": "If set, only players whose role name matches this value (case-insensitive) can open the editor. Leave empty to allow all players with access to debug/admin menu (or always allow in singleplayer)."
 }

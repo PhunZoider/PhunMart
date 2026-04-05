@@ -160,3 +160,11 @@ option PhunMart.Debug
     page = PhunMart,
     translation=PhunMart_Debug,
 }
+
+option PhunMart.EditorRole
+{
+    type = string,
+    default = ,
+    page = PhunMart,
+    translation=PhunMart_EditorRole,
+}
