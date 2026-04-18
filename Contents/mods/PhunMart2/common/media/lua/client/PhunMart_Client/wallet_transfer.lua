@@ -33,7 +33,7 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
             if Core.isLocal then
                 name = player:getPlayerNum()
             end
-            if wallet.wallet and Core.settings.OnlyPickupOwn and name ~= wallet.owner then
+            if wallet.wallet and Core.settings.OnlyPickupOwn and name ~= wallet.owner and not wallet.anyone then
                 return {
                     ignoreAction = true
                 }
@@ -57,14 +57,23 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                         end
                     end
                 end
-            else
-                -- MP: server merges wallet balances and removes wallet item.
-                sendClientCommand(Core.name, Core.commands.consumeDroppedWallet, {
-                    walletData = wallet.wallet
-                })
-            end
-            if Core.isLocal then
                 consumeItem(item)
+            else
+                local container = destContainer
+                if container then
+                    container:DoRemoveItem(item)
+                end
+                -- MP: B42 is server-authoritative for inventory state, so the
+                -- server must remove the item. Pass the exact item ID so it
+                -- can look up this specific wallet (getFirstTypeRecurse picks
+                -- an arbitrary DroppedWallet, which causes ghosts on repeated
+                -- pickups). Client does NOT remove locally; the server fires
+                -- sendRemoveItemFromContainer which syncs all clients.
+                sendClientCommand(Core.name, Core.commands.consumeDroppedWallet, {
+                    walletData = wallet.wallet,
+                    itemId = item:getID()
+                })
+
             end
             getSoundManager():PlaySound("PhunMart_WalletPickup", false, 0):setVolume(0.50)
         end)

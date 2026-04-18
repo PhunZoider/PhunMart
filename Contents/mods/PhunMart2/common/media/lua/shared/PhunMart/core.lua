@@ -80,6 +80,7 @@ PhunMart = {
         updateWallet = "PhunMartUpdateWallet",
         consumeCoin = "PhunMartConsumeCoin",
         consumeDroppedWallet = "PhunMartConsumeDroppedWallet",
+        dropWallet = "PhunMartDropWallet",
         -- Admin wallet
         getPlayerList = "PhunMartGetPlayerList",
         getPlayersWallet = "PhunMartGetPlayersWallet",

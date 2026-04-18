@@ -18,6 +18,9 @@
   "Sandbox_PhunMart_WalletOnlyPickupOwn": "Wallets only pickupable by owner",
   "Sandbox_PhunMart_WalletOnlyPickupOwn_tooltip": "If enabled, only the owner of a wallet can pick it up.",
 
+  "Sandbox_PhunMart_AllowWalletDrop": "Allow manual wallet drop",
+  "Sandbox_PhunMart_AllowWalletDrop_tooltip": "If enabled, players can drop currency from their wallet as a pickupable item. Intentional drops are always pickupable by any player, regardless of the wallet pickup setting.",
+
   "Sandbox_PhunMart_WalletReturnRate": "Wallets return rate",
   "Sandbox_PhunMart_WalletReturnRate_tooltip": "The percentage of money that is returned to the player on death. 0 means no money is returned, 100 means all money is returned.",
 

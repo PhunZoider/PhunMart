@@ -2,7 +2,11 @@ if isServer() then
     return
 end
 require "ISUI/ISPanel"
+require "ISUI/ISTextBox"
 local Core = PhunMart
+
+local BUTTON_HGT = 25
+local BUTTON_PAD = 6
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
@@ -121,6 +125,13 @@ function UI:createChildren()
 
     self:addChild(self.datas);
 
+    self.btnDrop = ISButton:new(10, 0, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Drop"), self, UI.onDropClicked)
+    self.btnDrop.internal = "DROP"
+    self.btnDrop:initialise()
+    self.btnDrop:instantiate()
+    self.btnDrop:setEnable(false)
+    self:addChild(self.btnDrop)
+
     self.tooltip = ISToolTip:new();
     self.tooltip:initialise();
     self.tooltip:setVisible(false);
@@ -141,14 +152,96 @@ function UI:prerender()
     local sw = maxWidth
     local tabY = self.parent.tabHeight
     self:setWidth(sw)
+    -- The view sits at y=tabY inside the tab panel, so its usable height is
+    -- (tabPanel.height - tabY). Clamp to that so child hit areas stay inside
+    -- the tab panel's routable region.
+    self:setHeight(maxHeight - tabY)
     self.datas:setX(10)
     self.datas:setWidth(self.parent.width - 20)
     self.datas:setY(tabY + 10)
-    local height = maxHeight - (tabY + 20) - self.datas.itemheight
-    if height > maxHeight then
-        height = maxHeight
+
+    local dropAllowed = Core.getOption("AllowWalletDrop", true) ~= false
+    self.btnDrop:setVisible(dropAllowed)
+
+    local bottomReserved = self.datas.itemheight
+    if dropAllowed then
+        bottomReserved = bottomReserved + BUTTON_HGT + BUTTON_PAD
+    end
+
+    local height = self.height - (tabY + 20) - bottomReserved
+    if height < 0 then
+        height = 0
     end
     self.datas:setHeight(height)
+
+    if dropAllowed then
+        self.btnDrop:setX(10)
+        self.btnDrop:setY(self.height - BUTTON_HGT - 10)
+        self.btnDrop:bringToTop()
+        local enable = false
+        local selected = self.datas.items[self.datas.selected]
+        if selected and selected.item and not selected.item.bound then
+            local balance = (Core.wallet:get(self.player).current[selected.text] or 0)
+            enable = balance > 0
+        end
+        self.btnDrop:setEnable(enable)
+    end
+end
+
+function UI:onDropClicked()
+    local selected = self.datas.items[self.datas.selected]
+    if not selected or not selected.item or selected.item.bound then
+        return
+    end
+    local poolKey = selected.text
+    local balance = Core.wallet:get(self.player).current[poolKey] or 0
+    if balance <= 0 then
+        return
+    end
+
+    local title
+    if selected.item.format == "cents" then
+        title = getText("IGUI_PhunMart_Drop_TitleCents", selected.item.label, string.format("%.2f", balance / 100))
+    else
+        title = getText("IGUI_PhunMart_Drop_TitleCount", selected.item.label, tostring(balance))
+    end
+
+    local w, h = 320, 140
+    local x = getCore():getScreenWidth() / 2 - w / 2
+    local y = getCore():getScreenHeight() / 2 - h / 2
+    local box = ISTextBox:new(x, y, w, h, title, tostring(balance), self,
+        function(target, button, pool)
+            if button.internal ~= "OK" then return end
+            local text = button.parent.entry:getText()
+            local amt = tonumber(text)
+            if not amt or amt <= 0 then return end
+            target:submitDrop(pool, math.floor(amt))
+        end, nil, poolKey)
+    box:initialise()
+    box:addToUIManager()
+end
+
+function UI:submitDrop(poolKey, amount)
+    local wallet = Core.wallet:get(self.player)
+    local balance = wallet.current[poolKey] or 0
+    if amount > balance then
+        amount = balance
+    end
+    if amount <= 0 then
+        return
+    end
+
+    if Core.isLocal then
+        local square = self.player:getSquare()
+        if not square then return end
+        Core.wallet:adjustByPool(self.player, "current", poolKey, -amount)
+        Core.wallet:spawnDroppedItem(self.player, square, {{pool = poolKey, amount = amount}}, {anyone = true})
+    else
+        sendClientCommand(Core.name, Core.commands.dropWallet, {
+            pool = poolKey,
+            amount = amount
+        })
+    end
 end
 
 function UI:drawDatas(y, item, alt)

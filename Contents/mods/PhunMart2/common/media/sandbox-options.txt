@@ -40,11 +40,19 @@ option PhunMart.DropOnDeath
 }
 
 option PhunMart.OnlyPickupOwn
-{ 
+{
     type = boolean,
     default = true,
     page = PhunMart,
     translation = PhunMart_WalletOnlyPickupOwn,
+}
+
+option PhunMart.AllowWalletDrop
+{
+    type = boolean,
+    default = true,
+    page = PhunMart,
+    translation = PhunMart_AllowWalletDrop,
 }
 
 option PhunMart.ReturnRate

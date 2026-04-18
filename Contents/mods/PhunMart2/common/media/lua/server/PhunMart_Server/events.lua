@@ -48,30 +48,7 @@ Events.OnCharacterDeath.Add(function(character)
         end
 
         if #toAdd > 0 then
-            local square = character:getSquare()
-            local ok, err = pcall(function()
-                local item = instanceItem("PhunMart.DroppedWallet")
-                if not item then
-                    error("instanceItem returned nil for PhunMart.DroppedWallet")
-                end
-                local walletName = character:getUsername() .. "'s Wallet"
-                pcall(function()
-                    walletName = getText("IGUI_PhunMart_CharsWallet", character:getUsername())
-                end)
-                item:setName(walletName)
-                item:getModData().PhunWallet = {
-                    owner = Core.isLocal and character:getPlayerNum() or character:getUsername(),
-                    wallet = toAdd
-                }
-                local worldItem = square:AddWorldInventoryItem(item, 0, 0, 0)
-                if worldItem and worldItem:getWorldItem() then
-                    worldItem:getWorldItem():setIgnoreRemoveSandbox(true)
-                    worldItem:getWorldItem():transmitCompleteItemToClients()
-                end
-            end)
-            if not ok then
-                Core.debugLn("OnCharacterDeath: failed to drop wallet: " .. tostring(err))
-            end
+            Core.wallet:spawnDroppedItem(character, character:getSquare(), toAdd)
         end
     end
 

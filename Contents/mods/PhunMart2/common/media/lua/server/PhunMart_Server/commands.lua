@@ -6,13 +6,16 @@ local Core = PhunMart
 local Commands = {}
 
 Commands[Core.commands.compile] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:recompileShops()
 end
 
-
 Commands[Core.commands.setBlacklist] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.setBlacklist(args)
 end
 
@@ -21,14 +24,13 @@ Commands[Core.commands.openShop] = function(playerObj, args)
 end
 
 Commands[Core.commands.relocateShop] = function(playerObj, args)
-    Core.ServerSystem.instance:relocateShop(
-        args.oldX, args.oldY, args.oldZ,
-        args.newX, args.newY, args.newZ
-    )
+    Core.ServerSystem.instance:relocateShop(args.oldX, args.oldY, args.oldZ, args.newX, args.newY, args.newZ)
 end
 
 Commands[Core.commands.restock] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local obj = Core.ServerSystem.instance:getLuaObjectAt(args.x, args.y, args.z)
     if not obj then
         return
@@ -46,7 +48,9 @@ Commands[Core.commands.restock] = function(playerObj, args)
 end
 
 Commands[Core.commands.changeTo] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local loc = args.location
     local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
     local oldKey = oldObj and oldObj:getKey()
@@ -71,49 +75,69 @@ Commands[Core.commands.closeShop] = function(playerObj, args)
 end
 
 Commands[Core.commands.upsertShopDefinition] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertShopDefinition(args)
 end
 
 Commands[Core.commands.upsertGroupDef] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.lua", "groups", args.key, args.def)
 end
 
 Commands[Core.commands.upsertItemDef] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Items.lua", "items", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPriceDef] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.lua", "prices", args.key, args.def)
 end
 
 Commands[Core.commands.upsertSpecialDef] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Specials.lua", "specials", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.lua", "pools", args.key, args.def)
 end
 
 Commands[Core.commands.getTokenRewards] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     sendServerCommand(playerObj, Core.name, Core.commands.getTokenRewards, {
         cfg = Core.tokenRewardsCfg or {}
     })
 end
 
 Commands[Core.commands.saveTokenRewards] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.tokenRewardsCfg = args.cfg or {}
     Core.fileUtils.saveTable("PhunMart_TokenRewards.lua", Core.tokenRewardsCfg)
     -- Reload the reward modules so they pick up the new config.
-    if Core.playtimeRewards then Core.playtimeRewards:load() end
-    if Core.killRewards then Core.killRewards:load() end
+    if Core.playtimeRewards then
+        Core.playtimeRewards:load()
+    end
+    if Core.killRewards then
+        Core.killRewards:load()
+    end
     sendServerCommand(playerObj, Core.name, Core.commands.getTokenRewards, {
         cfg = Core.tokenRewardsCfg
     })
@@ -214,7 +238,9 @@ Commands[Core.commands.buy] = function(playerObj, args)
 end
 
 Commands[Core.commands.requestItemDefs] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     -- because this can be so massive, we will need to chunk it down
     local row = 0
     local chunkIteration = 0
@@ -258,7 +284,9 @@ Commands[Core.commands.requestItemDefs] = function(playerObj, args)
 end
 
 Commands[Core.commands.reroll] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local loc = args.location
     local oldObj = Core.ServerSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
     local oldKey = oldObj and oldObj:getKey()
@@ -281,12 +309,16 @@ Commands[Core.commands.reroll] = function(playerObj, args)
 end
 
 Commands[Core.commands.rerollAllShops] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:rerollAll()
 end
 
 Commands[Core.commands.restockAllShops] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:restockAll()
 end
 
@@ -300,7 +332,9 @@ end
 
 -- generates or re-generates shop and inventory
 Commands[Core.commands.requestShopGenerate] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     Core.ServerSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
 end
 
@@ -411,9 +445,6 @@ Commands[Core.commands.getInstanceList] = function(playerObj, args)
     end
 end
 
-
-
-
 Commands[Core.commands.getShopData] = function(playerObj, args)
     local data = Core.ServerSystem.instance:getShopData(args.location)
     if data then
@@ -424,10 +455,14 @@ end
 -- Player picked up a coin in MP — adjust wallet, remove coin, and sync back.
 Commands[Core.commands.consumeCoin] = function(playerObj, args)
     local itemType = args and args.itemType
-    if not itemType or not Core.wallet:isCurrency(itemType) then return end
+    if not itemType or not Core.wallet:isCurrency(itemType) then
+        return
+    end
 
     local adjusted = Core.wallet:adjust(playerObj, itemType, 1)
-    if not adjusted then return end
+    if not adjusted then
+        return
+    end
     Core.wallet:save()
 
     -- Remove one coin of this type from player inventory
@@ -445,10 +480,15 @@ Commands[Core.commands.consumeCoin] = function(playerObj, args)
     })
 end
 
--- Player picked up a DroppedWallet in MP — merge balances, remove item, and sync back.
+-- Player picked up a DroppedWallet in MP — merge balances, remove the specific
+-- item by its ID, and sync back. B42 is server-authoritative so removal MUST
+-- happen server-side. Using getFirstTypeRecurse picks an arbitrary wallet and
+-- leaves ghosts on repeat pickups; getItemById matches the exact one.
 Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
     local walletData = args and args.walletData
-    if not walletData then return end
+    if not walletData then
+        return
+    end
 
     for _, entry in ipairs(walletData) do
         if entry.pool and entry.amount and entry.amount > 0 then
@@ -463,10 +503,15 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
 
     Core.wallet:save()
 
-    -- Remove the dropped wallet item from player inventory
     local inv = playerObj:getInventory()
-    local walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
+    local walletItem = args.itemId and inv:getItemById(args.itemId)
+    print("consumeDroppedWallet: looking for item ID " .. tostring(args.itemId) .. ", found: " .. tostring(walletItem))
+    if not walletItem then
+        print("consumeDroppedWallet: item not found by ID, falling back to type search (may cause ghosts)")
+        walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
+    end
     if walletItem then
+        print("consumeDroppedWallet: removing item " .. walletItem:getFullType() .. " with ID " .. walletItem:getID())
         local container = walletItem:getContainer()
         container:Remove(walletItem)
         sendRemoveItemFromContainer(container, walletItem)
@@ -476,6 +521,54 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
         username = playerObj:getUsername(),
         wallet = Core.wallet:get(playerObj)
     })
+end
+
+-- Player-initiated wallet drop. Deducts from the player's wallet, spawns a
+-- DroppedWallet item at their square tagged so any player can pick it up.
+Commands[Core.commands.dropWallet] = function(playerObj, args)
+    if Core.getOption("AllowWalletDrop", true) == false then
+        return
+    end
+
+    local pool = args and args.pool
+    local amount = args and tonumber(args.amount)
+    if not pool or not amount or amount <= 0 then
+        return
+    end
+
+    local poolDef = Core.wallet.pools[pool]
+    if not poolDef or poolDef.bound then
+        return
+    end
+
+    local balance = Core.wallet:getBalance(playerObj, pool)
+    if amount > balance then
+        amount = balance
+    end
+    if amount <= 0 then
+        return
+    end
+
+    local square = playerObj:getSquare()
+    if not square then
+        return
+    end
+
+    Core.wallet:adjustByPool(playerObj, "current", pool, -amount)
+    Core.wallet:spawnDroppedItem(playerObj, square, {{
+        pool = pool,
+        amount = amount
+    }}, {
+        anyone = true
+    })
+    Core.wallet:save()
+
+    if not Core.isLocal then
+        sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
+            username = playerObj:getUsername(),
+            wallet = Core.wallet:get(playerObj)
+        })
+    end
 end
 
 Commands[Core.commands.addToWallet] = function(_, args)
@@ -520,7 +613,9 @@ Commands[Core.commands.reportKills] = function(playerObj, args)
 end
 
 Commands[Core.commands.getPlayerList] = function(player, args)
-    if not Core.utils.isAdmin(player) then return end
+    if not Core.utils.isAdmin(player) then
+        return
+    end
     local players = {}
     for k, v in pairs(Core.wallet.data) do
         table.insert(players, tostring(k))
@@ -531,14 +626,18 @@ Commands[Core.commands.getPlayerList] = function(player, args)
 end
 
 Commands[Core.commands.getPlayersWallet] = function(player, args)
-    if not Core.utils.isAdmin(player) then return end
+    if not Core.utils.isAdmin(player) then
+        return
+    end
     sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
         wallet = Core.wallet:get(args.playername)
     })
 end
 
 Commands[Core.commands.adjustPlayerWallet] = function(player, args)
-    if not Core.utils.isAdmin(player) then return end
+    if not Core.utils.isAdmin(player) then
+        return
+    end
     Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
     local wallet = Core.wallet:get(args.playername)
     -- Update the admin editor
@@ -559,7 +658,9 @@ Commands[Core.commands.adjustPlayerWallet] = function(player, args)
 end
 
 Commands[Core.commands.requestPool] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local poolKey = args and args.poolKey
     if not poolKey then
         return
@@ -584,7 +685,9 @@ Commands[Core.commands.requestPool] = function(playerObj, args)
 end
 
 Commands[Core.commands.quickBlacklist] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local itemKey = args and args.itemKey
     if not itemKey then
         return
@@ -597,7 +700,9 @@ Commands[Core.commands.quickBlacklist] = function(playerObj, args)
 end
 
 Commands[Core.commands.blacklistInPool] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local poolKey = args and args.poolKey
     local itemKey = args and args.itemKey
     if not (poolKey and itemKey) then
@@ -608,7 +713,9 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     override[poolKey].blacklist = override[poolKey].blacklist or {}
     -- avoid duplicates
     for _, v in ipairs(override[poolKey].blacklist) do
-        if v == itemKey then return end
+        if v == itemKey then
+            return
+        end
     end
     table.insert(override[poolKey].blacklist, itemKey)
     Core.fileUtils.saveTable("PhunMart_Pools.lua", override)
@@ -616,7 +723,9 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
 end
 
 Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local poolKey = args and args.poolKey
     local offerId = args and args.offerId
     local weight = args and tonumber(args.weight)
@@ -637,7 +746,9 @@ Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
 end
 
 Commands[Core.commands.moveOffers] = function(playerObj, args)
-    if not Core.utils.isAdmin(playerObj) then return end
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
     local fromPool = args and args.fromPool
     local toPool = args and args.toPool
     local offerIds = args and args.offerIds
