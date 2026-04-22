@@ -52,7 +52,9 @@ function ServerSystem.addToWorld(square, shop, direction)
     end
     local c = Core
     local sprite = c.shops[shop].sprites[index]
-    local isoObject = IsoThumpable.new(square:getCell(), square, sprite, false, {})
+    -- Plain IsoObject (not IsoThumpable): zombies ignore it and it can't be
+    -- destroyed. Admin pickup/relocate goes through transmitRemoveItemFromSquare.
+    local isoObject = IsoObject.new(square:getCell(), square, sprite)
     ServerSystem.initializeShopObject(isoObject)
     square:AddSpecialObject(isoObject, -1)
     triggerEvent("OnObjectAdded", isoObject)
@@ -492,48 +494,118 @@ function ServerSystem:checkObjectAdded(obj)
     end
 end
 
+-- One-time in-place upgrade: pre-existing shops from older saves are backed by
+-- IsoThumpable (destroyable). Swap the backing iso for a plain IsoObject while
+-- preserving offers/lastRestock so the shop keeps its inventory across the swap.
+function ServerSystem:upgradeThumpableShop(square, obj)
+    local oldData = obj:getModData() or {}
+    local saved = {
+        created = oldData.created,
+        lastRestock = oldData.lastRestock,
+        offers = oldData.offers
+    }
+    local customName = obj:getSprite():getProperties():get("CustomName")
+    local facing = obj:getFacing()
+
+    local x, y, z = obj:getX(), obj:getY(), obj:getZ()
+    local oldLua = self:getLuaObjectAt(x, y, z)
+    if oldLua then
+        self:removeLuaObject(oldLua)
+    end
+
+    -- Full teardown: transmitRemoveItemFromSquare alone only networks the
+    -- removal; the IsoThumpable's physics body and AI blocker stay attached,
+    -- so on the next chunk reload the serialized thumpable comes back and a
+    -- new physics body stacks on top ("Too many physics objects" error). The
+    -- admin Remove Item tool does this 4-step dance for the same reason.
+    square:transmitRemoveItemFromSquare(obj)
+    square:RemoveTileObject(obj)
+    if obj.removeFromWorld then
+        obj:removeFromWorld()
+    end
+    if obj.removeFromSquare then
+        obj:removeFromSquare()
+    end
+    if obj.setSquare then
+        obj:setSquare(nil)
+    end
+    square:RecalcAllWithNeighbours(true)
+
+    ServerSystem.addToWorld(square, customName, facing)
+
+    local newLua = self:getLuaObjectAt(x, y, z)
+    if newLua and saved.offers then
+        if saved.created then
+            newLua.created = saved.created
+        end
+        newLua.lastRestock = saved.lastRestock
+        newLua.offers = saved.offers
+        local newIso = newLua:getIsoObject()
+        if newIso then
+            newLua:toModData(newIso:getModData())
+            newIso:transmitModData()
+        end
+    end
+
+    Core.debugLn("upgradeThumpableShop: " .. tostring(customName) .. " at " .. x .. "," .. y .. "," .. z)
+end
+
 function ServerSystem:loadGridsquare(square)
 
     local objects = square:getObjects()
+    local existing = {}
+    local candidates = {}
+    local convertEnabled = (Core.settings.ChanceToConvert or 0) > 0
+
     for i = 0, objects:size() - 1 do
         local obj = objects:get(i)
-        -- is this sprite a shop
         local sprite = obj:getSprite()
         if sprite and sprite.getProperties then
-
             local customName = sprite:getProperties():get("CustomName")
-
             if customName and Core.shops[customName] then
-                -- PhunMart sprite: ensure it has backing global object data.
-                -- Recovers orphaned machines after a crash/restart without save.
-                self:checkObjectAdded(obj)
-
-            elseif Core.targetSprites[sprite:getName()] then
-                -- Vanilla vending machine sprite: try to auto-convert.
-                local modData = obj:getModData()
-                if not modData.PhunMart then
-                    modData.PhunMart = {}
-                end
-                if Core.settings.ChanceToConvert > 0 then
-                    local chance = ZombRand(100)
-                    if chance <= Core.settings.ChanceToConvert then
-                        local shopname = self:getRandomShop(square:getX(), square:getY())
-                        if shopname then
-                            local facing = obj:getFacing()
-                            -- hack around some incorrect facing data
-                            if sprite:getName() == "location_shop_accessories_01_31" or sprite:getName() ==
-                                "location_shop_accessories_01_29" then
-                                facing = IsoDirections.N
-                            end
-                            square:transmitRemoveItemFromSquare(obj)
-                            self.addToWorld(square, shopname, facing)
-                        end
-                    end
-                end
+                existing[#existing + 1] = obj
+            elseif convertEnabled and Core.targetSprites[sprite:getName()] and not obj:getModData().PhunMart then
+                -- Untested vanilla vending machine: eligible for one conversion roll.
+                candidates[#candidates + 1] = {
+                    obj = obj,
+                    sprite = sprite
+                }
             end
         end
-
     end
+
+    for _, obj in ipairs(existing) do
+        if instanceof(obj, "IsoThumpable") then
+            -- Legacy destroyable shop: upgrade in place to a plain IsoObject.
+            self:upgradeThumpableShop(square, obj)
+        else
+            -- PhunMart sprite already IsoObject: ensure backing global
+            -- object data. Recovers orphans after a crash/restart.
+            self:checkObjectAdded(obj)
+        end
+    end
+
+    for _, value in ipairs(candidates) do
+        local obj = value.obj
+        local sprite = value.sprite
+        -- Stamp the sentinel so future chunk loads skip this machine even if
+        -- the roll below fails. Otherwise we'd re-roll every load.
+        obj:getModData().PhunMart = {}
+        if ZombRand(100) <= Core.settings.ChanceToConvert then
+            local shopname = self:getRandomShop(square:getX(), square:getY())
+            if shopname then
+                local facing = obj:getFacing()
+                -- hack around some incorrect facing data
+                if sprite:getName() == "location_shop_accessories_01_31" or sprite:getName() ==
+                    "location_shop_accessories_01_29" then
+                    facing = IsoDirections.N
+                end
+                square:transmitRemoveItemFromSquare(obj)
+                self.addToWorld(square, shopname, facing)
+            end
+        end
+    end
+
 end
 
 function ServerSystem:OnClientCommand(command, playerObj, args)

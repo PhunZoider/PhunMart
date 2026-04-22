@@ -57,10 +57,13 @@ Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobject
     end
 end)
 
+-- Events.EveryOneMinute.Add(ConfigTiles)
+
 local function setup()
     Events.OnTick.Remove(setup)
     Core:ini()
     sendClientCommand(Core.name, Core.commands.playerSetup, {})
+
 end
 
 Events.OnTick.Add(setup)

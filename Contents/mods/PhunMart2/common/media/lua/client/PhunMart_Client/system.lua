@@ -14,7 +14,7 @@ function ClientSystem:new()
 end
 
 function ClientSystem:isValidIsoObject(isoObject)
-    return instanceof(isoObject, "IsoThumpable") and isoObject:getName() == "PhunMartVendingMachine"
+    return isoObject:getName() == "PhunMartVendingMachine"
 end
 
 function ClientSystem:newLuaObject(globalObject)
@@ -185,12 +185,6 @@ function ClientSystem:checkObjectAdded(obj)
     end
 end
 
-function ClientSystem:checkLocals()
-    for i = 1, self:getLuaObjectCount() do
-
-    end
-end
-
 function ClientSystem:prepareShopList(player)
     Core.ui.shop_selector.open(player or getSpecificPlayer(0))
 end
@@ -211,7 +205,3 @@ function ClientSystem:upsertShopDefinition(args, player)
 end
 
 CGlobalObjectSystem.RegisterSystemClass(Core.ClientSystem)
-
-Events.EveryOneMinute.Add(function()
-    Core.ClientSystem.instance:checkLocals()
-end)

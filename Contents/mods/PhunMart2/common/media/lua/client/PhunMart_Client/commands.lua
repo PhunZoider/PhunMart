@@ -128,11 +128,28 @@ Commands[Core.commands.onShopChange] = function(args)
     triggerEvent(Core.events.OnShopChange, args.key, args.data, args.replaced == true)
 end
 
+local function ConfigTiles()
+    local c = Core
+    print("Configuring shop sprites...")
+    if Core.utils.isAdmin(getSpecificPlayer(0)) then
+        return
+    end
+
+    for tileName, _ in pairs(c.spriteToShop) do
+        print("Configuring tile " .. tileName)
+        local tile = IsoSpriteManager.instance:getSprite(tileName)
+        local props = tile:getProperties()
+        props:unset("IsMoveAble")
+    end
+
+end
+
 Commands[Core.commands.syncPurchases] = function(arguments)
     Core.debug("syncPurchases", arguments)
 
     Core.purchases.histories = Core.purchases.histories or {}
     Core.purchases.histories[arguments.username] = arguments.history
+    ConfigTiles()
 end
 
 Commands[Core.commands.requestShop] = function(arguments)
