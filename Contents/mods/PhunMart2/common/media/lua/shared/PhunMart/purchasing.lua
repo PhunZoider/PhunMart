@@ -10,11 +10,12 @@ local Core = PhunMart
 --   { kind = "currency", pool = "tokens", amount = 1 }
 --   { kind = "items", items = {{ item = "Base.Bandage", amount = 2 }} }
 
-function Core:canAfford(player, price)
+function Core:canAfford(player, price, qty)
+    qty = qty or 1
     if price.kind == "free" then
         return true
     elseif price.kind == "currency" then
-        return Core.wallet:getBalance(player, price.pool) >= price.amount
+        return Core.wallet:getBalance(player, price.pool) >= price.amount * qty
     elseif price.kind == "items" then
         for _, entry in ipairs(price.items or {}) do
             local count = player:getInventory():getItemCountRecurse(entry.item)
@@ -23,7 +24,7 @@ function Core:canAfford(player, price)
                     count = count + player:getInventory():getItemCountRecurse(sub)
                 end
             end
-            if count < entry.amount then
+            if count < entry.amount * qty then
                 return false
             end
         end
@@ -33,11 +34,11 @@ function Core:canAfford(player, price)
 end
 
 -- Check all prices in a list. Returns: allAffordable (bool), failures (list of price entries).
-function Core:canAffordAll(player, prices)
+function Core:canAffordAll(player, prices, qty)
     local result = true
     local failures = {}
     for _, price in ipairs(prices or {}) do
-        if not Core:canAfford(player, price) then
+        if not Core:canAfford(player, price, qty) then
             result = false
             table.insert(failures, price)
         end
@@ -63,8 +64,8 @@ end
 
 -- Validates all prices first, then deducts all. Will not partially deduct.
 -- Returns: success (bool), failures (list of unaffordable price entries).
-function Core:deductAll(player, prices)
-    local canAfford, failures = Core:canAffordAll(player, prices)
+function Core:deductAll(player, prices, qty)
+    local canAfford, failures = Core:canAffordAll(player, prices, qty)
     if not canAfford then
         return false, failures
     end

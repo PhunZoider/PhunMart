@@ -193,9 +193,34 @@ Commands[Core.commands.buy] = function(playerObj, args)
     -- Affordability + deduct
     local price = offer.price
     if price and price.kind ~= "free" then
-        local ok = Core:deductAll(playerObj, {price})
+        local ok = Core:deductAll(playerObj, {price}, qty)
         if not ok then
             return fail("InsufficientFunds")
+        end
+        -- For item-based prices the server must remove items authoritatively;
+        -- client-side removal is optimistic only and does not survive a relog.
+        if price.kind == "items" then
+            local inv = playerObj:getInventory()
+            for _, entry in ipairs(price.items or {}) do
+                local remaining = entry.amount * qty
+                local sources = {entry.item}
+                if entry.substitutes then
+                    for _, sub in ipairs(entry.substitutes) do
+                        table.insert(sources, sub)
+                    end
+                end
+                for _, itemType in ipairs(sources) do
+                    while remaining > 0 do
+                        local item = inv:getFirstTypeRecurse(itemType)
+                        if not item then break end
+                        local container = item:getContainer()
+                        container:Remove(item)
+                        sendRemoveItemFromContainer(container, item)
+                        remaining = remaining - 1
+                    end
+                    if remaining <= 0 then break end
+                end
+            end
         end
     end
 
