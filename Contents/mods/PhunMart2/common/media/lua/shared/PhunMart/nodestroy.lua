@@ -23,6 +23,9 @@ end
 
 local oldDestroyStuffAction = ISDestroyStuffAction["isValid"]
 ISDestroyStuffAction["isValid"] = function(self)
+    if Core.utils.isAdmin(getSpecificPlayer(0)) then
+        return oldDestroyStuffAction(self)
+    end
     local target = self.item
     local square = target and target.getSquare and target:getSquare()
     if not square and self.character then
@@ -37,6 +40,9 @@ end
 if ISDestroyCursor then
     local oldISDestroyIsValid = ISDestroyCursor.isValid
     function ISDestroyCursor:isValid(square)
+        if Core.utils.isAdmin(getSpecificPlayer(0)) then
+            return oldISDestroyIsValid(self, square)
+        end
         if squareHasShopSprite(square) then
             return false
         end
