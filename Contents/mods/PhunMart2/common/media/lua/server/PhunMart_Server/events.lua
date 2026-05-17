@@ -15,7 +15,16 @@ Events.LoadGridsquare.Add(function(square)
 end)
 
 Events.OnCharacterDeath.Add(function(character)
+
     if not instanceof(character, "IsoPlayer") then
+        return
+    end
+
+    -- instanceof("IsoPlayer") also matches IsoAnimal in current B42 builds, so check exact class
+    local ok, cls = pcall(function()
+        return character:getClass():getSimpleName()
+    end)
+    if not ok or cls ~= "IsoPlayer" then
         return
     end
 
