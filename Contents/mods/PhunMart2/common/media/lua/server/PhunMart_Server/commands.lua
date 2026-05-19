@@ -528,15 +528,30 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
 
     Core.wallet:save()
 
+    -- Race condition: the client fires onComplete when the client-side transfer
+    -- animation ends, but the server may not have processed the transfer packet
+    -- yet. Search inventory first, then the floor at the player's square (where
+    -- the wallet was just picked up from), then fall back to type search.
     local inv = playerObj:getInventory()
     local walletItem = args.itemId and inv:getItemById(args.itemId)
-    print("consumeDroppedWallet: looking for item ID " .. tostring(args.itemId) .. ", found: " .. tostring(walletItem))
+    if not walletItem and args.itemId then
+        local sq = playerObj:getSquare()
+        local floorContainer = sq and sq:getItemContainer()
+        if floorContainer then
+            local items = floorContainer:getItems()
+            for i = 0, items:size() - 1 do
+                local it = items:get(i)
+                if tostring(it:getID()) == tostring(args.itemId) then
+                    walletItem = it
+                    break
+                end
+            end
+        end
+    end
     if not walletItem then
-        print("consumeDroppedWallet: item not found by ID, falling back to type search (may cause ghosts)")
         walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
     end
     if walletItem then
-        print("consumeDroppedWallet: removing item " .. walletItem:getFullType() .. " with ID " .. walletItem:getID())
         local container = walletItem:getContainer()
         container:Remove(walletItem)
         sendRemoveItemFromContainer(container, walletItem)

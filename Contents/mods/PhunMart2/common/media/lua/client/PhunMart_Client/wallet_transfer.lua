@@ -45,6 +45,13 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
 
     if wallet and wallet.wallet then
         action:setOnComplete(function()
+            -- Only process if the destination is the player's own inventory.
+            -- Moving it between floor/external containers must not grant currency.
+            -- item:getContainer() is unreliable at onComplete time in B42 MP
+            -- (client state lags server sync), so check destContainer instead.
+            if destContainer ~= player:getInventory() then
+                return
+            end
             if Core.isLocal then
                 -- SP: merge dropped wallet pool balances locally, respecting caps.
                 for _, entry in ipairs(wallet.wallet or {}) do
@@ -59,10 +66,6 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                 end
                 consumeItem(item)
             else
-                local container = destContainer
-                if container then
-                    container:DoRemoveItem(item)
-                end
                 -- MP: B42 is server-authoritative for inventory state, so the
                 -- server must remove the item. Pass the exact item ID so it
                 -- can look up this specific wallet (getFirstTypeRecurse picks
