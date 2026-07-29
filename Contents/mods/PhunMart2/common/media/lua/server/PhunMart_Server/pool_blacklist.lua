@@ -12,9 +12,17 @@ local function mergeBlacklists(base, override)
     local baseEx = type(base) == "table" and type(base.items) == "table" and base.items.exclude or {}
     local overEx = type(override) == "table" and type(override.items) == "table" and override.items.exclude or {}
     local merged = {}
-    for k, v in pairs(baseEx) do merged[k] = v end
-    for k, v in pairs(overEx) do merged[k] = v end
-    return { items = { exclude = merged } }
+    for k, v in pairs(baseEx) do
+        merged[k] = v
+    end
+    for k, v in pairs(overEx) do
+        merged[k] = v
+    end
+    return {
+        items = {
+            exclude = merged
+        }
+    }
 end
 
 -- Load and cache the built-in defaults once.
@@ -28,7 +36,7 @@ end
 
 function Core.getBlacklist(refresh)
     if blacklistData == nil or refresh then
-        local override = Core.fileUtils.loadTable("PhunMart_Blacklist.lua") or {}
+        local override = Core.fileUtils.loadTable("PhunMart_Blacklist.txt") or {}
         blacklistData = mergeBlacklists(getDefaults(), override)
     end
     return blacklistData
@@ -36,6 +44,6 @@ end
 
 function Core.setBlacklist(data)
     blacklistData = data or {}
-    Core.fileUtils.saveTable("PhunMart_Blacklist.lua", blacklistData)
+    Core.fileUtils.saveTable("PhunMart_Blacklist.txt", blacklistData)
 end
 

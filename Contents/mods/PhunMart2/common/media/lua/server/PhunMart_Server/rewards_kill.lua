@@ -1,4 +1,6 @@
-if isClient() then return end
+if isClient() then
+    return
+end
 
 require "PhunMart/core"
 local Core = PhunMart
@@ -6,7 +8,7 @@ local Core = PhunMart
 Core.killRewards = {}
 local R = Core.killRewards
 
-local SAVE_FILE = "PhunMart_KillTracking.lua"
+local SAVE_FILE = "PhunMart_KillTracking.txt"
 
 -- Persistent data loaded from / saved to SAVE_FILE.
 -- username → {
@@ -33,7 +35,9 @@ end
 -- In SP, getUsername() returns the character name which changes per playthrough,
 -- so we key on a constant to preserve progress across characters.
 function R:getPlayerData(username)
-    if Core.isLocal then username = 0 end
+    if Core.isLocal then
+        username = 0
+    end
     if not self.data[username] then
         self.data[username] = {
             zombieKills = 0,
@@ -42,9 +46,15 @@ function R:getPlayerData(username)
         }
     end
     local pd = self.data[username]
-    if not pd.zombieKills then pd.zombieKills = 0 end
-    if not pd.sprinterKills then pd.sprinterKills = 0 end
-    if not pd.claimed then pd.claimed = {} end
+    if not pd.zombieKills then
+        pd.zombieKills = 0
+    end
+    if not pd.sprinterKills then
+        pd.sprinterKills = 0
+    end
+    if not pd.claimed then
+        pd.claimed = {}
+    end
     return pd
 end
 
@@ -53,7 +63,9 @@ end
 -- milestones: array of { kills=N, rewards={{item,amount},...} }
 -- prefix: string used to key the claim record (e.g. "zombie" or "sprinter")
 local function checkMilestones(player, pd, milestones, count, prefix)
-    if not milestones then return end
+    if not milestones then
+        return
+    end
     local username = player:getUsername()
     for _, entry in ipairs(milestones) do
         if entry.kills and count >= entry.kills then
@@ -70,7 +82,8 @@ local function checkMilestones(player, pd, milestones, count, prefix)
             local multiple = math.floor(count / entry.everyKills)
             if pd.claimed[key] == nil then
                 pd.claimed[key] = multiple
-                Core.debugLn("[KillRewards] " .. username .. " initialized recurring baseline " .. key .. " at " .. multiple)
+                Core.debugLn("[KillRewards] " .. username .. " initialized recurring baseline " .. key .. " at " ..
+                                 multiple)
             elseif multiple > pd.claimed[key] then
                 local gained = multiple - pd.claimed[key]
                 pd.claimed[key] = multiple
@@ -89,8 +102,12 @@ end
 -- normal:   count of non-sprinter zombies killed this batch
 -- sprinter: count of sprinter zombies killed this batch
 function R:reportKills(player, normal, sprinter)
-    if not self.loaded then return end
-    if Core.getOption("EnableTokenPool") == false then return end
+    if not self.loaded then
+        return
+    end
+    if Core.getOption("EnableTokenPool") == false then
+        return
+    end
     local username = player:getUsername()
     local pd = self:getPlayerData(username)
 
@@ -105,7 +122,7 @@ function R:reportKills(player, normal, sprinter)
     -- Check milestones
     local cfg = Core.tokenRewardsCfg or {}
     if normal > 0 or sprinter > 0 then
-        checkMilestones(player, pd, cfg.zombieKills,   pd.zombieKills,   "zombie")
+        checkMilestones(player, pd, cfg.zombieKills, pd.zombieKills, "zombie")
         checkMilestones(player, pd, cfg.sprinterKills, pd.sprinterKills, "sprinter")
     end
 

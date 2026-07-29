@@ -75,9 +75,9 @@ Follow steps 1 and 2 from the quick start, but create one special per script nam
 with a single entry in Action Args. Then add all the resulting special keys to the group's
 **Specials (By key)** field. As many variants as you have, that many times through the flow.
 
-**Route B -- Edit `PhunMart_Specials.lua` directly**
+**Route B -- Edit `PhunMart_Specials.txt` directly**
 
-Create the file `Zomboid/Lua/PhunMart_Specials.lua` (or add to it if it already exists) and
+Create the file `Zomboid/Lua/PhunMart_Specials.txt` (or add to it if it already exists) and
 define one entry per variant:
 
 ```lua
@@ -104,7 +104,7 @@ return {
 ```
 
 Then add both keys to the group via the admin Groups editor (**Specials (By key)**), or in
-`PhunMart_Groups.lua`:
+`PhunMart_Groups.txt`:
 
 ```lua
 return {
@@ -153,6 +153,7 @@ The player is effectively left with a useless item and has already paid. There i
 refund.
 
 **To avoid this:**
+
 - Only add a vehicle mod's scripts while that mod is active on the server
 - If you remove a vehicle mod, remove the corresponding special and group entries at the same
   time so the offer stops appearing at restock
@@ -178,10 +179,10 @@ When a player buys a vehicle offer:
 
 | What                   | File                                                   |
 | ---------------------- | ------------------------------------------------------ |
-| Price tiers            | `defaults/prices.lua`                                  |
-| Special definitions    | `defaults/specials.lua` (VEHICLES section)             |
-| Group definitions      | `defaults/groups.lua` (WrentAWreck section)            |
-| Pool→group wiring      | `defaults/pools.lua`                                   |
-| Shop→pool wiring       | `defaults/shops.lua` (`WrentAWreck.poolSets`)          |
-| Spawn logic (server)   | `server/PhunMart_Server/main.lua` (`grantReward`)      |
-| Key use logic (client) | `client/PhunMart_Client/commands.lua` (`spawnVehicle`) |
+| Price tiers            | `defaults/prices.txt`                                  |
+| Special definitions    | `defaults/specials.txt` (VEHICLES section)             |
+| Group definitions      | `defaults/groups.txt` (WrentAWreck section)            |
+| Pool→group wiring      | `defaults/pools.txt`                                   |
+| Shop→pool wiring       | `defaults/shops.txt` (`WrentAWreck.poolSets`)          |
+| Spawn logic (server)   | `server/PhunMart_Server/main.txt` (`grantReward`)      |
+| Key use logic (client) | `client/PhunMart_Client/commands.txt` (`spawnVehicle`) |

@@ -171,6 +171,6 @@ return {
         }
     }
 
-    -- XP and boost offer items are defined in PhunMart_XP_Items.lua (generated)
+    -- XP and boost offer items are defined in PhunMart_XP_Items.txt (generated)
 
 }

@@ -72,9 +72,9 @@ function Core.purchases:getCount(scope, username, charId, key, windowSeconds)
 end
 
 function Core.purchases:load()
-    self.histories = Core.fileUtils.loadTable("PhunMart_Purchases.lua")
+    self.histories = Core.fileUtils.loadTable("PhunMart_Purchases.txt")
 end
 
 function Core.purchases:save()
-    Core.fileUtils.saveTable("PhunMart_Purchases.lua", self.histories or {})
+    Core.fileUtils.saveTable("PhunMart_Purchases.txt", self.histories or {})
 end

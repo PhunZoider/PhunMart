@@ -13,7 +13,7 @@
 --   Currency items (PhunMart.Token, PhunMart.Nickel, etc.) are credited directly
 --   to the player wallet. All other items are spawned into inventory.
 --
--- To override: place PhunMart_TokenRewards.lua in your server Lua folder.
+-- To override: place PhunMart_TokenRewards.txt in your server Lua folder.
 -- The override file is loaded in full (not merged), so copy and modify this file.
 return {
     -- playtime: one-time milestone rewards at cumulative online time thresholds.

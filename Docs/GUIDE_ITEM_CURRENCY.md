@@ -52,7 +52,7 @@ child price becomes an item-barter cost instead of a wallet deduction.
 
 ## Override file
 
-If you prefer to set this up outside the game, create or edit `PhunMart_Prices.lua` in your
+If you prefer to set this up outside the game, create or edit `PhunMart_Prices.txt` in your
 server's `Zomboid/Lua/` folder:
 
 ```lua

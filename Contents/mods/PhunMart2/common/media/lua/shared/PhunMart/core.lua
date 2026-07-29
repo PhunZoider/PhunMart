@@ -3,7 +3,7 @@ PhunMart = {
     inied = false,
     consts = {
         shops = "PhunMart_Shops",
-        shopsLuaFile = "PhunMart_Shops.lua",
+        shopsLuaFile = "PhunMart_Shops.txt",
         players = "PhunMart_Players",
         history = "PhunMart_History",
         east = 0,
@@ -346,9 +346,13 @@ end
 -- Accepts bare names ("CarNormal") or full types ("Base.CarNormal").
 -- Returns true defensively when getScriptManager is unavailable (e.g. early init).
 function Core.vehicleScriptExists(scriptName)
-    if not getScriptManager then return true end
+    if not getScriptManager then
+        return true
+    end
     local sm = getScriptManager()
-    if not sm or not sm.getVehicle then return true end
+    if not sm or not sm.getVehicle then
+        return true
+    end
     local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
     return sm:getVehicle(fullType) ~= nil
 end
@@ -619,13 +623,14 @@ function Core.compileWith(overrides)
     end
 
     local ctx = {
-        prices         = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
-        specials       = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards"}, overrides.specials),
-        conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"}, overrides.conditionsDefs),
-        items          = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),
-        groups         = mergeCtx({"PhunMart/defaults/groups"}, overrides.groups),
-        pools          = mergeCtx({"PhunMart/defaults/pools"}, overrides.pools),
-        shops          = mergeCtx({"PhunMart/defaults/shops"}, overrides.shops),
+        prices = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
+        specials = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards"}, overrides.specials),
+        conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"},
+            overrides.conditionsDefs),
+        items = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),
+        groups = mergeCtx({"PhunMart/defaults/groups"}, overrides.groups),
+        pools = mergeCtx({"PhunMart/defaults/pools"}, overrides.pools),
+        shops = mergeCtx({"PhunMart/defaults/shops"}, overrides.shops)
     }
 
     local runtime, log = Core.compiler.compileAll(ctx)

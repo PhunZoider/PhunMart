@@ -1498,7 +1498,7 @@ return {
         }}
     }
 
-    -- XP rewards defined in PhunMart_XP_Rewards.lua (generated file)
+    -- XP rewards defined in PhunMart_XP_Rewards.txt (generated file)
     -- Each follows pattern: skill_<Perk>_t1, skill_<Perk>_t2, skill_<Perk>_t3
     -- and: boost_<Perk>_t1, boost_<Perk>_t2, boost_<Perk>_t3
 

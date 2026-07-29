@@ -32,37 +32,37 @@ Each concept is a named, reusable definition stored in its own override file. Re
 top-down shows how to design a shop; bottom-up shows how data flows at compile time.
 
 ```
-SHOP  (PhunMart_Shops.lua)
+SHOP  (PhunMart_Shops.txt)
   Machine sprite, pool sets, default pricing & roll count
   │
   └─► POOL SET  (defined inline on the shop)
         Roll count, default price for this shelf
         │
-        └─► POOL  (PhunMart_Pools.lua)
+        └─► POOL  (PhunMart_Pools.txt)
               Which groups to draw from; zone gating
               │
-              └─► GROUP  (PhunMart_Groups.lua)
+              └─► GROUP  (PhunMart_Groups.txt)
                     Which game items or specials to include; default price & weight
                     │
                     ├─► game item catalogue  (via `categories` or explicit `items`)
                     ├─► SPECIAL  (via `specialCategories` or explicit `specials`)
                     │
-                    └─► ITEM / OFFER  (PhunMart_Items.lua)
+                    └─► ITEM / OFFER  (PhunMart_Items.txt)
                           Per-offer overrides: price, weight, stock, conditions
                           │
-                          ├─► PRICE  (PhunMart_Prices.lua)
-                          └─► CONDITIONS  (PhunMart_Conditions.lua)
+                          ├─► PRICE  (PhunMart_Prices.txt)
+                          └─► CONDITIONS  (PhunMart_Conditions.txt)
 ```
 
-| Layer          | Override file             | Controls                                           |
-| -------------- | ------------------------- | -------------------------------------------------- |
-| **Shop**       | `PhunMart_Shops.lua`      | Sprite, pool sets, pricing, roll count, spawn rules |
-| **Pool**       | `PhunMart_Pools.lua`      | Which groups to draw from; zone gating              |
-| **Group**      | `PhunMart_Groups.lua`     | Which items or specials are eligible; default price |
-| **Special**    | `PhunMart_Specials.lua`   | What the player receives (trait, XP, vehicle, etc.) |
-| **Item/Offer** | `PhunMart_Items.lua`      | Per-offer weight, stock, price, conditions          |
-| **Price**      | `PhunMart_Prices.lua`     | Cost in change, tokens, or inventory items          |
-| **Condition**  | `PhunMart_Conditions.lua` | Who can buy it and how many times                   |
+| Layer          | Override file             | Controls                                            |
+| -------------- | ------------------------- | --------------------------------------------------- |
+| **Shop**       | `PhunMart_Shops.txt`      | Sprite, pool sets, pricing, roll count, spawn rules |
+| **Pool**       | `PhunMart_Pools.txt`      | Which groups to draw from; zone gating              |
+| **Group**      | `PhunMart_Groups.txt`     | Which items or specials are eligible; default price |
+| **Special**    | `PhunMart_Specials.txt`   | What the player receives (trait, XP, vehicle, etc.) |
+| **Item/Offer** | `PhunMart_Items.txt`      | Per-offer weight, stock, price, conditions          |
+| **Price**      | `PhunMart_Prices.txt`     | Cost in change, tokens, or inventory items          |
+| **Condition**  | `PhunMart_Conditions.txt` | Who can buy it and how many times                   |
 
 ---
 
@@ -77,7 +77,7 @@ below is a standalone override file you drop into `Zomboid/Lua/`. See
 Make all food shops cheaper. `currency_low` is the default price used by GoodPhoods --
 override just the `amount` field.
 
-`PhunMart_Prices.lua`
+`PhunMart_Prices.txt`
 
 ```lua
 return {
@@ -90,7 +90,7 @@ return {
 Prevent specific items from appearing in any shop. No recompile needed -- takes effect on
 next restock.
 
-`PhunMart_Items.lua`
+`PhunMart_Items.txt`
 
 ```lua
 return {
@@ -107,7 +107,7 @@ right-click an item → **Add to blacklist**.
 Add specific items to an existing group so they appear in that group's pools. This merges
 with the built-in list.
 
-`PhunMart_Groups.lua`
+`PhunMart_Groups.txt`
 
 ```lua
 return {
@@ -121,7 +121,7 @@ return {
 
 Require Carpentry 3+ to buy a specific item, and limit it to one purchase per player.
 
-`PhunMart_Conditions.lua`
+`PhunMart_Conditions.txt`
 
 ```lua
 return {
@@ -132,7 +132,7 @@ return {
 }
 ```
 
-`PhunMart_Items.lua`
+`PhunMart_Items.txt`
 
 ```lua
 return {
@@ -151,7 +151,7 @@ covers it in two steps using the in-game admin UI -- no Lua editing required.
 
 Make WrentAWreck restock weekly instead of using the server default.
 
-`PhunMart_Shops.lua`
+`PhunMart_Shops.txt`
 
 ```lua
 return {
@@ -173,16 +173,16 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 
 | Override file                | Patches                 |
 | ---------------------------- | ----------------------- |
-| `PhunMart_Prices.lua`        | Prices                  |
-| `PhunMart_Specials.lua`      | Specials                |
-| `PhunMart_Conditions.lua`    | Conditions              |
-| `PhunMart_Items.lua`         | Offer items             |
-| `PhunMart_XP_Items.lua`      | XP offer items          |
-| `PhunMart_XP_Conditions.lua` | XP conditions           |
-| `PhunMart_Groups.lua`        | Item groups             |
-| `PhunMart_Pools.lua`         | Pools                   |
-| `PhunMart_Shops.lua`         | Shops                   |
-| `PhunMart_TokenRewards.lua`  | Token reward milestones |
+| `PhunMart_Prices.txt`        | Prices                  |
+| `PhunMart_Specials.txt`      | Specials                |
+| `PhunMart_Conditions.txt`    | Conditions              |
+| `PhunMart_Items.txt`         | Offer items             |
+| `PhunMart_XP_Items.txt`      | XP offer items          |
+| `PhunMart_XP_Conditions.txt` | XP conditions           |
+| `PhunMart_Groups.txt`        | Item groups             |
+| `PhunMart_Pools.txt`         | Pools                   |
+| `PhunMart_Shops.txt`         | Shops                   |
+| `PhunMart_TokenRewards.txt`  | Token reward milestones |
 
 **Deep merge rules:**
 
@@ -190,7 +190,7 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 - Arrays are replaced entirely (not merged element-by-element).
 - Setting a key to a new value in your override replaces it.
 - You only need to include the keys you want to change -- everything else stays as-is.
-- `PhunMart_TokenRewards.lua` is loaded in full (not merged) -- copy the whole file before editing.
+- `PhunMart_TokenRewards.txt` is loaded in full (not merged) -- copy the whole file before editing.
 
 Each override file must `return {}` with your changes as a Lua table.
 
@@ -198,7 +198,7 @@ Each override file must `return {}` with your changes as a Lua table.
 
 ## 4. Prices
 
-File: `PhunMart_Prices.lua`
+File: `PhunMart_Prices.txt`
 
 Named price definitions. Referenced by pool sets (as `price`) on shops, by groups (as `defaults.price`), and by individual offers (as `price`).
 
@@ -277,7 +277,7 @@ property to scale the entire price tree in one step. See the dedicated guide:
 
 ## 5. Specials
 
-File: `PhunMart_Specials.lua`
+File: `PhunMart_Specials.txt`
 
 Named special definitions -- non-item actions the player receives (traits, XP, boosts, vehicles).
 Supports inheritance via `inherit` to avoid repetition. Templates (`template = true`) are base
@@ -339,7 +339,7 @@ If `display.texture` is omitted for an item special, the game icon for that item
 
 ## 6. Conditions
 
-File: `PhunMart_Conditions.lua`
+File: `PhunMart_Conditions.txt`
 
 Named condition definitions. Referenced in offer `conditions` arrays and pool `defaults.conditions`.
 A condition is a named test applied server-side at purchase time and client-side for UI feedback.
@@ -385,7 +385,7 @@ See [Reference: condition tests](#13-reference-condition-tests) for all availabl
 
 ## 7. Items (Offers)
 
-File: `PhunMart_Items.lua`
+File: `PhunMart_Items.txt`
 
 Named offer definitions. These are the individual purchasable slots in a pool. Each offer
 links a `price`, a `reward` (special key), and optional `conditions` and `offer` behaviour.
@@ -447,7 +447,7 @@ Pool sets on shops supply a default `price` that applies to all offers rolled fr
 
 ## 8. Groups
 
-File: `PhunMart_Groups.lua`
+File: `PhunMart_Groups.txt`
 
 Groups define which game items or specials are eligible for a pool. For item-type shops the
 preferred approach is to source by **category** rather than listing items individually. A
@@ -540,7 +540,7 @@ return {
 
 ## 9. Pools
 
-File: `PhunMart_Pools.lua`
+File: `PhunMart_Pools.txt`
 
 Pools control which groups contribute to a shop shelf. They don't set pricing or roll counts
 -- those live on the pool set or shop (see [Shops](#10-shops)).
@@ -563,16 +563,16 @@ return {
 }
 ```
 
-| Field              | Description                                                                                                           |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `sources.groups`   | Array of Group keys to pull items/specials from                                                                       |
+| Field              | Description                                                                                                                                                       |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sources.groups`   | Array of Group keys to pull items/specials from                                                                                                                   |
 | `zones.difficulty` | Optional zone difficulty filter (0-5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). Checked at placement and restock. Omit for always-eligible. |
 
 ---
 
 ## 10. Shops
 
-File: `PhunMart_Shops.lua`
+File: `PhunMart_Shops.txt`
 
 Shops bind a machine sprite to one or more pools via **pool sets**. Each pool set merges its
 pools into one candidate list, then rolls a random subset.
@@ -622,16 +622,17 @@ return {
 | `background`       | PNG file name from `media/textures/` (no path prefix)                                          |
 | `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                          |
 | `unpoweredSprites` | Sprite names shown when machine is unpowered                                                   |
-| `defaultView`      | `"grid"` (default) or `"list"` -- layout mode for the shop UI                                   |
+| `defaultView`      | `"grid"` (default) or `"list"` -- layout mode for the shop UI                                  |
 | `roll`             | Default roll: `{ mode = "weighted", count = { min = N, max = M } }`. Overridable per pool set. |
 | `poolSets`         | Array of pool sets (see below)                                                                 |
 | `probability`      | Placement weight (default `1`). Set to `0` to disable auto-placement.                          |
-| `minDistance`       | Minimum tile gap from same shop type (overrides `DefaultDistance` sandbox setting)              |
+| `minDistance`      | Minimum tile gap from same shop type (overrides `DefaultDistance` sandbox setting)             |
 | `restockFrequency` | In-game hours between restocks (overrides server default)                                      |
 
 ### Pool sets
 
 Each pool set is an object with:
+
 - `keys` -- array of `{ key, weight }` pool references
 - `price` (optional) -- default price for all offers in this set
 - `roll` (optional) -- override roll count for this set
@@ -648,7 +649,7 @@ menu (e.g. BudgetXPerience merges XP and boost pools into one selection).
 
 ## 11. Token Rewards
 
-File: `PhunMart_TokenRewards.lua`
+File: `PhunMart_TokenRewards.txt`
 
 Controls when players automatically receive currency. This file is loaded in full -- copy the
 entire example file and edit it. It is not merged with defaults; your file replaces them.
@@ -821,7 +822,7 @@ seven override files.
 
 ### Step 1 -- Define prices
 
-`PhunMart_Prices.lua`
+`PhunMart_Prices.txt`
 
 ```lua
 return {
@@ -836,7 +837,7 @@ return {
 Only needed for non-item actions (trait grants, XP boosts, vehicle spawns). Regular items
 sourced from a group don't need a special entry.
 
-`PhunMart_Specials.lua`
+`PhunMart_Specials.txt`
 
 ```lua
 return {
@@ -850,7 +851,7 @@ return {
 
 ### Step 3 -- Define conditions (optional)
 
-`PhunMart_Conditions.lua`
+`PhunMart_Conditions.txt`
 
 ```lua
 return {
@@ -863,7 +864,7 @@ return {
 
 ### Step 4 -- Register the special as an offer
 
-`PhunMart_Items.lua`
+`PhunMart_Items.txt`
 
 ```lua
 return {
@@ -878,7 +879,7 @@ return {
 
 ### Step 5 -- Define the item group
 
-`PhunMart_Groups.lua`
+`PhunMart_Groups.txt`
 
 ```lua
 return {
@@ -895,7 +896,7 @@ return {
 
 ### Step 6 -- Define the pool
 
-`PhunMart_Pools.lua`
+`PhunMart_Pools.txt`
 
 ```lua
 return {
@@ -909,7 +910,7 @@ return {
 
 ### Step 7 -- Define the shop
 
-`PhunMart_Shops.lua`
+`PhunMart_Shops.txt`
 
 ```lua
 return {

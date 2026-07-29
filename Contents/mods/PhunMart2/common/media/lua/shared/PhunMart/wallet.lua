@@ -115,14 +115,18 @@ function Core.wallet:reset(player)
     for pool, def in pairs(self.pools) do
         local cur = w.current[pool] or 0
         if cur > 0 then
-            if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool, -cur) end
+            if Core.fileUtils then
+                Core.fileUtils.logTo(self.log, name, pool, -cur)
+            end
             w.current[pool] = 0
         end
         if def.bound then
             local boundAmt = w.bound[pool] or 0
             if boundAmt > 0 then
                 w.current[pool] = boundAmt
-                if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool, boundAmt) end
+                if Core.fileUtils then
+                    Core.fileUtils.logTo(self.log, name, pool, boundAmt)
+                end
             end
         end
     end
@@ -135,7 +139,9 @@ function Core.wallet:adjustByPool(player, walletType, pool, amount)
     local w = self:get(name)
     if w then
         w[walletType][pool] = (w[walletType][pool] or 0) + amount
-        if Core.fileUtils then Core.fileUtils.logTo(self.log, name, pool .. "(" .. walletType .. ")", amount) end
+        if Core.fileUtils then
+            Core.fileUtils.logTo(self.log, name, pool .. "(" .. walletType .. ")", amount)
+        end
     end
 end
 
@@ -174,7 +180,9 @@ function Core.wallet:adjust(player, item, amount)
         w.bound[pool] = (w.bound[pool] or 0) + toAdd
     end
 
-    if Core.fileUtils then Core.fileUtils.logTo(self.log, name, item, toAdd) end
+    if Core.fileUtils then
+        Core.fileUtils.logTo(self.log, name, item, toAdd)
+    end
 
     local atCap = cap ~= nil and (w.current[pool] >= cap)
     return true, atCap
@@ -255,14 +263,18 @@ end
 -- Survives server crashes between game saves.
 function Core.wallet:save()
     if Core.fileUtils then
-        Core.fileUtils.saveTable("PhunMart_Wallet.lua", self.data or {})
+        Core.fileUtils.saveTable("PhunMart_Wallet.txt", self.data or {})
     end
 end
 
 function Core.wallet:load()
-    if not Core.fileUtils then return end
-    local saved = Core.fileUtils.loadTable("PhunMart_Wallet.lua")
-    if not saved then return end
+    if not Core.fileUtils then
+        return
+    end
+    local saved = Core.fileUtils.loadTable("PhunMart_Wallet.txt")
+    if not saved then
+        return
+    end
     -- Merge file-backed data into ModData, preferring higher balances
     -- so a crash between file-save and game-save doesn't lose progress.
     if self.data == nil then

@@ -5,8 +5,8 @@
     Lua console (SP/debug):   PhunDump.run("all")   or   PhunDump.items() etc.
 
     Writes Lua-formatted dump files to:
-        Windows: C:\Users\<you>\Zomboid\Lua\PhunMart_dump_<name>.lua
-        Linux:   ~/Zomboid/Lua/PhunMart_dump_<name>.lua
+        Windows: C:\Users\<you>\Zomboid\Lua\PhunMart_dump_<name>.txt
+        Linux:   ~/Zomboid/Lua/PhunMart_dump_<name>.txt
 --]] PhunDump = {} -- global so Lua console can call it directly
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ local function print_chat(txt)
 end
 
 local function writeFile(name, lines)
-    local filename = "PhunMart_dump_" .. name .. ".lua"
+    local filename = "PhunMart_dump_" .. name .. ".txt"
     local ok, err = pcall(function()
         local writer = getFileWriter(filename, false, false)
         writer:write(table.concat(lines))

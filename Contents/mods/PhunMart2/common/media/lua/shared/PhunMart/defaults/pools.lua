@@ -216,7 +216,7 @@ return {
 
     -- =========================================================
     -- XPerience  (XP grants - one pool per tier, sources use reward category)
-    -- Defined in PhunMart_XP_Items.lua and PhunMart_XP_Conditions.lua
+    -- Defined in PhunMart_XP_Items.txt and PhunMart_XP_Conditions.txt
     --
     -- Zone difficulty gating (requires PhunZones):
     --   Zone 1       -> budget only          (+1 level grants)

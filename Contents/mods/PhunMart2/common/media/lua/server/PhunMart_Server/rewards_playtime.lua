@@ -8,7 +8,7 @@ local Core = PhunMart
 Core.playtimeRewards = {}
 local R = Core.playtimeRewards
 
-local SAVE_FILE = "PhunMart_PlaytimeTracking.lua"
+local SAVE_FILE = "PhunMart_PlaytimeTracking.txt"
 
 -- Persistent data loaded from / saved to SAVE_FILE.
 -- username → { totalMinutes = N, playtimeRewards = { ["60"] = lastMultiple, ... } }
@@ -55,7 +55,9 @@ end
 
 -- Check and grant any unclaimed playtime milestone rewards for a player.
 function R:checkPlaytimeRewards(player)
-    if Core.getOption("EnableTokenPool") == false then return end
+    if Core.getOption("EnableTokenPool") == false then
+        return
+    end
     local username = player:getUsername()
     local pd = self:getPlayerData(username)
     local cfg = Core.tokenRewardsCfg and Core.tokenRewardsCfg.playtime
@@ -71,7 +73,8 @@ function R:checkPlaytimeRewards(player)
             local key = "playtime_" .. tostring(threshold)
             if totalMinutes >= threshold and not pd.claimed[key] then
                 pd.claimed[key] = true
-                local label = math.floor(threshold / 60) > 0 and (math.floor(threshold / 60) .. "h playtime") or (threshold .. "m playtime")
+                local label = math.floor(threshold / 60) > 0 and (math.floor(threshold / 60) .. "h playtime") or
+                                  (threshold .. "m playtime")
                 for _, reward in ipairs(entry.rewards or {}) do
                     Core:grantConfigReward(player, reward, label)
                 end
@@ -83,7 +86,8 @@ function R:checkPlaytimeRewards(player)
             local multiple = math.floor(totalMinutes / interval)
             if pd.claimed[key] == nil then
                 pd.claimed[key] = multiple
-                Core.debugLn("[PlaytimeRewards] " .. username .. " initialized recurring baseline " .. key .. " at " .. multiple)
+                Core.debugLn("[PlaytimeRewards] " .. username .. " initialized recurring baseline " .. key .. " at " ..
+                                 multiple)
             elseif multiple > pd.claimed[key] then
                 local gained = multiple - pd.claimed[key]
                 pd.claimed[key] = multiple

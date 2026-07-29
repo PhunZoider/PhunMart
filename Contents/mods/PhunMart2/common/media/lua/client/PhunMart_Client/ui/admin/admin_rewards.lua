@@ -69,7 +69,9 @@ end
 ---------------------------------------------------------------------------
 
 local function resolveItemDisplay(itemKey)
-    if not itemKey then return getText("IGUI_PhunMart_Lbl_None") end
+    if not itemKey then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
     local si = getScriptManager():getItem(itemKey)
     return si and si:getDisplayName() or itemKey
 end
@@ -112,7 +114,9 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
     local selectedItems = {}
     if entry and entry.rewards then
         for _, r in ipairs(entry.rewards) do
-            if r.item then table.insert(selectedItems, r.item) end
+            if r.item then
+                table.insert(selectedItems, r.item)
+            end
         end
     end
 
@@ -121,8 +125,7 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
         amountDefault = tostring(entry.rewards[1].amount or 1)
     end
 
-    local titleText = isNew and getText("IGUI_PhunMart_Title_AddReward") or
-                          getText("IGUI_PhunMart_Title_EditReward")
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddReward") or getText("IGUI_PhunMart_Title_EditReward")
 
     local form = FormPanel:new({
         width = math.floor(380 * FONT_SCALE),
@@ -140,10 +143,15 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
 
             local rewards = {}
             for _, item in ipairs(items) do
-                table.insert(rewards, { item = item, amount = math.floor(amount) })
+                table.insert(rewards, {
+                    item = item,
+                    amount = math.floor(amount)
+                })
             end
 
-            local newEntry = { rewards = rewards }
+            local newEntry = {
+                rewards = rewards
+            }
             newEntry[thresholdKey(cat, recurring)] = math.floor(threshold)
 
             if cb then
@@ -151,7 +159,7 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
             end
 
             f:close()
-        end,
+        end
     })
 
     form:addComboField("category", getText("IGUI_PhunMart_Lbl_Category"), {
@@ -161,15 +169,15 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
         onChange = function(f)
             local cat = f:getFieldValue("category")
             updateThresholdHint(f, cat)
-        end,
+        end
     })
     form:addCheckField("recurring", getText("IGUI_PhunMart_Lbl_Recurring"), {
-        checked = recurringDefault,
+        checked = recurringDefault
     })
     form:addTextField("threshold", getText("IGUI_PhunMart_Lbl_Threshold"), {
         default = threshDefault,
         numbersOnly = true,
-        hint = " ",  -- placeholder; updated after initialise
+        hint = " " -- placeholder; updated after initialise
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Item"), {
         value = selectedItems,
@@ -179,12 +187,12 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
                 selectedItems = keys or {}
                 f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
             end)
-        end,
+        end
     })
     form:addTextField("amount", getText("IGUI_PhunMart_Lbl_RewardAmount"), {
         default = amountDefault,
         numbersOnly = true,
-        hint = getText("IGUI_PhunMart_Hint_RewardAmount"),
+        hint = getText("IGUI_PhunMart_Hint_RewardAmount")
     })
 
     form:initialise()
@@ -439,10 +447,14 @@ if Core.isLocal then
         Core.tokenRewardsCfg = args.cfg or {}
         -- In SP, also persist via fileUtils if available on the server side.
         if Core.fileUtils and Core.fileUtils.saveTable then
-            Core.fileUtils.saveTable("PhunMart_TokenRewards.lua", Core.tokenRewardsCfg)
+            Core.fileUtils.saveTable("PhunMart_TokenRewards.txt", Core.tokenRewardsCfg)
         end
-        if Core.playtimeRewards then Core.playtimeRewards:load() end
-        if Core.killRewards then Core.killRewards:load() end
+        if Core.playtimeRewards then
+            Core.playtimeRewards:load()
+        end
+        if Core.killRewards then
+            Core.killRewards:load()
+        end
         for _, instance in pairs(UI.instances or {}) do
             instance:setData(Core.tokenRewardsCfg)
         end
