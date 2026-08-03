@@ -537,6 +537,17 @@ function ServerObject:restock()
     local lastRestock = self.lastRestock or 0
     local times = math.floor((now - lastRestock) / frequency)
     self.lastRestock = lastRestock + (times * frequency)
+
+    -- Admin-forced restock: the grid-aligned lastRestock above can still land
+    -- before md.forceRestockAt (a shop only 10h into a 24h cycle keeps
+    -- lastRestock unchanged), so requiresRestock() would keep firing on every
+    -- open. Snap to now so this shop's forced restock counts as serviced. The
+    -- global stamp itself must stay set for shops still in unloaded chunks.
+    local md = ModData.getOrCreate("PhunMart")
+    if md.forceRestockAt and md.forceRestockAt > self.lastRestock then
+        self.lastRestock = now
+    end
+
     self:buildOffers()
     self:saveData() -- toModData + transmitModData → engine syncs offers to all clients
 end

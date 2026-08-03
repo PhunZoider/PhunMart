@@ -177,7 +177,10 @@ function ServerSystem:rerollAll()
 end
 
 function ServerSystem:restockAll()
-    local now = GameTime:getInstance():getWorldAgeHours()
+    -- Round to the same precision lastRestock persists at (numberToTens), so a
+    -- shop that services this stamp can't come back with a rounded-down
+    -- lastRestock that still looks older than the stamp.
+    local now = tonumber(string.format("%.1f", GameTime:getInstance():getWorldAgeHours()))
     -- Stamp global ModData so unloaded-chunk shops restock when their chunk loads
     local md = ModData.getOrCreate("PhunMart")
     md.forceRestockAt = now
