@@ -20,11 +20,9 @@ Events.OnCharacterDeath.Add(function(character)
         return
     end
 
-    -- instanceof("IsoPlayer") also matches IsoAnimal in current B42 builds, so check exact class
-    local ok, cls = pcall(function()
-        return character:getClass():getSimpleName()
-    end)
-    if not ok or cls ~= "IsoPlayer" then
+    -- instanceof("IsoPlayer") also matches IsoAnimal in current B42 builds, so reject animals
+    -- explicitly. isAnimal() is public on IsoGameCharacter and is not overridden by IsoAnimal.
+    if character:isAnimal() then
         return
     end
 

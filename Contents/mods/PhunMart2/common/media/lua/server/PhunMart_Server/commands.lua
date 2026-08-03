@@ -85,7 +85,7 @@ Commands[Core.commands.upsertGroupDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.txts", "groups", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.txt", "groups", args.key, args.def)
 end
 
 Commands[Core.commands.upsertItemDef] = function(playerObj, args)
