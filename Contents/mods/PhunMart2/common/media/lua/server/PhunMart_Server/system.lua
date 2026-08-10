@@ -602,6 +602,9 @@ function ServerSystem:loadGridsquare(square)
                 if sprite:getName() == "location_shop_accessories_01_31" or sprite:getName() ==
                     "location_shop_accessories_01_29" then
                     facing = IsoDirections.N
+                elseif sprite:getName() == "location_shop_accessories_01_28" or sprite:getName() ==
+                    "location_shop_accessories_01_30" then
+                    facing = IsoDirections.W
                 end
                 square:transmitRemoveItemFromSquare(obj)
                 self.addToWorld(square, shopname, facing)
