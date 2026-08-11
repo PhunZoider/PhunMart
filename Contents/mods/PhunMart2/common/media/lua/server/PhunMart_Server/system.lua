@@ -104,28 +104,41 @@ function ServerSystem:newLuaObject(globalObject)
     return Core.ServerObject:new(self, globalObject)
 end
 
+-- Map a facing string/enum (or targetSprites entry) to IsoDirections.
+-- Sprite orientation is the source of truth; getFacing() is often wrong on
+-- vanilla vending machines (e.g. east-facing sprites reporting north).
+local function facingToIsoDirection(f)
+    if f == nil then
+        return IsoDirections.N
+    end
+    if f == IsoDirections.E or f == IsoDirections.S or f == IsoDirections.W or f == IsoDirections.N then
+        return f
+    end
+    local s = string.lower(tostring(f))
+    if s == "e" or s == "east" then
+        return IsoDirections.E
+    end
+    if s == "s" or s == "south" then
+        return IsoDirections.S
+    end
+    if s == "w" or s == "west" then
+        return IsoDirections.W
+    end
+    return IsoDirections.N
+end
+
+-- Resolve a shop object's facing string/enum to an IsoDirections constant.
+local function resolveFacing(shopObj)
+    return facingToIsoDirection(shopObj.facing)
+end
+
 function ServerSystem:generateRandomShopOnSquare(square, direction)
-    direction = direction or "south"
+    direction = facingToIsoDirection(direction or "south")
     local shop = Core:generateShop(square)
     if shop ~= nil then
         square:transmitRemoveItemFromSquare(true)
         self.addToWorld(square, shop, direction)
     end
-end
-
--- Resolve a shop object's facing string/enum to an IsoDirections constant.
-local function resolveFacing(shopObj)
-    local f = shopObj.facing
-    if f == "E" or f == IsoDirections.E then
-        return IsoDirections.E
-    end
-    if f == "S" or f == IsoDirections.S then
-        return IsoDirections.S
-    end
-    if f == "W" or f == IsoDirections.W then
-        return IsoDirections.W
-    end
-    return IsoDirections.N
 end
 
 -- Build a shop payload table suitable for sending to clients or triggering events.
@@ -597,15 +610,9 @@ function ServerSystem:loadGridsquare(square)
         if ZombRand(100) <= Core.settings.ChanceToConvert then
             local shopname = self:getRandomShop(square:getX(), square:getY())
             if shopname then
-                local facing = obj:getFacing()
-                -- hack around some incorrect facing data
-                if sprite:getName() == "location_shop_accessories_01_31" or sprite:getName() ==
-                    "location_shop_accessories_01_29" then
-                    facing = IsoDirections.N
-                elseif sprite:getName() == "location_shop_accessories_01_28" or sprite:getName() ==
-                    "location_shop_accessories_01_30" then
-                    facing = IsoDirections.W
-                end
+                -- Prefer sprite→direction map; getFacing() often disagrees with
+                -- the actual tile art on vanilla/modded vending machines.
+                local facing = facingToIsoDirection(Core.targetSprites[sprite:getName()] or obj:getFacing())
                 square:transmitRemoveItemFromSquare(obj)
                 self.addToWorld(square, shopname, facing)
             end

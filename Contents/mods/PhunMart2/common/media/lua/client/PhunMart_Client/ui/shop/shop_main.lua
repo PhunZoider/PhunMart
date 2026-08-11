@@ -43,6 +43,11 @@ local FONT_MD = tools.FONT_HGT_MEDIUM
 local BASE_W = 480
 local BASE_H = 660
 
+-- Auto-close when the player leaves the machine or takes a hit (tiles²).
+-- Player stands on the front square (~1 tile); ~3 tiles covers a step away without
+-- closing on tiny movement, matching typical loot-window range.
+local CLOSE_DIST_SQ = 3 * 3
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Layout: all positions in BASE pixel coordinates (window = 480 × 660).
 -- Measured against machine-hard-wear.png stretched to fill that canvas.
@@ -844,6 +849,38 @@ end
 
 function UI:onKeyRelease(key)
     if key == Keyboard.KEY_ESCAPE then
+        self:close()
+    end
+end
+
+-- Close if the player walks away from the machine, dies, or gets hit.
+function UI:update()
+    ISPanel.update(self)
+    if not self:isVisible() then
+        return
+    end
+
+    local player = self.player
+    if not player or player:isDead() then
+        self:close()
+        return
+    end
+
+    local hit = player:getHitReaction()
+    if (hit and hit ~= "") or player:isKnockedDown() then
+        self:close()
+        return
+    end
+
+    local loc = self.data and self.data.location
+    if not loc then
+        return
+    end
+    if math.floor(player:getZ() + 0.5) ~= loc.z then
+        self:close()
+        return
+    end
+    if player:DistToSquared(loc.x + 0.5, loc.y + 0.5) > CLOSE_DIST_SQ then
         self:close()
     end
 end
