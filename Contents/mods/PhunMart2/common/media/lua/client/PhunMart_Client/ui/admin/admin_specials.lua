@@ -54,6 +54,8 @@ local function formatAction(def)
         return tostring(act.amount or 0) .. " tokens"
     elseif act.type == "adjustBalance" then
         return tostring(act.amount or 0) .. " " .. (act.pool or "change")
+    elseif act.type == "giveItem" then
+        return tostring(act.amount or 1) .. "x " .. (act.item or "?")
     end
     return act.type or ""
 end
@@ -62,7 +64,7 @@ end
 -- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
 
-local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens", "adjustBalance"}
+local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens", "adjustBalance", "giveItem"}
 local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector", "pawn"}
 
 local function getActionArgHint(actionType)
@@ -74,6 +76,8 @@ local function getActionArgHint(actionType)
         return getText("IGUI_PhunMart_Hint_TokenAmount")
     elseif actionType == "adjustBalance" then
         return getText("IGUI_PhunMart_Hint_ChangeAmount")
+    elseif actionType == "giveItem" then
+        return getText("IGUI_PhunMart_Hint_ItemAmount")
     end
     return ""
 end
@@ -175,7 +179,16 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
 
                 local actionType = f:getFieldValue("action")
                 local argText = f:getFieldValue("actionArg")
-                if actionType and argText ~= "" then
+                if actionType == "giveItem" then
+                    -- giveItem: item type is the required field; actionArg holds the
+                    -- per-purchase amount (defaults to 1 when blank/invalid).
+                    local itemType = f:getFieldValue("giveItemItem")
+                    if itemType and itemType ~= "" then
+                        local amt = tonumber(argText)
+                        amt = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
+                        result.actions = {{ type = "giveItem", item = itemType, amount = amt }}
+                    end
+                elseif actionType and argText ~= "" then
                     local action = { type = actionType }
                     if actionType == "addTrait" or actionType == "removeTrait" then
                         action.trait = argText
@@ -292,6 +305,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
             local actionType = f:getFieldValue("action")
             f:setHintText("actionArg", getActionArgHint(actionType))
             f:setGroupVisible("adjustBalance", actionType == "adjustBalance")
+            f:setGroupVisible("giveItem", actionType == "giveItem")
         end,
     })
     form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
@@ -303,6 +317,11 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         default = (curAction and curAction.pool) or "change",
         hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
         group = "adjustBalance",
+    })
+    form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
+        default = (curAction and curAction.item) or "",
+        hint = getText("IGUI_PhunMart_Hint_ItemKey"),
+        group = "giveItem",
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(), default = def.price or "",
@@ -328,12 +347,16 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         group = "instance",
     })
 
-    form:initialise()
-
-    -- Apply initial group visibility
+    -- Apply initial group visibility BEFORE initialise so the window height is
+    -- computed from only the visible fields. Done after initialise, the hidden
+    -- template/pool fields still count toward the height and the form opens too
+    -- tall until the first user-triggered reflow.
     form:setGroupVisible("template", isTpl)
     form:setGroupVisible("instance", not isTpl)
     form:setGroupVisible("adjustBalance", not isTpl and curActionType == "adjustBalance")
+    form:setGroupVisible("giveItem", not isTpl and curActionType == "giveItem")
+
+    form:initialise()
 
     form:addToUIManager()
     form:bringToTop()

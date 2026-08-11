@@ -45,8 +45,16 @@ function Core:grantReward(player, action, qty, context)
     local t = action.type
 
     if t == "giveItem" then
+        -- action.amount = items granted per purchase (defaults to 1); multiplied by
+        -- the purchase quantity. Lets a single action hand out a stack (e.g. physical
+        -- currency payouts) without repeating the entry N times.
+        local per = tonumber(action.amount) or 1
+        if per < 1 then
+            per = 1
+        end
+        local total = math.floor(per) * qty
         local inv = player:getInventory()
-        for i = 1, qty do
+        for i = 1, total do
             local item = inv:AddItem(action.item)
             if item then
                 sendAddItemToContainer(inv, item)

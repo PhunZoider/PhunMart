@@ -1164,18 +1164,43 @@ function UI:renderDetails(z)
 
     -- For collector/pawn offers, show what the player receives on the next line.
     if isCollector and offer.reward and offer.reward.actions then
+        local receiveText, receiveTex
+        -- Aggregate giveItem payouts of the same item so a single amount=N entry
+        -- (or several repeated entries) renders as one "Receive: Nx Item" line.
+        local giveItemName, giveItemTotal = nil, 0
         for _, action in ipairs(offer.reward.actions) do
             if action.type == "grantBoundTokens" then
-                local receiveText = getText("IGUI_PhunMart_ReceiveTokens", tostring(action.amount or 1))
-                self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
-                y = y + lh + 4
+                receiveText = getText("IGUI_PhunMart_ReceiveTokens", tostring(action.amount or 1))
                 break
             elseif action.type == "adjustBalance" then
-                local receiveText = getText("IGUI_PhunMart_ReceiveChange", fmtCents(action.amount or 0))
-                self:drawText(truncate(receiveText, maxW, UIFont.Small), x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
-                y = y + lh + 4
+                receiveText = getText("IGUI_PhunMart_ReceiveChange", fmtCents(action.amount or 0))
                 break
+            elseif action.type == "giveItem" and action.item then
+                giveItemName = giveItemName or action.item
+                if action.item == giveItemName then
+                    giveItemTotal = giveItemTotal + (tonumber(action.amount) or 1)
+                end
             end
+        end
+        if not receiveText and giveItemName then
+            local itemName = giveItemName
+            local si = getScriptManager and getScriptManager():FindItem(giveItemName)
+            if si then
+                itemName = si:getDisplayName() or itemName
+                receiveTex = si:getNormalTexture()
+            end
+            receiveText = getText("IGUI_PhunMart_ReceiveItems", tostring(giveItemTotal), itemName)
+        end
+        if receiveText then
+            local iconSz = lh - 3
+            local iconRoom = receiveTex and (iconSz + 4) or 0
+            local truncated = truncate(receiveText, maxW - iconRoom, UIFont.Small)
+            self:drawText(truncated, x, y, 0.85, 0.75, 0.20, 1, UIFont.Small)
+            if receiveTex then
+                local textW = getTextManager():MeasureStringX(UIFont.Small, truncated)
+                self:drawTextureScaledAspect(receiveTex, x + textW + 2, y, iconSz, iconSz, 1, 1, 1, 1)
+            end
+            y = y + lh + 4
         end
     end
 
