@@ -9,6 +9,8 @@ local Commands = {}
 
 -- itemId (string) → { vehicleScript, condition } — populated by spawnVehicle command
 Core._vehicleKeys = Core._vehicleKeys or {}
+-- itemId (string) → { animalType, animalBreed, animalSize } — populated by spawnAnimal command
+Core._animalTokens = Core._animalTokens or {}
 
 Commands[Core.commands.updateWallet] = function(args)
     local player = Core.utils.getPlayerByUsername(args.username)
@@ -212,6 +214,17 @@ Commands[Core.commands.spawnVehicle] = function(args)
     end
 end
 
+-- Server sends this after granting an AnimalClaimToken.
+Commands[Core.commands.spawnAnimal] = function(args)
+    if args.itemId then
+        Core._animalTokens[args.itemId] = {
+            animalType = args.animalType,
+            animalBreed = args.animalBreed,
+            animalSize = args.animalSize
+        }
+    end
+end
+
 -- Right-click a VehicleKeySpawner to claim the vehicle.
 Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, ctx, items)
     for _, v in ipairs(items) do
@@ -235,6 +248,29 @@ Events.OnFillInventoryObjectContextMenu.Add(function(playerNum, ctx, items)
                     option.toolTip = ISToolTip:new()
                     option.toolTip:initialise()
                     option.toolTip.description = "You must be outside to claim a vehicle."
+                end
+            end
+        elseif item and item.getFullType and item:getFullType() == "PhunMart.AnimalClaimToken" then
+            local md = item:getModData()
+            local tokenData = Core._animalTokens[tostring(item:getID())]
+            local animalType = (md and md.animalType) or (tokenData and tokenData.animalType)
+            local animalBreed = (md and md.animalBreed) or (tokenData and tokenData.animalBreed)
+            if animalType and animalBreed then
+                local label = Core.getAnimalLabel and Core.getAnimalLabel(animalType, animalBreed) or
+                                  (animalType .. " (" .. animalBreed .. ")")
+                local player = getSpecificPlayer(playerNum)
+                local inBuilding = player and player:getSquare() and player:getSquare():getBuilding() ~= nil
+                local option = ctx:addOption("Release: " .. label, playerNum, function(pNum)
+                    sendClientCommand(Core.name, Core.commands.claimAnimal, {
+                        animalType = animalType,
+                        animalBreed = animalBreed
+                    })
+                end)
+                if inBuilding then
+                    option.notAvailable = true
+                    option.toolTip = ISToolTip:new()
+                    option.toolTip:initialise()
+                    option.toolTip.description = "You must be outside to release livestock."
                 end
             end
         end

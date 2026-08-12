@@ -430,6 +430,65 @@ Commands[Core.commands.claimVehicle] = function(playerObj, args)
     end
 end
 
+-- Player uses an AnimalClaimToken to spawn livestock at their square.
+Commands[Core.commands.claimAnimal] = function(playerObj, args)
+    local animalType = args.animalType
+    local animalBreed = args.animalBreed
+    if not animalType or not animalBreed then
+        return
+    end
+
+    local inv = playerObj:getInventory()
+    local allItems = inv.getAllItemsRecurse and inv:getAllItemsRecurse() or inv:getItems()
+    local tokenItem = nil
+    for i = 0, allItems:size() - 1 do
+        local item = allItems:get(i)
+        if item:getFullType() == "PhunMart.AnimalClaimToken" then
+            local md = item:getModData()
+            if md and md.animalType == animalType and md.animalBreed == animalBreed then
+                tokenItem = item
+                break
+            end
+        end
+    end
+
+    if not tokenItem then
+        Core.debugLn("claimAnimal: no matching token for '" .. animalType .. "/" .. animalBreed .. "' in inventory")
+        return
+    end
+
+    if not Core.animalTypeExists(animalType) or not Core.animalBreedExists(animalType, animalBreed) then
+        Core.debugLn("claimAnimal: invalid animal '" .. animalType .. "/" .. animalBreed .. "'")
+        return
+    end
+
+    local square = playerObj:getSquare()
+    if not square then
+        return
+    end
+
+    local breedObj = animalBreed
+    local ok, def = pcall(function()
+        return AnimalDefinitions.getDef and AnimalDefinitions.getDef(animalType)
+    end)
+    if ok and def and def.getBreedByName then
+        local resolved = def:getBreedByName(animalBreed)
+        if resolved then
+            breedObj = resolved
+        end
+    end
+
+    local animal = addAnimal(getCell(), square:getX(), square:getY(), square:getZ(), animalType, breedObj, false)
+    if animal then
+        animal:addToWorld()
+        local tokenContainer = tokenItem:getContainer()
+        tokenContainer:Remove(tokenItem)
+        sendRemoveItemFromContainer(tokenContainer, tokenItem)
+    else
+        Core.debugLn("claimAnimal: addAnimal failed for '" .. animalType .. "/" .. animalBreed .. "'")
+    end
+end
+
 Commands[Core.commands.requestLocations] = function(playerObj, args)
     local locations = Core.ServerSystem.instance:getShopLocations(args.key)
     sendServerCommand(playerObj, Core.name, Core.commands.requestLocations, {

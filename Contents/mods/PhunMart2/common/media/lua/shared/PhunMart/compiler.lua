@@ -552,9 +552,13 @@ local function itemExists(itemType)
 end
 
 local function vehicleExists(scriptName)
-    if not getScriptManager then return true end
+    if not getScriptManager then
+        return true
+    end
     local sm = getScriptManager()
-    if not sm or not sm.getVehicle then return true end
+    if not sm or not sm.getVehicle then
+        return true
+    end
     local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
     return sm:getVehicle(fullType) ~= nil
 end
@@ -746,9 +750,9 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     end
 
     -- conditions merge (AND): pool → group → special → item
-    merged.conditions = mergeConditions(mergeConditions(mergeConditions(poolDef.defaults and poolDef.defaults.conditions,
-        groupDef and groupDef.defaults and groupDef.defaults.conditions),
-        specialDef and specialDef.conditions or nil),
+    merged.conditions = mergeConditions(mergeConditions(mergeConditions(
+        poolDef.defaults and poolDef.defaults.conditions,
+        groupDef and groupDef.defaults and groupDef.defaults.conditions), specialDef and specialDef.conditions or nil),
         itemDef and itemDef.conditions)
 
     merged.offer = normalizeOffer(merged.offer)
@@ -885,16 +889,50 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
                     if #invalidScripts > 0 then
                         if #validScripts == 0 then
                             logger:warn("Offer '" .. offerId .. "': no valid vehicle scripts found (" ..
-                                table.concat(invalidScripts, ", ") ..
-                                ") -- offer disabled (mod may not be loaded)")
+                                            table.concat(invalidScripts, ", ") ..
+                                            ") -- offer disabled (mod may not be loaded)")
                             return offerId, nil
                         else
                             logger:warn("Offer '" .. offerId .. "': vehicle script(s) not found, removed from pool: " ..
-                                table.concat(invalidScripts, ", "))
+                                            table.concat(invalidScripts, ", "))
                             action.scripts = validScripts
                             action.script = nil
                         end
                     end
+                end
+            end
+
+            -- Validate animal type/breed against AnimalDefinitions.
+            if action.type == "spawnAnimal" then
+                local animalType = action.animal or action.typeAnimal
+                local breed = action.breed
+                local invalid = false
+                if animalType and breed then
+                    if Core.animalTypeExists and not Core.animalTypeExists(animalType) then
+                        invalid = true
+                    elseif Core.animalBreedExists and not Core.animalBreedExists(animalType, breed) then
+                        invalid = true
+                    end
+                elseif type(action.animals) == "table" and #action.animals > 0 then
+                    local anyValid = false
+                    for _, e in ipairs(action.animals) do
+                        local a = e.animal or e.type
+                        local b = e.breed
+                        if a and b and Core.animalTypeExists and Core.animalTypeExists(a) and Core.animalBreedExists and
+                            Core.animalBreedExists(a, b) then
+                            anyValid = true
+                            break
+                        end
+                    end
+                    invalid = not anyValid
+                else
+                    invalid = true
+                end
+                if invalid then
+                    logger:warn(
+                        "Offer '" .. offerId .. "': invalid animal definition (" .. tostring(animalType) .. "/" ..
+                            tostring(breed) .. ") -- offer disabled")
+                    return offerId, nil
                 end
             end
         end
@@ -909,7 +947,8 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
         conditions = offerConditions,
         meta = {
             sourceGroup = groupDef and groupDef.__key or nil,
-            category = (groupDef and groupDef.label) or (groupDef and groupDef.fallbackCategory) or poolDef.fallbackCategory or nil,
+            category = (groupDef and groupDef.label) or (groupDef and groupDef.fallbackCategory) or
+                poolDef.fallbackCategory or nil,
             fallbackTexture = (groupDef and groupDef.fallbackTexture) or poolDef.fallbackTexture or nil
         }
     }
@@ -1013,7 +1052,8 @@ function Compiler.compileAll(ctx)
 
             -- direct items (deprecated — use groups with 'items' field instead)
             if type(sources.items) == "table" then
-                logger:warn("Pool '" .. poolKey .. "' uses sources.items (deprecated). Use groups with 'items' field instead.")
+                logger:warn("Pool '" .. poolKey ..
+                                "' uses sources.items (deprecated). Use groups with 'items' field instead.")
                 for _, itemType in ipairs(sources.items) do
                     itemsSet[itemType] = itemsSet[itemType] or {
                         fromGroup = nil,
@@ -1024,7 +1064,8 @@ function Compiler.compileAll(ctx)
 
             -- specials-based items (deprecated — use groups with 'specialCategories' field instead)
             if type(sources.specials) == "table" then
-                logger:warn("Pool '" .. poolKey .. "' uses sources.specials (deprecated). Use groups with 'specialCategories' field instead.")
+                logger:warn("Pool '" .. poolKey ..
+                                "' uses sources.specials (deprecated). Use groups with 'specialCategories' field instead.")
                 local catSet = {}
                 for _, cat in ipairs(sources.specials) do
                     catSet[cat] = true
@@ -1104,11 +1145,13 @@ function Compiler.compileAll(ctx)
             if poolRuntime.sticky then
                 local maxSticky = (SandboxVars and SandboxVars.PhunMart and SandboxVars.PhunMart.MaxStickyItems) or 10
                 local count = 0
-                for _ in pairs(poolRuntime.offers) do count = count + 1 end
+                for _ in pairs(poolRuntime.offers) do
+                    count = count + 1
+                end
                 if count > maxSticky then
-                    logger:warn("Sticky pool '" .. poolKey .. "' has " .. count
-                        .. " offers (max " .. maxSticky .. "). Sticky pools should be small."
-                        .. " Increase MaxStickyItems in sandbox settings if this is intentional.")
+                    logger:warn("Sticky pool '" .. poolKey .. "' has " .. count .. " offers (max " .. maxSticky ..
+                                    "). Sticky pools should be small." ..
+                                    " Increase MaxStickyItems in sandbox settings if this is intentional.")
                 end
             end
         end

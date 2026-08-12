@@ -75,17 +75,16 @@ return {
                 weight = 1.0
             }
         },
-        items = {"Base.Crisps", "Base.Crisps2", "Base.Crisps3", "Base.Crisps4", "Base.TortillaChips",
-                 "Base.PorkRinds", "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses",
-                 "Base.CandyNovapops", "Base.Candycane", "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes",
-                 "Base.HardCandies", "Base.LicoriceBlack", "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy",
-                 "Base.Peppermint", "Base.RockCandy", "Base.CandyFruitSlices", "Base.CandyCaramels",
-                 "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy", "Base.Chocolate_Crackle",
-                 "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy", "Base.Chocolate_Smirkers",
-                 "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks", "Base.Chocolate_HeartBox",
-                 "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted", "Base.DoughnutJelly",
-                 "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle", "Base.SodaCan",
-                 "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza", "Base.PizzaWhole",
+        items = {"Base.Crisps", "Base.Crisps2", "Base.Crisps3", "Base.Crisps4", "Base.TortillaChips", "Base.PorkRinds",
+                 "Base.CandyCorn", "Base.CandyGummyfish", "Base.CandyMolasses", "Base.CandyNovapops", "Base.Candycane",
+                 "Base.GummyBears", "Base.GummyWorms", "Base.Jujubes", "Base.HardCandies", "Base.LicoriceBlack",
+                 "Base.LicoriceRed", "Base.Lollipop", "Base.MintCandy", "Base.Peppermint", "Base.RockCandy",
+                 "Base.CandyFruitSlices", "Base.CandyCaramels", "Base.Chocolate_Butterchunkers", "Base.Chocolate_Candy",
+                 "Base.Chocolate_Crackle", "Base.Chocolate_Deux", "Base.Chocolate_GalacticDairy",
+                 "Base.Chocolate_Smirkers", "Base.Chocolate_SnikSnak", "Base.Chocolate_RoysPBPucks",
+                 "Base.Chocolate_HeartBox", "Base.ChocoCakes", "Base.DoughnutChocolate", "Base.DoughnutFrosted",
+                 "Base.DoughnutJelly", "Base.DoughnutPlain", "Base.Pop", "Base.Pop2", "Base.Pop3", "Base.PopBottle",
+                 "Base.SodaCan", "Base.Hotdog", "Base.Hotdog_single", "Base.Burger", "Base.Pizza", "Base.PizzaWhole",
                  "Base.TVDinner", "Base.Corndog", "Base.FrenchFries", "Base.Fries", "Base.Frozen_FrenchFries",
                  "Base.TatoDots", "Base.Frozen_TatoDots", "Base.Crackers", "Base.GrahamCrackers", "Base.Popcorn",
                  "Base.Popsicle", "Base.Icecream", "Base.IcecreamSandwich", "Base.FudgeePop", "Base.GranolaBar",
@@ -221,8 +220,8 @@ return {
                 weight = 1.0
             }
         },
-        items = {"SutureNeedle", "SutureNeedleHolder", "Tweezers", "Forceps_Forged", "ScissorsBluntMedical",
-                 "Splint", "Pills", "PillsVitamins", "Stethoscope"}
+        items = {"SutureNeedle", "SutureNeedleHolder", "Tweezers", "Forceps_Forged", "ScissorsBluntMedical", "Splint",
+                 "Pills", "PillsVitamins", "Stethoscope"}
     },
 
     -- Tier 3: prescription/controlled drugs — rare in PZ loot, zone-gated to 2+.
@@ -351,6 +350,18 @@ return {
         categories = {"Animal"}
     },
 
+    -- Live livestock claim tokens (spawnAnimal specials)
+    animals_livestock = {
+        label = "Livestock",
+        fallbackTexture = "Item_TrapCage",
+        defaults = {
+            offer = {
+                weight = 1.0
+            }
+        },
+        specialCategories = {"animal"}
+    },
+
     trapping_gear = {
         defaults = {
             price = "currency_low",
@@ -402,8 +413,8 @@ return {
                 weight = 1.0
             }
         },
-        items = {"BookAiming1", "BookBlacksmith1", "BookButchering1", "BookCarpentry1", "BookCarving1",
-                 "BookCooking1", "BookElectrician1", "BookFancy1", "BookFarming1", "BookFirstAid1", "BookFishing1",
+        items = {"BookAiming1", "BookBlacksmith1", "BookButchering1", "BookCarpentry1", "BookCarving1", "BookCooking1",
+                 "BookElectrician1", "BookFancy1", "BookFarming1", "BookFirstAid1", "BookFishing1",
                  "BookFlintKnapping1", "BookForaging1", "BookGlassmaking1", "BookHusbandry1", "BookLongBlade1",
                  "BookMaintenance1", "BookMasonry1", "BookMechanic1", "BookMetalWelding1", "BookPottery1",
                  "BookReloading1", "BookTailoring1", "BookTracking1", "BookTrapping1"}
@@ -416,8 +427,8 @@ return {
                 weight = 1.0
             }
         },
-        items = {"BookAiming2", "BookBlacksmith2", "BookButchering2", "BookCarpentry2", "BookCarving2",
-                 "BookCooking2", "BookElectrician2", "BookFancy2", "BookFarming2", "BookFirstAid2", "BookFishing2",
+        items = {"BookAiming2", "BookBlacksmith2", "BookButchering2", "BookCarpentry2", "BookCarving2", "BookCooking2",
+                 "BookElectrician2", "BookFancy2", "BookFarming2", "BookFirstAid2", "BookFishing2",
                  "BookFlintKnapping2", "BookForaging2", "BookGlassmaking2", "BookHusbandry2", "BookLongBlade2",
                  "BookMaintenance2", "BookMasonry2", "BookMechanic2", "BookMetalWelding2", "BookPottery2",
                  "BookReloading2", "BookTailoring2", "BookTracking2", "BookTrapping2"}
@@ -430,8 +441,8 @@ return {
                 weight = 1.0
             }
         },
-        items = {"BookAiming3", "BookBlacksmith3", "BookButchering3", "BookCarpentry3", "BookCarving3",
-                 "BookCooking3", "BookElectrician3", "BookFancy3", "BookFarming3", "BookFirstAid3", "BookFishing3",
+        items = {"BookAiming3", "BookBlacksmith3", "BookButchering3", "BookCarpentry3", "BookCarving3", "BookCooking3",
+                 "BookElectrician3", "BookFancy3", "BookFarming3", "BookFirstAid3", "BookFishing3",
                  "BookFlintKnapping3", "BookForaging3", "BookGlassmaking3", "BookHusbandry3", "BookLongBlade3",
                  "BookMaintenance3", "BookMasonry3", "BookMechanic3", "BookMetalWelding3", "BookPottery3",
                  "BookReloading3", "BookTailoring3", "BookTracking3", "BookTrapping3"}
@@ -537,16 +548,15 @@ return {
         items = { -- Generic vans
         "Van", "VanSeats", "VanMail", "VanMechanic", "VanBuilder", "VanUtility", "VanRadio", "VanAmbulance",
         "VanSpiffo", -- Branded transit/work vans
-        "Van_Transit", "Van_Leather", "Van_CraftSupplies", "Van_VoltMojo", "Van_BugWipers", "Van_Masonry",
-        "Van_Glass", "Van_MassGenFac", "Van_LectroMax", "Van_Locksmith", "Van_KnoxDisti", "Van_Perfick_Potato",
+        "Van_Transit", "Van_Leather", "Van_CraftSupplies", "Van_VoltMojo", "Van_BugWipers", "Van_Masonry", "Van_Glass",
+        "Van_MassGenFac", "Van_LectroMax", "Van_Locksmith", "Van_KnoxDisti", "Van_Perfick_Potato",
         "Van_HeritageTailors", "Van_Blacksmith", -- Branded company vans
-        "VanKnoxCom", "VanMooreMechanics", "VanMetalworker", "VanMeltingPointMetal", "VanMetalheads",
-        "VanKorshunovs", "VanJonesFabrication", "VanDeerValley", "VanPluggedInElectrics", "VanOldMill",
-        "VanPennSHam", "VanMicheles", "VanGreenes", "VanGardenGods", "VanCarpenter", "VanGardener",
-        "VanRiversideFabrication", "VanOvoFarm", "VanLouisvilleLandscaping", "VanCoastToCoast",
-        "VanSchwabSheetMetal", "VanUncloggers", "VanTreyBaines", "VanPlattAuto", "VanMobileMechanics",
-        "VanBrewsterHarbin", "VanBeckmans", "VanMccoy", "VanJohnMcCoy", "VanKnobCreekGas", "VanFossoil",
-        "VanKerrHomes", "VanWPCarpentry", "VanRosewoodworking", -- Van seats variants
+        "VanKnoxCom", "VanMooreMechanics", "VanMetalworker", "VanMeltingPointMetal", "VanMetalheads", "VanKorshunovs",
+        "VanJonesFabrication", "VanDeerValley", "VanPluggedInElectrics", "VanOldMill", "VanPennSHam", "VanMicheles",
+        "VanGreenes", "VanGardenGods", "VanCarpenter", "VanGardener", "VanRiversideFabrication", "VanOvoFarm",
+        "VanLouisvilleLandscaping", "VanCoastToCoast", "VanSchwabSheetMetal", "VanUncloggers", "VanTreyBaines",
+        "VanPlattAuto", "VanMobileMechanics", "VanBrewsterHarbin", "VanBeckmans", "VanMccoy", "VanJohnMcCoy",
+        "VanKnobCreekGas", "VanFossoil", "VanKerrHomes", "VanWPCarpentry", "VanRosewoodworking", -- Van seats variants
         "VanSeats_Trippy", "VanSeats_Space", "VanSeats_Mural", "VanSeats_Creature", "VanSeats_LadyDelighter",
         "VanSeats_Valkyrie", "VanSeats_Prison", "VanSeatsAirportShuttle", "VanRadio_3N",
         -- Step vans (large cargo vans)
@@ -626,8 +636,8 @@ return {
                 weight = 1.0
             }
         },
-        items = {"Dice_00", "Dice_4", "Dice_6", "Dice_8", "Dice_10", "Dice_12", "Dice_20", "ToyCar", "ToyPlane",
-                 "Doll", "Yoyo", "Bricktoys", "Cube", "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox"}
+        items = {"Dice_00", "Dice_4", "Dice_6", "Dice_8", "Dice_10", "Dice_12", "Dice_20", "ToyCar", "ToyPlane", "Doll",
+                 "Yoyo", "Bricktoys", "Cube", "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox"}
     },
 
     -- Tier 1b: Curios — common collectibles and antiques (weight 5-100). Bring 2 → 1 token.
@@ -663,11 +673,10 @@ return {
         "Crystal", "Goblet_Silver", "Goblet_Gold", -- Character portraits (weight ~0.23 each)
         "BobPic", "CaseyPic", "ChrisPic", "HankPic", "JamesPic", "KatePic", "MariannePic", "CortmanPic",
         -- Rare wearables
-        "Hat_ArmyWWII", "Hat_Stovepipe_UncleSam", "Glasses_MonocleLeft", "Glasses_Cosmetic_MonocleLeft",
-        -- Novelties
+        "Hat_ArmyWWII", "Hat_Stovepipe_UncleSam", "Glasses_MonocleLeft", "Glasses_Cosmetic_MonocleLeft", -- Novelties
         "Necklace_Teeth", "KeyRing_Spiffos", "Lunchbox2", -- Halloween masks (weight ~2.4 each, seasonal)
-        "Hat_HalloweenMaskWitch", "Hat_HalloweenMaskVampire", "Hat_HalloweenMaskSkeleton",
-        "Hat_HalloweenMaskPumpkin", "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil", "Hat_Witch"}
+        "Hat_HalloweenMaskWitch", "Hat_HalloweenMaskVampire", "Hat_HalloweenMaskSkeleton", "Hat_HalloweenMaskPumpkin",
+        "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil", "Hat_Witch"}
     },
 
     -- Tier 3: Legendary — near-zero or zero spawn weight; event/admin drops. Bring 1 → 3 tokens.
@@ -683,8 +692,7 @@ return {
         "Jacket_LeatherWildRacoons", "Jacket_LeatherIronRodent", "Jacket_LeatherBarrelDogs",
         "Vest_Leather_WildRaccoons", "Vest_Leather_IronRodents", "Vest_Leather_BarrelDogs", "Vest_Leather_Biker",
         "Vest_Leather_Veteran", -- Ultra-rare event / loot (weight <0.01 or not in tables)
-        "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing",
-        "LargeMeteorite", -- Spiffo collectibles (zero spawn — admin/event only)
+        "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing", "LargeMeteorite", -- Spiffo collectibles (zero spawn — admin/event only)
         "SpiffoSuit", "Hat_Spiffo", "Hat_Jay", "Hat_GoldStar", "HobbyHorse", "Hat_Cowboy_Plastic",
         "Hat_BaseballCap_Spiffos", "Hat_BaseballCap_Spiffos_Reverse", "Hat_BaseballCap_SpiffosLogo",
         "Hat_BaseballCap_SpiffosLogo_Reverse", -- Racing keyrings (zero spawn — admin/event only)
@@ -842,7 +850,9 @@ return {
     pawn_core = {
         label = "Pawn - Cash",
         items = {"Base.Money"},
-        defaults = { reward = "change_payout_budget" }
+        defaults = {
+            reward = "change_payout_budget"
+        }
     }
 
 }

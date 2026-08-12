@@ -50,6 +50,8 @@ local function formatAction(def)
         return "-" .. (act.trait or "")
     elseif act.type == "spawnVehicle" then
         return "vehicle:" .. (act.script or (act.scripts and act.scripts[1]) or "")
+    elseif act.type == "spawnAnimal" then
+        return "animal:" .. tostring(act.animal or "?") .. "/" .. tostring(act.breed or "?")
     elseif act.type == "grantBoundTokens" then
         return tostring(act.amount or 0) .. " tokens"
     elseif act.type == "adjustBalance" then
@@ -64,14 +66,17 @@ end
 -- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
 
-local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "grantBoundTokens", "adjustBalance", "giveItem"}
-local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "collector", "pawn"}
+local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "spawnAnimal", "grantBoundTokens", "adjustBalance",
+                      "giveItem"}
+local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "animal", "collector", "pawn"}
 
 local function getActionArgHint(actionType)
     if actionType == "addTrait" or actionType == "removeTrait" then
         return getText("IGUI_PhunMart_Hint_TraitKey")
     elseif actionType == "spawnVehicle" then
         return getText("IGUI_PhunMart_Hint_ScriptNames")
+    elseif actionType == "spawnAnimal" then
+        return "type/breed (e.g. hen/rhodeisland)"
     elseif actionType == "grantBoundTokens" then
         return getText("IGUI_PhunMart_Hint_TokenAmount")
     elseif actionType == "adjustBalance" then
@@ -93,7 +98,9 @@ local function getPriceKeys()
         end
     end
     table.sort(sorted)
-    for _, k in ipairs(sorted) do table.insert(keys, k) end
+    for _, k in ipairs(sorted) do
+        table.insert(keys, k)
+    end
     return keys
 end
 
@@ -111,6 +118,8 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
             argDefault = curAction.script
         elseif curAction.scripts then
             argDefault = table.concat(curAction.scripts, ", ")
+        elseif curAction.animal and curAction.breed then
+            argDefault = curAction.animal .. "/" .. curAction.breed
         elseif curAction.amount then
             argDefault = tostring(curAction.amount)
         end
@@ -148,7 +157,9 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         title = titleText,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then return end
+            if not key or key == "" then
+                return
+            end
 
             local result = {}
             local tpl = f:getFieldValue("template")
@@ -164,8 +175,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 local ovl = f:getFieldValue("overlay")
                 if tex ~= "" or ovl ~= "" then
                     result.display = {}
-                    if tex ~= "" then result.display.texture = tex end
-                    if ovl ~= "" then result.display.overlay = ovl end
+                    if tex ~= "" then
+                        result.display.texture = tex
+                    end
+                    if ovl ~= "" then
+                        result.display.overlay = ovl
+                    end
                 end
             else
                 local inheritIdx = f._fieldsByKey["inherit"]._combo.selected
@@ -174,7 +189,9 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 end
                 local dispText = f:getFieldValue("displayText")
                 if dispText ~= "" then
-                    result.display = { text = dispText }
+                    result.display = {
+                        text = dispText
+                    }
                 end
 
                 local actionType = f:getFieldValue("action")
@@ -186,10 +203,16 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     if itemType and itemType ~= "" then
                         local amt = tonumber(argText)
                         amt = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
-                        result.actions = {{ type = "giveItem", item = itemType, amount = amt }}
+                        result.actions = {{
+                            type = "giveItem",
+                            item = itemType,
+                            amount = amt
+                        }}
                     end
                 elseif actionType and argText ~= "" then
-                    local action = { type = actionType }
+                    local action = {
+                        type = actionType
+                    }
                     if actionType == "addTrait" or actionType == "removeTrait" then
                         action.trait = argText
                     elseif actionType == "spawnVehicle" then
@@ -205,13 +228,26 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                         else
                             action.script = argText
                         end
+                    elseif actionType == "spawnAnimal" then
+                        local aType, aBreed = argText:match("^([^:/]+)%s*[:/]%s*(.+)$")
+                        if aType and aBreed then
+                            action.animal = aType:match("^%s*(.-)%s*$")
+                            action.breed = aBreed:match("^%s*(.-)%s*$")
+                            action.size = "medium"
+                        else
+                            return
+                        end
                     elseif actionType == "grantBoundTokens" then
                         local amt = tonumber(argText)
-                        if not amt then return end
+                        if not amt then
+                            return
+                        end
                         action.amount = math.floor(amt)
                     elseif actionType == "adjustBalance" then
                         local amt = tonumber(argText)
-                        if not amt then return end
+                        if not amt then
+                            return
+                        end
                         action.amount = math.floor(amt)
                         local poolVal = f:getFieldValue("pool")
                         action.pool = (poolVal and poolVal ~= "") and poolVal or "change"
@@ -231,11 +267,17 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 local stockMax = f:getFieldNumber("stockMax")
                 if weightVal or stockMin or stockMax then
                     result.offer = {}
-                    if weightVal then result.offer.weight = weightVal end
+                    if weightVal then
+                        result.offer.weight = weightVal
+                    end
                     if stockMin or stockMax then
                         result.offer.stock = {}
-                        if stockMin then result.offer.stock.min = math.floor(stockMin) end
-                        if stockMax then result.offer.stock.max = math.floor(stockMax) end
+                        if stockMin then
+                            result.offer.stock.min = math.floor(stockMin)
+                        end
+                        if stockMax then
+                            result.offer.stock.max = math.floor(stockMax)
+                        end
                     end
                 end
 
@@ -246,14 +288,17 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 end
             end
 
-            if cb then cb(key, result) end
+            if cb then
+                cb(key, result)
+            end
             f:close()
-        end,
+        end
     })
 
     -- Key
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
-        default = specialKey or "", editable = isNew,
+        default = specialKey or "",
+        editable = isNew
     })
 
     -- Template checkbox
@@ -264,37 +309,37 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
             local tpl = f:getFieldValue("template")
             f:setGroupVisible("template", tpl)
             f:setGroupVisible("instance", not tpl)
-        end,
+        end
     })
 
     -- Template-only fields
     form:addComboField("kind", getText("IGUI_PhunMart_Lbl_Kind"), {
         options = KIND_OPTIONS,
         selected = def.kind or KIND_OPTIONS[1],
-        group = "template",
+        group = "template"
     })
     form:addTextField("category", getText("IGUI_PhunMart_Lbl_Category"), {
         default = def.category or "",
-        group = "template",
+        group = "template"
     })
     form:addTextField("texture", getText("IGUI_PhunMart_Lbl_Texture"), {
         default = (def.display and def.display.texture) or "",
-        group = "template",
+        group = "template"
     })
     form:addTextField("overlay", getText("IGUI_PhunMart_Lbl_Overlay"), {
         default = (def.display and def.display.overlay) or "",
-        group = "template",
+        group = "template"
     })
 
     -- Instance-only fields
     form:addComboField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
         options = inheritOptions,
         selected = inheritSelected,
-        group = "instance",
+        group = "instance"
     })
     form:addTextField("displayText", getText("IGUI_PhunMart_Lbl_Label"), {
         default = (def.display and def.display.text) or "",
-        group = "instance",
+        group = "instance"
     })
     local curActionType = curAction and curAction.type or ACTION_TYPES[1]
     form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
@@ -306,45 +351,47 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
             f:setHintText("actionArg", getActionArgHint(actionType))
             f:setGroupVisible("adjustBalance", actionType == "adjustBalance")
             f:setGroupVisible("giveItem", actionType == "giveItem")
-        end,
+        end
     })
     form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
         default = argDefault,
         hint = getActionArgHint(curActionType),
-        group = "instance",
+        group = "instance"
     })
     form:addTextField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
         default = (curAction and curAction.pool) or "change",
         hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
-        group = "adjustBalance",
+        group = "adjustBalance"
     })
     form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
         default = (curAction and curAction.item) or "",
         hint = getText("IGUI_PhunMart_Hint_ItemKey"),
-        group = "giveItem",
+        group = "giveItem"
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
-        options = getPriceKeys(), default = def.price or "",
-        allowEmpty = true, group = "instance",
+        options = getPriceKeys(),
+        default = def.price or "",
+        allowEmpty = true,
+        group = "instance"
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
         hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
-        group = "instance",
+        group = "instance"
     })
     form:addTextField("stockMin", getText("IGUI_PhunMart_Lbl_StockMin"), {
         default = (def.offer and def.offer.stock and def.offer.stock.min) and tostring(def.offer.stock.min) or "",
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        group = "instance",
+        group = "instance"
     })
     form:addTextField("stockMax", getText("IGUI_PhunMart_Lbl_StockMax"), {
         default = (def.offer and def.offer.stock and def.offer.stock.max) and tostring(def.offer.stock.max) or "",
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        group = "instance",
+        group = "instance"
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
         checked = def.enabled ~= false,
-        group = "instance",
+        group = "instance"
     })
 
     -- Apply initial group visibility BEFORE initialise so the window height is
@@ -427,7 +474,9 @@ function UI:refreshSpecials()
         local def = specials[key]
         if not def.template then
             local displayKey = key
-            if def.enabled == false then displayKey = displayKey .. " [off]" end
+            if def.enabled == false then
+                displayKey = displayKey .. " [off]"
+            end
             self:addListItem(key, {
                 key = key,
                 displayKey = displayKey,

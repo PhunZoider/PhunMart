@@ -131,6 +131,81 @@ function Core:grantReward(player, action, qty, context)
             end
         end
 
+    elseif t == "spawnAnimal" then
+        -- Build candidate list from animals[] and/or singular animal+breed.
+        local entries = {}
+        if type(action.animals) == "table" then
+            for _, e in ipairs(action.animals) do
+                table.insert(entries, e)
+            end
+        elseif action.animal or action.typeAnimal then
+            table.insert(entries, {
+                animal = action.animal or action.typeAnimal,
+                breed = action.breed,
+                size = action.size
+            })
+        end
+        local valid = {}
+        for _, e in ipairs(entries) do
+            local aType = e.animal or e.type
+            local aBreed = e.breed
+            if aType and aBreed and Core.animalTypeExists(aType) and Core.animalBreedExists(aType, aBreed) then
+                table.insert(valid, {
+                    animal = aType,
+                    breed = aBreed,
+                    size = e.size or action.size or "medium"
+                })
+            else
+                Core.debugLn("grantReward: animal '" .. tostring(aType) .. "/" .. tostring(aBreed) ..
+                                 "' not found at grant time -- skipped")
+            end
+        end
+
+        local selected = nil
+        -- Prefer offer.item when it encodes "type:breed" and is still valid.
+        local offerItem = context and context.offerItem
+        if type(offerItem) == "string" and offerItem:find(":") then
+            local oType, oBreed = offerItem:match("^([^:]+):(.+)$")
+            if oType and oBreed and Core.animalTypeExists(oType) and Core.animalBreedExists(oType, oBreed) then
+                selected = {
+                    animal = oType,
+                    breed = oBreed,
+                    size = action.size or "medium"
+                }
+            end
+        end
+        if not selected and #valid > 0 then
+            selected = valid[ZombRand(#valid) + 1]
+        end
+
+        if selected then
+            local item = player:getInventory():AddItem("PhunMart.AnimalClaimToken")
+            if item then
+                sendAddItemToContainer(player:getInventory(), item)
+                local size = selected.size or "medium"
+                local weight = (Core.animalClaimWeights and Core.animalClaimWeights[size]) or 5.0
+                item:setWeight(weight)
+                if item.setActualWeight then
+                    item:setActualWeight(weight)
+                end
+                local label = Core.getAnimalLabel(selected.animal, selected.breed)
+                item:setName("Livestock Claim: " .. label)
+                item:getModData()["animalType"] = selected.animal
+                item:getModData()["animalBreed"] = selected.breed
+                item:getModData()["animalSize"] = size
+                sendAddItemToContainer(player:getInventory(), item)
+                sendServerCommand(player, Core.name, Core.commands.spawnAnimal, {
+                    itemId = tostring(item:getID()),
+                    animalType = selected.animal,
+                    animalBreed = selected.breed,
+                    animalSize = size
+                })
+            else
+                Core.debugLn("grantReward: failed to add AnimalClaimToken for '" .. selected.animal .. "/" ..
+                                 selected.breed .. "'")
+            end
+        end
+
     elseif t == "applyBoost" then
         local ok, err = pcall(function()
             local perk = Perks[action.skill]

@@ -180,7 +180,7 @@ return {
     -- =========================================================
     pool_hoesnmoes = {
         sources = {
-            groups = {"gardening_all", "animal_supplies", "trapping_gear"}
+            groups = {"gardening_all", "animal_supplies", "animals_livestock", "trapping_gear"}
         }
     },
 

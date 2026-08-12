@@ -145,6 +145,12 @@ function tools.resolveOfferDisplayName(offer)
     if Core.getVehicleLabel and offer.reward and offer.reward.kind == "vehicle" then
         return Core.getVehicleLabel(offer.item)
     end
+    if Core.getAnimalLabel and offer.reward and offer.reward.kind == "animal" then
+        local action = offer.reward.actions and offer.reward.actions[1]
+        if action and action.animal and action.breed then
+            return Core.getAnimalLabel(action.animal, action.breed)
+        end
+    end
     if offer.reward and offer.reward.display and offer.reward.display.text then
         return offer.reward.display.text
     end

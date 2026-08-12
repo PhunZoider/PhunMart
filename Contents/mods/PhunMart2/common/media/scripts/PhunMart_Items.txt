@@ -66,6 +66,16 @@ module PhunMart
         DisplayCategory =   Currency,
     }
 
+    item AnimalClaimToken
+    {
+        DisplayName     =   Livestock Claim Cage,
+        ItemType        =   base:normal,
+        Weight          =   5.0,
+        Icon            =   TrapCage,
+        DisplayCategory =   Animal,
+        WorldStaticModel = TrapCage,
+    }
+
     item GoodPhoods
     {
         DisplayCategory   = Furniture,

@@ -88,6 +88,12 @@ return {
         category = "vehicle"
     },
 
+    animal_base = {
+        template = true,
+        kind = "animal",
+        category = "animal"
+    },
+
     -- =========================================================
     -- TRAIT ADDITIONS  (positive traits)
     -- trait key format from dump: "base:<name>"

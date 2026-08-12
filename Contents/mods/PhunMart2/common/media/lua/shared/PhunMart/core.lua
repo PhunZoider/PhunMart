@@ -66,6 +66,7 @@ PhunMart = {
         payWithInventory = "PhunMartPayWithInventory",
         modifyTraits = "PhunMartModifyTraits",
         spawnVehicle = "PhunMartSpawnVehicle",
+        spawnAnimal = "PhunMartSpawnAnimal",
         -- History / misc
         updateHistory = "PhunMartUpdateHistory",
         syncPurchases = "PhunMartSyncPurchases",
@@ -86,6 +87,7 @@ PhunMart = {
         getPlayersWallet = "PhunMartGetPlayersWallet",
         adjustPlayerWallet = "PhunMartAdjustPlayerWallet",
         claimVehicle = "PhunMartClaimVehicle",
+        claimAnimal = "PhunMartClaimAnimal",
         -- Token rewards admin
         getTokenRewards = "PhunMartGetTokenRewards",
         saveTokenRewards = "PhunMartSaveTokenRewards",
@@ -357,6 +359,108 @@ function Core.vehicleScriptExists(scriptName)
     return sm:getVehicle(fullType) ~= nil
 end
 
+-- Claim-token weights for livestock (symbolic crates, not live encumbrance).
+Core.animalClaimWeights = {
+    small = 1.0,
+    medium = 5.0,
+    large = 15.0
+}
+
+-- True if animalType exists in AnimalDefinitions (Lua table).
+function Core.animalTypeExists(animalType)
+    if not animalType or animalType == "" then
+        return false
+    end
+    if not AnimalDefinitions or not AnimalDefinitions.animals then
+        return true -- defensive during early init
+    end
+    return AnimalDefinitions.animals[animalType] ~= nil
+end
+
+-- True if breed is valid for the animal type's group.
+function Core.animalBreedExists(animalType, breedName)
+    if not Core.animalTypeExists(animalType) then
+        return false
+    end
+    if not breedName or breedName == "" then
+        return false
+    end
+    if not AnimalDefinitions or not AnimalDefinitions.animals then
+        return true
+    end
+    local animalDef = AnimalDefinitions.animals[animalType]
+    local breeds = animalDef and animalDef.breeds
+    if not breeds then
+        local group = animalDef and animalDef.group
+        breeds = group and AnimalDefinitions.breeds and AnimalDefinitions.breeds[group] and
+                     AnimalDefinitions.breeds[group].breeds
+    end
+    return breeds ~= nil and breeds[breedName] ~= nil
+end
+
+-- Resolve breed table entry for icon lookup.
+local function getAnimalBreedDef(animalType, breedName)
+    if not AnimalDefinitions or not AnimalDefinitions.animals then
+        return nil
+    end
+    local animalDef = AnimalDefinitions.animals[animalType]
+    if not animalDef then
+        return nil
+    end
+    local breeds = animalDef.breeds
+    if not breeds then
+        local group = animalDef.group
+        breeds = group and AnimalDefinitions.breeds and AnimalDefinitions.breeds[group] and
+                     AnimalDefinitions.breeds[group].breeds
+    end
+    return breeds and breeds[breedName] or nil
+end
+
+-- Live inventory icon for an animal type+breed (Item_* texture name), or nil.
+function Core.getAnimalIcon(animalType, breedName)
+    local breed = getAnimalBreedDef(animalType, breedName)
+    if not breed then
+        return nil
+    end
+    local animalDef = AnimalDefinitions.animals[animalType]
+    if animalDef and animalDef.female == true then
+        return breed.invIconFemale or breed.invIconMale or breed.invIconBaby
+    end
+    -- Babies typically have a babyType on the adult, and are themselves the babyType of another stage.
+    if animalDef and animalDef.babyType == nil and animalDef.female == nil then
+        -- Ambiguous; prefer baby icon when the type name looks juvenile, else male.
+        local t = tostring(animalType)
+        if t:find("chick") or t:find("calf") or t:find("lamb") or t:find("piglet") or t:find("kitten") or
+            t:find("poult") or t:find("pup") or t:find("kit") or t:find("fawn") or t:find("baby") then
+            return breed.invIconBaby or breed.invIconFemale or breed.invIconMale
+        end
+        return breed.invIconMale or breed.invIconFemale or breed.invIconBaby
+    end
+    if animalDef and animalDef.female == false then
+        return breed.invIconMale or breed.invIconFemale or breed.invIconBaby
+    end
+    return breed.invIconBaby or breed.invIconFemale or breed.invIconMale
+end
+
+-- Human-readable label using vanilla IGUI_AnimalType_* / IGUI_Breed_* keys.
+function Core.getAnimalLabel(animalType, breedName)
+    local typeLabel = animalType or "?"
+    if animalType then
+        local key = "IGUI_AnimalType_" .. animalType
+        local translated = getText(key)
+        if translated ~= key then
+            typeLabel = translated
+        end
+    end
+    if breedName and breedName ~= "" then
+        local bkey = "IGUI_Breed_" .. breedName
+        local btranslated = getText(bkey)
+        local breedLabel = (btranslated ~= bkey) and btranslated or breedName
+        return breedLabel .. " " .. typeLabel
+    end
+    return typeLabel
+end
+
 -- Returns a human-readable label for a vehicle full type (e.g. "Base.CarNormal").
 -- Populates the cache via getAllVehicles() on first call.
 -- Falls back to the bare script name if no translation exists.
@@ -624,7 +728,8 @@ function Core.compileWith(overrides)
 
     local ctx = {
         prices = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
-        specials = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards"}, overrides.specials),
+        specials = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards",
+                             "PhunMart/defaults/animal_rewards"}, overrides.specials),
         conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"},
             overrides.conditionsDefs),
         items = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),

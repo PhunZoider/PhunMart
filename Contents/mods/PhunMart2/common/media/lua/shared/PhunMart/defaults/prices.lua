@@ -34,16 +34,46 @@ return {
         factor = 1
     },
 
-    currency_05  = { inherit = "currency_base", amount = 5   }, -- $0.05  (one nickel)
-    currency_10  = { inherit = "currency_base", amount = 10  }, -- $0.10  (one dime)
-    currency_25  = { inherit = "currency_base", amount = 25  }, -- $0.25  (one quarter)
-    currency_50  = { inherit = "currency_base", amount = 50  }, -- $0.50
-    currency_75  = { inherit = "currency_base", amount = 75  }, -- $0.75
-    currency_100 = { inherit = "currency_base", amount = 100 }, -- $1.00
-    currency_150 = { inherit = "currency_base", amount = 150 }, -- $1.50
-    currency_200 = { inherit = "currency_base", amount = 200 }, -- $2.00
-    currency_250 = { inherit = "currency_base", amount = 250 }, -- $2.50
-    currency_500 = { inherit = "currency_base", amount = 500 }, -- $5.00
+    currency_05 = {
+        inherit = "currency_base",
+        amount = 5
+    }, -- $0.05  (one nickel)
+    currency_10 = {
+        inherit = "currency_base",
+        amount = 10
+    }, -- $0.10  (one dime)
+    currency_25 = {
+        inherit = "currency_base",
+        amount = 25
+    }, -- $0.25  (one quarter)
+    currency_50 = {
+        inherit = "currency_base",
+        amount = 50
+    }, -- $0.50
+    currency_75 = {
+        inherit = "currency_base",
+        amount = 75
+    }, -- $0.75
+    currency_100 = {
+        inherit = "currency_base",
+        amount = 100
+    }, -- $1.00
+    currency_150 = {
+        inherit = "currency_base",
+        amount = 150
+    }, -- $1.50
+    currency_200 = {
+        inherit = "currency_base",
+        amount = 200
+    }, -- $2.00
+    currency_250 = {
+        inherit = "currency_base",
+        amount = 250
+    }, -- $2.50
+    currency_500 = {
+        inherit = "currency_base",
+        amount = 500
+    }, -- $5.00
 
     -- ── Tokens ───────────────────────────────────────────────────────────────
     -- Base entry for all token prices. Override to scale token economy.
@@ -54,31 +84,106 @@ return {
         factor = 1
     },
 
-    token_1  = { inherit = "token_base", amount = 1  },
-    token_2  = { inherit = "token_base", amount = 2  },
-    token_3  = { inherit = "token_base", amount = 3  },
-    token_5  = { inherit = "token_base", amount = 5  },
-    token_6  = { inherit = "token_base", amount = 6  },
-    token_9  = { inherit = "token_base", amount = 9  },
-    token_12 = { inherit = "token_base", amount = 12 },
-    token_15 = { inherit = "token_base", amount = 15 },
-    token_18 = { inherit = "token_base", amount = 18 },
-    token_24 = { inherit = "token_base", amount = 24 },
-    token_30 = { inherit = "token_base", amount = 30 },
+    token_1 = {
+        inherit = "token_base",
+        amount = 1
+    },
+    token_2 = {
+        inherit = "token_base",
+        amount = 2
+    },
+    token_3 = {
+        inherit = "token_base",
+        amount = 3
+    },
+    token_5 = {
+        inherit = "token_base",
+        amount = 5
+    },
+    token_6 = {
+        inherit = "token_base",
+        amount = 6
+    },
+    token_9 = {
+        inherit = "token_base",
+        amount = 9
+    },
+    token_12 = {
+        inherit = "token_base",
+        amount = 12
+    },
+    token_15 = {
+        inherit = "token_base",
+        amount = 15
+    },
+    token_18 = {
+        inherit = "token_base",
+        amount = 18
+    },
+    token_24 = {
+        inherit = "token_base",
+        amount = 24
+    },
+    token_30 = {
+        inherit = "token_base",
+        amount = 30
+    },
 
-    tokens      = { inherit = "token_base", amount = 2 },
-    tokens_mid  = { inherit = "token_base", amount = 4 },
-    tokens_high = { inherit = "token_base", amount = 8 },
+    tokens = {
+        inherit = "token_base",
+        amount = 2
+    },
+    tokens_mid = {
+        inherit = "token_base",
+        amount = 4
+    },
+    tokens_high = {
+        inherit = "token_base",
+        amount = 8
+    },
 
     -- ── Named tiers (used by pool defaults) ──────────────────────────────────
-    currency_boost    = { inherit = "currency_base", amount = 200 },  -- $2.00  (basic boost, budget shop)
-    currency_boost_t2 = { inherit = "currency_base", amount = 350 },  -- $3.50  (enhanced boost, gifted shop)
-    currency_boost_t3 = { inherit = "currency_base", amount = 500 },  -- $5.00  (superior boost, luxury shop)
+    currency_boost = {
+        inherit = "currency_base",
+        amount = 200
+    }, -- $2.00  (basic boost, budget shop)
+    currency_boost_t2 = {
+        inherit = "currency_base",
+        amount = 350
+    }, -- $3.50  (enhanced boost, gifted shop)
+    currency_boost_t3 = {
+        inherit = "currency_base",
+        amount = 500
+    }, -- $5.00  (superior boost, luxury shop)
 
-    currency_xlow = { inherit = "currency_base", amount = { min = 50,   max = 150  } }, -- $0.50-$1.50
-    currency_low  = { inherit = "currency_base", amount = { min = 250,  max = 600  } }, -- $2.50-$6.00
-    currency_mid  = { inherit = "currency_base", amount = { min = 1000, max = 1200 } }, -- $10.00-$12.00
-    currency_high = { inherit = "currency_base", amount = { min = 3000, max = 6000 } }, -- $30.00-$60.00
+    currency_xlow = {
+        inherit = "currency_base",
+        amount = {
+            min = 50,
+            max = 150
+        }
+    }, -- $0.50-$1.50
+    currency_low = {
+        inherit = "currency_base",
+        amount = {
+            min = 250,
+            max = 600
+        }
+    }, -- $2.50-$6.00
+    currency_mid = {
+        inherit = "currency_base",
+        amount = {
+            min = 1000,
+            max = 1200
+        }
+    }, -- $10.00-$12.00
+    currency_high = {
+        inherit = "currency_base",
+        amount = {
+            min = 3000,
+            max = 6000
+        }
+    }, -- $30.00-$60.00
 
     -- ── Collector self-pay ────────────────────────────────────────────────────
     -- "self" means the player hands over N of the displayed offer item.
@@ -88,18 +193,89 @@ return {
         factor = 1
     },
 
-    self_1  = { inherit = "self_base", amount = 1  },
-    self_2  = { inherit = "self_base", amount = 2  },
-    self_3  = { inherit = "self_base", amount = 3  },
-    self_5  = { inherit = "self_base", amount = 5  },
-    self_10 = { inherit = "self_base", amount = 10 },
+    self_1 = {
+        inherit = "self_base",
+        amount = 1
+    },
+    self_2 = {
+        inherit = "self_base",
+        amount = 2
+    },
+    self_3 = {
+        inherit = "self_base",
+        amount = 3
+    },
+    self_5 = {
+        inherit = "self_base",
+        amount = 5
+    },
+    self_10 = {
+        inherit = "self_base",
+        amount = 10
+    },
 
     -- ── Vehicles ────────────────────────────────────────────────────────────
     -- WrentAWreck and similar shops. Inherits from currency_base so the global
     -- currency factor applies here too.
-    vehicle_common   = { inherit = "currency_base", amount = { min = 1000, max = 2000 } },
-    vehicle_uncommon = { inherit = "currency_base", amount = { min = 2000, max = 4000 } },
-    vehicle_rare     = { inherit = "currency_base", amount = { min = 4000, max = 8000 } },
+    vehicle_common = {
+        inherit = "currency_base",
+        amount = {
+            min = 1000,
+            max = 2000
+        }
+    },
+    vehicle_uncommon = {
+        inherit = "currency_base",
+        amount = {
+            min = 2000,
+            max = 4000
+        }
+    },
+    vehicle_rare = {
+        inherit = "currency_base",
+        amount = {
+            min = 4000,
+            max = 8000
+        }
+    },
+
+    -- ── Livestock ────────────────────────────────────────────────────────────
+    -- HoesNMoes animal claim tokens. Cheaper than vehicles; scale by size/rarity.
+    animal_cheap = {
+        inherit = "currency_base",
+        amount = {
+            min = 200,
+            max = 400
+        }
+    },
+    animal_common = {
+        inherit = "currency_base",
+        amount = {
+            min = 400,
+            max = 800
+        }
+    },
+    animal_uncommon = {
+        inherit = "currency_base",
+        amount = {
+            min = 800,
+            max = 1500
+        }
+    },
+    animal_rare = {
+        inherit = "currency_base",
+        amount = {
+            min = 1500,
+            max = 3000
+        }
+    },
+    animal_premium = {
+        inherit = "currency_base",
+        amount = {
+            min = 3000,
+            max = 5000
+        }
+    }
 
     -- ── Physical items ───────────────────────────────────────────────────────
     -- Use for barter-style shops or recipes that require inventory items.
