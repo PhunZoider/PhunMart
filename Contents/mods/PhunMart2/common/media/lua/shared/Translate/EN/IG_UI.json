@@ -74,6 +74,7 @@
   "IGUI_PhunWallet.BalanceReplenishedOnDeath": "Balance of %1 will be restored on death.",
 
   "IGUI_PhunMart_Buy": "BUY",
+  "IGUI_PhunMart_Sell": "SELL",
   "IGUI_PhunMart_SelectAnItem": "Select an item",
   "IGUI_PhunMart_Balance": "Balance",
   "IGUI_PhunMart_Requires": "Requires:",

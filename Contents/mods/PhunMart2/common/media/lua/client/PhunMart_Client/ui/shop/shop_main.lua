@@ -429,6 +429,7 @@ function UI:setData(data)
 
     self.controls.grid:setData(data)
     self.controls.buyBtn:setEnable(false)
+    self:updateBuyButtonTitle(nil)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -485,11 +486,21 @@ function UI:canPurchase(offer, offerId)
     return true
 end
 
+-- price.selfPay is set by bakePrice() for kind="self" offers: the price IS the
+-- displayed item, so the player is selling to the shop rather than buying from it.
+function UI:updateBuyButtonTitle(offer)
+    local isSell = offer and offer.price and offer.price.selfPay == true
+    self.controls.buyBtn:setTitle(getText(isSell and "IGUI_PhunMart_Sell" or "IGUI_PhunMart_Buy"))
+end
+
 function UI:onOfferSelected(id, offer, entry)
     self.selectedId = id
     self.selectedOffer = offer
     self.selectedEntry = entry
     self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
+    -- Collector/pawn offers hand the displayed item over for currency — that's a sale,
+    -- so label the button SELL instead of BUY.
+    self:updateBuyButtonTitle(offer)
 
     -- Show 3D vehicle preview only for spawnVehicle reward actions.
     local p3d = self.controls.preview3d
@@ -573,29 +584,10 @@ function UI:onPurchaseComplete(result)
         end
     end
 
-    -- SP: item removal is deferred to client; in SP the buy command handler
-    -- doesn't run, so we remove items here using the container sync pattern.
-    if Core.isLocal and result.price and result.price.kind == "items" then
-        local inv = self.player:getInventory()
-        for _, entry in ipairs(result.price.items or {}) do
-            local remaining = entry.amount
-            local sources = {entry.item}
-            if entry.substitutes then
-                for _, sub in ipairs(entry.substitutes) do
-                    table.insert(sources, sub)
-                end
-            end
-            for _, itemType in ipairs(sources) do
-                if remaining <= 0 then break end
-                for i = 1, remaining do
-                    local target = inv:getItemFromTypeRecurse(itemType)
-                    if not target then break end
-                    local container = target:getContainer()
-                    container:Remove(target)
-                    remaining = remaining - 1
-                end
-            end
-        end
+    -- Item-based prices are removed authoritatively by the buy command handler,
+    -- which also runs in SP (OnClientCommand fires locally there). Do NOT remove
+    -- them again here — that charged the player twice the displayed amount.
+    if result.price and result.price.kind == "items" then
         ISInventoryPage.dirtyUI()
     end
 
@@ -603,7 +595,10 @@ function UI:onPurchaseComplete(result)
     if self.selectedId == result.offerId then
         -- Record the purchase locally so purchaseCountMax evaluates correctly
         -- on repeated buys without waiting for the next playerSetup sync.
-        Core.purchases:add(self.player, result.offerId, 1)
+        -- In SP the buy command handler already added it to the same table.
+        if not Core.isLocal then
+            Core.purchases:add(self.player, result.offerId, 1)
+        end
         self.controls.buyBtn:setEnable(self:canPurchase(self.selectedOffer, self.selectedId))
     end
 

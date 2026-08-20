@@ -47,8 +47,9 @@ function Core:canAffordAll(player, prices, qty)
 end
 
 -- Deduct a single price from the player. Returns true on success.
--- For item-based prices, actual inventory removal is deferred to the client
--- via sendRemoveItemFromContainer so the container properly syncs to the UI.
+-- Item-based prices are only validated here; the buy command handler removes
+-- them from the inventory afterwards (it knows the purchased qty). Removing
+-- them here as well would charge the player twice.
 function Core:deduct(player, price)
     if price.kind == "free" then
         return true
@@ -56,7 +57,7 @@ function Core:deduct(player, price)
         Core.wallet:adjustByPool(player, "current", price.pool, -price.amount)
         return true
     elseif price.kind == "items" then
-        -- Server only validates via canAffordAll; client handles removal.
+        -- Validated via canAffordAll; removal happens in Commands[buy].
         return true
     end
     return false
