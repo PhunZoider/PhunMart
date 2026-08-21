@@ -67,6 +67,9 @@ function FormPanel:new(opts)
     o._groups = {} -- groupName -> {field descriptors}
     o._onApply = opts.onApply -- function(values)
     o._onCancel = opts.onCancel -- function() (optional)
+    o._validateForm = opts.validate -- function(form) -> errorText (cross-field rules)
+    o._showErrors = false -- set on the first Apply; errors then track live edits
+    o:setWantKeyEvents(true)
     o._labelW = opts.labelWidth -- nil = auto-measure from longest label
     o._formWidth = w
     if opts.title then
@@ -80,7 +83,33 @@ end
 --
 -- Each method returns self for chaining.
 -- Every field has: key, label, hint (optional), group (optional), visible
+--
+-- Validation opts accepted by every field type:
+--   required   Field must not be blank
+--   numeric    Must parse as a number when non-blank
+--   integer    Must be a whole number when non-blank
+--   min / max  Numeric bounds when non-blank
+--   validate   function(value, form) -> errorText or nil
+-- A field carrying any of these gets a message row even without a hint, so
+-- showing an error never resizes the window under the user's cursor.
 ---------------------------------------------------------------------------
+
+--- Copy validation options onto the freshly-added descriptor and index it.
+function FormPanel:_registerField(opts)
+    local f = self._fields[#self._fields]
+    opts = opts or {}
+    f.required = opts.required
+    f.numeric = opts.numeric
+    f.integer = opts.integer
+    f.min = opts.min
+    f.max = opts.max
+    f.requireBoth = opts.requireBoth
+    f.validate = opts.validate
+    f.hasMessageRow = (f.hint ~= nil) or f.required == true or f.numeric == true or f.integer == true or f.min ~=
+                          nil or f.max ~= nil or f.validate ~= nil
+    self._fieldsByKey[f.key] = f
+    return self
+end
 
 --- Text entry field.
 -- opts: { default, hint, group, editable, numbersOnly }
@@ -97,8 +126,7 @@ function FormPanel:addTextField(key, label, opts)
         numbersOnly = opts.numbersOnly,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Combo box field.
@@ -117,8 +145,7 @@ function FormPanel:addComboField(key, label, opts)
         onChange = opts.onChange,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Picker field (display label + Pick button).
@@ -137,8 +164,7 @@ function FormPanel:addPickerField(key, label, opts)
         group = opts.group,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Checkbox field.
@@ -156,26 +182,26 @@ function FormPanel:addCheckField(key, label, opts)
         onChange = opts.onChange,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Inline range field (min entry - max entry on one row).
--- opts: { min, max, hint, group }
+-- opts: { minDefault, maxDefault, hint, group }
+-- Note: `min`/`max` are the shared numeric validation bounds (see above), so
+-- the starting values of the two entries are named minDefault/maxDefault.
 function FormPanel:addRangeField(key, label, opts)
     opts = opts or {}
     table.insert(self._fields, {
         type = "range",
         key = key,
         label = label,
-        minDefault = opts.min or "",
-        maxDefault = opts.max or "",
+        minDefault = opts.minDefault or "",
+        maxDefault = opts.maxDefault or "",
         hint = opts.hint,
         group = opts.group,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Embedded list field (scrolling list + Add/Edit/Remove buttons).
@@ -207,8 +233,7 @@ function FormPanel:addListField(key, label, opts)
         group = opts.group,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 --- Visual separator (horizontal line + optional section label).
@@ -222,8 +247,7 @@ function FormPanel:addSeparator(key, opts)
         group = opts.group,
         visible = true
     })
-    self._fieldsByKey[key] = self._fields[#self._fields]
-    return self
+    return self:_registerField(opts)
 end
 
 ---------------------------------------------------------------------------
@@ -361,10 +385,16 @@ end
 -- around PZ ISLabel quirk where setName resets x.
 function FormPanel:setHintText(key, text)
     local f = self._fieldsByKey[key]
-    if f and f._hint then
-        f._hint:setName(text)
-        if f._fieldX then
-            f._hint:setX(f._fieldX)
+    if f then
+        -- Update the stored hint as well as the label: once the user has
+        -- attempted Apply, _refreshMessages repaints this label from f.hint
+        -- every frame and would otherwise undo the change.
+        f.hint = text
+        if f._hint and not (self._showErrors and f._error) then
+            f._hint:setName(text)
+            if f._fieldX then
+                f._hint:setX(f._fieldX)
+            end
         end
     end
 end
@@ -461,13 +491,17 @@ function FormPanel:_computeNeededHeight()
                 y = y + PAD
             else
                 y = y + ROW_H
-                if f.hint then
+                if f.hasMessageRow then
                     y = y + 2 + FONT_HGT_SMALL
                 end
                 y = y + PAD
             end
         end
     end
+
+    -- Form-level message row (always reserved, so a cross-field error appearing
+    -- doesn't shift the buttons out from under the cursor)
+    y = y + FONT_HGT_SMALL + 2
 
     -- Apply/Cancel buttons
     y = y + PAD + ROW_H + PAD
@@ -549,8 +583,8 @@ function FormPanel:_createField(f)
         end
         self:addChild(f._entry)
 
-        if f.hint then
-            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
             f._hint:initialise()
             self:addChild(f._hint)
         end
@@ -582,8 +616,8 @@ function FormPanel:_createField(f)
         end
         self:addChild(f._combo)
 
-        if f.hint then
-            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
             f._hint:initialise()
             self:addChild(f._hint)
         end
@@ -607,8 +641,8 @@ function FormPanel:_createField(f)
         f._displayLabel:initialise()
         self:addChild(f._displayLabel)
 
-        if f.hint then
-            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
             f._hint:initialise()
             self:addChild(f._hint)
         end
@@ -646,8 +680,8 @@ function FormPanel:_createField(f)
         f._maxEntry:instantiate()
         self:addChild(f._maxEntry)
 
-        if f.hint then
-            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
             f._hint:initialise()
             self:addChild(f._hint)
         end
@@ -922,6 +956,10 @@ function FormPanel:reflowFields()
         end
     end
 
+    -- Form-level message row (reserved whether or not an error is showing)
+    self._formMsgY = y
+    y = y + FONT_HGT_SMALL + 2
+
     -- Extra padding before buttons
     y = y + PAD
 
@@ -1000,6 +1038,16 @@ end
 function FormPanel:prerender()
     ISCollapsableWindowJoypad.prerender(self)
 
+    -- Once the user has attempted Apply, keep errors in step with their edits
+    -- so a corrected field clears without another click.
+    if self._showErrors then
+        self:validateAll()
+    end
+
+    if self._formError and self._formMsgY then
+        self:drawText(self._formError, PAD, self._formMsgY, 0.95, 0.45, 0.4, 1, UIFont.Small)
+    end
+
     for _, f in ipairs(self._fields) do
         if not f.visible then
             -- skip
@@ -1028,10 +1076,141 @@ function FormPanel:prerender()
 end
 
 ---------------------------------------------------------------------------
+-- Validation
+---------------------------------------------------------------------------
+
+--- True when a field holds nothing the user has entered.
+local function isFieldBlank(f, value)
+    if f.type == "picker" then
+        if value == nil or value == "" then
+            return true
+        end
+        return type(value) == "table" and #value == 0
+    elseif f.type == "range" then
+        return type(value) ~= "table" or (value.min == "" and value.max == "")
+    end
+    return value == nil or value == ""
+end
+
+--- Run one field's rules. Returns an error string, or nil when the field is ok.
+local function validateField(form, f)
+    if f.type == "separator" or f.type == "list" or f.type == "check" then
+        return nil
+    end
+
+    local value = form:getFieldValue(f.key)
+    local blank = isFieldBlank(f, value)
+
+    if f.required and blank then
+        return getText("IGUI_PhunMart_Err_Required")
+    end
+
+    -- Built-in checks only apply to a field the user has filled in; a custom
+    -- validate still runs either way, since it may be what decides whether an
+    -- empty value is acceptable.
+    if not blank then
+        local err = FormPanel._builtinChecks(form, f, value)
+        if err then
+            return err
+        end
+    end
+
+    if f.validate then
+        return f.validate(value, form)
+    end
+    return nil
+end
+
+function FormPanel._builtinChecks(form, f, value)
+    if f.type == "range" then
+        local mn, mx = form:getFieldRange(f.key)
+        if (value.min ~= "" and not mn) or (value.max ~= "" and not mx) then
+            return getText("IGUI_PhunMart_Err_Numeric")
+        end
+        if f.requireBoth and (not mn or not mx) then
+            return getText("IGUI_PhunMart_Err_RangeBoth")
+        end
+        if mn and mx and mx < mn then
+            return getText("IGUI_PhunMart_Err_RangeOrder")
+        end
+        if f.min and ((mn and mn < f.min) or (mx and mx < f.min)) then
+            return getText("IGUI_PhunMart_Err_Min", tostring(f.min))
+        end
+    elseif f.numeric or f.integer or f.min ~= nil or f.max ~= nil then
+        local n = tonumber(value)
+        if not n then
+            return getText("IGUI_PhunMart_Err_Numeric")
+        end
+        if f.integer and n % 1 ~= 0 then
+            return getText("IGUI_PhunMart_Err_Integer")
+        end
+        if f.min ~= nil and n < f.min then
+            return getText("IGUI_PhunMart_Err_Min", tostring(f.min))
+        end
+        if f.max ~= nil and n > f.max then
+            return getText("IGUI_PhunMart_Err_Max", tostring(f.max))
+        end
+    end
+    return nil
+end
+
+--- Push each field's current error (or its hint) into its message label.
+function FormPanel:_refreshMessages()
+    for _, f in ipairs(self._fields) do
+        if f._hint then
+            local showError = self._showErrors and f._error
+            f._hint:setName(showError or f.hint or "")
+            if showError then
+                f._hint.r, f._hint.g, f._hint.b = 0.95, 0.45, 0.4
+            else
+                f._hint.r, f._hint.g, f._hint.b = 0.5, 0.5, 0.5
+            end
+            -- Re-apply position after setName (PZ ISLabel resets x)
+            if f._fieldX then
+                f._hint:setX(f._fieldX)
+            end
+        end
+    end
+end
+
+--- Validate every visible field plus any cross-field rule.
+--- Returns true when the form is safe to apply.
+function FormPanel:validateAll()
+    local ok = true
+    for _, f in ipairs(self._fields) do
+        if f.visible then
+            f._error = validateField(self, f)
+            if f._error then
+                ok = false
+            end
+        else
+            f._error = nil
+        end
+    end
+
+    self._formError = nil
+    if ok and self._validateForm then
+        self._formError = self._validateForm(self)
+        if self._formError then
+            ok = false
+        end
+    end
+
+    self:_refreshMessages()
+    return ok
+end
+
+---------------------------------------------------------------------------
 -- Apply / Cancel
 ---------------------------------------------------------------------------
 
 function FormPanel:_onApplyClick()
+    -- From the first Apply onwards, errors track edits live rather than only
+    -- appearing on click.
+    self._showErrors = true
+    if not self:validateAll() then
+        return
+    end
     if self._onApply then
         self._onApply(self)
     end
@@ -1046,6 +1225,20 @@ end
 
 function FormPanel:close()
     ISCollapsableWindowJoypad.close(self)
+end
+
+---------------------------------------------------------------------------
+-- Keyboard
+---------------------------------------------------------------------------
+
+function FormPanel:isKeyConsumed(key)
+    return key == Keyboard.KEY_ESCAPE
+end
+
+function FormPanel:onKeyRelease(key)
+    if key == Keyboard.KEY_ESCAPE then
+        self:_onCancelClick()
+    end
 end
 
 return FormPanel

@@ -124,6 +124,7 @@ end
 
 local function createEditModal(priceKey, priceDef, isNew, cb)
     local def = priceDef or {}
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
 
     -- Pre-compute amount default (convert cents to dollars for display)
     local amountDefault = ""
@@ -163,16 +164,23 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         title = titleText,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then return end
 
             local kind = f:getFieldValue("kind")
-            local result = { kind = kind }
+            -- Start from the existing definition so keys this form doesn't model
+            -- (substitutes, and anything added later) survive the edit.
+            local result = Core.utils.deepCopy(def)
+            result.kind = kind
+            -- Each branch below owns a different shape; clear the other shapes'
+            -- fields so switching kind doesn't leave stale ones behind.
+            result.pool = nil
+            result.amount = nil
+            result.item = nil
+            result.items = nil
 
             if kind == "currency" then
                 result.pool = f:getFieldValue("pool")
                 local amt = f:getFieldNumber("amount")
                 local maxAmt = f:getFieldNumber("max")
-                if not amt then return end
                 if result.pool == "change" then
                     amt = math.floor(amt * 100 + 0.5)
                     if maxAmt then maxAmt = math.floor(maxAmt * 100 + 0.5) end
@@ -187,11 +195,9 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 end
             elseif kind == "self" then
                 local amt = f:getFieldNumber("amount")
-                if not amt then return end
                 result.amount = math.floor(amt + 0.5)
             elseif kind == "items" then
                 local items = f:getFieldValue("items")
-                if not items or #items == 0 then return end
                 local amt = f:getFieldNumber("amount")
                 amt = amt and math.floor(amt + 0.5) or 1
                 if #items == 1 then
@@ -206,15 +212,10 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             end
 
             local inherit = f:getFieldValue("inherit")
-            if inherit and inherit ~= "" then result.inherit = inherit end
+            result.inherit = (inherit ~= "") and inherit or nil
 
             local factor = f:getFieldNumber("factor")
-            if factor and factor ~= 1 then result.factor = factor end
-
-            -- Preserve substitutes the editor doesn't manage yet
-            if priceDef and priceDef.substitutes then
-                result.substitutes = priceDef.substitutes
-            end
+            result.factor = (factor and factor ~= 1) and factor or nil
 
             if cb then cb(key, result) end
             f:close()
@@ -223,6 +224,12 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
 
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = priceKey or "", editable = isNew,
+        required = true,
+        validate = isNew and function(value)
+            if prices[value] then
+                return getText("IGUI_PhunMart_Err_KeyInUse")
+            end
+        end or nil,
     })
     form:addComboField("kind", getText("IGUI_PhunMart_Lbl_Kind"), {
         options = {"free", "currency", "self", "items"},
@@ -238,16 +245,27 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         default = amountDefault,
         hint = getText("IGUI_PhunMart_Hint_AmountDollars"),
         group = "amount",
+        numeric = true, min = 0,
+        -- Required for currency and self, but optional for items, where a blank
+        -- amount means one of each.
+        validate = function(value, f)
+            local kind = f:getFieldValue("kind")
+            if value == "" and (kind == "currency" or kind == "self") then
+                return getText("IGUI_PhunMart_Err_Required")
+            end
+        end,
     })
     form:addTextField("max", getText("IGUI_PhunMart_Lbl_Max"), {
         default = maxDefault,
         hint = getText("IGUI_PhunMart_Hint_FixedAmount"),
         group = "max",
+        numeric = true, min = 0,
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
         value = selectedItems,
         display = formatItemList(selectedItems),
         group = "item",
+        required = true,
         onPick = function(f, field)
             ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
                 selectedItems = keys or {}
@@ -258,10 +276,19 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     form:addTextField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
         default = def.inherit or "",
         hint = getText("IGUI_PhunMart_Hint_InheritKey"),
+        validate = function(value)
+            if value ~= "" and not prices[value] then
+                return getText("IGUI_PhunMart_Err_NoSuchPrice")
+            end
+            if value ~= "" and value == priceKey then
+                return getText("IGUI_PhunMart_Err_InheritSelf")
+            end
+        end,
     })
     form:addTextField("factor", getText("IGUI_PhunMart_Lbl_Factor"), {
         default = factorDefault,
         hint = getText("IGUI_PhunMart_Hint_Factor"),
+        numeric = true, min = 0,
     })
 
     form:initialise()

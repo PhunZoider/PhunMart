@@ -137,10 +137,6 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
             local items = f:getFieldValue("items")
             local amount = f:getFieldNumber("amount")
 
-            if not threshold or threshold <= 0 or not items or #items == 0 or not amount or amount <= 0 then
-                return
-            end
-
             local rewards = {}
             for _, item in ipairs(items) do
                 table.insert(rewards, {
@@ -177,11 +173,15 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
     form:addTextField("threshold", getText("IGUI_PhunMart_Lbl_Threshold"), {
         default = threshDefault,
         numbersOnly = true,
-        hint = " " -- placeholder; updated after initialise
+        hint = " ", -- placeholder; updated after initialise
+        required = true,
+        integer = true,
+        min = 1
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Item"), {
         value = selectedItems,
         display = formatItemList(selectedItems),
+        required = true,
         onPick = function(f, field)
             ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
                 selectedItems = keys or {}
@@ -192,7 +192,10 @@ local function createEditModal(category, entry, editIndex, isNew, cb)
     form:addTextField("amount", getText("IGUI_PhunMart_Lbl_RewardAmount"), {
         default = amountDefault,
         numbersOnly = true,
-        hint = getText("IGUI_PhunMart_Hint_RewardAmount")
+        hint = getText("IGUI_PhunMart_Hint_RewardAmount"),
+        required = true,
+        integer = true,
+        min = 1
     })
 
     form:initialise()

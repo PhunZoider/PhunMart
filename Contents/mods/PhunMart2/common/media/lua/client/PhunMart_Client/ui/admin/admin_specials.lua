@@ -87,6 +87,33 @@ local function getActionArgHint(actionType)
     return ""
 end
 
+-- Validate the free-text action argument against whatever the Action combo is
+-- currently set to. Each action type reads this box differently.
+local function validateActionArg(value, f)
+    local actionType = f:getFieldValue("action")
+    if actionType == "giveItem" then
+        -- Here the box holds the quantity; blank is allowed and means 1.
+        if value ~= "" and not tonumber(value) then
+            return getText("IGUI_PhunMart_Err_Numeric")
+        end
+        return nil
+    end
+    if value == "" then
+        return getText("IGUI_PhunMart_Err_Required")
+    end
+    if actionType == "spawnAnimal" then
+        local aType, aBreed = value:match("^([^:/]+)%s*[:/]%s*(.+)$")
+        if not aType or not aBreed then
+            return getText("IGUI_PhunMart_Err_AnimalFormat")
+        end
+    elseif actionType == "grantBoundTokens" or actionType == "adjustBalance" then
+        if not tonumber(value) then
+            return getText("IGUI_PhunMart_Err_Numeric")
+        end
+    end
+    return nil
+end
+
 -- Collect sorted price keys for combo.
 local function getPriceKeys()
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
@@ -157,20 +184,19 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         title = titleText,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then
-                return
-            end
 
-            local result = {}
+            -- Start from the existing definition so anything this form doesn't
+            -- model survives the round trip; diffTable drops what's unchanged.
+            local result = Core.utils.deepCopy(def)
             local tpl = f:getFieldValue("template")
 
             if tpl then
                 result.template = true
                 result.kind = f:getFieldValue("kind")
+
                 local cat = f:getFieldValue("category")
-                if cat ~= "" then
-                    result.category = cat
-                end
+                result.category = (cat ~= "") and cat or nil
+
                 local tex = f:getFieldValue("texture")
                 local ovl = f:getFieldValue("overlay")
                 if tex ~= "" or ovl ~= "" then
@@ -181,36 +207,43 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     if ovl ~= "" then
                         result.display.overlay = ovl
                     end
+                else
+                    result.display = nil
                 end
+
+                -- Instance-only shape doesn't belong on a template.
+                result.inherit = nil
+                result.actions = nil
+                result.price = nil
+                result.offer = nil
+                result.enabled = nil
             else
+                result.template = nil
+
                 local inheritIdx = f._fieldsByKey["inherit"]._combo.selected
-                if inheritIdx > 1 then
-                    result.inherit = f:getFieldValue("inherit")
-                end
+                result.inherit = inheritIdx > 1 and f:getFieldValue("inherit") or nil
+
                 local dispText = f:getFieldValue("displayText")
-                if dispText ~= "" then
-                    result.display = {
-                        text = dispText
-                    }
-                end
+                result.display = (dispText ~= "") and {
+                    text = dispText
+                } or nil
 
                 local actionType = f:getFieldValue("action")
                 local argText = f:getFieldValue("actionArg")
+                local action
+
                 if actionType == "giveItem" then
                     -- giveItem: item type is the required field; actionArg holds the
-                    -- per-purchase amount (defaults to 1 when blank/invalid).
-                    local itemType = f:getFieldValue("giveItemItem")
-                    if itemType and itemType ~= "" then
-                        local amt = tonumber(argText)
-                        amt = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
-                        result.actions = {{
-                            type = "giveItem",
-                            item = itemType,
-                            amount = amt
-                        }}
-                    end
-                elseif actionType and argText ~= "" then
-                    local action = {
+                    -- per-purchase amount (defaults to 1 when blank).
+                    local amt = tonumber(argText)
+                    amt = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
+                    action = {
+                        type = "giveItem",
+                        item = f:getFieldValue("giveItemItem"),
+                        amount = amt
+                    }
+                elseif actionType then
+                    action = {
                         type = actionType
                     }
                     if actionType == "addTrait" or actionType == "removeTrait" then
@@ -230,36 +263,27 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                         end
                     elseif actionType == "spawnAnimal" then
                         local aType, aBreed = argText:match("^([^:/]+)%s*[:/]%s*(.+)$")
-                        if aType and aBreed then
-                            action.animal = aType:match("^%s*(.-)%s*$")
-                            action.breed = aBreed:match("^%s*(.-)%s*$")
-                            action.size = "medium"
-                        else
-                            return
-                        end
+                        action.animal = aType:match("^%s*(.-)%s*$")
+                        action.breed = aBreed:match("^%s*(.-)%s*$")
+                        action.size = "medium"
                     elseif actionType == "grantBoundTokens" then
-                        local amt = tonumber(argText)
-                        if not amt then
-                            return
-                        end
-                        action.amount = math.floor(amt)
+                        action.amount = math.floor(tonumber(argText))
                     elseif actionType == "adjustBalance" then
-                        local amt = tonumber(argText)
-                        if not amt then
-                            return
-                        end
-                        action.amount = math.floor(amt)
+                        action.amount = math.floor(tonumber(argText))
                         local poolVal = f:getFieldValue("pool")
                         action.pool = (poolVal and poolVal ~= "") and poolVal or "change"
                     end
-                    result.actions = {action}
                 end
 
-                -- Price (optional)
-                local priceVal = f:getFieldValue("price")
-                if priceVal and priceVal ~= "" then
-                    result.price = priceVal
+                if action then
+                    -- This form only edits the first action. Keep any others the
+                    -- definition already had rather than truncating the list.
+                    result.actions = result.actions or {}
+                    result.actions[1] = action
                 end
+
+                local priceVal = f:getFieldValue("price")
+                result.price = (priceVal and priceVal ~= "") and priceVal or nil
 
                 -- Offer: weight and stock
                 local weightVal = f:getFieldNumber("weight")
@@ -279,13 +303,17 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                             result.offer.stock.max = math.floor(stockMax)
                         end
                     end
+                else
+                    result.offer = nil
                 end
 
-                -- Enabled
-                local enabledVal = f:getFieldValue("enabled")
-                if not enabledVal then
-                    result.enabled = false
-                end
+                -- Written explicitly rather than only on false, so re-enabling is
+                -- a real change the override layer can carry.
+                result.enabled = f:getFieldValue("enabled") and true or false
+
+                -- Template-only shape doesn't belong on an instance.
+                result.kind = nil
+                result.category = nil
             end
 
             if cb then
@@ -298,7 +326,13 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- Key
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = specialKey or "",
-        editable = isNew
+        editable = isNew,
+        required = true,
+        validate = isNew and function(value)
+            if specials[value] then
+                return getText("IGUI_PhunMart_Err_KeyInUse")
+            end
+        end or nil
     })
 
     -- Template checkbox
@@ -342,10 +376,14 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         group = "instance"
     })
     local curActionType = curAction and curAction.type or ACTION_TYPES[1]
+    local extraActions = (def.actions and #def.actions > 1) and (#def.actions - 1) or 0
     form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
         options = ACTION_TYPES,
         selected = curActionType,
         group = "instance",
+        -- Only the first action is editable here. Say so when there are more,
+        -- rather than letting them look absent (they are preserved on save).
+        hint = extraActions > 0 and getText("IGUI_PhunMart_Hint_MoreActions", tostring(extraActions)) or nil,
         onChange = function(f, field)
             local actionType = f:getFieldValue("action")
             f:setHintText("actionArg", getActionArgHint(actionType))
@@ -356,7 +394,8 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
         default = argDefault,
         hint = getActionArgHint(curActionType),
-        group = "instance"
+        group = "instance",
+        validate = validateActionArg
     })
     form:addTextField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
         default = (curAction and curAction.pool) or "change",
@@ -366,28 +405,34 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
         default = (curAction and curAction.item) or "",
         hint = getText("IGUI_PhunMart_Hint_ItemKey"),
-        group = "giveItem"
+        group = "giveItem",
+        required = true
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
-        default = def.price or "",
-        allowEmpty = true,
+        selected = def.price or "",
         group = "instance"
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
         hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
-        group = "instance"
+        group = "instance",
+        numeric = true,
+        min = 0
     })
     form:addTextField("stockMin", getText("IGUI_PhunMart_Lbl_StockMin"), {
         default = (def.offer and def.offer.stock and def.offer.stock.min) and tostring(def.offer.stock.min) or "",
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        group = "instance"
+        group = "instance",
+        integer = true,
+        min = 0
     })
     form:addTextField("stockMax", getText("IGUI_PhunMart_Lbl_StockMax"), {
         default = (def.offer and def.offer.stock and def.offer.stock.max) and tostring(def.offer.stock.max) or "",
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        group = "instance"
+        group = "instance",
+        integer = true,
+        min = 0
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
         checked = def.enabled ~= false,

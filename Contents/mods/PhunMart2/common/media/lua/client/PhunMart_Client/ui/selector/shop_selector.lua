@@ -23,10 +23,25 @@ function UI:refreshAll()
     self.controls.list:clear()
     self.controls.list.instanceCounts = {}
     local shops = Core.runtime and Core.runtime.shops or {}
+
+    -- Sort by display name so the list holds a stable order between sessions —
+    -- pairs() order is undefined, and this is the first list an admin sees.
+    local rows = {}
     for shopType, shopDef in pairs(shops) do
-        self.controls.list:addItem(getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType, {
+        table.insert(rows, {
             type = shopType,
+            label = getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType,
             enabled = shopDef.enabled ~= false
+        })
+    end
+    table.sort(rows, function(a, b)
+        return a.label:lower() < b.label:lower()
+    end)
+
+    for _, row in ipairs(rows) do
+        self.controls.list:addItem(row.label, {
+            type = row.type,
+            enabled = row.enabled
         })
     end
 

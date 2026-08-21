@@ -55,6 +55,7 @@ end
 local function createEditModal(itemKey, itemDef, isNew, cb)
     local def = itemDef or {}
 
+    local items = Core.defs and Core.defs.items or require "PhunMart/defaults/items"
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceKeys = {""}
     for _, pk in ipairs(getSortedKeys(prices)) do table.insert(priceKeys, pk) end
@@ -82,16 +83,19 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
         title = titleText,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then return end
 
-            local result = {
-                price = f:getFieldValue("price"),
-                reward = f:getFieldValue("special"),
-                offer = {}
-            }
+            -- Start from the existing definition so anything this form doesn't
+            -- model survives; diffTable drops whatever is unchanged.
+            local result = Core.utils.deepCopy(def)
+            result.offer = result.offer or {}
 
-            local weight = f:getFieldNumber("weight")
-            result.offer.weight = weight or 1.0
+            local priceVal = f:getFieldValue("price")
+            result.price = (priceVal ~= "") and priceVal or nil
+
+            local specialVal = f:getFieldValue("special")
+            result.reward = (specialVal ~= "") and specialVal or nil
+
+            result.offer.weight = f:getFieldNumber("weight") or 1.0
 
             local stockMin, stockMax = f:getFieldRange("stock")
             if stockMin and stockMax then
@@ -99,11 +103,14 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
                     min = math.floor(stockMin),
                     max = math.floor(stockMax)
                 }
+            else
+                -- Blank stock means unlimited; clear any previous limit.
+                result.offer.stock = nil
             end
 
-            if not f:getFieldValue("enabled") then
-                result.enabled = false
-            end
+            -- Written explicitly rather than only on false, so re-enabling is a
+            -- real change the override layer can carry.
+            result.enabled = f:getFieldValue("enabled") and true or false
 
             if cb then cb(key, result) end
             f:close()
@@ -112,6 +119,12 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
 
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = itemKey or "", editable = isNew,
+        required = true,
+        validate = isNew and function(value)
+            if items[value] then
+                return getText("IGUI_PhunMart_Err_KeyInUse")
+            end
+        end or nil,
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = priceKeys, selected = def.price or priceKeys[1],
@@ -124,10 +137,12 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = weightDefault,
         hint = getText("IGUI_PhunMart_Hint_Weight"),
+        numeric = true, min = 0,
     })
     form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
-        min = stockMinDefault, max = stockMaxDefault,
+        minDefault = stockMinDefault, maxDefault = stockMaxDefault,
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+        integer = true, min = 0, requireBoth = true,
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
         checked = def.enabled ~= false,

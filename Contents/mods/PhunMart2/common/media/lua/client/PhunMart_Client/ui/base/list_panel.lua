@@ -188,6 +188,11 @@ end
 function ListPanel:clearList()
     self._allItems = {}
     self.list:clear()
+    -- Clear the box too, not just the cached text — otherwise a refresh (which
+    -- every save triggers) leaves a filter showing that isn't being applied.
+    if self._filterEntry then
+        self._filterEntry:setText("")
+    end
     self._lastFilterText = ""
 end
 

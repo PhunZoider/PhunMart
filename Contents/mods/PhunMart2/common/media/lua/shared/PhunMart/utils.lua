@@ -59,9 +59,50 @@ function utils.isAdmin(player, ignoreLocal)
 end
 
 
+--- Tombstone sentinel. The override layer is a deep merge, which can only add
+--- or replace keys — it has no way to say "this key should not exist". Storing
+--- this value against a key means "unset it": diffTable emits it for keys the
+--- editor dropped, deepMerge carries it through into the override file, and
+--- stripRemoved deletes it (and the key) when the overrides land on the
+--- defaults in Core.compileWith. Without it, unticking Enabled or clearing an
+--- optional field is a permanent, irreversible edit.
+utils.REMOVED = "__phunmart_removed__"
+
+function utils.isRemoved(v)
+    return v == utils.REMOVED
+end
+
+--- Recursively drop every key whose value is the tombstone sentinel.
+--- Sequences are rebuilt contiguously so removals never leave holes.
+function utils.stripRemoved(t)
+    if type(t) ~= "table" then
+        return t
+    end
+    if utils.isSequence(t) then
+        local out = {}
+        for _, v in ipairs(t) do
+            if v ~= utils.REMOVED then
+                table.insert(out, type(v) == "table" and utils.stripRemoved(v) or v)
+            end
+        end
+        return out
+    end
+    local out = {}
+    for k, v in pairs(t) do
+        if v ~= utils.REMOVED then
+            out[k] = type(v) == "table" and utils.stripRemoved(v) or v
+        end
+    end
+    return out
+end
+
 --- Compute a minimal diff of `edited` against `original`.
 --- Returns a table containing only keys whose values differ.
 --- Nested maps are diffed recursively; sequences are compared as wholes.
+--- Keys present in `original` but absent from `edited` are emitted as
+--- utils.REMOVED tombstones — callers must therefore pass a complete `edited`
+--- table (see utils.deepCopy) rather than only the fields they manage, or the
+--- unmanaged ones will be unset.
 --- Returns nil if there are no differences.
 function utils.diffTable(original, edited)
     if original == nil then
@@ -95,6 +136,14 @@ function utils.diffTable(original, edited)
         local sub = utils.diffTable(original[k], v)
         if sub ~= nil then
             diff[k] = sub
+            hasDiff = true
+        end
+    end
+    -- Keys the editor dropped become tombstones, so the override file can
+    -- express a removal rather than silently keeping the previous value.
+    for k in pairs(original) do
+        if edited[k] == nil then
+            diff[k] = utils.REMOVED
             hasDiff = true
         end
     end

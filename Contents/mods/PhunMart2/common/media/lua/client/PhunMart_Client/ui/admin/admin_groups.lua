@@ -142,6 +142,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local defaults = def.defaults or {}
     local offer = defaults.offer or {}
 
+    local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceOpts = {""}
     local priceKeys = getSortedKeys(prices)
@@ -173,42 +174,49 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(480 * FONT_SCALE),
         title = titleText,
+        -- A group with nothing to draw from produces no offers. Every shipped
+        -- group has exactly one source, so requiring one blocks nothing real.
+        validate = function(f)
+            if #selectedCats == 0 and #selectedItems == 0 and #selectedSpecialItems == 0 and #selectedSpecialCats ==
+                0 then
+                return getText("IGUI_PhunMart_Err_NeedItemOrCat")
+            end
+        end,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then return end
 
-            local result = { defaults = { offer = {} } }
+            -- Start from the existing definition so anything this form doesn't
+            -- model survives; diffTable drops whatever is unchanged.
+            local result = Core.utils.deepCopy(def)
+            result.defaults = result.defaults or {}
+            result.defaults.offer = result.defaults.offer or {}
 
             local priceText = f:getFieldValue("price")
-            if priceText ~= "" then result.defaults.price = priceText end
+            result.defaults.price = (priceText ~= "") and priceText or nil
 
-            if selectedSpecial and selectedSpecial ~= "" then
-                result.defaults.reward = selectedSpecial
-            end
+            result.defaults.reward = (selectedSpecial and selectedSpecial ~= "") and selectedSpecial or nil
 
-            local weight = f:getFieldNumber("weight")
-            result.defaults.offer.weight = weight or 1.0
+            result.defaults.offer.weight = f:getFieldNumber("weight") or 1.0
 
             local labelText = f:getFieldValue("label")
-            if labelText ~= "" then result.label = labelText end
+            result.label = (labelText ~= "") and labelText or nil
 
-            if #selectedCats > 0 then result.categories = selectedCats end
-            if #selectedItems > 0 then result.items = selectedItems end
-            if #selectedSpecialItems > 0 then result.specials = selectedSpecialItems end
-            if #selectedSpecialCats > 0 then result.specialCategories = selectedSpecialCats end
+            result.categories = #selectedCats > 0 and selectedCats or nil
+            result.items = #selectedItems > 0 and selectedItems or nil
+            result.specials = #selectedSpecialItems > 0 and selectedSpecialItems or nil
+            result.specialCategories = #selectedSpecialCats > 0 and selectedSpecialCats or nil
 
             local fbTex = f:getFieldValue("fallbackTexture")
-            if fbTex and fbTex ~= "" then result.fallbackTexture = fbTex end
+            result.fallbackTexture = (fbTex ~= "") and fbTex or nil
             local fbCat = f:getFieldValue("fallbackCategory")
-            if fbCat and fbCat ~= "" then result.fallbackCategory = fbCat end
+            result.fallbackCategory = (fbCat ~= "") and fbCat or nil
 
-            if #selectedBlItems > 0 then result.blacklist = selectedBlItems end
-            if #selectedBlCats > 0 then result.blacklistCategories = selectedBlCats end
+            result.blacklist = #selectedBlItems > 0 and selectedBlItems or nil
+            result.blacklistCategories = #selectedBlCats > 0 and selectedBlCats or nil
 
-            -- Enabled
-            if not f:getFieldValue("enabled") then
-                result.enabled = false
-            end
+            -- Written explicitly rather than only on false, so re-enabling is a
+            -- real change the override layer can carry.
+            result.enabled = f:getFieldValue("enabled") and true or false
 
             if cb then cb(key, result) end
             f:close()
@@ -217,6 +225,12 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = groupKey or "", editable = isNew,
+        required = true,
+        validate = isNew and function(value)
+            if groups[value] then
+                return getText("IGUI_PhunMart_Err_KeyInUse")
+            end
+        end or nil,
     })
     form:addTextField("label", getText("IGUI_PhunMart_Lbl_Label"), {
         default = def.label or "",
@@ -294,6 +308,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = tostring(offer.weight or "1.0"),
         hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
+        numeric = true, min = 0,
     })
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
         default = def.fallbackTexture or "",

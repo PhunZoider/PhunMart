@@ -88,7 +88,8 @@ local function formatKeyList(keys, limit)
     return text
 end
 
--- Collect sorted price keys for combo.
+-- Collect sorted price keys for combo. The leading blank is the "no default
+-- price" option, and lets an existing one be cleared.
 local function getPriceKeys()
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local keys = {}
@@ -98,11 +99,26 @@ local function getPriceKeys()
         end
     end
     table.sort(keys)
+    table.insert(keys, 1, "")
     return keys
+end
+
+-- Reject anything in the zones field that isn't a plain number.
+local function validateZones(value)
+    if not value or value == "" then
+        return nil
+    end
+    for s in value:gmatch("[^,]+") do
+        if not tonumber(s:match("^%s*(.-)%s*$")) then
+            return getText("IGUI_PhunMart_Err_Numeric")
+        end
+    end
+    return nil
 end
 
 local function createEditModal(poolKey, poolDef, isNew, cb)
     local def = poolDef or {}
+    local allPools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
 
     local zonesDefault = ""
     if def.zones and def.zones.difficulty then
@@ -134,49 +150,42 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         title = titleText,
         onApply = function(f)
             local key = f:getFieldValue("key")
-            if not key or key == "" then return end
 
-            local result = {}
+            -- Start from the existing definition so keys this form doesn't model
+            -- survive the edit — pool blacklists, written by the in-shop menu,
+            -- being the one that bites. diffTable drops anything unchanged
+            -- before it reaches the override file, and emits a tombstone for
+            -- anything we clear below.
+            local result = Core.utils.deepCopy(def)
 
             -- Sources (groups only)
-            if #selectedGroups > 0 then
-                result.sources = { groups = selectedGroups }
-            end
+            result.sources = #selectedGroups > 0 and {groups = selectedGroups} or nil
 
             -- Defaults price (optional)
             local priceVal = f:getFieldValue("defaultsPrice")
             if priceVal and priceVal ~= "" then
                 result.defaults = result.defaults or {}
                 result.defaults.price = priceVal
+            elseif result.defaults then
+                result.defaults.price = nil
             end
 
             -- Zones (optional)
             local zones = parseCSVNumbers(f:getFieldValue("zones"))
-            if zones then
-                result.zones = { difficulty = zones }
-            end
+            result.zones = zones and {difficulty = zones} or nil
 
-            -- Fallback Texture (optional)
+            -- Fallback texture / category (optional)
             local fbTex = f:getFieldValue("fallbackTexture")
-            if fbTex and fbTex ~= "" then
-                result.fallbackTexture = fbTex
-            end
+            result.fallbackTexture = (fbTex ~= "") and fbTex or nil
 
-            -- Fallback Category (optional)
             local fbCat = f:getFieldValue("fallbackCategory")
-            if fbCat and fbCat ~= "" then
-                result.fallbackCategory = fbCat
-            end
+            result.fallbackCategory = (fbCat ~= "") and fbCat or nil
 
-            -- Sticky
-            if f:getFieldValue("sticky") then
-                result.sticky = true
-            end
+            result.sticky = f:getFieldValue("sticky") and true or nil
 
-            -- Enabled
-            if not f:getFieldValue("enabled") then
-                result.enabled = false
-            end
+            -- Written explicitly rather than only on false, so re-enabling is a
+            -- real change the override layer can carry.
+            result.enabled = f:getFieldValue("enabled") and true or false
 
             if cb then cb(key, result) end
             f:close()
@@ -185,6 +194,12 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = poolKey or "", editable = isNew,
+        required = true,
+        validate = isNew and function(value)
+            if allPools[value] then
+                return getText("IGUI_PhunMart_Err_KeyInUse")
+            end
+        end or nil,
     })
     form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
         checked = def.sticky == true,
@@ -202,9 +217,10 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
         default = zonesDefault,
         hint = getText("IGUI_PhunMart_Hint_Zones"),
+        validate = validateZones,
     })
     form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
-        options = priceKeys, default = currentPrice, allowEmpty = true,
+        options = priceKeys, selected = currentPrice,
     })
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
         default = def.fallbackTexture or "",
@@ -428,6 +444,12 @@ function UI.OnEditPool(player, poolKey)
     end
     createEditModal(poolKey, poolDef, isNew, function(key, def)
         savePoolDef(key, def)
-        print("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
+        -- Refresh an open Pools list, matching what OnEditGroup / OnEditItem do;
+        -- without this an edit made from the in-shop menu leaves the list stale.
+        local inst = UI.instances[player:getPlayerNum()]
+        if inst and inst:isVisible() then
+            inst:refreshPools()
+        end
+        Core.debugLn("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
     end)
 end

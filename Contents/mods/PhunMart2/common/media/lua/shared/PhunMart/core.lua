@@ -702,6 +702,7 @@ end
 -- override tables from the server and calls this — client never touches the FS.
 
 local _deepMerge = Core.utils.deepMerge
+local _stripRemoved = Core.utils.stripRemoved
 
 local function _loadDefaults(path)
     local ok, result = pcall(require, path)
@@ -723,7 +724,10 @@ function Core.compileWith(overrides)
                 base[k] = v
             end
         end
-        return _deepMerge(base, override or {})
+        -- Overrides may carry tombstones (utils.REMOVED) marking keys the editor
+        -- cleared. Strip them here so the compiled context sees the key as absent
+        -- rather than set to a sentinel string.
+        return _stripRemoved(_deepMerge(base, override or {}))
     end
 
     local ctx = {

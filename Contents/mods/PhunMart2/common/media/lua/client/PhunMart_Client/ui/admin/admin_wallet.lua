@@ -134,6 +134,9 @@ end
 function EditModal:onApply()
     local raw = parseAmount(self.amountEntry:getText(), self.format)
     if not raw then
+        -- Reuse the format hint as the error slot so the modal doesn't resize.
+        self.hintLabel:setName(getText("IGUI_PhunMart_Err_Amount"))
+        self.hintLabel.r, self.hintLabel.g, self.hintLabel.b = 0.95, 0.45, 0.4
         return
     end
 
@@ -238,8 +241,17 @@ function UI:setWallet(wallet)
     self.datas:clear()
     self.datas:setVisible(false)
 
+    -- Sort by key: pairs() order is undefined, so without this the balance rows
+    -- reorder themselves between refreshes.
     local pools = Core.wallet.pools or {}
-    for pool, def in pairs(pools) do
+    local poolKeys = {}
+    for pool in pairs(pools) do
+        table.insert(poolKeys, pool)
+    end
+    table.sort(poolKeys)
+
+    for _, pool in ipairs(poolKeys) do
+        local def = pools[pool]
         local current = (wallet.current or {})[pool] or 0
         self.datas:addItem(pool, {
             label = def.label or pool,

@@ -181,9 +181,6 @@ local function createSetEditForm(setData, isNew, cb)
         title = titleText,
         onApply = function(f)
             local pools = f:getFieldValue("pools")
-            if not pools or #pools == 0 then
-                return
-            end
 
             local result = {
                 keys = {}
@@ -223,6 +220,7 @@ local function createSetEditForm(setData, isNew, cb)
     form:addPickerField("pools", getText("IGUI_PhunMart_Lbl_Pools"), {
         value = selectedPools,
         display = formatPoolDisplay(selectedPools),
+        required = true,
         onPick = function(f, field)
             local poolKeys = getPoolKeys()
             KeyPicker.open(getSpecificPlayer(0), poolKeys, selectedPools, function(keys)
@@ -235,7 +233,9 @@ local function createSetEditForm(setData, isNew, cb)
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = "1.0",
-        hint = getText("IGUI_PhunMart_Hint_PoolWeight")
+        hint = getText("IGUI_PhunMart_Hint_PoolWeight"),
+        numeric = true,
+        min = 0
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceKeys,
@@ -243,9 +243,12 @@ local function createSetEditForm(setData, isNew, cb)
         hint = getText("IGUI_PhunMart_Hint_SetPrice")
     })
     form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_DefaultRoll"), {
-        min = rollMinDefault,
-        max = rollMaxDefault,
-        hint = getText("IGUI_PhunMart_Hint_DefaultRoll")
+        minDefault = rollMinDefault,
+        maxDefault = rollMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_DefaultRoll"),
+        integer = true,
+        min = 0,
+        requireBoth = true
     })
 
     form:initialise()
@@ -276,7 +279,11 @@ local function parseCSV(text)
     return result
 end
 
-local function createEditModal(shopKey, shopDef, cb)
+-- `shopDef` populates the fields and may come from the compiled runtime as a
+-- fallback. `preserveBase` is the definition-table entry only — the compiled
+-- runtime carries resolved offers and prices that must never be written back
+-- into an override file, so it is not a safe base to copy forward from.
+local function createEditModal(shopKey, shopDef, preserveBase, cb)
     local def = shopDef or {}
 
     local rollMinDefault = ""
@@ -293,44 +300,24 @@ local function createEditModal(shopKey, shopDef, cb)
         width = math.floor(560 * FONT_SCALE),
         title = getText("IGUI_PhunMart_Title_EditX", shopKey or ""),
         onApply = function(f)
-            local result = {}
+            -- Start from the existing definition so anything this form doesn't
+            -- model survives the round trip; diffTable drops what's unchanged
+            -- and tombstones what we clear below.
+            local result = Core.utils.deepCopy(preserveBase or {})
 
-            result.enabled = f:getFieldValue("enabled")
-
-            local prob = f:getFieldNumber("probability")
-            if prob then
-                result.probability = prob
-            end
-
-            local dist = f:getFieldNumber("minDistance")
-            if dist then
-                result.minDistance = dist
-            end
-
-            local restock = f:getFieldNumber("restockFrequency")
-            if restock then
-                result.restockFrequency = restock
-            end
+            result.enabled = f:getFieldValue("enabled") and true or false
+            result.probability = f:getFieldNumber("probability")
+            result.minDistance = f:getFieldNumber("minDistance")
+            result.restockFrequency = f:getFieldNumber("restockFrequency")
 
             local view = f:getFieldValue("defaultView")
-            if view == "list" then
-                result.defaultView = "list"
-            end
+            result.defaultView = (view == "list") and "list" or nil
 
             local bg = f:getFieldValue("background")
-            if bg and bg ~= "" then
-                result.background = bg
-            end
+            result.background = (bg and bg ~= "") and bg or nil
 
-            local sprites = parseCSV(f:getFieldValue("sprites"))
-            if sprites then
-                result.sprites = sprites
-            end
-
-            local unpSprites = parseCSV(f:getFieldValue("unpSprites"))
-            if unpSprites then
-                result.unpoweredSprites = unpSprites
-            end
+            result.sprites = parseCSV(f:getFieldValue("sprites"))
+            result.unpoweredSprites = parseCSV(f:getFieldValue("unpSprites"))
 
             local rollMin, rollMax = f:getFieldRange("roll")
             if rollMin and rollMax then
@@ -341,12 +328,12 @@ local function createEditModal(shopKey, shopDef, cb)
                         max = rollMax
                     }
                 }
+            else
+                result.roll = nil
             end
 
             local poolSets = f:getFieldValue("poolSets")
-            if poolSets and #poolSets > 0 then
-                result.poolSets = poolSets
-            end
+            result.poolSets = (poolSets and #poolSets > 0) and poolSets or nil
 
             if cb then
                 cb(shopKey, result)
@@ -361,15 +348,21 @@ local function createEditModal(shopKey, shopDef, cb)
     })
     form:addTextField("probability", getText("IGUI_PhunMart_Lbl_Probability"), {
         default = tostring(def.probability or 1),
-        hint = getText("IGUI_PhunMart_Hint_Probability")
+        hint = getText("IGUI_PhunMart_Hint_Probability"),
+        numeric = true,
+        min = 0
     })
     form:addTextField("minDistance", getText("IGUI_PhunMart_Lbl_MinDistance"), {
         default = def.minDistance and tostring(def.minDistance) or "",
-        hint = getText("IGUI_PhunMart_Hint_MinDistance")
+        hint = getText("IGUI_PhunMart_Hint_MinDistance"),
+        integer = true,
+        min = 0
     })
     form:addTextField("restockFrequency", getText("IGUI_PhunMart_Lbl_RestockFrequency"), {
         default = def.restockFrequency and tostring(def.restockFrequency) or "",
-        hint = getText("IGUI_PhunMart_Hint_RestockFrequency")
+        hint = getText("IGUI_PhunMart_Hint_RestockFrequency"),
+        numeric = true,
+        min = 0
     })
     form:addComboField("defaultView", getText("IGUI_PhunMart_Lbl_DefaultView"), {
         options = {"grid", "list"},
@@ -389,9 +382,12 @@ local function createEditModal(shopKey, shopDef, cb)
         hint = getText("IGUI_PhunMart_Hint_UnpSprites")
     })
     form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_RollMin"), {
-        min = rollMinDefault,
-        max = rollMaxDefault,
-        hint = getText("IGUI_PhunMart_Hint_ShopRoll")
+        minDefault = rollMinDefault,
+        maxDefault = rollMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_ShopRoll"),
+        integer = true,
+        min = 0,
+        requireBoth = true
     })
 
     form:addListField("poolSets", getText("IGUI_PhunMart_Lbl_PoolSets"), {
@@ -436,6 +432,7 @@ function AdminShops.OnOpenPanel(player, shopKey)
     -- Fall back to runtime for fields not in defs (backwards compat).
     local defs = Core.defs and Core.defs.shops
     local shopDef = defs and defs[shopKey]
+    local preserveBase = shopDef
     if not shopDef then
         local runtime = Core.runtime and Core.runtime.shops
         shopDef = runtime and runtime[shopKey]
@@ -444,7 +441,7 @@ function AdminShops.OnOpenPanel(player, shopKey)
         return
     end
 
-    createEditModal(shopKey, shopDef, function(key, def)
+    createEditModal(shopKey, shopDef, preserveBase, function(key, def)
         def.type = key
         sendClientCommand(Core.name, Core.commands.upsertShopDefinition, def)
         if not Core.isLocal and Core.defs and Core.defs.shops then
