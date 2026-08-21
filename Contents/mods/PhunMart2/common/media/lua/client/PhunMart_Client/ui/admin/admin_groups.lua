@@ -8,6 +8,7 @@ local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local CategoryPicker = require "PhunMart_Client/ui/base/category_picker"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
+local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -387,6 +388,20 @@ function UI:createChildren()
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), self.onDeleteClick, true)
+end
+
+function UI:onDeleteClick()
+    if not self.list.selected or self.list.selected == 0 then
+        return
+    end
+    local selectedItem = self.list.items[self.list.selected]
+    if not selectedItem then
+        return
+    end
+    DeleteHelper.confirm("groups", selectedItem.item.key, function()
+        self:refreshGroups()
+    end)
 end
 
 function UI:getFilterText(itemData)

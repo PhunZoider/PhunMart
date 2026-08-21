@@ -5,6 +5,7 @@ end
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
+local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -498,6 +499,20 @@ function UI:createChildren()
     -- Bottom buttons
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), UI.onAddClick, false)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), UI.onDeleteClick, true)
+end
+
+function UI:onDeleteClick()
+    if not self.list.selected or self.list.selected == 0 then
+        return
+    end
+    local selectedItem = self.list.items[self.list.selected]
+    if not selectedItem then
+        return
+    end
+    DeleteHelper.confirm("specials", selectedItem.item.key, function()
+        self:refreshSpecials()
+    end)
 end
 
 function UI:getFilterText(itemData)

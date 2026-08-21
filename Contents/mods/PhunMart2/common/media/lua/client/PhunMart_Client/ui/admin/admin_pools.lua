@@ -6,6 +6,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
+local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -367,6 +368,7 @@ function UI:createChildren()
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), UI.onAddClick, false)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_View"), UI.onViewClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), UI.onDeleteClick, true)
 end
 
 function UI:getFilterText(itemData)
@@ -442,6 +444,19 @@ function UI:onEditClick()
     local data = selectedItem.item
     createEditModal(data.key, data.def, false, function(key, def)
         savePoolDef(key, def)
+        self:refreshPools()
+    end)
+end
+
+function UI:onDeleteClick()
+    if not self.list.selected or self.list.selected == 0 then
+        return
+    end
+    local selectedItem = self.list.items[self.list.selected]
+    if not selectedItem then
+        return
+    end
+    DeleteHelper.confirm("pools", selectedItem.item.key, function()
         self:refreshPools()
     end)
 end

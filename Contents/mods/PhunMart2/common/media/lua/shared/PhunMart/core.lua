@@ -41,6 +41,7 @@ PhunMart = {
         upsertPriceDef = "PhunMartUpsertPriceDef",
         upsertSpecialDef = "PhunMartUpsertSpecialDef",
         upsertPoolDef = "PhunMartUpsertPoolDef",
+        deleteDefinition = "PhunMartDeleteDefinition",
         getShopList = "PhunMartGetShopList",
         getInstanceList = "PhunMartGetInstanceList",
         getShopData = "PhunMartGetShopData",
@@ -715,13 +716,42 @@ local function _loadDefaults(path)
     return result or {}
 end
 
+-- Which default modules feed each definition category. Single source of truth:
+-- compileWith builds the base context from these, and the admin UI uses them to
+-- tell an admin-created key (deletable) from one that ships with the mod (only
+-- maskable, never removable).
+Core.defaultPaths = {
+    prices = {"PhunMart/defaults/prices"},
+    specials = {"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards", "PhunMart/defaults/animal_rewards"},
+    conditionsDefs = {"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"},
+    items = {"PhunMart/defaults/items", "PhunMart/defaults/xp_items"},
+    groups = {"PhunMart/defaults/groups"},
+    pools = {"PhunMart/defaults/pools"},
+    shops = {"PhunMart/defaults/shops"}
+}
+
+--- True when `key` is defined by the mod's own defaults for `kind`.
+--- Such a key can be disabled but never deleted: the override layer sits on top
+--- of the defaults, so removing the override just restores the shipped version.
+function Core.isShippedKey(kind, key)
+    if not key then
+        return false
+    end
+    for _, path in ipairs(Core.defaultPaths[kind] or {}) do
+        if _loadDefaults(path)[key] ~= nil then
+            return true
+        end
+    end
+    return false
+end
+
 function Core.compileWith(overrides)
     overrides = overrides or {}
     Core.compiler = Core.compiler or require "PhunMart/compiler"
 
-    local function mergeCtx(defaultPaths, override)
+    local function mergeCtx(kind, override)
         local base = {}
-        for _, path in ipairs(defaultPaths) do
+        for _, path in ipairs(Core.defaultPaths[kind] or {}) do
             for k, v in pairs(_loadDefaults(path)) do
                 base[k] = v
             end
@@ -733,15 +763,13 @@ function Core.compileWith(overrides)
     end
 
     local ctx = {
-        prices = mergeCtx({"PhunMart/defaults/prices"}, overrides.prices),
-        specials = mergeCtx({"PhunMart/defaults/specials", "PhunMart/defaults/xp_rewards",
-                             "PhunMart/defaults/animal_rewards"}, overrides.specials),
-        conditionsDefs = mergeCtx({"PhunMart/defaults/conditions", "PhunMart/defaults/xp_conditions"},
-            overrides.conditionsDefs),
-        items = mergeCtx({"PhunMart/defaults/items", "PhunMart/defaults/xp_items"}, overrides.items),
-        groups = mergeCtx({"PhunMart/defaults/groups"}, overrides.groups),
-        pools = mergeCtx({"PhunMart/defaults/pools"}, overrides.pools),
-        shops = mergeCtx({"PhunMart/defaults/shops"}, overrides.shops)
+        prices = mergeCtx("prices", overrides.prices),
+        specials = mergeCtx("specials", overrides.specials),
+        conditionsDefs = mergeCtx("conditionsDefs", overrides.conditionsDefs),
+        items = mergeCtx("items", overrides.items),
+        groups = mergeCtx("groups", overrides.groups),
+        pools = mergeCtx("pools", overrides.pools),
+        shops = mergeCtx("shops", overrides.shops)
     }
 
     local runtime, log = Core.compiler.compileAll(ctx)

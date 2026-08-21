@@ -383,7 +383,23 @@ function ServerSystem:upsertDefinition(filename, defsKey, key, def)
     self:recompileShops()
 end
 
---- Relocate a shop's global object and instance data from old coords to new coords.
+--- Drop a definition's override entry entirely.
+-- Only meaningful for a key that exists solely in the override file: the
+-- override layer sits on top of the shipped defaults, so removing the entry for
+-- a default-supplied key just restores the shipped version rather than deleting
+-- it. Callers are expected to have checked Core.isShippedKey first.
+function ServerSystem:deleteDefinition(filename, key)
+    local override = Core.fileUtils.loadTable(filename) or {}
+    if override[key] == nil then
+        return false
+    end
+    override[key] = nil
+    Core.fileUtils.saveTable(filename, override)
+    self:recompileShops()
+    return true
+end
+
+-- Relocate a shop's global object and instance data from old coords to new coords.
 --- Preserves shop type, facing, offers, restock time, etc.
 function ServerSystem:relocateShop(oldX, oldY, oldZ, newX, newY, newZ)
     local oldObj = self:getLuaObjectAt(oldX, oldY, oldZ)

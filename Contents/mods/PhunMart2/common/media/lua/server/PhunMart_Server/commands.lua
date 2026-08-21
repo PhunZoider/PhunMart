@@ -116,6 +116,36 @@ Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
     Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.txt", "pools", args.key, args.def)
 end
 
+-- Override file backing each definition category the editors can delete from.
+-- Shops are deliberately absent: a shop definition backs machines already placed
+-- in the world, so it can be disabled but never removed.
+local DEF_OVERRIDE_FILES = {
+    pools = "PhunMart_Pools.txt",
+    groups = "PhunMart_Groups.txt",
+    items = "PhunMart_Items.txt",
+    prices = "PhunMart_Prices.txt",
+    specials = "PhunMart_Specials.txt"
+}
+
+Commands[Core.commands.deleteDefinition] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    local kind = args and args.kind
+    local key = args and args.key
+    local filename = kind and DEF_OVERRIDE_FILES[kind]
+    if not (filename and key) then
+        return
+    end
+    -- Refuse anything the mod itself ships; the client checks too, but the
+    -- server owns the files and shouldn't trust the caller.
+    if Core.isShippedKey(kind, key) then
+        Core.debugLn("deleteDefinition refused for shipped key " .. kind .. "/" .. tostring(key))
+        return
+    end
+    Core.ServerSystem.instance:deleteDefinition(filename, key)
+end
+
 Commands[Core.commands.getTokenRewards] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
