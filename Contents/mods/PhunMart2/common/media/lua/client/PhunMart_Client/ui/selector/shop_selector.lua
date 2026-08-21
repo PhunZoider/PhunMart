@@ -300,40 +300,61 @@ function UI:onAdminToolsMenu(btn)
     local screenY = btn:getAbsoluteY()
 
     local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
-    context:addOption(getText("IGUI_PhunMart_Btn_Pools"), self, function()
-        Core.ui.admin_pools.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Groups"), self, function()
-        Core.ui.admin_groups.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Specials"), self, function()
-        Core.ui.admin_specials.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Items"), self, function()
-        Core.ui.admin_items.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Prices"), self, function()
-        Core.ui.admin_prices.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Blacklist"), self, function()
-        Core.ui.admin_blacklist.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
-        Core.ui.admin.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Rewards"), self, function()
-        Core.ui.admin_rewards.OnOpenPanel(self.player)
-    end)
-    context:addOption(getText("IGUI_PhunMart_Btn_Recompile"), self, function()
-        sendClientCommand(Core.name, Core.commands.compile, {})
-    end)
+
+    -- Anything outstanding goes first and only when there is something to show,
+    -- so the one time-sensitive entry isn't buried among the editors.
     local pr = Core.ui.pending_restock
     if pr and pr.count() > 0 then
         context:addOption(getText("IGUI_PhunMart_Btn_PendingN", tostring(pr.count())), self, function()
             pr.show()
         end)
     end
-    context:addOption(getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
+
+    -- The definition editors are one bag of related things, not eight peers of
+    -- Wallet and Recompile. Ordered along the chain a shop actually resolves
+    -- through, rather than alphabetically, so the menu itself hints at how they
+    -- relate: pools draw on groups, groups gather items and specials, both of
+    -- which carry prices.
+    local defsMenu = ISContextMenu:getNew(context)
+    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Definitions")), defsMenu)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Pools"), self, function()
+        Core.ui.admin_pools.OnOpenPanel(self.player)
+    end)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Groups"), self, function()
+        Core.ui.admin_groups.OnOpenPanel(self.player)
+    end)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Items"), self, function()
+        Core.ui.admin_items.OnOpenPanel(self.player)
+    end)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Specials"), self, function()
+        Core.ui.admin_specials.OnOpenPanel(self.player)
+    end)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Prices"), self, function()
+        Core.ui.admin_prices.OnOpenPanel(self.player)
+    end)
+    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Blacklist"), self, function()
+        Core.ui.admin_blacklist.OnOpenPanel(self.player)
+    end)
+
+    local playersMenu = ISContextMenu:getNew(context)
+    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Players")), playersMenu)
+    playersMenu:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
+        Core.ui.admin.OnOpenPanel(self.player)
+    end)
+    playersMenu:addOption(getText("IGUI_PhunMart_Btn_Rewards"), self, function()
+        Core.ui.admin_rewards.OnOpenPanel(self.player)
+    end)
+
+    -- Recompile and Restock All are not editing actions, and sitting alongside
+    -- the editors made Recompile read as the commit step for an edit. It isn't:
+    -- every save already recompiles. Its real job is picking up override files
+    -- hand-edited on disk, which is a maintenance task.
+    local maintMenu = ISContextMenu:getNew(context)
+    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Maintenance")), maintMenu)
+    maintMenu:addOption(getText("IGUI_PhunMart_Btn_Recompile"), self, function()
+        sendClientCommand(Core.name, Core.commands.compile, {})
+    end)
+    maintMenu:addOption(getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
         local w = 300
         local h = 150
         local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - w / 2, getCore():getScreenHeight() / 2 - h / 2,

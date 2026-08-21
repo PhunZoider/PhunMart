@@ -377,7 +377,7 @@ function UI:createChildren()
     self.list:setOnMouseDoubleClick(self, self.GridDoubleClick)
 
     -- Bottom buttons: New, Edit (requires selection), View (requires selection)
-    self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), UI.onAddClick, false)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), UI.onAddClick, false)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_View"), UI.onViewClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), UI.onDeleteClick, true)

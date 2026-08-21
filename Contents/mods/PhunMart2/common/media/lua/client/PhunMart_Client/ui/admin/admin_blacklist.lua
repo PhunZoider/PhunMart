@@ -65,6 +65,8 @@ function UI:createChildren()
     self:addListColumn(getText("IGUI_PhunMart_Col_Name"), 0)
     self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0.45)
 
+    -- "Add" here rather than "New": this puts an existing item onto a list, it
+    -- doesn't author a new definition the way the other panels' buttons do.
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Add"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Unblacklist"), self.onRemoveClick, true)
 end
