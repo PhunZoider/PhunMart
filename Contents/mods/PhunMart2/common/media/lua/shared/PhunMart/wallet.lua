@@ -132,7 +132,7 @@ function Core.wallet:reset(player)
     end
 end
 
--- Direct pool adjustment — used by admin commands and purchase deduction.
+-- Direct pool adjustment, used by admin commands and purchase deduction.
 -- walletType is "current" or "bound".
 function Core.wallet:adjustByPool(player, walletType, pool, amount)
     local name = type(player) == "string" and player or player:getUsername()
@@ -147,7 +147,7 @@ end
 
 -- Adjust by coin item type (converts item → pool + value).
 -- Returns: adjusted (bool), atCap (bool).
--- If already at cap, returns false, true and the coin is NOT consumed — leave it in inventory.
+-- If already at cap, returns false, true and the coin is NOT consumed, leave it in inventory.
 function Core.wallet:adjust(player, item, amount)
     local currency = self.currencies[item]
     if not currency then

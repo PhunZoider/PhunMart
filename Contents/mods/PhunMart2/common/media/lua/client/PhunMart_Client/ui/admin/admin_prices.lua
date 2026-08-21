@@ -163,6 +163,14 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(360 * FONT_SCALE),
         title = titleText,
+        onDelete = (not isNew) and function(f)
+            DeleteHelper.confirm("prices", priceKey, function()
+                if not f._removed then
+                    f._removed = true
+                    f:close()
+                end
+            end)
+        end or nil,
         onApply = function(f)
             local key = f:getFieldValue("key")
 
@@ -485,3 +493,5 @@ function UI:drawRow(y, item, alt)
     self.itemsHeight = y + self.itemheight
     return self.itemsHeight
 end
+
+UI.refresh = UI.refreshPrices

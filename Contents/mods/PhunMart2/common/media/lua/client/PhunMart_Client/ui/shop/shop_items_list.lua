@@ -96,7 +96,7 @@ end
 function UI:initialise()
     ISPanel.initialise(self)
 
-    -- Tooltips are NOT added to UIManager here — added/removed dynamically so
+    -- Tooltips are NOT added to UIManager here. They are added and removed dynamically so
     -- render() is never called when hidden (avoids DoTooltip crashes on hidden panels).
     self.invTooltip = ISToolTipInv:new()
     self.invTooltip:initialise()
@@ -142,7 +142,7 @@ function UI:updateTooltip()
     -- Try inventory item tooltip first (real items only, not traits/vehicles/boosts)
     local itemName = e.offer and e.offer.item
     if itemName and getScriptManager():getItem(itemName) then
-        -- Cache InventoryItem per key — instanceItem is a Java call, avoid per-frame
+        -- Cache InventoryItem per key: instanceItem is a Java call, avoid per-frame
         if self._tipItemKey ~= itemName then
             self._tipItemKey = itemName
             self._tipItem = instanceItem(itemName)
@@ -525,7 +525,7 @@ function UI:onMouseUp(x, y)
     if self.onSelectFn then
         self.onSelectFn(e.id, e.offer, e)
     end
-    -- Re-assert tooltip after the callback — the UI state change from onSelectFn
+    -- Re-assert tooltip after the callback: the UI state change from onSelectFn
     -- (enabling buy button, 3D preview, etc.) can trigger a stray mouse event that
     -- clears the tooltip even though the mouse hasn't moved.
     self:updateTooltip()

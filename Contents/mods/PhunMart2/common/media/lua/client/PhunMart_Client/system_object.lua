@@ -68,7 +68,7 @@ function ClientObject:stateToIsoObject(isoObject)
     self:stateFromIsoObject(isoObject)
 end
 
--- Manual sync — call when you know the underlying IsoObject's modData may have changed.
+-- Manual sync: call when you know the underlying IsoObject's modData may have changed.
 function ClientObject:updateFromIsoObject()
     local iso = self:getIsoObject()
     if iso then

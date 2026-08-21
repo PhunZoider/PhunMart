@@ -3,7 +3,7 @@ id=3685690481
 title=PhunMart 2 [DEV]
 description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 description=
-description=⚠️ DEV BRANCH — Preview build for testing, balancing and feedback new featured in [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3689006725]PhunMart 2[/url]. This version may change frequently.
+description=⚠️ DEV BRANCH. Preview build for testing, balancing and feedback new featured in [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3689006725]PhunMart 2[/url]. This version may change frequently.
 description=[url=https://github.com/PhunZoider/PhunMart]Repo and more info[/url]
 description=
 tags=Build 42;Balance;Clothing/Armor;Food;Framework;Interface;Items;Misc;Multiplayer;Skills;Traits;Vehicles;Weapons

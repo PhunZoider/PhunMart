@@ -702,7 +702,7 @@ end
 -- Core.compileWith(overrides) is callable from both server and client.
 -- On the server, Core.compile() in server/main.lua reads override files from
 -- disk and calls this. On the client, the requestShopDefs handler receives the
--- override tables from the server and calls this — client never touches the FS.
+-- override tables from the server and calls this. The client never touches the FS.
 
 local _deepMerge = Core.utils.deepMerge
 local _stripRemoved = Core.utils.stripRemoved

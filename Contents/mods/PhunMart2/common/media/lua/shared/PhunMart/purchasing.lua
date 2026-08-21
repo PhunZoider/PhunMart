@@ -1,6 +1,6 @@
 require "PhunMart/core"
 local Core = PhunMart
--- NOTE: Do NOT cache Core.wallet here — wallet.lua loads after purchasing.lua
+-- NOTE: Do NOT cache Core.wallet here: wallet.lua loads after purchasing.lua
 -- (alphabetical order), so Core.wallet is nil at module load time.
 -- Access Core.wallet directly inside each function instead.
 

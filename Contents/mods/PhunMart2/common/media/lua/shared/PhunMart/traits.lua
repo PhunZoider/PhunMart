@@ -98,7 +98,7 @@ end
 
 -- Returns true if the player currently has the trait.
 -- traitKey: string type key (e.g. "base:blacksmith")
--- Uses player:getCharacterTraits():getKnownTraits() — mirrors vanilla B42 pattern.
+-- Uses player:getCharacterTraits():getKnownTraits(), mirroring the vanilla B42 pattern.
 function Traits.playerHas(player, traitKey)
     if not player or traitKey == nil then
         return false

@@ -113,7 +113,7 @@ end
 
 -- Options for the pool blacklist picker: everything currently blacklisted, plus
 -- everything the pool can currently offer. Seeding with the existing entries
--- matters — a blacklisted item is compiled out of pool.offers entirely, so
+-- matters: a blacklisted item is compiled out of pool.offers entirely, so
 -- without this the picker couldn't represent it and unticking would be the only
 -- way to lose it.
 local function getBlacklistOptions(poolKey, current)
@@ -206,12 +206,22 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(520 * FONT_SCALE),
         title = titleText,
+        -- Only offered on an existing entry; there is nothing to remove on an
+        -- Add form. The list refreshes itself once the recompile lands.
+        onDelete = (not isNew) and function(f)
+            DeleteHelper.confirm("pools", poolKey, function()
+                if not f._removed then
+                    f._removed = true
+                    f:close()
+                end
+            end)
+        end or nil,
         onApply = function(f)
             local key = f:getFieldValue("key")
 
             -- Start from the existing definition so keys this form doesn't model
-            -- survive the edit — pool blacklists, written by the in-shop menu,
-            -- being the one that bites. diffTable drops anything unchanged
+            -- survive the edit. Pool blacklists, written by the in-shop menu,
+            -- are the ones that bite. diffTable drops anything unchanged
             -- before it reaches the override file, and emits a tombstone for
             -- anything we clear below.
             local result = Core.utils.deepCopy(def)
@@ -557,3 +567,5 @@ function UI.OnEditPool(player, poolKey)
         Core.debugLn("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
     end)
 end
+
+UI.refresh = UI.refreshPools

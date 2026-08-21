@@ -1050,7 +1050,7 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- direct items (deprecated — use groups with 'items' field instead)
+            -- direct items (deprecated, use groups with an 'items' field instead)
             if type(sources.items) == "table" then
                 logger:warn("Pool '" .. poolKey ..
                                 "' uses sources.items (deprecated). Use groups with 'items' field instead.")
@@ -1062,7 +1062,7 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            -- specials-based items (deprecated — use groups with 'specialCategories' field instead)
+            -- specials-based items (deprecated, use groups with a 'specialCategories' field instead)
             if type(sources.specials) == "table" then
                 logger:warn("Pool '" .. poolKey ..
                                 "' uses sources.specials (deprecated). Use groups with 'specialCategories' field instead.")

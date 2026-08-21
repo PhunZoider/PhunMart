@@ -451,7 +451,7 @@ function ServerObject:updateSprite(force)
     if def.powered == true then
         local hasPower = self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
                              GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
-        -- skip if power state unchanged — avoids redundant setSprite + network transmit on every tick
+        -- skip if power state unchanged: avoids redundant setSprite + network transmit on every tick
         if not force and hasPower == self.powered then
             return
         end

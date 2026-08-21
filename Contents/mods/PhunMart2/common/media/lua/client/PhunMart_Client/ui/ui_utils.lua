@@ -158,7 +158,7 @@ function tools.resolveOfferDisplayName(offer)
 end
 
 -- Format a price for compact display (grid badges, list rows).
--- Returns (text, texture) — text is a short string like "FREE", "$1.50", "3t", "25";
+-- Returns (text, texture) where text is a short string like "FREE", "$1.50", "3t", "25";
 -- texture is the item icon for kind="items" (nil otherwise).
 function tools.formatPriceShort(offer)
     local price = offer and offer.price

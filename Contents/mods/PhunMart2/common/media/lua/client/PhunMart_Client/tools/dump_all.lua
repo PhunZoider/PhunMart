@@ -62,7 +62,7 @@ local function writeFile(name, lines)
     if ok then
         print_chat("Written: " .. filename)
     else
-        print_chat("FAILED: " .. filename .. " — " .. tostring(err))
+        print_chat("FAILED: " .. filename .. ": " .. tostring(err))
     end
 end
 
@@ -70,7 +70,7 @@ end
 
 function PhunDump.perks()
     local lines = {"-- PhunMart Perk Dump\n",
-                   "-- 'key' is tostring(perk:getType()) — use this as your cache/lookup key\n", "return {\n"}
+                   "-- 'key' is tostring(perk:getType()). Use this as your cache/lookup key\n", "return {\n"}
     for i = 0, Perks.getMaxIndex() - 1 do
         local perkEnum = Perks.fromIndex(i)
         local perk = PerkFactory.getPerk(perkEnum)
@@ -92,7 +92,7 @@ function PhunDump.perks()
 end
 
 function PhunDump.traits()
-    local lines = {"-- PhunMart Trait Dump\n", "-- 'key' is trait:getType() — use as lookup key\n",
+    local lines = {"-- PhunMart Trait Dump\n", "-- 'key' is trait:getType(). Use as lookup key\n",
                    "-- cost > 0 = good trait, cost < 0 = bad trait\n", "return {\n"}
     local ok, err = pcall(function()
         local traits = CharacterTraitDefinition.getTraits()
@@ -218,7 +218,7 @@ local COMMANDS = {
     vehicles = PhunDump.vehicles
 }
 
--- PhunDump.run("all") — callable from Lua console in SP/debug mode
+-- PhunDump.run("all") is callable from the Lua console in SP/debug mode
 function PhunDump.run(arg)
     if not Core.utils.isAdmin(getPlayer()) then
         print_chat("Admin access required.")

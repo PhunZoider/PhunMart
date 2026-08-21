@@ -68,7 +68,7 @@ function EditModal:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    local titleText = self.poolLabel .. " — " .. self.playerName
+    local titleText = self.poolLabel .. ": " .. self.playerName
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
@@ -457,7 +457,7 @@ if Core.isLocal then
 
     -- This is the singleplayer path for the adjustment. The server-side handler
     -- deliberately bails out under Core.isLocal so the increment isn't applied
-    -- twice — don't restore it there without removing it here.
+    -- twice. Don't restore it there without removing it here.
     Commands[Core.commands.adjustPlayerWallet] = function(player, args)
         Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
         for _, instance in pairs(UI.instances or {}) do

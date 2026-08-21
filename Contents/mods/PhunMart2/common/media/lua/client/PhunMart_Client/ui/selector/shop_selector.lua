@@ -24,7 +24,7 @@ function UI:refreshAll()
     self.controls.list.instanceCounts = {}
     local shops = Core.runtime and Core.runtime.shops or {}
 
-    -- Sort by display name so the list holds a stable order between sessions —
+    -- Sort by display name so the list holds a stable order between sessions.
     -- pairs() order is undefined, and this is the first list an admin sees.
     local rows = {}
     for shopType, shopDef in pairs(shops) do

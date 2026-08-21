@@ -13,8 +13,8 @@ local FONT_SCALE = tools.FONT_SCALE
 -- Shared "delete a definition" flow for the admin list panels.
 --
 -- Delete means two different things depending on where the key comes from:
---   * admin-created (override file only) — genuinely removable
---   * shipped with the mod — the override layer sits on top of the defaults,
+--   * admin-created (override file only): genuinely removable
+--   * shipped with the mod: the override layer sits on top of the defaults,
 --     so removing the override restores the shipped version rather than
 --     deleting it. Those can only be disabled.
 -- Rather than presenting a dead button for the second case, the confirm says
@@ -22,8 +22,8 @@ local FONT_SCALE = tools.FONT_SCALE
 ---------------------------------------------------------------------------
 local DeleteHelper = {}
 
--- Categories that carry an `enabled` flag. Prices don't — there is nothing to
--- disable on one, so a shipped price is simply immovable.
+-- Categories that carry an `enabled` flag. Prices don't, so there is nothing to
+-- disable on one and a shipped price is simply immovable.
 local CAN_DISABLE = {
     pools = true,
     groups = true,

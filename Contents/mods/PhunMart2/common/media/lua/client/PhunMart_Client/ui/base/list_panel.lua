@@ -3,6 +3,7 @@ if isServer() then
 end
 
 require "ISUI/ISCollapsableWindowJoypad"
+local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_HGT_SMALL = tools.FONT_HGT_SMALL
@@ -15,6 +16,22 @@ local HEADER_HGT = tools.HEADER_HGT
 local SCROLLBAR_W = 13
 
 local ListPanel = ISCollapsableWindowJoypad:derive("PhunMartListPanel")
+
+-- Open panels, weakly held so closed ones fall out on their own.
+local liveInstances = setmetatable({}, {
+    __mode = "k"
+})
+
+-- Re-read whenever the definitions recompile, so a change made anywhere (a
+-- different panel, the in-shop menu, another admin in multiplayer) shows up
+-- without reopening the window. Subclasses opt in by setting UI.refresh.
+Events[Core.events.OnDefsUpdated].Add(function()
+    for inst in pairs(liveInstances) do
+        if inst.refresh and inst.isVisible and inst:isVisible() then
+            inst:refresh()
+        end
+    end
+end)
 
 -- Export constants for subclasses
 ListPanel.PAD = PAD
@@ -40,6 +57,7 @@ function ListPanel:new(x, y, width, height, player)
     o.anchorRight = true
     o.anchorBottom = true
     o:setWantKeyEvents(true)
+    liveInstances[o] = true
     return o
 end
 
@@ -188,7 +206,7 @@ end
 function ListPanel:clearList()
     self._allItems = {}
     self.list:clear()
-    -- Clear the box too, not just the cached text — otherwise a refresh (which
+    -- Clear the box too, not just the cached text. Otherwise a refresh (which
     -- every save triggers) leaves a filter showing that isn't being applied.
     if self._filterEntry then
         self._filterEntry:setText("")

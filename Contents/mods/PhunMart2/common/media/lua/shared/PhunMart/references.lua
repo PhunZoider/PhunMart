@@ -1,8 +1,8 @@
 -- Reverse lookup across the definition graph: given a definition key, find
 -- everything that points at it.
 --
--- The definition tables form a chain — shop → pool → group → item/special →
--- price — but only ever store the forward direction, so nothing in the editor
+-- The definition tables form a chain (shop → pool → group → item/special →
+-- price) but only ever store the forward direction, so nothing in the editor
 -- could previously answer "what breaks if I remove this". This walks the
 -- compiled context to answer it. Used to warn before a delete, and intended as
 -- the basis for a "Used by" view on the definition panels.
@@ -26,7 +26,7 @@ end
 
 --- Find everything referencing `key` within category `kind`.
 -- @param kind  "prices" | "groups" | "pools" | "specials" | "items"
--- @return array of {kind, key, via} — `via` names the field that holds the
+-- @return array of {kind, key, via} where `via` names the field that holds the
 --         reference, so the caller can explain the relationship.
 function refs.find(kind, key)
     local defs = Core.defs or {}

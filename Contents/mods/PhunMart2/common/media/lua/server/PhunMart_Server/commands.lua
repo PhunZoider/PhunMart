@@ -570,7 +570,7 @@ Commands[Core.commands.getShopData] = function(playerObj, args)
     end
 end
 
--- Player picked up a coin in MP — adjust wallet, remove coin, and sync back.
+-- Player picked up a coin in MP: adjust wallet, remove coin, and sync back.
 Commands[Core.commands.consumeCoin] = function(playerObj, args)
     local itemType = args and args.itemType
     if not itemType or not Core.wallet:isCurrency(itemType) then
@@ -598,7 +598,7 @@ Commands[Core.commands.consumeCoin] = function(playerObj, args)
     })
 end
 
--- Player picked up a DroppedWallet in MP — merge balances, remove the specific
+-- Player picked up a DroppedWallet in MP: merge balances, remove the specific
 -- item by its ID, and sync back. B42 is server-authoritative so removal MUST
 -- happen server-side. Using getFirstTypeRecurse picks an arbitrary wallet and
 -- leaves ghosts on repeat pickups; getItemById matches the exact one.

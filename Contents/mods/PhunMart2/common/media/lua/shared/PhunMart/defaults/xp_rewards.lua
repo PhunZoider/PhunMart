@@ -2613,7 +2613,7 @@ return {
     },
 
     ---------------------------------------------------------------------------
-    -- TIER 2 BOOST REWARDS (enhanced — setPerkBoost level 2, 100% XP bonus)
+    -- TIER 2 BOOST REWARDS (enhanced, setPerkBoost level 2, 100% XP bonus)
     ---------------------------------------------------------------------------
     boost_Cooking_t2 = {
         inherit = "boost_reward_t2_base",
@@ -3317,7 +3317,7 @@ return {
     },
 
     ---------------------------------------------------------------------------
-    -- TIER 3 BOOST REWARDS (superior — setPerkBoost level 3, 125% XP bonus)
+    -- TIER 3 BOOST REWARDS (superior, setPerkBoost level 3, 125% XP bonus)
     ---------------------------------------------------------------------------
     boost_Cooking_t3 = {
         inherit = "boost_reward_t3_base",

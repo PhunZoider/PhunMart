@@ -60,7 +60,7 @@ end
 
 
 --- Tombstone sentinel. The override layer is a deep merge, which can only add
---- or replace keys — it has no way to say "this key should not exist". Storing
+--- or replace keys, so it has no way to say "this key should not exist". Storing
 --- this value against a key means "unset it": diffTable emits it for keys the
 --- editor dropped, deepMerge carries it through into the override file, and
 --- stripRemoved deletes it (and the key) when the overrides land on the
@@ -100,7 +100,7 @@ end
 --- Returns a table containing only keys whose values differ.
 --- Nested maps are diffed recursively; sequences are compared as wholes.
 --- Keys present in `original` but absent from `edited` are emitted as
---- utils.REMOVED tombstones — callers must therefore pass a complete `edited`
+--- utils.REMOVED tombstones, so callers must pass a complete `edited`
 --- table (see utils.deepCopy) rather than only the fields they manage, or the
 --- unmanaged ones will be unset.
 --- Returns nil if there are no differences.
@@ -271,7 +271,7 @@ function utils.merge(tableA, tableB, excludeKeys)
     if type(excludeKeys) == "table" then
         -- Support both plain arrays and ArrayList-like objects
         if excludeKeys.contains then
-            -- Legacy ArrayList — convert to set
+            -- Legacy ArrayList: convert to set
             for i = 0, (excludeKeys.size and excludeKeys:size() - 1 or -1) do
                 exclude[excludeKeys:get(i)] = true
             end

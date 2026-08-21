@@ -13,7 +13,7 @@ local BUTTON_HGT = tools.BUTTON_HGT
 local CHECK_SZ = FONT_HGT_SMALL
 
 ---------------------------------------------------------------------------
--- PickerPanel — filterable multi-select modal for choosing keys.
+-- PickerPanel: filterable multi-select modal for choosing keys.
 --
 -- Usage from a subclass:
 --   1. Derive:  local MyPicker = PickerPanel:derive("MyPicker")
@@ -22,8 +22,8 @@ local CHECK_SZ = FONT_HGT_SMALL
 --      callback(keys) receives an array of selected key strings, or nil on cancel.
 --
 -- Optional overrides:
---   :getFilterText(itemData)  — return searchable string for an item
---   :doDrawItem(y, item, alt) — custom row rendering
+--   :getFilterText(itemData)  returns a searchable string for an item
+--   :doDrawItem(y, item, alt) does custom row rendering
 ---------------------------------------------------------------------------
 local PickerPanel = ISCollapsableWindowJoypad:derive("PhunMartPickerPanel")
 
@@ -173,7 +173,7 @@ function PickerPanel:createChildren()
 end
 
 ---------------------------------------------------------------------------
--- Item population — override in subclass
+-- Item population: override in subclass
 ---------------------------------------------------------------------------
 
 --- Override this to add items via self:addPickerItem(key, display, extra).

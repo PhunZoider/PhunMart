@@ -67,6 +67,7 @@ function FormPanel:new(opts)
     o._groups = {} -- groupName -> {field descriptors}
     o._onApply = opts.onApply -- function(values)
     o._onCancel = opts.onCancel -- function() (optional)
+    o._onDelete = opts.onDelete -- function(form), optional; omit on an Add form
     o._validateForm = opts.validate -- function(form) -> errorText (cross-field rules)
     o._showErrors = false -- set on the first Apply; errors then track live edits
     o:setWantKeyEvents(true)
@@ -559,6 +560,18 @@ function FormPanel:createChildren()
     end
     self:addChild(self._cancelBtn)
 
+    -- Delete sits hard left, away from the centred Apply/Cancel pair, so it
+    -- can't be hit by aiming at either of them.
+    if self._onDelete then
+        self._deleteBtn = ISButton:new(PAD, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Delete"), self,
+            FormPanel._onDeleteClick)
+        self._deleteBtn:initialise()
+        if self._deleteBtn.enableCancelColor then
+            self._deleteBtn:enableCancelColor()
+        end
+        self:addChild(self._deleteBtn)
+    end
+
     -- Initial layout
     self:reflowFields()
 end
@@ -973,6 +986,10 @@ function FormPanel:reflowFields()
     self._applyBtn:setY(y)
     self._cancelBtn:setX(btnX + btnW + btnGap)
     self._cancelBtn:setY(y)
+    if self._deleteBtn then
+        self._deleteBtn:setX(PAD)
+        self._deleteBtn:setY(y)
+    end
 
     y = y + ROW_H + PAD
 
@@ -1213,6 +1230,12 @@ function FormPanel:_onApplyClick()
     end
     if self._onApply then
         self._onApply(self)
+    end
+end
+
+function FormPanel:_onDeleteClick()
+    if self._onDelete then
+        self._onDelete(self)
     end
 end
 

@@ -1,16 +1,16 @@
 # PhunMart
 
 A Project Zomboid (B42) mod that converts vanilla vending machines into 16 themed automated
-shops — dispensing food, gear, weapons, vehicles, skill books, traits, XP boosts, and more.
+shops, dispensing food, gear, weapons, vehicles, skill books, traits, XP boosts, and more.
 Stock rotates on a timer. Coins come from scavenging. Tokens come from surviving.
 
 Shops source from the game's item catalogue by category, so **modded items show up
-automatically** — no config needed. Right-click a machine, browse the shop UI, and buy with
+automatically**, no config needed. Right-click a machine, browse the shop UI, and buy with
 **change** (coins found as loot) or **tokens** (earned through milestones and trade-ins).
 Admins can place machines manually and override every aspect of the system through Lua files.
 
 > **Requires:** Project Zomboid Build 42.15+ (singleplayer or multiplayer)
-> **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) — zone-difficulty filtering on shop pools
+> **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) for zone-difficulty filtering on shop pools
 
 ![Shop in the apocolypse](Docs/images/shopping.png)
 
@@ -25,7 +25,7 @@ Admins can place machines manually and override every aspect of the system throu
 | **MichellesCrafts**   | Crafts        | Common | Sewing kits, thread, needles, and assorted craft supplies for the fashion-conscious survivor.       |
 | **CarAParts**         | Vehicle Parts | Common | Mechanical spares, fluids, and components to keep your ride alive.                                  |
 | **CSVPharmacy**       | Medical       | Common | Bandages and basics up front; antibiotics and rare pharmaceuticals at the back.                     |
-| **RadioHacks**        | Electronics   | Common | Walkie-talkies, batteries, circuitry — if it runs on volts, it's probably here.                     |
+| **RadioHacks**        | Electronics   | Common | Walkie-talkies, batteries, circuitry. If it runs on volts, it's probably here.                     |
 | **Phish4U**           | Fishing       | Common | Rods, tackle, lures, and bait. Someone kept this thing restocked.                                   |
 | **HoesNMoes**         | Gardening     | Common | Seeds, fertiliser, farming tools. Plan for next season.                                             |
 | **HardWear**          | Clothing      | Common | Civilian clothing at standard weight; military and protective gear at lower odds.                   |
@@ -49,7 +49,7 @@ PhunMart uses two separate wallets:
 
 ### Change (loose coin)
 
-- Found as loot throughout the world — **Nickel** (5¢), **Dime** (10¢), **Quarter** (25¢)
+- Found as loot throughout the world: **Nickel** (5¢), **Dime** (10¢), **Quarter** (25¢)
 - Stored as a cents balance (integer). Cap: **$99.99** by default (configurable)
 - Used for everyday purchases: food, tools, medical, clothing, books
 - On death, the player drops a wallet containing their coins that only they can pick up
@@ -57,8 +57,8 @@ PhunMart uses two separate wallets:
 
 ### Tokens (bound)
 
-- **Not found as loot** — earned only through milestones and the Collectors machine
-- Bound to the account — survive character death
+- **Not found as loot**. Earned only through milestones and the Collectors machine
+- Bound to the account, so they survive character death
 - Cap: **60 tokens** by default (configurable)
 - Used for high-value purchases, specifically traits
 
@@ -73,7 +73,7 @@ Tokens are earned two ways:
 
 ### One-time milestones
 
-Awarded automatically when thresholds are crossed — no player action required.
+Awarded automatically when thresholds are crossed, with no player action required.
 
 | Milestone                    | Reward              |
 | ---------------------------- | ------------------- |
@@ -82,12 +82,12 @@ Awarded automatically when thresholds are crossed — no player action required.
 | Zombie kills: 100, 500, 1000 | Tokens (increasing) |
 | Sprinter kills: 50, 200      | Tokens              |
 
-Exact amounts are configurable — see [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards) (player rewards).
+Exact amounts are configurable. See [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards) (player rewards).
 
 ### Collectors machine (repeatable)
 
 Bring collectible items (toys, antiques, mementos) to a Collectors machine and trade them in
-for bound tokens. Rarer items pay more — from 1 token per 3 common items up to 3 tokens for
+for bound tokens. Rarer items pay more, from 1 token per 3 common items up to 3 tokens for
 a legendary find. The selection rotates each restock.
 
 ---
@@ -98,7 +98,7 @@ a legendary find. The selection rotates each restock.
 
 1. Subscribe on Steam Workshop (or install manually into `mods/`)
 2. Enable **PhunMart2** in your server mod list
-3. Start the server — machines will convert automatically on first load
+3. Start the server and machines will convert automatically on first load
 
 ### Sandbox Options
 
@@ -117,8 +117,8 @@ Key settings available in `sandbox-options.txt` or the server sandbox editor:
 
 ### Admin Commands
 
-- `/dumppz all` — dumps perks, traits, items, vehicles to a Lua file for reference
-- `/dumppz perks` / `traits` / `items` / `vehicles` — individual dumps
+- `/dumppz all` dumps perks, traits, items, vehicles to a Lua file for reference
+- `/dumppz perks` / `traits` / `items` / `vehicles` for individual dumps
 
 Admins can also place machines manually via the in-game Items List.
 
@@ -137,16 +137,16 @@ Everything is data-driven and overridable without touching the mod. Drop overrid
 your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
 rewards on top of the built-in defaults.
 
-Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** — common admin recipes,
+Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** covers common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.
 
-**Adding modded vehicles to WrentAWreck:** [Docs/GUIDE_ADDING_MODDED_VEHICLE.md](Docs/GUIDE_ADDING_MODDED_VEHICLE.md) — quick-start in two steps using the in-game admin UI.
+**Adding modded vehicles to WrentAWreck:** [Docs/GUIDE_ADDING_MODDED_VEHICLE.md](Docs/GUIDE_ADDING_MODDED_VEHICLE.md) is a quick-start in two steps using the in-game admin UI.
 
 ---
 
 ## Compatibility
 
-Build 42 only. Works in singleplayer and multiplayer. Mod-compatible by design — item shops
+Build 42 only. Works in singleplayer and multiplayer. Mod-compatible by design: item shops
 source by category, so modded items appear automatically. No known conflicts; please
 [report issues on GitHub](https://github.com/PhunZoider/PhunMart/issues).
 

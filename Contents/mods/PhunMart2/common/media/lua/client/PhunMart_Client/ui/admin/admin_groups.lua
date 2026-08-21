@@ -175,6 +175,14 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(480 * FONT_SCALE),
         title = titleText,
+        onDelete = (not isNew) and function(f)
+            DeleteHelper.confirm("groups", groupKey, function()
+                if not f._removed then
+                    f._removed = true
+                    f:close()
+                end
+            end)
+        end or nil,
         -- A group with nothing to draw from produces no offers. Every shipped
         -- group has exactly one source, so requiring one blocks nothing real.
         validate = function(f)
@@ -535,3 +543,5 @@ function UI:drawRow(y, item, alt)
     self.itemsHeight = y + self.itemheight
     return self.itemsHeight
 end
+
+UI.refresh = UI.refreshGroups

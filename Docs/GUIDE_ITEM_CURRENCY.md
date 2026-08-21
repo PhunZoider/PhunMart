@@ -2,7 +2,7 @@
 
 By default PhunMart uses its own currency called **change** to price items.
 If you'd rather price everything in a physical inventory item like `Base.Money`, `Base.Nails`, `Base.Jewels`
-or anything else players can loot — you can do that with a single edit to the base price.
+or anything else players can loot, you can do that with a single edit to the base price.
 
 ---
 
@@ -18,7 +18,7 @@ or anything else players can loot — you can do that with a single edit to the 
    | **Kind**   | `items`                                                                |
    | **Amount** | `1` (or whatever base quantity you want)                               |
    | **Items**  | Click **Pick...** and select the item (e.g. `Base.Money`)              |
-   | **Factor** | A scaling multiplier (e.g. `0.04`) — see [below](#the-factor-property) |
+   | **Factor** | A scaling multiplier (e.g. `0.04`). See [below](#the-factor-property) |
 
    Leave **Inherit** blank.
 
@@ -28,7 +28,7 @@ or anything else players can loot — you can do that with a single edit to the 
 
 That's it. Every price that inherits from `currency_base` now costs N of your chosen item
 instead of N cents from the wallet. The factor scales the inherited `amount` values down to
-reasonable item counts — `currency_50` with `amount = 50` and `factor = 0.04` resolves to
+reasonable item counts. `currency_50` with `amount = 50` and `factor = 0.04` resolves to
 `ceil(50 * 0.04) = 2` of `Base.Money`.
 
 > Note: Changes will only come into effect when the shop restocks. Click Restock All option from the admin window
@@ -45,7 +45,7 @@ currency_base = { kind = "currency", pool = "change", amount = 1, factor = 1 }
 
 Child prices like `currency_25`, `currency_50`, `currency_150` etc. inherit the `kind`,
 `pool`, and `factor` from `currency_base` and override only the `amount`. Changing
-`currency_base` to `kind = "items"` flips the entire inheritance tree in one step — every
+`currency_base` to `kind = "items"` flips the entire inheritance tree in one step: every
 child price becomes an item-barter cost instead of a wallet deduction.
 
 ---
@@ -100,7 +100,7 @@ minimum of 1.
 
 This is the key to making item-based currency work cleanly. The built-in children have
 `amount` values designed for cents (25, 50, 150, 500…). When you switch to items, those raw
-amounts would mean "25 of Base.Money" — far too expensive. Instead of overriding every
+amounts would mean "25 of Base.Money", far too expensive. Instead of overriding every
 child, you set a `factor` on `currency_base` that scales the whole tree down to sensible
 item quantities:
 
@@ -113,7 +113,7 @@ item quantities:
 | `currency_250` | 250    | 0.04   | 10                               |
 | `currency_500` | 500    | 0.04   | 20                               |
 
-A child can override `factor` on itself to deviate from the base — the child's factor
+A child can override `factor` on itself to deviate from the base: the child's factor
 replaces the parent's (no compounding).
 
 ---
@@ -121,7 +121,7 @@ replaces the parent's (no compounding).
 ## Things to keep in mind
 
 - **Wallet UI:** The player's change wallet balance (shown in the character panel) becomes
-  irrelevant when prices use `kind = "items"` — the system checks inventory instead. You
+  irrelevant when prices use `kind = "items"`, because the system checks inventory instead. You
   may want to disable the change pool entirely via the **EnableChangePool** sandbox setting.
 
 - **Token prices are unaffected.** Prices with `pool = "tokens"` use a separate system and

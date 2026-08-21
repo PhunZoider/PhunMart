@@ -280,7 +280,7 @@ local function parseCSV(text)
 end
 
 -- `shopDef` populates the fields and may come from the compiled runtime as a
--- fallback. `preserveBase` is the definition-table entry only — the compiled
+-- fallback. `preserveBase` is the definition-table entry only. The compiled
 -- runtime carries resolved offers and prices that must never be written back
 -- into an override file, so it is not a safe base to copy forward from.
 local function createEditModal(shopKey, shopDef, preserveBase, cb)

@@ -7,9 +7,9 @@ local Toast = require "PhunMart_Client/ui/toast"
 
 local Commands = {}
 
--- itemId (string) → { vehicleScript, condition } — populated by spawnVehicle command
+-- itemId (string) → { vehicleScript, condition }, populated by the spawnVehicle command
 Core._vehicleKeys = Core._vehicleKeys or {}
--- itemId (string) → { animalType, animalBreed, animalSize } — populated by spawnAnimal command
+-- itemId (string) → { animalType, animalBreed, animalSize }, populated by the spawnAnimal command
 Core._animalTokens = Core._animalTokens or {}
 
 Commands[Core.commands.updateWallet] = function(args)

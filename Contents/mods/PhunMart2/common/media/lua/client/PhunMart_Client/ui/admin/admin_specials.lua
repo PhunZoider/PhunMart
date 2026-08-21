@@ -183,6 +183,14 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(420 * FONT_SCALE),
         title = titleText,
+        onDelete = (not isNew) and function(f)
+            DeleteHelper.confirm("specials", specialKey, function()
+                if not f._removed then
+                    f._removed = true
+                    f:close()
+                end
+            end)
+        end or nil,
         onApply = function(f)
             local key = f:getFieldValue("key")
 
@@ -647,3 +655,5 @@ function UI:close()
     ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
 end
+
+UI.refresh = UI.refreshSpecials

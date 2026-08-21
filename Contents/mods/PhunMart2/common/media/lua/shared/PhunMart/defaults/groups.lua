@@ -194,7 +194,7 @@ return {
     },
 
     -- =========================================================
-    -- CSVPharmacy  (medical — 3 tiers)
+    -- CSVPharmacy  (medical, 3 tiers)
     -- cheap:    common wound care      $0.50-$1.50  (coin_xlow)
     -- standard: tools/boxes/pills      $2.50-$6.00  (coin_low)
     -- rare:     prescription drugs     $10-$12      (coin_mid, zone 2+)
@@ -224,7 +224,7 @@ return {
                  "Pills", "PillsVitamins", "Stethoscope"}
     },
 
-    -- Tier 3: prescription/controlled drugs — rare in PZ loot, zone-gated to 2+.
+    -- Tier 3: prescription/controlled drugs, rare in PZ loot, zone-gated to 2+.
     -- B42 script names: PillsAntiDep / PillsBeta / PillsSleepingTablets (NOT Antidepressants etc.)
     medical_rare = {
         defaults = {
@@ -237,7 +237,7 @@ return {
     },
 
     -- =========================================================
-    -- HardWear  (clothing + protective gear — 2 tiers)
+    -- HardWear  (clothing + protective gear, 2 tiers)
     -- clothing:   casual/work clothing         $2.50-$6.00  (coin_low)
     -- protective: helmets/vests/tactical gear  $10-$12      (coin_mid, zone 2+)
     -- =========================================================
@@ -627,7 +627,7 @@ return {
     -- t1 = junk/curios (1 token), t2 = rare (2 tokens), t3 = legendary (3 tokens)
     -- =========================================================
 
-    -- Tier 1a: Junk — abundant toys/games (weight >100). Bring 3 → 1 token.
+    -- Tier 1a: Junk, abundant toys/games (weight >100). Bring 3 → 1 token.
     collectors_junk = {
         defaults = {
             price = "self_3",
@@ -640,7 +640,7 @@ return {
                  "Yoyo", "Bricktoys", "Cube", "Revolver_CapGun", "Rifle_CapGun", "CapGunCap", "CapGunCapBox"}
     },
 
-    -- Tier 1b: Curios — common collectibles and antiques (weight 5-100). Bring 2 → 1 token.
+    -- Tier 1b: Curios, common collectibles and antiques (weight 5-100). Bring 2 → 1 token.
     collectors_curios = {
         defaults = {
             price = "self_2",
@@ -660,7 +660,7 @@ return {
         "Hominid_Skull", "Hominid_Skull_Partial", "Hominid_Skull_Fragment"}
     },
 
-    -- Tier 2: Rare — scarce items (weight <5, naturally spawnable). Bring 1 → 2 tokens.
+    -- Tier 2: Rare, scarce items (weight <5, naturally spawnable). Bring 1 → 2 tokens.
     collectors_rare = {
         defaults = {
             price = "self_1",
@@ -679,7 +679,7 @@ return {
         "Hat_HalloweenMaskMonster", "Hat_HalloweenMaskDevil", "Hat_Witch"}
     },
 
-    -- Tier 3: Legendary — near-zero or zero spawn weight; event/admin drops. Bring 1 → 3 tokens.
+    -- Tier 3: Legendary, near-zero or zero spawn weight; event/admin drops. Bring 1 → 3 tokens.
     collectors_legendary = {
         defaults = {
             price = "self_1",
@@ -692,10 +692,10 @@ return {
         "Jacket_LeatherWildRacoons", "Jacket_LeatherIronRodent", "Jacket_LeatherBarrelDogs",
         "Vest_Leather_WildRaccoons", "Vest_Leather_IronRodents", "Vest_Leather_BarrelDogs", "Vest_Leather_Biker",
         "Vest_Leather_Veteran", -- Ultra-rare event / loot (weight <0.01 or not in tables)
-        "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing", "LargeMeteorite", -- Spiffo collectibles (zero spawn — admin/event only)
+        "HalloweenCandyBucket", "KeyRing_StinkyFace", "Amethyst", "SilverCoin", "GoldCoin", "RatKing", "LargeMeteorite", -- Spiffo collectibles (zero spawn, admin/event only)
         "SpiffoSuit", "Hat_Spiffo", "Hat_Jay", "Hat_GoldStar", "HobbyHorse", "Hat_Cowboy_Plastic",
         "Hat_BaseballCap_Spiffos", "Hat_BaseballCap_Spiffos_Reverse", "Hat_BaseballCap_SpiffosLogo",
-        "Hat_BaseballCap_SpiffosLogo_Reverse", -- Racing keyrings (zero spawn — admin/event only)
+        "Hat_BaseballCap_SpiffosLogo_Reverse", -- Racing keyrings (zero spawn, admin/event only)
         "KeyRing_Racing12", "KeyRing_Racing34", "KeyRing_Racing58", -- Dog tags (zero spawn variants)
         "Necklace_DogTag_Male", "Necklace_DogTag_Female"}
     },

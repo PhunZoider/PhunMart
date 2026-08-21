@@ -70,7 +70,7 @@ Core.getPlayerAdapter = function(player)
     if not player then
         return nil
     end
-    -- Always create a fresh adapter — the player Java object may change across
+    -- Always create a fresh adapter: the player Java object may change across
     -- disconnect/reconnect cycles, so caching by username is not safe.
     return getAdapter(player)
 end

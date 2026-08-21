@@ -71,7 +71,7 @@ local L = {
     screenH = 140, -- display screen  (preview)
     keypadY = 278,
     keypadH = 210, -- keypad area     (details)
-    -- 488 → 580: lower machine section — balance pane lives here
+    -- 488 → 580: lower machine section, balance pane lives here
 
     -- Balance zone: between keypad bottom (488) and tray (580)
     balanceY = 493,
@@ -419,7 +419,7 @@ function UI:setData(data)
     local p3d = self.controls.preview3d
     if p3d then
         p3d.vehicleName = nil
-        -- NOTE: do NOT reset p3d.initialized here — the Java scene object persists
+        -- NOTE: do NOT reset p3d.initialized here: the Java scene object persists
         -- across setData calls and "vehicle" already exists; calling createVehicle again crashes.
         p3d.rotX = 22;
         p3d.rotY = 45
@@ -498,7 +498,7 @@ function UI:onOfferSelected(id, offer, entry)
     self.selectedOffer = offer
     self.selectedEntry = entry
     self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
-    -- Collector/pawn offers hand the displayed item over for currency — that's a sale,
+    -- Collector/pawn offers hand the displayed item over for currency, so that's a sale,
     -- so label the button SELL instead of BUY.
     self:updateBuyButtonTitle(offer)
 
@@ -509,7 +509,7 @@ function UI:onOfferSelected(id, offer, entry)
         if offer and offer.reward and offer.reward.actions then
             for _, action in ipairs(offer.reward.actions) do
                 if action.type == "spawnVehicle" then
-                    -- Use the offer's item key as the preview script — this IS the
+                    -- Use the offer's item key as the preview script: this IS the
                     -- vehicle script name (e.g. "ModernCarLightsCityLouisvillePD"),
                     -- which matches exactly what the player sees in the list.
                     vehicleScript = offer.item
@@ -586,7 +586,7 @@ function UI:onPurchaseComplete(result)
 
     -- Item-based prices are removed authoritatively by the buy command handler,
     -- which also runs in SP (OnClientCommand fires locally there). Do NOT remove
-    -- them again here — that charged the player twice the displayed amount.
+    -- them again here: that charged the player twice the displayed amount.
     if result.price and result.price.kind == "items" then
         ISInventoryPage.dirtyUI()
     end
@@ -1288,6 +1288,6 @@ function UI:renderDetails(z)
         end
     end
     if not headerDrawn then
-        y = headerY -- reclaim the reserved line — all conditions pass
+        y = headerY -- reclaim the reserved line, all conditions pass
     end
 end
