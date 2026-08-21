@@ -161,6 +161,12 @@ function UI:close()
     if not self.locked then
         ISCollapsableWindowJoypad.close(self);
     end
+    -- Closing the shop list is the natural "done editing" moment, so bring any
+    -- outstanding restocks back into view rather than letting them be forgotten.
+    local pr = Core.ui.pending_restock
+    if pr and pr.count() > 0 then
+        pr.show()
+    end
 end
 
 function UI:createChildren()
@@ -321,6 +327,12 @@ function UI:onAdminToolsMenu(btn)
     context:addOption(getText("IGUI_PhunMart_Btn_Recompile"), self, function()
         sendClientCommand(Core.name, Core.commands.compile, {})
     end)
+    local pr = Core.ui.pending_restock
+    if pr and pr.count() > 0 then
+        context:addOption(getText("IGUI_PhunMart_Btn_PendingN", tostring(pr.count())), self, function()
+            pr.show()
+        end)
+    end
     context:addOption(getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
         local w = 300
         local h = 150
