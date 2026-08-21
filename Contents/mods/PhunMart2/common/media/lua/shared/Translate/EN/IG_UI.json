@@ -31,10 +31,8 @@
   "IGUI_PhunMart_Shop_PrawnStars_tooltip": "Got gold? We'll give you cash for your jewelry and precious items",
   "IGUI_PhunMart_Shop_ShedsAndCommoners": "Sheds & Commoners",
   "IGUI_PhunMart_Shop_ShedsAndCommoners_tooltip": "Books, magazines and more to keep you entertained during the apocalypse",
-
   "IGUI_PhunMart_Open_X": "View %1",
   "IGUI_PhunMart_Open_X_nopower_tooltip": "The %1 vending machine requires power",
-
   "IGUI_PhunMart_Cond_Failed": "Condition failed: %1",
   "IGUI_PhunMart_Cond_UnknownKey": "Unknown requirement: %1",
   "IGUI_PhunMart_Cond_UnknownTest": "Invalid requirement '%1' (unknown test: %2)",
@@ -57,7 +55,6 @@
   "IGUI_PhunMart_Cond_TraitDisabledMP": "Not available in multiplayer",
   "IGUI_PhunMart_Cond_TraitKeyMissing": "Trait not found",
   "IGUI_PhunMart_Cond_BoundTokensBelowMax": "Token storage full (%1/%2)",
-
   "IGUI_PhunMart_CoinDropChance": "Coin Drop Chance",
   "IGUI_PhunMart_CoinDropChance_tooltip": "The chance for coins to drop from zombies.",
   "IGUI_PhunMart_CoinMinCents": "Coin Min Cents",
@@ -70,9 +67,7 @@
   "IGUI_PhunMart_CoinSprinterMinCents_tooltip": "The minimum amount of cents that can drop from a sprinter.",
   "IGUI_PhunMart_CoinSprinterMaxCents": "Coin Sprinter Max Cents",
   "IGUI_PhunMart_CoinSprinterMaxCents_tooltip": "The maximum amount of cents that can drop from a sprinter.",
-
   "IGUI_PhunWallet.BalanceReplenishedOnDeath": "Balance of %1 will be restored on death.",
-
   "IGUI_PhunMart_Buy": "BUY",
   "IGUI_PhunMart_Sell": "SELL",
   "IGUI_PhunMart_SelectAnItem": "Select an item",
@@ -87,13 +82,11 @@
   "IGUI_PhunMart_ReceiveTokens": "Receive: %1 token(s)",
   "IGUI_PhunMart_ReceiveChange": "Receive: %1",
   "IGUI_PhunMart_ReceiveItems": "Receive: %1x %2",
-
   "IGUI_PhunMart_Msg_OutBadge": "OUT",
   "IGUI_PhunMart_Msg_RestockReady": "Restock ready",
   "IGUI_PhunMart_Msg_RestockMinutes": "Restocks in %1m",
   "IGUI_PhunMart_Msg_RestockHours": "Restocks in %1h",
   "IGUI_PhunMart_Msg_NoItemsAvailable": "No items available",
-
   "IGUI_PhunMart_Msg_NoLocationData": "No location data",
   "IGUI_PhunMart_Msg_Purchasing": "Purchasing...",
   "IGUI_PhunMart_Msg_OutOfStock": "Out of stock",
@@ -111,7 +104,6 @@
   "IGUI_PhunMart_Msg_GlobalBlacklisted": "Global blacklisted: %1",
   "IGUI_PhunMart_Msg_BlacklistedInPool": "Blacklisted in %1: %2",
   "IGUI_PhunMart_Msg_PoolNotFound": "Pool not found for offer",
-
   "IGUI_PhunMart_Btn_Apply": "Apply",
   "IGUI_PhunMart_Btn_Cancel": "Cancel",
   "IGUI_PhunMart_Btn_OK": "OK",
@@ -124,7 +116,6 @@
   "IGUI_PhunMart_Btn_Refresh": "Refresh",
   "IGUI_PhunMart_Btn_List": "List",
   "IGUI_PhunMart_Btn_Grid": "Grid",
-
   "IGUI_PhunMart_Admin_Random": "Random",
   "IGUI_PhunMart_Admin_ChangeTo": "Change To",
   "IGUI_PhunMart_Admin_Restock": "Restock",
@@ -136,7 +127,6 @@
   "IGUI_PhunMart_Admin_MoveToPool": "Move to pool",
   "IGUI_PhunMart_Admin_ActivePools": "Active pools",
   "IGUI_PhunMart_Admin_SetN": "Set %1",
-
   "IGUI_PhunMart_Admin_PoolTitle": "Pool: %1",
   "IGUI_PhunMart_Admin_EditPool": "Edit Pool",
   "IGUI_PhunMart_Admin_ShowBlacklisted": "Show globally blacklisted",
@@ -158,7 +148,6 @@
   "IGUI_PhunMart_Admin_NoMatching": "No matching offers",
   "IGUI_PhunMart_Admin_FREE": "FREE",
   "IGUI_PhunMart_TokenSuffix": "t",
-
   "IGUI_PhunMart_Col_Name": "Name",
   "IGUI_PhunMart_Col_Price": "Price",
   "IGUI_PhunMart_Col_Wt": "Wt",
@@ -184,7 +173,6 @@
   "IGUI_PhunMart_Col_InWorld": "In World",
   "IGUI_PhunMart_Col_Pool": "Pool",
   "IGUI_PhunMart_Col_Balance": "Balance",
-
   "IGUI_PhunMart_Title_Locations": "Locations",
   "IGUI_PhunMart_Title_Shops": "Shops",
   "IGUI_PhunMart_Title_WalletAdmin": "Wallet Admin",
@@ -207,7 +195,6 @@
   "IGUI_PhunMart_Title_AddPrice": "Add Price",
   "IGUI_PhunMart_Title_AddPoolSet": "Add Pool Set",
   "IGUI_PhunMart_Title_EditPoolSet": "Edit Pool Set",
-
   "IGUI_PhunMart_Btn_Config": "Edit",
   "IGUI_PhunMart_Btn_Locations": "Locations",
   "IGUI_PhunMart_Btn_Wallet": "Wallet",
@@ -222,9 +209,10 @@
   "IGUI_PhunMart_Btn_Pools": "Pools",
   "IGUI_PhunMart_Btn_Blacklist": "Blacklist",
   "IGUI_PhunMart_Title_PendingRestock": "Pending Restocks",
-  "IGUI_PhunMart_Desc_PendingRestock": "These shops draw on something you changed. Machines already placed keep their current stock until they restock. Untick any you want to leave alone.",
-  "IGUI_PhunMart_Btn_RestockN": "Restock %1",
-  "IGUI_PhunMart_Btn_AllNone": "All / None",
+  "IGUI_PhunMart_Desc_PendingRestock": "Recent changes may require one or more shops to restock in order for changes to take effect.",
+  "IGUI_PhunMart_Btn_RestockSelected": "Restock selected (%1)",
+  "IGUI_PhunMart_Btn_Skip": "Skip",
+  "IGUI_PhunMart_Lbl_SelectAll": "Select all",
   "IGUI_PhunMart_Btn_Clear": "Clear",
   "IGUI_PhunMart_Btn_PendingN": "Pending restocks (%1)",
   "IGUI_PhunMart_Confirm_Delete": "Delete \"%1\"? This removes your override and cannot be undone.",
@@ -239,10 +227,8 @@
   "IGUI_PhunMart_Btn_AdminTools": "Admin Tools",
   "IGUI_PhunMart_Btn_Port": "Port",
   "IGUI_PhunMart_Btn_Pick": "Pick...",
-
   "IGUI_PhunMart_Admin_PickCategories": "Pick Categories",
   "IGUI_PhunMart_Admin_PickItems": "Pick Items",
-
   "IGUI_PhunMart_Lbl_Enabled": "Enabled:",
   "IGUI_PhunMart_Lbl_Category": "Category:",
   "IGUI_PhunMart_Lbl_Probability": "Probability:",
@@ -298,7 +284,6 @@
   "IGUI_PhunMart_Lbl_ActionSubtract": "Subtract",
   "IGUI_PhunMart_Lbl_ActionSetTo": "Set to",
   "IGUI_PhunMart_Lbl_None": "(none)",
-
   "IGUI_PhunMart_Err_Required": "Required",
   "IGUI_PhunMart_Err_Amount": "Enter a number of 0 or more",
   "IGUI_PhunMart_Err_Numeric": "Must be a number",
@@ -314,7 +299,6 @@
   "IGUI_PhunMart_Err_NoSuchPrice": "No price with that key",
   "IGUI_PhunMart_Err_InheritSelf": "A price can't inherit from itself",
   "IGUI_PhunMart_Hint_MoreActions": "Editing the first action; %1 more will be kept unchanged",
-
   "IGUI_PhunMart_Hint_CategoryShown": "Display category shown in admin tools",
   "IGUI_PhunMart_Hint_Probability": "Relative weight in placement lottery (0 = manual only)",
   "IGUI_PhunMart_Hint_MinDistance": "(optional) Min tile distance between same shop type",
@@ -364,12 +348,9 @@
   "IGUI_PhunMart_Lbl_Factor": "Factor:",
   "IGUI_PhunMart_Lbl_SetRoll": "Set Roll:",
   "IGUI_PhunMart_Lbl_Pools": "Pools:",
-
   "IGUI_PhunMart_Admin_PanelBtn": "** PhunMart **",
-
   "IGUI_PhunMart_Col_Currency": "Currency",
   "IGUI_PhunMart_Col_Value": "Value",
-
   "IGUI_PhunMart_Yes": "Yes",
   "IGUI_PhunMart_No": "No",
   "IGUI_PhunMart_Free": "Free",
@@ -382,10 +363,8 @@
   "IGUI_PhunMart_Admin_PickSpecialCats": "Pick Special Categories",
   "IGUI_PhunMart_Admin_PickPools": "Pick Pools",
   "IGUI_PhunMart_Template": "template",
-
   "IGUI_ItemCat_Currency": "Currency",
   "IGUI_PhunMart_CharsWallet": "%1's Wallet",
-
   "IGUI_PhunMart_Title_RewardDefs": "Token Reward Milestones",
   "IGUI_PhunMart_Title_EditReward": "Edit Milestone",
   "IGUI_PhunMart_Title_AddReward": "Add Milestone",
@@ -408,6 +387,5 @@
   "IGUI_PhunMart_Reward_Playtime": "playtime",
   "IGUI_PhunMart_Reward_ZombieKills": "zombieKills",
   "IGUI_PhunMart_Reward_SprinterKills": "sprinterKills",
-
   "UI_PhunWalletPanel": "Your wallet balance across all currency pools"
 }

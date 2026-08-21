@@ -105,22 +105,46 @@ function Panel:createChildren()
     self:addChild(list)
     self.list = list
 
-    self.toggleBtn = ISButton:new(0, 0, math.floor(70 * FONT_SCALE), BUTTON_HGT,
-        getText("IGUI_PhunMart_Btn_AllNone"), self, Panel.onToggleAll)
-    self.toggleBtn:initialise()
-    self:addChild(self.toggleBtn)
+    -- A tickbox rather than a button: "select all" is a state, and showing it
+    -- ticked or not says whether everything is currently selected. A button
+    -- can only be labelled with the action, never the state.
+    self.selectAllTick = ISTickBox:new(PAD, 0, CHECK_SZ, CHECK_SZ, "")
+    self.selectAllTick:initialise()
+    self.selectAllTick:instantiate()
+    self.selectAllTick:addOption(getText("IGUI_PhunMart_Lbl_SelectAll"), nil)
+    self.selectAllTick.changeOptionMethod = function()
+        Panel.onToggleAll(self)
+    end
+    self.selectAllTick.changeOptionTarget = self
+    self:addChild(self.selectAllTick)
 
-    self.restockBtn = ISButton:new(0, 0, math.floor(130 * FONT_SCALE), BUTTON_HGT, "", self, Panel.onRestock)
+    -- List operations sit on the header row; the actions sit along the bottom.
+    self.clearBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_Clear")), BUTTON_HGT,
+        getText("IGUI_PhunMart_Btn_Clear"), self, Panel.onClear)
+    self.clearBtn:initialise()
+    self:addChild(self.clearBtn)
+
+    self.restockBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_RestockSelected", "00")),
+        BUTTON_HGT, "", self, Panel.onRestock)
     self.restockBtn:initialise()
     self:addChild(self.restockBtn)
 
-    self.clearBtn = ISButton:new(0, 0, math.floor(70 * FONT_SCALE), BUTTON_HGT, getText("IGUI_PhunMart_Btn_Clear"),
-        self, Panel.onClear)
-    self.clearBtn:initialise()
-    if self.clearBtn.enableCancelColor then
-        self.clearBtn:enableCancelColor()
+    self.restockAllBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_RestockAll")), BUTTON_HGT,
+        getText("IGUI_PhunMart_Btn_RestockAll"), self, Panel.onRestockAll)
+    self.restockAllBtn:initialise()
+    self:addChild(self.restockAllBtn)
+
+    self.skipBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_Skip")), BUTTON_HGT,
+        getText("IGUI_PhunMart_Btn_Skip"), self, Panel.onSkip)
+    self.skipBtn:initialise()
+    if self.skipBtn.enableCancelColor then
+        self.skipBtn:enableCancelColor()
     end
-    self:addChild(self.clearBtn)
+    self:addChild(self.skipBtn)
+end
+
+function Panel:btnWidth(text)
+    return math.max(math.floor(60 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, text) + PAD * 2)
 end
 
 function Panel:drawRow(listSelf, y, item, alt)
@@ -175,6 +199,30 @@ function Panel:onRestock()
     PendingRestock.restockChecked()
 end
 
+-- Every machine in the world, not just the ones listed. Same confirm as the
+-- Admin Tools entry, because on a populated server this rerolls shops nobody
+-- touched and pulls stock out from under anyone mid-purchase.
+function Panel:onRestockAll()
+    local w = math.floor(340 * FONT_SCALE)
+    local h = math.floor(150 * FONT_SCALE)
+    local modal = ISModalDialog:new((getCore():getScreenWidth() - w) / 2, (getCore():getScreenHeight() - h) / 2, w, h,
+        getText("IGUI_PhunMart_Confirm_RestockAll"), true, nil, function(_, button)
+            if button.internal == "YES" then
+                sendClientCommand(Core.name, Core.commands.restockAllShops, {})
+                -- Everything just restocked, so nothing is outstanding.
+                PendingRestock.clear()
+            end
+        end)
+    modal:initialise()
+    modal:addToUIManager()
+end
+
+-- Get out of the way without restocking. The list survives, so it can be
+-- picked back up from Admin Tools or when the shop list is closed.
+function Panel:onSkip()
+    PendingRestock.hide()
+end
+
 function Panel:onClear()
     PendingRestock.clear()
 end
@@ -192,6 +240,16 @@ function Panel:prerender()
     end
     y = y + PAD
 
+    -- Header row: select-all on the left, list operations on the right.
+    local total = PendingRestock.count()
+    local sel = PendingRestock.checkedCount()
+    self.selectAllTick:setSelected(1, total > 0 and sel == total)
+    self.selectAllTick:setX(PAD)
+    self.selectAllTick:setY(y)
+    self.clearBtn:setX(self.width - PAD - self.clearBtn.width)
+    self.clearBtn:setY(y - 2)
+    y = y + BUTTON_HGT + 4
+
     local btnRowH = BUTTON_HGT + PAD
     local listH = self.height - y - btnRowH - PAD - self:resizeWidgetHeight()
     self.list:setX(PAD)
@@ -199,15 +257,21 @@ function Panel:prerender()
     self.list:setWidth(self.width - PAD * 2)
     self.list:setHeight(math.max(ROW_H, listH))
 
+    -- Action row, right-aligned: Skip, Restock all, Restock selected.
     local by = self.height - self:resizeWidgetHeight() - BUTTON_HGT - PAD
-    self.toggleBtn:setX(PAD)
-    self.toggleBtn:setY(by)
+    local rightX = self.width - PAD
 
-    self.restockBtn:setTitle(getText("IGUI_PhunMart_Btn_RestockN", tostring(PendingRestock.checkedCount())))
-    self.restockBtn:setEnable(PendingRestock.checkedCount() > 0)
-    self.clearBtn:setX(self.width - PAD - self.clearBtn.width)
-    self.clearBtn:setY(by)
-    self.restockBtn:setX(self.clearBtn.x - PAD - self.restockBtn.width)
+    self.skipBtn:setX(rightX - self.skipBtn.width)
+    self.skipBtn:setY(by)
+    rightX = rightX - self.skipBtn.width - PAD
+
+    self.restockAllBtn:setX(rightX - self.restockAllBtn.width)
+    self.restockAllBtn:setY(by)
+    rightX = rightX - self.restockAllBtn.width - PAD
+
+    self.restockBtn:setTitle(getText("IGUI_PhunMart_Btn_RestockSelected", tostring(sel)))
+    self.restockBtn:setEnable(sel > 0)
+    self.restockBtn:setX(rightX - self.restockBtn.width)
     self.restockBtn:setY(by)
 end
 
@@ -219,8 +283,8 @@ function Panel:close()
 end
 
 function Panel:new()
-    local w = math.floor(320 * FONT_SCALE)
-    local h = math.floor(280 * FONT_SCALE)
+    local w = math.floor(420 * FONT_SCALE)
+    local h = math.floor(300 * FONT_SCALE)
     local core = getCore()
     -- Bottom-left, clear of the centred editor windows.
     local x = math.floor(20 * FONT_SCALE)
