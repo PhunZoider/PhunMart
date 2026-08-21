@@ -455,6 +455,9 @@ if Core.isLocal then
         end
     end
 
+    -- This is the singleplayer path for the adjustment. The server-side handler
+    -- deliberately bails out under Core.isLocal so the increment isn't applied
+    -- twice — don't restore it there without removing it here.
     Commands[Core.commands.adjustPlayerWallet] = function(player, args)
         Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
         for _, instance in pairs(UI.instances or {}) do

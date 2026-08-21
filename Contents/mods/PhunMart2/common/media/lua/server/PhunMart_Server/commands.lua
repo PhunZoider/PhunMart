@@ -741,6 +741,14 @@ Commands[Core.commands.adjustPlayerWallet] = function(player, args)
     if not Core.utils.isAdmin(player) then
         return
     end
+    -- Singleplayer runs the server files in the same Lua state as the client, so
+    -- this handler and the wallet panel's own local handler both receive the
+    -- one OnClientCommand. adjustByPool increments rather than assigns, so
+    -- letting both run credits the amount twice. The panel owns the SP path
+    -- (admin_wallet.lua) because it also refreshes the UI afterwards.
+    if Core.isLocal then
+        return
+    end
     Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
     local wallet = Core.wallet:get(args.playername)
     -- Update the admin editor
