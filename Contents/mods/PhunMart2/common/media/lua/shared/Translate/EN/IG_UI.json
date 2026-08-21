@@ -213,7 +213,6 @@
   "IGUI_PhunMart_Btn_RestockSelected": "Restock selected (%1)",
   "IGUI_PhunMart_Btn_Skip": "Skip",
   "IGUI_PhunMart_Lbl_SelectAll": "Select all",
-  "IGUI_PhunMart_Btn_Clear": "Clear",
   "IGUI_PhunMart_Btn_PendingN": "Pending restocks (%1)",
   "IGUI_PhunMart_Confirm_Delete": "Delete \"%1\"? This removes your override and cannot be undone.",
   "IGUI_PhunMart_Confirm_ShippedDisable": "\"%1\" ships with PhunMart, so it can't be deleted, because the built-in version would just come back. Disable it instead?",

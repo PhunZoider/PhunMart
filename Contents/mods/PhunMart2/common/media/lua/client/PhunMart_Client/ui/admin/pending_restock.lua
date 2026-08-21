@@ -118,12 +118,6 @@ function Panel:createChildren()
     self.selectAllTick.changeOptionTarget = self
     self:addChild(self.selectAllTick)
 
-    -- List operations sit on the header row; the actions sit along the bottom.
-    self.clearBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_Clear")), BUTTON_HGT,
-        getText("IGUI_PhunMart_Btn_Clear"), self, Panel.onClear)
-    self.clearBtn:initialise()
-    self:addChild(self.clearBtn)
-
     self.restockBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_RestockSelected", "00")),
         BUTTON_HGT, "", self, Panel.onRestock)
     self.restockBtn:initialise()
@@ -217,13 +211,11 @@ function Panel:onRestockAll()
     modal:addToUIManager()
 end
 
--- Get out of the way without restocking. The list survives, so it can be
--- picked back up from Admin Tools or when the shop list is closed.
+-- Skip is "restock none": forget the list and close. Keeping it and merely
+-- hiding meant a later edit to an already-listed shop changed nothing visible,
+-- so the panel stayed shut on a change that did need a restock. Discarding
+-- makes the next edit repopulate from scratch and reopen.
 function Panel:onSkip()
-    PendingRestock.hide()
-end
-
-function Panel:onClear()
     PendingRestock.clear()
 end
 
@@ -240,14 +232,11 @@ function Panel:prerender()
     end
     y = y + PAD
 
-    -- Header row: select-all on the left, list operations on the right.
     local total = PendingRestock.count()
     local sel = PendingRestock.checkedCount()
     self.selectAllTick:setSelected(1, total > 0 and sel == total)
     self.selectAllTick:setX(PAD)
     self.selectAllTick:setY(y)
-    self.clearBtn:setX(self.width - PAD - self.clearBtn.width)
-    self.clearBtn:setY(y - 2)
     y = y + BUTTON_HGT + 4
 
     local btnRowH = BUTTON_HGT + PAD
@@ -275,11 +264,11 @@ function Panel:prerender()
     self.restockBtn:setY(by)
 end
 
--- Closing keeps the list. Only restocking or Clear empties it, so an admin can
--- get the panel out of the way mid-session without losing the running total.
+-- The title bar X is the same decision as Skip, so it does the same thing.
+-- Two ways to close with different consequences is exactly the sort of hidden
+-- distinction that makes a tool feel unpredictable.
 function Panel:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
+    PendingRestock.clear()
 end
 
 function Panel:new()
@@ -328,11 +317,20 @@ function PendingRestock.show()
     panel:refreshList()
 end
 
-function PendingRestock.hide()
+-- Takes the window off screen without touching the list. Kept separate from
+-- clear() so clear() can call it: routing through Panel:close() would recurse,
+-- since that now clears.
+local function hidePanel()
     if panel then
-        panel:close()
+        panel:setVisible(false)
+        panel:removeFromUIManager()
     end
 end
+
+-- Deliberately not exposed: hiding while the list is still populated is the
+-- state that caused the bug this replaced, where a later edit to an
+-- already-listed shop had nothing new to add and so never reopened the panel.
+-- Every close now goes through clear().
 
 --- Record that a definition changed, and surface the shops it feeds.
 -- A change that reaches no shop type (an unused price, say) adds nothing,
@@ -377,7 +375,7 @@ end
 function PendingRestock.clear()
     pending = {}
     checked = {}
-    PendingRestock.hide()
+    hidePanel()
 end
 
 function PendingRestock.restockChecked()
@@ -402,7 +400,7 @@ function PendingRestock.restockChecked()
     end
 
     if PendingRestock.count() == 0 then
-        PendingRestock.hide()
+        hidePanel()
     elseif panel and panel:isVisible() then
         panel:refreshList()
     end
