@@ -4,6 +4,7 @@ end
 
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 require "PhunMart/references"
 
 local FONT_HGT_SMALL = tools.FONT_HGT_SMALL
@@ -77,6 +78,9 @@ local function doDelete(kind, key, onDone)
         kind = kind,
         key = key
     })
+    -- Worked out before the recompile lands, while the reference graph still
+    -- contains the thing being removed.
+    PendingRestock.note(kind, key)
     refreshWhenDefsLand(onDone)
 end
 
@@ -94,6 +98,7 @@ local function doDisable(kind, key, onDone)
     if not Core.isLocal and Core.defs and Core.defs[kind] then
         Core.defs[kind][key] = copy
     end
+    PendingRestock.note(kind, key)
     refreshWhenDefsLand(onDone)
 end
 

@@ -784,6 +784,11 @@ function UI:onBlacklistOffer(id, offer)
     sendClientCommand(Core.name, Core.commands.quickBlacklist, {
         itemKey = itemKey
     })
+    -- This machine can be restocked from the gear menu, but every other machine
+    -- keeps the item until it rolls again, so track it like any other edit.
+    if Core.ui.pending_restock then
+        Core.ui.pending_restock.noteAllShops()
+    end
     self:showFeedback(getText("IGUI_PhunMart_Msg_GlobalBlacklisted", tostring(itemKey)), 0.9, 0.5, 0.2)
 end
 
@@ -802,6 +807,9 @@ function UI:onBlacklistInPool(id, offer)
         poolKey = poolKey,
         itemKey = itemKey
     })
+    if Core.ui.pending_restock then
+        Core.ui.pending_restock.note("pools", poolKey)
+    end
     self:showFeedback(getText("IGUI_PhunMart_Msg_BlacklistedInPool", poolKey, tostring(itemKey)), 0.9, 0.5, 0.2)
 end
 

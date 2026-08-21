@@ -6,6 +6,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -201,6 +202,7 @@ function UI.OnEditItem(player, itemKey)
     end
     createEditModal(itemKey, def, false, function(key, editedDef)
         sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = editedDef})
+        PendingRestock.note("items", key)
         if not Core.isLocal and Core.defs and Core.defs.items then
             Core.defs.items[key] = editedDef
         end
@@ -271,6 +273,7 @@ end
 
 local function saveItemDef(self, key, def)
     sendClientCommand(Core.name, Core.commands.upsertItemDef, {key = key, def = def})
+    PendingRestock.note("items", key)
     if not Core.isLocal and Core.defs and Core.defs.items then
         Core.defs.items[key] = def
     end

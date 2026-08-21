@@ -5,6 +5,7 @@ end
 local Core = PhunMart
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local FONT_SCALE = FormPanel.FONT_SCALE
 
@@ -444,6 +445,7 @@ function AdminShops.OnOpenPanel(player, shopKey)
     createEditModal(shopKey, shopDef, preserveBase, function(key, def)
         def.type = key
         sendClientCommand(Core.name, Core.commands.upsertShopDefinition, def)
+        PendingRestock.note("shops", key)
         if not Core.isLocal and Core.defs and Core.defs.shops then
             Core.defs.shops[key] = def
         end

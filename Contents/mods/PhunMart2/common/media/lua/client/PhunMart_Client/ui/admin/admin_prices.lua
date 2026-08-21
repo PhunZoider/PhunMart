@@ -8,6 +8,7 @@ local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local tools = require "PhunMart_Client/ui/ui_utils"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -401,6 +402,7 @@ local function savePriceDef(self, key, def)
         key = key,
         def = def
     })
+    PendingRestock.note("prices", key)
     -- In SP, skip optimistic update: shared Lua state means the server-side
     -- recompile will update Core.defs directly, and mutating it here would
     -- poison the diff in upsertDefinition (it compares against Core.defs).

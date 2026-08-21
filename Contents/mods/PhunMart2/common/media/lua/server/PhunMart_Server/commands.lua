@@ -381,6 +381,13 @@ Commands[Core.commands.restockAllShops] = function(playerObj, args)
     Core.ServerSystem.instance:restockAll()
 end
 
+Commands[Core.commands.restockShopTypes] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    Core.ServerSystem.instance:restockTypes(args and args.types)
+end
+
 Commands[Core.commands.updateHistory] = function(playerObj, args)
     local history = Core:getPlayerData(playerObj)
     sendServerCommand(playerObj, Core.name, Core.commands.updateHistory, {

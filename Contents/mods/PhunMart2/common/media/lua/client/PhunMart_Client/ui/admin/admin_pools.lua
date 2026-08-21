@@ -7,6 +7,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -333,6 +334,7 @@ end
 
 local function savePoolDef(key, def)
     sendClientCommand(Core.name, Core.commands.upsertPoolDef, {key = key, def = def})
+    PendingRestock.note("pools", key)
     if not Core.isLocal and Core.defs and Core.defs.pools then
         Core.defs.pools[key] = def
     end

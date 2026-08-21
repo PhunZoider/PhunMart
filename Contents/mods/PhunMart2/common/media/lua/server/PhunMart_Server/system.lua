@@ -210,6 +210,41 @@ function ServerSystem:restockAll()
     Core.debugLn("restockAll: restocked " .. tostring(count) .. " loaded shops at " .. tostring(now))
 end
 
+-- Restock only machines of the given shop types. Used after a definition edit,
+-- where restocking everything would reroll shops the change never touched and
+-- pull stock out from under any player mid-purchase.
+function ServerSystem:restockTypes(types)
+    local wanted = {}
+    for _, t in ipairs(types or {}) do
+        wanted[t] = true
+    end
+    if not next(wanted) then
+        return 0
+    end
+
+    -- Same rounding as restockAll, for the same reason.
+    local now = tonumber(string.format("%.1f", GameTime:getInstance():getWorldAgeHours()))
+    -- Per-type stamp so machines in unloaded chunks catch up when their chunk
+    -- loads, without dragging in every other shop type the way forceRestockAt
+    -- would.
+    local md = ModData.getOrCreate("PhunMart")
+    md.forceRestockTypeAt = md.forceRestockTypeAt or {}
+    for t in pairs(wanted) do
+        md.forceRestockTypeAt[t] = now
+    end
+
+    local count = 0
+    for i = 1, self:getLuaObjectCount() do
+        local obj = self:getLuaObjectByIndex(i)
+        if obj and wanted[obj.type] then
+            obj:restock()
+            count = count + 1
+        end
+    end
+    Core.debugLn("restockTypes: restocked " .. tostring(count) .. " loaded shops at " .. tostring(now))
+    return count
+end
+
 function ServerSystem:openShop(player, args, forceRestock)
     local shop = self:getLuaObjectAt(args.x, args.y, args.z)
 

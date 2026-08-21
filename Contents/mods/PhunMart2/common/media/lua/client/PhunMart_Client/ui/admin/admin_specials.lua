@@ -6,6 +6,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -563,6 +564,7 @@ local function saveSpecialDef(self, key, def)
         key = key,
         def = def
     })
+    PendingRestock.note("specials", key)
     if not Core.isLocal and Core.defs and Core.defs.specials then
         Core.defs.specials[key] = def
     end

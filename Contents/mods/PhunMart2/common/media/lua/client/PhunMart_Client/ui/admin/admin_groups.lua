@@ -9,6 +9,7 @@ local CategoryPicker = require "PhunMart_Client/ui/base/category_picker"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -446,6 +447,7 @@ end
 
 local function saveGroupDef(self, key, def)
     sendClientCommand(Core.name, Core.commands.upsertGroupDef, {key = key, def = def})
+    PendingRestock.note("groups", key)
     if not Core.isLocal and Core.defs and Core.defs.groups then
         Core.defs.groups[key] = def
     end

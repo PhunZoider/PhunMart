@@ -514,6 +514,22 @@ function ServerObject:toModData(modData)
     end
 end
 
+-- Newest admin-forced restock stamp that applies to this machine: the global
+-- one left by Restock All, or a per-type one left by a targeted restock after a
+-- definition edit. Returns nil when neither applies.
+function ServerObject:forcedRestockStamp()
+    local md = ModData.getOrCreate("PhunMart")
+    local stamp = md.forceRestockAt or 0
+    local byType = md.forceRestockTypeAt and md.forceRestockTypeAt[self.type]
+    if byType and byType > stamp then
+        stamp = byType
+    end
+    if stamp > 0 then
+        return stamp
+    end
+    return nil
+end
+
 function ServerObject:requiresRestock()
     local shop = Core.runtime.shops and Core.runtime.shops[self.type]
     local frequency = (shop and shop.restockFrequency) or 24
@@ -521,9 +537,9 @@ function ServerObject:requiresRestock()
     if now >= (self.lastRestock or 0) + frequency then
         return true
     end
-    -- Check if an admin forced a global restock while this chunk was unloaded
-    local md = ModData.getOrCreate("PhunMart")
-    if md.forceRestockAt and md.forceRestockAt > (self.lastRestock or 0) then
+    -- Check if an admin forced a restock while this chunk was unloaded
+    local forced = self:forcedRestockStamp()
+    if forced and forced > (self.lastRestock or 0) then
         return true
     end
     return false
@@ -543,8 +559,8 @@ function ServerObject:restock()
     -- lastRestock unchanged), so requiresRestock() would keep firing on every
     -- open. Snap to now so this shop's forced restock counts as serviced. The
     -- global stamp itself must stay set for shops still in unloaded chunks.
-    local md = ModData.getOrCreate("PhunMart")
-    if md.forceRestockAt and md.forceRestockAt > self.lastRestock then
+    local forced = self:forcedRestockStamp()
+    if forced and forced > self.lastRestock then
         self.lastRestock = now
     end
 

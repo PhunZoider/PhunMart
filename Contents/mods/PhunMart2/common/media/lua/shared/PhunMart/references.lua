@@ -138,6 +138,48 @@ function refs.find(kind, key)
     return out
 end
 
+--- Walk the reference chain upwards to the shop types that ultimately draw on
+--- `key`, e.g. a price used by items that sit in groups that feed pools that a
+--- shop rolls from. Used to work out which machines a definition edit affects.
+--- Returns a sorted array of shop type keys.
+function refs.findShops(kind, key)
+    if kind == "shops" then
+        return {key}
+    end
+
+    local shops, seen = {}, {}
+    local queue = {{
+        kind = kind,
+        key = key
+    }}
+    -- `seen` handles the cycles the graph genuinely contains (price inherit
+    -- chains, special inherit chains); the counter is a backstop so a malformed
+    -- override can't hang the client.
+    local guard = 0
+    while #queue > 0 and guard < 2000 do
+        guard = guard + 1
+        local cur = table.remove(queue, 1)
+        local id = cur.kind .. "/" .. tostring(cur.key)
+        if not seen[id] then
+            seen[id] = true
+            if cur.kind == "shops" then
+                shops[cur.key] = true
+            else
+                for _, r in ipairs(refs.find(cur.kind, cur.key)) do
+                    table.insert(queue, r)
+                end
+            end
+        end
+    end
+
+    local out = {}
+    for k in pairs(shops) do
+        table.insert(out, k)
+    end
+    table.sort(out)
+    return out
+end
+
 --- Short human-readable summary of refs.find, e.g. "3 pools, 1 shop".
 function refs.summarise(found)
     local counts, order = {}, {}

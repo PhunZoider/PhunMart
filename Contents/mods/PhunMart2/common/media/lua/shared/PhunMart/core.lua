@@ -29,6 +29,7 @@ PhunMart = {
         reroll = "PhunMartReroll",
         rerollAllShops = "PhunMartRerollAllShops",
         restockAllShops = "PhunMartRestockAllShops",
+        restockShopTypes = "PhunMartRestockShopTypes",
         changeTo = "PhunMartChangeShopType",
         restock = "PhunMartRestockShop",
         closeShop = "PhunMartCloseShop",

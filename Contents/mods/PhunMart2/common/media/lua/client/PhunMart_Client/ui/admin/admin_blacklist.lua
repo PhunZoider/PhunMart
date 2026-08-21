@@ -5,6 +5,7 @@ end
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
+local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local FONT_SCALE = ListPanel.FONT_SCALE
 local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
@@ -84,12 +85,17 @@ end
 
 function UI:onAddClick()
     ItemPicker.open(self.player, {}, function(picked)
-        for _, key in ipairs(picked or {}) do
+        if not picked or #picked == 0 then
+            return
+        end
+        for _, key in ipairs(picked) do
             sendClientCommand(Core.name, Core.commands.setGlobalBlacklistEntry, {
                 itemKey = key,
                 excluded = true
             })
         end
+        -- The global list is consulted by every shop when it rolls stock.
+        PendingRestock.noteAllShops()
         self:requestData()
     end)
 end
@@ -106,6 +112,8 @@ function UI:onRemoveClick()
         itemKey = selectedItem.item.key,
         excluded = false
     })
+    -- The global list is consulted by every shop when it rolls stock.
+    PendingRestock.noteAllShops()
     self:requestData()
 end
 
