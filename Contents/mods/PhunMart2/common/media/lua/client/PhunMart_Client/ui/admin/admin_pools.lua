@@ -103,6 +103,59 @@ local function getPriceKeys()
     return keys
 end
 
+-- Resolve a blacklist entry's display name. Entries may be item IDs or special
+-- keys, so fall back to the raw key when the script manager doesn't know it.
+local function resolveEntryName(key)
+    local si = getScriptManager():getItem(key)
+    return si and si:getDisplayName() or key
+end
+
+-- Options for the pool blacklist picker: everything currently blacklisted, plus
+-- everything the pool can currently offer. Seeding with the existing entries
+-- matters — a blacklisted item is compiled out of pool.offers entirely, so
+-- without this the picker couldn't represent it and unticking would be the only
+-- way to lose it.
+local function getBlacklistOptions(poolKey, current)
+    local seen, opts = {}, {}
+    local function add(key)
+        if key and key ~= "" and not seen[key] then
+            seen[key] = true
+            table.insert(opts, {
+                key = key,
+                display = resolveEntryName(key)
+            })
+        end
+    end
+    for _, k in ipairs(current or {}) do
+        add(k)
+    end
+    local pool = poolKey and Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+    for _, offer in pairs(pool and pool.offers or {}) do
+        add(offer.item)
+    end
+    table.sort(opts, function(a, b)
+        return a.display:lower() < b.display:lower()
+    end)
+    return opts
+end
+
+-- Format the blacklist picker's summary line using display names.
+local function formatBlacklistDisplay(keys)
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
+    local limit = math.min(#keys, 3)
+    local names = {}
+    for i = 1, limit do
+        names[i] = resolveEntryName(keys[i])
+    end
+    local text = table.concat(names, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
+end
+
 -- Reject anything in the zones field that isn't a plain number.
 local function validateZones(value)
     if not value or value == "" then
@@ -134,6 +187,10 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     if def.sources and def.sources.groups then
         for _, g in ipairs(def.sources.groups) do table.insert(selectedGroups, g) end
     end
+    local selectedBlacklist = {}
+    if def.blacklist then
+        for _, b in ipairs(def.blacklist) do table.insert(selectedBlacklist, b) end
+    end
 
     -- Collect available group keys for picker
     local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
@@ -160,6 +217,11 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
             -- Sources (groups only)
             result.sources = #selectedGroups > 0 and {groups = selectedGroups} or nil
+
+            -- Emptying the blacklist relies on the tombstone: nil here makes
+            -- diffTable unset the key, which is what restores a pool that was
+            -- blacklisted from the in-shop menu.
+            result.blacklist = #selectedBlacklist > 0 and selectedBlacklist or nil
 
             -- Defaults price (optional)
             local priceVal = f:getFieldValue("defaultsPrice")
@@ -212,6 +274,20 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 selectedGroups = keys or {}
                 f:setPickerValue("groups", selectedGroups, formatKeyList(selectedGroups))
             end, { title = getText("IGUI_PhunMart_Admin_PickGroups") })
+        end,
+    })
+    form:addPickerField("blacklist", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
+        value = selectedBlacklist,
+        display = formatBlacklistDisplay(selectedBlacklist),
+        hint = getText("IGUI_PhunMart_Hint_PoolBlacklist"),
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), getBlacklistOptions(poolKey, selectedBlacklist), selectedBlacklist,
+                function(keys)
+                    selectedBlacklist = keys or {}
+                    f:setPickerValue("blacklist", selectedBlacklist, formatBlacklistDisplay(selectedBlacklist))
+                end, {
+                    title = getText("IGUI_PhunMart_Admin_PickBlacklist")
+                })
         end,
     })
     form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
@@ -275,10 +351,11 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    -- Columns: Key, Sources, Zones
+    -- Columns: Key, Sources, Blacklist, Zones
     self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
     self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.40)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.80)
+    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.70)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.82)
 
     -- Custom row renderer
     self.list.doDrawItem = self.drawDatas
@@ -296,6 +373,9 @@ function UI:getFilterText(itemData)
     local text = (itemData.key or "") .. " " .. (itemData.sources or "")
     if itemData.sticky then
         text = text .. " sticky"
+    end
+    if itemData.blacklist ~= "" then
+        text = text .. " blacklist"
     end
     return text
 end
@@ -322,6 +402,7 @@ function UI:refreshPools()
             sticky = def.sticky == true,
             enabled = def.enabled ~= false,
             sources = formatSources(def),
+            blacklist = def.blacklist and #def.blacklist > 0 and tostring(#def.blacklist) or "",
             zones = formatZones(def),
             def = def
         })
@@ -396,6 +477,7 @@ function UI:drawDatas(y, item, alt)
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size
     local col3X = self.columns[3].size
+    local col4X = self.columns[4].size
     local clipY = math.max(0, y + self:getYScroll())
     local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
 
@@ -415,9 +497,16 @@ function UI:drawDatas(y, item, alt)
     self:drawText(data.sources, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
     self:clearStencilRect()
 
+    -- Blacklist count column
+    self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
+    if data.blacklist ~= "" then
+        self:drawText(data.blacklist, col3X + 4, textY, 0.9, 0.5, 0.5, a, self.font)
+    end
+    self:clearStencilRect()
+
     -- Zones column
     if data.zones ~= "" then
-        self:drawText(data.zones, col3X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
+        self:drawText(data.zones, col4X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
     end
 
     self.itemsHeight = y + self.itemheight

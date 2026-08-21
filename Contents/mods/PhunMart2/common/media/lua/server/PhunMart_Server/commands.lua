@@ -802,6 +802,53 @@ Commands[Core.commands.quickBlacklist] = function(playerObj, args)
     Core.setBlacklist(list)
 end
 
+-- The effective global blacklist as a sorted array of keys. Entries explicitly
+-- set to false are un-blacklisted and omitted (see setGlobalBlacklistEntry).
+local function collectGlobalBlacklist()
+    local excluded = (Core.getBlacklist().items or {}).exclude or {}
+    local keys = {}
+    for k, v in pairs(excluded) do
+        if v then
+            table.insert(keys, k)
+        end
+    end
+    table.sort(keys)
+    return keys
+end
+
+Commands[Core.commands.getGlobalBlacklist] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    sendServerCommand(playerObj, Core.name, Core.commands.getGlobalBlacklist, {
+        items = collectGlobalBlacklist()
+    })
+end
+
+Commands[Core.commands.setGlobalBlacklistEntry] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    local itemKey = args and args.itemKey
+    if not itemKey then
+        return
+    end
+    local list = Core.getBlacklist() or {}
+    list.items = list.items or {}
+    list.items.exclude = list.items.exclude or {}
+    -- Store an explicit false rather than removing the key: the built-in
+    -- defaults are unioned back in on every load, so a key that is merely
+    -- absent from the override reappears. Consumers test `if excluded[key]`,
+    -- so false correctly reads as "allowed".
+    list.items.exclude[itemKey] = args.excluded == true
+    Core.setBlacklist(list)
+    -- Takes effect at the next restock; the global list is read when a shop
+    -- rolls its stock, not at compile time.
+    sendServerCommand(playerObj, Core.name, Core.commands.getGlobalBlacklist, {
+        items = collectGlobalBlacklist()
+    })
+end
+
 Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
