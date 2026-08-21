@@ -211,12 +211,8 @@ function Panel:onRestockAll()
     modal:addToUIManager()
 end
 
--- Skip is "restock none": forget the list and close. Keeping it and merely
--- hiding meant a later edit to an already-listed shop changed nothing visible,
--- so the panel stayed shut on a change that did need a restock. Discarding
--- makes the next edit repopulate from scratch and reopen.
 function Panel:onSkip()
-    PendingRestock.clear()
+    PendingRestock.skip()
 end
 
 function Panel:prerender()
@@ -268,7 +264,7 @@ end
 -- Two ways to close with different consequences is exactly the sort of hidden
 -- distinction that makes a tool feel unpredictable.
 function Panel:close()
-    PendingRestock.clear()
+    PendingRestock.skip()
 end
 
 function Panel:new()
@@ -317,9 +313,9 @@ function PendingRestock.show()
     panel:refreshList()
 end
 
--- Takes the window off screen without touching the list. Kept separate from
--- clear() so clear() can call it: routing through Panel:close() would recurse,
--- since that now clears.
+-- Takes the window off screen without touching the list. Kept separate so
+-- skip() and clear() can call it: routing through Panel:close() would recurse,
+-- since that now calls skip().
 local function hidePanel()
     if panel then
         panel:setVisible(false)
@@ -327,30 +323,38 @@ local function hidePanel()
     end
 end
 
--- Deliberately not exposed: hiding while the list is still populated is the
--- state that caused the bug this replaced, where a later edit to an
--- already-listed shop had nothing new to add and so never reopened the panel.
--- Every close now goes through clear().
+--- "Restock none". The shops stay on the list, because they are genuinely
+--- still stale and forgetting them would under-report on the next edit, but
+--- they drop out of the selection so a later Restock selected doesn't sweep
+--- them up by accident. note() re-ticks and reopens on any further change.
+function PendingRestock.skip()
+    for t in pairs(pending) do
+        checked[t] = nil
+    end
+    hidePanel()
+end
 
 --- Record that a definition changed, and surface the shops it feeds.
--- A change that reaches no shop type (an unused price, say) adds nothing,
+-- A change that reaches no shop type (an unused price, say) records nothing,
 -- which is correct: nothing in the world is stale.
+--
+-- Reopens on every touch, not just on shops entering the list for the first
+-- time. That is what makes a hidden-but-populated list safe: an edit to a shop
+-- that was skipped earlier still brings the panel back.
 function PendingRestock.note(kind, key)
     if not key then
         return
     end
-    local added = false
+    local touched = false
     for _, t in ipairs(Core.references.findShops(kind, key)) do
-        if not pending[t] then
-            pending[t] = true
-            checked[t] = true
-            added = true
-        end
+        pending[t] = true
+        -- Re-tick. A shop skipped earlier has just been changed again, so it
+        -- goes back to being selected by default.
+        checked[t] = true
+        touched = true
     end
-    if added then
+    if touched then
         PendingRestock.show()
-    elseif panel and panel:isVisible() then
-        panel:refreshList()
     end
 end
 
@@ -358,15 +362,13 @@ end
 --- which every shop draws through.
 function PendingRestock.noteAllShops()
     local shops = Core.defs and Core.defs.shops or {}
-    local added = false
+    local touched = false
     for t in pairs(shops) do
-        if not pending[t] then
-            pending[t] = true
-            checked[t] = true
-            added = true
-        end
+        pending[t] = true
+        checked[t] = true
+        touched = true
     end
-    if added then
+    if touched then
         PendingRestock.show()
     end
 end

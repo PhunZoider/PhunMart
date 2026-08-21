@@ -214,11 +214,15 @@ end
 -- where restocking everything would reroll shops the change never touched and
 -- pull stock out from under any player mid-purchase.
 function ServerSystem:restockTypes(types)
+    -- Tracked with a flag rather than testing the table with next(), which
+    -- PZ's Lua sandbox does not expose.
     local wanted = {}
+    local any = false
     for _, t in ipairs(types or {}) do
         wanted[t] = true
+        any = true
     end
-    if not next(wanted) then
+    if not any then
         return 0
     end
 
