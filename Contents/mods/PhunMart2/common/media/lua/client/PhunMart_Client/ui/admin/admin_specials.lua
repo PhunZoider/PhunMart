@@ -57,6 +57,10 @@ local function formatAction(def)
         return "vehicle:" .. (act.script or (act.scripts and act.scripts[1]) or "")
     elseif act.type == "spawnAnimal" then
         return "animal:" .. tostring(act.animal or "?") .. "/" .. tostring(act.breed or "?")
+    elseif act.type == "giveXP" then
+        return (act.skill or "?") .. " +" .. tostring(act.amount or 0) .. " XP"
+    elseif act.type == "applyBoost" then
+        return (act.skill or "?") .. " x" .. tostring(act.multiplier or 1) .. " for " .. tostring(act.hours or 0) .. "h"
     elseif act.type == "grantBoundTokens" then
         return tostring(act.amount or 0) .. " tokens"
     elseif act.type == "adjustBalance" then
@@ -71,8 +75,12 @@ end
 -- Edit / Add Modal (FormPanel-based)
 ---------------------------------------------------------------------------
 
-local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "spawnAnimal", "grantBoundTokens", "adjustBalance",
-                      "giveItem"}
+-- giveXP and applyBoost were missing here, which was quietly destructive: they
+-- are 210 of the 316 shipped specials, the combo cannot show an option it does
+-- not have so it fell back to the first one, and saving then replaced a real
+-- giveXP action with an empty addTrait.
+local ACTION_TYPES = {"addTrait", "removeTrait", "giveXP", "applyBoost", "spawnVehicle", "spawnAnimal",
+                      "grantBoundTokens", "adjustBalance", "giveItem"}
 local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "animal", "collector", "pawn"}
 
 local function trim(s)
@@ -97,6 +105,8 @@ end
 local ACTION_GROUPS = {
     addTrait = "act_trait",
     removeTrait = "act_trait",
+    giveXP = "act_xp",
+    applyBoost = "act_boost",
     spawnVehicle = "act_vehicle",
     spawnAnimal = "act_animal",
     grantBoundTokens = "act_tokens",
@@ -104,7 +114,8 @@ local ACTION_GROUPS = {
     giveItem = "act_item"
 }
 
-local ALL_ACTION_GROUPS = {"act_trait", "act_vehicle", "act_animal", "act_tokens", "act_balance", "act_item"}
+local ALL_ACTION_GROUPS = {"act_trait", "act_xp", "act_boost", "act_vehicle", "act_animal", "act_tokens",
+                           "act_balance", "act_item"}
 
 -- Show only the group belonging to `actionType`, hiding the rest.
 local function applyActionGroups(form, actionType, isTemplate)
@@ -263,12 +274,19 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                         -- Blank means one per purchase.
                         amount = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
                     }
-                elseif actionType then
+                elseif ACTION_GROUPS[actionType] then
                     action = {
                         type = actionType
                     }
                     if actionType == "addTrait" or actionType == "removeTrait" then
                         action.trait = f:getFieldValue("trait")
+                    elseif actionType == "giveXP" then
+                        action.skill = trim(f:getFieldValue("xpSkill"))
+                        action.amount = f:getFieldNumber("xpAmount")
+                    elseif actionType == "applyBoost" then
+                        action.skill = trim(f:getFieldValue("boostSkill"))
+                        action.multiplier = f:getFieldNumber("boostMultiplier")
+                        action.hours = f:getFieldNumber("boostHours")
                     elseif actionType == "spawnVehicle" then
                         local scripts = parseScriptList(f:getFieldValue("vehicleScripts"))
                         if #scripts > 1 then
@@ -289,6 +307,11 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     end
                 end
 
+                -- Only written when the form actually modelled the type. An
+                -- action this form knows nothing about keeps whatever it had:
+                -- rebuilding it from fields that were never shown is how a
+                -- giveXP action became an empty addTrait, and the same would
+                -- happen to any type added later or by another mod.
                 if action then
                     -- This form only edits the first action. Keep any others the
                     -- definition already had rather than truncating the list.
@@ -397,9 +420,25 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         group = "instance"
     })
     local curActionType = curAction and curAction.type or ACTION_TYPES[1]
+
+    -- A combo cannot show an option it does not have, and it does not complain:
+    -- it just sits on the first one, so an unrecognised action would read as
+    -- addTrait. Add it instead, and the save path leaves it alone because it has
+    -- no field group.
+    local actionOptions = {}
+    local knownType = false
+    for _, t in ipairs(ACTION_TYPES) do
+        table.insert(actionOptions, t)
+        if t == curActionType then
+            knownType = true
+        end
+    end
+    if not knownType and curActionType and curActionType ~= "" then
+        table.insert(actionOptions, curActionType)
+    end
     local extraActions = (def.actions and #def.actions > 1) and (#def.actions - 1) or 0
     form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
-        options = ACTION_TYPES,
+        options = actionOptions,
         selected = curActionType,
         group = "instance",
         -- Only the first action is editable here. Say so when there are more,
@@ -430,6 +469,42 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     singleSelect = true
                 })
         end
+    })
+    form:addTextField("xpSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
+        default = (curAction and curAction.skill) or "",
+        hint = getText("IGUI_PhunMart_Hint_Skill"),
+        group = "act_xp",
+        required = true
+    })
+    form:addTextField("xpAmount", getText("IGUI_PhunMart_Lbl_XPAmount"), {
+        default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_XPAmount"),
+        group = "act_xp",
+        required = true,
+        numeric = true,
+        min = 0
+    })
+    form:addTextField("boostSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
+        default = (curAction and curAction.skill) or "",
+        hint = getText("IGUI_PhunMart_Hint_Skill"),
+        group = "act_boost",
+        required = true
+    })
+    form:addTextField("boostMultiplier", getText("IGUI_PhunMart_Lbl_BoostMultiplier"), {
+        default = (curAction and curAction.multiplier) and tostring(curAction.multiplier) or "",
+        hint = getText("IGUI_PhunMart_Hint_BoostMultiplier"),
+        group = "act_boost",
+        required = true,
+        numeric = true,
+        min = 0
+    })
+    form:addTextField("boostHours", getText("IGUI_PhunMart_Lbl_BoostHours"), {
+        default = (curAction and curAction.hours) and tostring(curAction.hours) or "",
+        hint = getText("IGUI_PhunMart_Hint_BoostHours"),
+        group = "act_boost",
+        required = true,
+        numeric = true,
+        min = 0
     })
     form:addTextField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
         default = vehicleDefault,
