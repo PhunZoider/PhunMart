@@ -746,6 +746,37 @@ function Core.isShippedKey(kind, key)
     return false
 end
 
+--- May this player open the definition editor?
+---
+--- One predicate for every entry point. There were three, which disagreed: the
+--- debug menu checked nothing at all, the admin panel button checked only the
+--- EditorRole sandbox option, and the Admin Tools button inside checked only
+--- isAdmin. So EditorRole could be bypassed by using a different door.
+---
+--- EditorRole narrows within the admin population rather than granting access
+--- to non-admins, matching its own tooltip: empty allows everyone with
+--- debug/admin access, set restricts to a role among them. It is a policy
+--- control, not a security boundary. The boundary is the server, which checks
+--- isAdmin on every command it accepts.
+function Core.canEditConfig(player)
+    if Core.isLocal then
+        return true
+    end
+    if not Core.utils.isAdmin(player) then
+        return false
+    end
+    local required = Core.getOption("EditorRole", "")
+    if not required or required == "" then
+        return true
+    end
+    local role = player and player.getRole and player:getRole()
+    local roleName = role and role.getName and role:getName()
+    if not roleName or roleName == "" then
+        return false
+    end
+    return roleName:lower() == required:lower()
+end
+
 --- True when `key` has an entry in the override files, meaning someone changed
 --- it. Independent of isShippedKey: together they give three states, a stock
 --- definition, a shipped one that has been edited, and one an admin created.

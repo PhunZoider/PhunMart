@@ -249,8 +249,10 @@ function UI:createChildren()
     self._buttonBar:addChild(closeBtn)
     self._closeBtn = closeBtn
 
-    -- Edit Pool button (admin only, right side next to Close)
-    if Core.utils.isAdmin(self.player) then
+    -- Edit Pool button, right side next to Close. Gated on canEditConfig rather
+    -- than plain admin because it opens a definition editor: the viewer itself
+    -- is read-only and stays available to any admin.
+    if Core.canEditConfig(self.player) then
         local editBtnW = math.max(math.floor(70 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, getText(
             "IGUI_PhunMart_Admin_EditPool")) + PAD * 2)
         self.editPoolBtn = ISButton:new(0, PAD, editBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Admin_EditPool"), self,

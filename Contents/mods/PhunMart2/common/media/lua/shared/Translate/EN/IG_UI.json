@@ -104,6 +104,7 @@
   "IGUI_PhunMart_Msg_GlobalBlacklisted": "Global blacklisted: %1",
   "IGUI_PhunMart_Msg_BlacklistedInPool": "Blacklisted in %1: %2",
   "IGUI_PhunMart_Msg_PoolNotFound": "Pool not found for offer",
+  "IGUI_PhunMart_Msg_NoEditorAccess": "You don't have permission to open the PhunMart editor. A server setting restricts it to a specific role.",
   "IGUI_PhunMart_Btn_Apply": "Apply",
   "IGUI_PhunMart_Btn_Cancel": "Cancel",
   "IGUI_PhunMart_Btn_OK": "OK",

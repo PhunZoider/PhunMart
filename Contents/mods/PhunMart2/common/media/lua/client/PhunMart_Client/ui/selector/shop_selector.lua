@@ -277,6 +277,11 @@ function UI:onKeyRelease(key)
 end
 
 function UI:onEdit(item)
+    -- Double-click opened the shop editor unchecked, which was the easiest of
+    -- the bypasses to hit by accident.
+    if not Core.canEditConfig(self.player) then
+        return
+    end
     local shop = self.controls.list.items[self.controls.list.selected].item
     if shop and shop.type then
         Core.ui.admin_shops.OnOpenPanel(self.player, shop.type)
@@ -288,7 +293,7 @@ function UI:onRowContextMenu(item, screenX, screenY)
     context:addOption(getText("IGUI_PhunMart_Btn_Locations"), self, function()
         Core.ui.shop_instances.open(self.player, item.type)
     end)
-    if Core.utils.isAdmin(self.player) then
+    if Core.canEditConfig(self.player) then
         context:addOption(getText("IGUI_PhunMart_Btn_Config"), self, function()
             Core.ui.admin_shops.OnOpenPanel(self.player, item.type)
         end)
@@ -397,10 +402,12 @@ function UI:prerender()
     -- right side: Close
     self.controls.btnClose:setX(self.controls.btnClose.parent.width - self.controls.btnClose.width - 10)
 
-    -- left side: Admin Tools (admin only)
-    local isAdminUser = Core.utils.isAdmin(self.player)
-    self.controls.btnAdmin:setVisible(isAdminUser)
-    if isAdminUser then
+    -- left side: Admin Tools. Same predicate as the two entry points that open
+    -- this window, so EditorRole cannot be sidestepped by getting in one way
+    -- and then editing from here.
+    local canEdit = Core.canEditConfig(self.player)
+    self.controls.btnAdmin:setVisible(canEdit)
+    if canEdit then
         self.controls.btnAdmin:setX(10)
     end
 end

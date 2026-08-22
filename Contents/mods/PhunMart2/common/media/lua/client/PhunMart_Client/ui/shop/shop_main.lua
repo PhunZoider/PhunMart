@@ -696,11 +696,19 @@ function UI:onAdminMenu(btn)
     context:addOption(getText("IGUI_PhunMart_Admin_Restock"), self, UI.onAdminRestock)
 
     -- ── Edit Shop ─────────────────────────────────────────────────────────
-    context:addOption(getText("IGUI_PhunMart_Admin_EditShop"), self, UI.onEditShop)
+    -- The options that open a definition editor honour EditorRole, the same as
+    -- the three ways into the editor from outside a shop. Restock, reroll and
+    -- blacklist stay on plain admin: they are maintenance on this machine, not
+    -- config authoring, and the server enforces isAdmin on them regardless.
+    local canEdit = Core.canEditConfig(self.player)
+
+    if canEdit then
+        context:addOption(getText("IGUI_PhunMart_Admin_EditShop"), self, UI.onEditShop)
+    end
 
     -- ── Pools (grouped by pool set; each pool → View / Edit submenu) ──────
     local poolSets = self.data and self.data.poolSets or {}
-    if #poolSets > 0 then
+    if #poolSets > 0 and canEdit then
         local poolsMenu = context:getNew(context)
         for si, poolSet in ipairs(poolSets) do
             local setLabel = #poolSets > 1 and getText("IGUI_PhunMart_Admin_SetN", tostring(si)) or

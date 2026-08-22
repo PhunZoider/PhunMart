@@ -185,23 +185,8 @@ function ClientSystem:checkObjectAdded(obj)
     end
 end
 
-function ClientSystem:prepareShopList(player)
-    Core.ui.shop_selector.open(player or getSpecificPlayer(0))
-end
-
 function ClientSystem:openShopList(player)
     Core.ui.shop_selector.open(player or getSpecificPlayer(0))
-end
-
-function ClientSystem:upsertShopDefinition(args, player)
-
-    self:sendCommand(player or getSpecificPlayer(0), Core.commands.upsertShopDefinition, {
-        shopId = args.shopId,
-        location = args.location,
-        type = args.type,
-        data = args.data
-    })
-
 end
 
 CGlobalObjectSystem.RegisterSystemClass(Core.ClientSystem)
