@@ -167,6 +167,26 @@ function ListPanel:createChildren()
                                  BUTTON_HGT + PAD
     end
 
+    -- The "used by" line, as a button rather than drawn text so it can be
+    -- clicked through to whatever it names. Chrome stripped off so it reads as
+    -- a line of text; the mouse-over tint is what says it does something.
+    if self:showsReferences() then
+        local refsBtn = ISButton:new(PAD, 0, 10, FONT_HGT_SMALL, "", self, self.onReferenceClick)
+        refsBtn:initialise()
+        refsBtn:instantiate()
+        refsBtn.font = UIFont.Small
+        refsBtn.backgroundColor = {r = 0, g = 0, b = 0, a = 0}
+        refsBtn.backgroundColorMouseOver = {r = 0.3, g = 0.7, b = 0.35, a = 0.25}
+        refsBtn.borderColor = {r = 0, g = 0, b = 0, a = 0}
+        refsBtn.textColor = {r = 0.75, g = 0.75, b = 0.75, a = 1}
+        -- Held rather than assigned, because prerender takes it off again when
+        -- the line has nothing to click through to.
+        refsBtn._tip = getText("IGUI_PhunMart_Tip_UsedBy")
+        refsBtn:setVisible(false)
+        self._mainPanel:addChild(refsBtn)
+        self._refsBtn = refsBtn
+    end
+
     -- Close button (right-aligned in button bar)
     local closeBtnW = math.max(math.floor(70 * FONT_SCALE),
         getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Close")) + PAD * 2)
@@ -289,6 +309,60 @@ function ListPanel:updateReferenceLine()
         self._refsText = getText("IGUI_PhunMart_Lbl_UsedByNothing")
     else
         self._refsText = getText("IGUI_PhunMart_Lbl_UsedBy", Core.references.summarise(found))
+    end
+end
+
+--- Follow one reference: switch the shell to that category's tab and select
+--- the row. The kinds references.find reports are the same strings the shell
+--- keys its tabs by, so no mapping is needed between them.
+function ListPanel:gotoReference(ref)
+    if not ref or not self.shell then
+        return
+    end
+    local view = self.shell:activateTab(ref.kind)
+    if view and view.selectKey then
+        view:selectKey(ref.key)
+    end
+end
+
+--- Clicking the "used by" line. One referrer goes straight there. Several are
+--- offered as a menu grouped by category, so the top level reads the same as
+--- the line itself ("3 pools, 1 shop") rather than as a flat list that a price
+--- used by forty items would bury the screen in.
+function ListPanel:onReferenceClick()
+    if self._refsOrphan or not self._refsKey then
+        return
+    end
+    local found = Core.references.find(self._defKind, self._refsKey)
+    if #found == 0 then
+        return
+    end
+    if #found == 1 then
+        self:gotoReference(found[1])
+        return
+    end
+
+    local order, byKind = {}, {}
+    for _, r in ipairs(found) do
+        if not byKind[r.kind] then
+            byKind[r.kind] = {}
+            table.insert(order, r.kind)
+        end
+        table.insert(byKind[r.kind], r)
+    end
+
+    local btn = self._refsBtn
+    local context = ISContextMenu.get(self.playerIndex, btn:getAbsoluteX(), btn:getAbsoluteY())
+    for _, kind in ipairs(order) do
+        local group = byKind[kind]
+        local sub = ISContextMenu:getNew(context)
+        -- summarise gives "3 pools" / "1 shop", the same wording as the line.
+        context:addSubMenu(context:addOption(Core.references.summarise(group)), sub)
+        for _, r in ipairs(group) do
+            -- The field holding the reference, because "why is this here" is
+            -- most of the question being asked.
+            sub:addOption(r.key .. "  (" .. r.via .. ")", self, self.gotoReference, r)
+        end
     end
 end
 
@@ -435,6 +509,14 @@ end
 
 --- Clear all items (call at start of refresh).
 function ListPanel:clearList()
+    -- Remember what was selected. Refresh runs on a save, on a recompile and
+    -- on every tab switch, and without this each one dumped you back at the top
+    -- of the list. Switching to a tab and back is how you retrace a
+    -- click-through, so the selection has to survive the trip.
+    local sel = self.list.selected
+    local current = sel and sel > 0 and self.list.items[sel]
+    self._pendingSelectKey = current and self:getRowKey(current.item) or nil
+
     self._allItems = {}
     self.list:clear()
     -- The reference counts may have moved with the data.
@@ -453,6 +535,31 @@ function ListPanel:selectKey(key)
     if not key then
         return false
     end
+
+    -- Filter first. A refresh leaves the list unfiltered until the next
+    -- prerender, so selecting before that would pick a row out of a list that
+    -- is about to be rebuilt, and ISScrollingListBox:clear resets the
+    -- selection. Applying it here also settles _lastFilterText, so prerender
+    -- leaves the selection alone.
+    self:applyFilter()
+    if self:findAndSelect(key) then
+        return true
+    end
+
+    -- Not in view, so the current filter is hiding it. Being sent to a
+    -- definition and landing on nothing is worse than losing a filter you can
+    -- retype, so drop both filters and look again.
+    if self._filterEntry then
+        self._filterEntry:setText("")
+    end
+    if self._onlyChangedTick then
+        self._onlyChangedTick:setSelected(1, false)
+    end
+    self:applyFilter()
+    return self:findAndSelect(key)
+end
+
+function ListPanel:findAndSelect(key)
     for i, entry in ipairs(self.list.items) do
         if self:getRowKey(entry.item) == key then
             self.list.selected = i
@@ -492,6 +599,14 @@ function ListPanel:applyFilter()
         if include then
             self.list:addItem(entry.text, entry.data)
         end
+    end
+
+    -- Rows only exist once they are through the filter, so restoring the
+    -- selection belongs here rather than in clearList where it was captured.
+    if self._pendingSelectKey then
+        local key = self._pendingSelectKey
+        self._pendingSelectKey = nil
+        self:findAndSelect(key)
     end
 end
 
@@ -594,14 +709,25 @@ function ListPanel:prerender()
     end
 
     -- "Used by" line, sitting between the list and the buttons.
-    if refsH > 0 then
+    if refsH > 0 and self._refsBtn then
         self:updateReferenceLine()
+        local btn = self._refsBtn
         if self._refsText and self._refsText ~= "" then
-            local r, g, b = 0.75, 0.75, 0.75
-            if self._refsOrphan then
-                r, g, b = 0.55, 0.55, 0.55
-            end
-            self:drawText(self._refsText, PAD, listY + listH + math.floor(PAD / 2), r, g, b, 1, UIFont.Small)
+            local textW = getTextManager():MeasureStringX(UIFont.Small, self._refsText)
+            btn:setTitle(self._refsText)
+            -- Widened and shifted by the same 4px so the centred label lines up
+            -- with the description text above rather than sitting indented.
+            btn:setX(PAD - 4)
+            btn:setY(listY + listH + math.floor(PAD / 2))
+            btn:setWidth(textW + 8)
+            btn:setHeight(FONT_HGT_SMALL)
+            btn:setVisible(true)
+            -- Nothing points at it, so there is nowhere to click through to.
+            -- Disabled also dims the text, which suits what it is saying.
+            btn:setEnable(not self._refsOrphan)
+            btn.tooltip = (not self._refsOrphan) and btn._tip or nil
+        else
+            btn:setVisible(false)
         end
     end
 end
