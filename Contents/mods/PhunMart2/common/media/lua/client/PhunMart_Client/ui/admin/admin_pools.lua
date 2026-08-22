@@ -341,24 +341,17 @@ local function savePoolDef(key, def)
     end
 end
 
-function UI.OnOpenPanel(player)
+--- Build this panel as a view for the tabbed shell. The shell owns the size
+--- and position, so both are placeholders until its first layout pass.
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
     local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(700 * FONT_SCALE)
-        local height = math.floor(500 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-        instance = UI:new(x, y, width, height, player)
-        instance:setTitle(getText("IGUI_PhunMart_Title_PoolDefs"))
+        instance = UI:new(0, 0, 100, 100, player)
         instance.description = getText("IGUI_PhunMart_Desc_PoolDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    instance:refreshPools()
     return instance
 end
 
@@ -494,11 +487,6 @@ function UI:GridDoubleClick(item)
     end)
 end
 
-function UI:close()
-    ISCollapsableWindowJoypad.close(self)
-    UI.instances[self.playerIndex] = nil
-end
-
 -- Open the edit modal directly for a specific pool key (used by shop_main context menu).
 -- Pass nil poolKey to open in "Add" mode.
 function UI.OnEditPool(player, poolKey)
@@ -517,7 +505,7 @@ function UI.OnEditPool(player, poolKey)
         -- Refresh an open Pools list, matching what OnEditGroup / OnEditItem do;
         -- without this an edit made from the in-shop menu leaves the list stale.
         local inst = UI.instances[player:getPlayerNum()]
-        if inst and inst:isVisible() then
+        if inst and inst:isLive() then
             inst:refreshPools()
         end
         Core.debugLn("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)

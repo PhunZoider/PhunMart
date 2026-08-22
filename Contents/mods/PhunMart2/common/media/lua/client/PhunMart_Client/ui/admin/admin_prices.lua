@@ -322,24 +322,17 @@ Core.ui.admin_prices.instances = {}
 local UI = Core.ui.admin_prices
 UI._defKind = "prices"
 
-function UI.OnOpenPanel(player)
+--- Build this panel as a view for the tabbed shell. The shell owns the size
+--- and position, so both are placeholders until its first layout pass.
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
     local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(500 * FONT_SCALE)
-        local height = math.floor(450 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-        instance = UI:new(x, y, width, height, player)
-        instance:setTitle(getText("IGUI_PhunMart_Title_PriceDefs"))
+        instance = UI:new(0, 0, 100, 100, player)
         instance.description = getText("IGUI_PhunMart_Desc_PriceDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    instance:refreshPrices()
     return instance
 end
 
@@ -444,11 +437,6 @@ function UI:onDoubleClick(item)
     createEditModal(item.key, item.def, false, function(key, def)
         savePriceDef(self, key, def)
     end)
-end
-
-function UI:close()
-    ISCollapsableWindowJoypad.close(self)
-    UI.instances[self.playerIndex] = nil
 end
 
 UI.refresh = UI.refreshPrices

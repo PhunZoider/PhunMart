@@ -5,17 +5,12 @@ end
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local FONT_SCALE = ListPanel.FONT_SCALE
-
-local profileName = "PhunMartUIShopListing"
-
-Core.ui.shop_selector = ListPanel:derive(profileName)
+Core.ui.shop_selector = ListPanel:derive("PhunMartUIShopListing")
+Core.ui.shop_selector.instances = {}
 local UI = Core.ui.shop_selector
 -- Shop definitions are override-backed like the rest, so the list marks the
 -- ones an admin has customised and can filter down to them.
 UI._defKind = "shops"
-
-local instances = {}
 
 ---------------------------------------------------------------------------
 -- Data
@@ -73,7 +68,7 @@ end
 
 --- Push counts into every open selector. Called from the server reply handler.
 function UI.updateInstanceCounts(list)
-    for _, inst in pairs(instances) do
+    for _, inst in pairs(UI.instances) do
         if inst.setInstanceCounts then
             inst:setInstanceCounts(list)
         end
@@ -81,32 +76,20 @@ function UI.updateInstanceCounts(list)
 end
 
 ---------------------------------------------------------------------------
--- Window
+-- Tab
 ---------------------------------------------------------------------------
 
-function UI.open(player)
+--- Build this panel as a view for the tabbed shell. The shell owns the size
+--- and position, so both are placeholders until its first layout pass.
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
-    local instance = instances[playerIndex]
-
+    local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(420 * FONT_SCALE)
-        local height = math.floor(340 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-
-        instance = UI:new(x, y, width, height, player)
-        instance:setTitle(getText("IGUI_PhunMart_Title_Shops"))
+        instance = UI:new(0, 0, 100, 100, player)
         instance.description = getText("IGUI_PhunMart_Desc_Shops")
         instance:initialise()
-        instances[playerIndex] = instance
-
-        ISLayoutManager.RegisterWindow(profileName, UI, instance)
+        UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    instance:ensureVisible()
-    instance:refreshAll()
     return instance
 end
 
@@ -164,30 +147,6 @@ function UI:prerender()
     ListPanel.prerender(self)
 end
 
-function UI:close()
-    if self.locked then
-        return
-    end
-    ListPanel.close(self)
-    instances[self.playerIndex] = nil
-
-    -- Closing the shop list is the natural "done editing" moment, so bring any
-    -- outstanding restocks back into view rather than letting them be forgotten.
-    local pr = Core.ui.pending_restock
-    if pr and pr.count() > 0 then
-        pr.show()
-    end
-end
-
-function UI:RestoreLayout(name, layout)
-    self:recalcSize()
-end
-
-function UI:SaveLayout(name, layout)
-    ISLayoutManager.DefaultSaveWindow(self, layout)
-    layout.userPosition = self.userPosition and 'true' or 'false'
-end
-
 ---------------------------------------------------------------------------
 -- Actions
 ---------------------------------------------------------------------------
@@ -229,39 +188,11 @@ function UI:onAdminToolsMenu(btn)
         end)
     end
 
-    -- The definition editors are one bag of related things, not eight peers of
-    -- Wallet and Recompile. Ordered along the chain a shop actually resolves
-    -- through, rather than alphabetically, so the menu itself hints at how they
-    -- relate: pools draw on groups, groups gather items and specials, both of
-    -- which carry prices.
-    local defsMenu = ISContextMenu:getNew(context)
-    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Definitions")), defsMenu)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Pools"), self, function()
-        Core.ui.admin_pools.OnOpenPanel(self.player)
-    end)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Groups"), self, function()
-        Core.ui.admin_groups.OnOpenPanel(self.player)
-    end)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Items"), self, function()
-        Core.ui.admin_items.OnOpenPanel(self.player)
-    end)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Specials"), self, function()
-        Core.ui.admin_specials.OnOpenPanel(self.player)
-    end)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Prices"), self, function()
-        Core.ui.admin_prices.OnOpenPanel(self.player)
-    end)
-    defsMenu:addOption(getText("IGUI_PhunMart_Btn_Blacklist"), self, function()
-        Core.ui.admin_blacklist.OnOpenPanel(self.player)
-    end)
-
-    local playersMenu = ISContextMenu:getNew(context)
-    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Players")), playersMenu)
-    playersMenu:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
+    -- The definition editors used to live here as a submenu. They are tabs now,
+    -- so what is left is the handful of things that are not a definition list:
+    -- one player-facing tool and two maintenance actions.
+    context:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
         Core.ui.admin.OnOpenPanel(self.player)
-    end)
-    playersMenu:addOption(getText("IGUI_PhunMart_Btn_Rewards"), self, function()
-        Core.ui.admin_rewards.OnOpenPanel(self.player)
     end)
 
     -- Recompile and Restock All are not editing actions, and sitting alongside

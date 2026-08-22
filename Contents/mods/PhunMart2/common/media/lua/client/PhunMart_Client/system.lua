@@ -185,8 +185,10 @@ function ClientSystem:checkObjectAdded(obj)
     end
 end
 
-function ClientSystem:openShopList(player)
-    Core.ui.shop_selector.open(player or getSpecificPlayer(0))
+--- Open the editor. `tabKey` and `selectKey` are optional and let a caller land
+--- on a particular list with a particular definition already selected.
+function ClientSystem:openShopList(player, tabKey, selectKey)
+    Core.ui.admin_shell.open(player or getSpecificPlayer(0), tabKey, selectKey)
 end
 
 CGlobalObjectSystem.RegisterSystemClass(Core.ClientSystem)

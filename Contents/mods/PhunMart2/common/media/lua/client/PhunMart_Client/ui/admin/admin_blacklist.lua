@@ -26,24 +26,17 @@ end
 -- Panel
 ---------------------------------------------------------------------------
 
-function UI.OnOpenPanel(player)
+--- Build this panel as a view for the tabbed shell. The shell owns the size
+--- and position, so both are placeholders until its first layout pass.
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
     local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(520 * FONT_SCALE)
-        local height = math.floor(450 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-        instance = UI:new(x, y, width, height, player)
-        instance:setTitle(getText("IGUI_PhunMart_Title_GlobalBlacklist"))
+        instance = UI:new(0, 0, 100, 100, player)
         instance.description = getText("IGUI_PhunMart_Desc_GlobalBlacklist")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    instance:requestData()
     return instance
 end
 
@@ -119,10 +112,10 @@ function UI:onRemoveClick()
     self:requestData()
 end
 
-function UI:close()
-    ISCollapsableWindowJoypad.close(self)
-    UI.instances[self.playerIndex] = nil
-end
+-- The global blacklist lives on the server rather than in the override files,
+-- so the shell's tab switch has to go and fetch it rather than re-read
+-- Core.defs.
+UI.refresh = UI.requestData
 
 ---------------------------------------------------------------------------
 -- Command handlers

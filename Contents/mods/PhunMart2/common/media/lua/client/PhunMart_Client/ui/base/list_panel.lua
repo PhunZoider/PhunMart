@@ -2,7 +2,7 @@ if isServer() then
     return
 end
 
-require "ISUI/ISCollapsableWindowJoypad"
+require "ISUI/ISPanel"
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
 require "PhunMart/references"
@@ -16,7 +16,12 @@ local BUTTON_HGT = tools.BUTTON_HGT
 local HEADER_HGT = tools.HEADER_HGT
 local SCROLLBAR_W = 13
 
-local ListPanel = ISCollapsableWindowJoypad:derive("PhunMartListPanel")
+-- A content panel rather than a window. Every definition list used to be its
+-- own collapsable window, which is how an admin ended up with seven of them
+-- stacked on top of each other while following a single shop down to a price.
+-- They are now views inside one tabbed shell (see ui/admin/admin_shell.lua),
+-- so this owns the list and its controls and nothing about window chrome.
+local ListPanel = ISPanel:derive("PhunMartListPanel")
 
 -- Open panels, weakly held so closed ones fall out on their own.
 local liveInstances = setmetatable({}, {
@@ -28,7 +33,7 @@ local liveInstances = setmetatable({}, {
 -- without reopening the window. Subclasses opt in by setting UI.refresh.
 Events[Core.events.OnDefsUpdated].Add(function()
     for inst in pairs(liveInstances) do
-        if inst.refresh and inst.isVisible and inst:isVisible() then
+        if inst.refresh and inst:isLive() then
             inst:refresh()
         end
     end
@@ -48,35 +53,52 @@ ListPanel.SCROLLBAR_W = SCROLLBAR_W
 ---------------------------------------------------------------------------
 
 function ListPanel:new(x, y, width, height, player)
-    local o = ISCollapsableWindowJoypad:new(x, y, width, height, player)
+    local o = ISPanel:new(x, y, width, height)
     setmetatable(o, self)
     self.__index = self
     o.player = player
     o.playerIndex = player:getPlayerNum()
-    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0.8}
+    o.backgroundColor = {r = 0, g = 0, b = 0, a = 0}
+    o.borderColor = {r = 0, g = 0, b = 0, a = 0}
     o.moveWithMouse = false
-    o.anchorRight = true
-    o.anchorBottom = true
-    o:setWantKeyEvents(true)
     liveInstances[o] = true
     return o
 end
 
+--- The shell that owns this view sets itself here, so the Close button and the
+--- Escape key can act on the window rather than on a panel that has none.
+function ListPanel:setShell(shell)
+    self.shell = shell
+end
+
+--- On screen right now? A hidden window does not clear its children's visible
+--- flags, so a view inside a closed shell still reports itself as visible and
+--- would keep doing refresh work nobody can see.
+function ListPanel:isLive()
+    if self.shell and not self.shell:isVisible() then
+        return false
+    end
+    return self:isVisible()
+end
+
+function ListPanel:requestClose()
+    if self.shell then
+        self.shell:close()
+    end
+end
+
 ---------------------------------------------------------------------------
--- Skeleton: title bar (from ISCollapsableWindowJoypad), description area,
--- scrolling list, and bottom button bar.
+-- Skeleton: description area, scrolling list, and bottom button bar.
 ---------------------------------------------------------------------------
 
 function ListPanel:createChildren()
-    ISCollapsableWindowJoypad.createChildren(self)
+    ISPanel.createChildren(self)
 
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
     local w = self.width
-    local h = self.height - th - rh
+    local h = self.height
 
-    -- Main content panel (everything below title bar)
-    local mainPanel = ISPanel:new(0, th, w, h)
+    -- Main content panel
+    local mainPanel = ISPanel:new(0, 0, w, h)
     mainPanel:initialise()
     mainPanel:instantiate()
     self:addChild(mainPanel)
@@ -148,7 +170,8 @@ function ListPanel:createChildren()
     -- Close button (right-aligned in button bar)
     local closeBtnW = math.max(math.floor(70 * FONT_SCALE),
         getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_Close")) + PAD * 2)
-    local closeBtn = ISButton:new(0, PAD, closeBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Close"), self, self.close)
+    local closeBtn = ISButton:new(0, PAD, closeBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Close"), self,
+        self.requestClose)
     closeBtn:initialise()
     closeBtn:instantiate()
     if closeBtn.enableCancelColor then
@@ -205,28 +228,6 @@ function ListPanel:addBottomButton(text, callback, requiresSelection)
     table.insert(self._bottomButtons, btn)
     return btn
 end
-
----------------------------------------------------------------------------
--- Keyboard
----------------------------------------------------------------------------
-
-function ListPanel:isKeyConsumed(key)
-    return key == Keyboard.KEY_ESCAPE
-end
-
-function ListPanel:onKeyRelease(key)
-    if key == Keyboard.KEY_ESCAPE then
-        self:close()
-    end
-end
-
-function ListPanel:close()
-    ISCollapsableWindowJoypad.close(self)
-end
-
----------------------------------------------------------------------------
--- Filtering
----------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------
 -- Customisation state
@@ -438,18 +439,39 @@ function ListPanel:clearList()
     self.list:clear()
     -- The reference counts may have moved with the data.
     self._refsDirty = true
-    -- Clear the box too, not just the cached text. Otherwise a refresh (which
-    -- every save triggers) leaves a filter showing that isn't being applied.
-    if self._filterEntry then
-        self._filterEntry:setText("")
+    -- Keep whatever is typed in the box but forget that it was applied, so the
+    -- next prerender reapplies it against the rebuilt list. Refresh runs on
+    -- every save and on every tab switch, and clearing the box outright meant
+    -- leaving a list and coming back lost the filter you were working under.
+    self._lastFilterText = nil
+end
+
+--- Select the row holding `key`, scrolling it into view. Used when the shell
+--- is asked to open on a particular definition rather than just a tab.
+--- Returns true when the key was found.
+function ListPanel:selectKey(key)
+    if not key then
+        return false
     end
-    self._lastFilterText = ""
+    for i, entry in ipairs(self.list.items) do
+        if self:getRowKey(entry.item) == key then
+            self.list.selected = i
+            self.list:ensureVisible(i)
+            self._refsDirty = true
+            return true
+        end
+    end
+    return false
 end
 
 --- Reapply the current filter against _allItems.
 function ListPanel:applyFilter()
-    local filterText = self._filterEntry:getText():lower()
-    self._lastFilterText = filterText
+    -- Remember the text as typed. prerender compares against the box verbatim,
+    -- so storing the lowered copy had any capitalised filter reapplying itself
+    -- on every frame.
+    local typed = self._filterEntry:getText()
+    self._lastFilterText = typed
+    local filterText = typed:lower()
 
     local onlyChanged = self._onlyChangedTick and self._onlyChangedTick:isSelected(1)
 
@@ -478,16 +500,14 @@ end
 ---------------------------------------------------------------------------
 
 function ListPanel:prerender()
-    ISCollapsableWindowJoypad.prerender(self)
+    ISPanel.prerender(self)
 
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
     local w = self.width
-    local contentH = self.height - th - rh
+    local contentH = self.height
 
     -- Main panel
     self._mainPanel:setX(0)
-    self._mainPanel:setY(th)
+    self._mainPanel:setY(0)
     self._mainPanel:setWidth(w)
     self._mainPanel:setHeight(contentH)
 
@@ -564,7 +584,7 @@ function ListPanel:prerender()
 
     -- Draw description text (over the main panel area)
     if self._descLines then
-        local dy = th + PAD
+        local dy = PAD
         for _, line in ipairs(self._descLines) do
             self:drawText(line, PAD, dy, 0.6, 0.6, 0.6, 1, UIFont.Small)
             dy = dy + FONT_HGT_SMALL
@@ -581,7 +601,7 @@ function ListPanel:prerender()
             if self._refsOrphan then
                 r, g, b = 0.55, 0.55, 0.55
             end
-            self:drawText(self._refsText, PAD, th + listY + listH + math.floor(PAD / 2), r, g, b, 1, UIFont.Small)
+            self:drawText(self._refsText, PAD, listY + listH + math.floor(PAD / 2), r, g, b, 1, UIFont.Small)
         end
     end
 end

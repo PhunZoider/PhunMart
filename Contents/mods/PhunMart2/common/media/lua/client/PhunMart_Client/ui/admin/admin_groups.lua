@@ -347,24 +347,17 @@ Core.ui.admin_groups.instances = {}
 local UI = Core.ui.admin_groups
 UI._defKind = "groups"
 
-function UI.OnOpenPanel(player)
+--- Build this panel as a view for the tabbed shell. The shell owns the size
+--- and position, so both are placeholders until its first layout pass.
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
     local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(620 * FONT_SCALE)
-        local height = math.floor(500 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-        instance = UI:new(x, y, width, height, player)
-        instance:setTitle(getText("IGUI_PhunMart_Title_GroupDefs"))
+        instance = UI:new(0, 0, 100, 100, player)
         instance.description = getText("IGUI_PhunMart_Desc_GroupDefs")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    instance:refreshGroups()
     return instance
 end
 
@@ -378,7 +371,7 @@ function UI.OnEditGroup(player, groupKey)
             Core.defs.groups[key] = editedDef
         end
         local inst = UI.instances[player:getPlayerNum()]
-        if inst and inst:isVisible() then
+        if inst and inst:isLive() then
             inst:refreshGroups()
         end
     end)
@@ -488,11 +481,6 @@ function UI:onDoubleClick(item)
     createEditModal(item.key, item.def, false, function(key, def)
         saveGroupDef(self, key, def)
     end)
-end
-
-function UI:close()
-    ISCollapsableWindowJoypad.close(self)
-    UI.instances[self.playerIndex] = nil
 end
 
 UI.refresh = UI.refreshGroups
