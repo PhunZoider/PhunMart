@@ -330,6 +330,9 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 result.category = nil
             end
 
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             if cb then
                 cb(key, result)
             end
@@ -347,6 +350,10 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     -- Template checkbox
@@ -541,17 +548,12 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    -- Columns: Key, Type, Display, Action
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
-        text = function(d)
-            return d.enabled and d.key or d.displayKey
-        end,
-        color = function(d)
-            if not d.enabled then
-                return 0.5, 0.5, 0.5
-            end
+    -- Columns: Name, Type, Display, Action
+    self:addNameColumn(function(d)
+        if not d.enabled then
+            return 0.5, 0.5, 0.5
         end
-    })
+    end)
     self:addListColumn(getText("IGUI_PhunMart_Col_Type"), 0.32, {field = "typeCol"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Display"), 0.55, {field = "display"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Action"), 0.78, {field = "action", color = {0.7, 0.7, 0.7}})
@@ -581,7 +583,8 @@ function UI:onDeleteClick()
 end
 
 function UI:getFilterText(itemData)
-    return (itemData.key or "") .. " " .. (itemData.typeCol or "") .. " " .. (itemData.action or "")
+    return (itemData.key or "") .. " " .. (itemData.title or "") .. " " .. (itemData.typeCol or "") .. " " ..
+               (itemData.action or "")
 end
 
 function UI:refreshSpecials()
@@ -593,18 +596,20 @@ function UI:refreshSpecials()
     for k in pairs(specials) do
         table.insert(keys, k)
     end
-    table.sort(keys)
+    self:sortKeysByName(keys, specials)
 
     for _, key in ipairs(keys) do
         local def = specials[key]
         if not def.template then
-            local displayKey = key
+            local markers = {}
             if def.enabled == false then
-                displayKey = displayKey .. " [off]"
+                table.insert(markers, "[off]")
             end
-            self:addListItem(key, {
+            local name, title = self:rowName(key, def, markers)
+            self:addListItem(name, {
                 key = key,
-                displayKey = displayKey,
+                name = name,
+                title = title,
                 enabled = def.enabled ~= false,
                 typeCol = formatType(def),
                 display = formatDisplay(def),

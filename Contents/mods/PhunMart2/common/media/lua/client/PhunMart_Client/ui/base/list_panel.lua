@@ -216,6 +216,8 @@ end
 --   text   function(data) -> string, when the cell isn't a plain field
 --   color  {r,g,b} or function(data) -> r,g,b; defaults to white for the first
 --          column and grey for the rest
+--   sub    function(data) -> string, drawn dim after the main text in the same
+--          cell. Used for the key trailing a name.
 --   align  "right" to right-align against the list edge
 function ListPanel:addListColumn(name, size, opts)
     opts = opts or {}
@@ -224,6 +226,7 @@ function ListPanel:addListColumn(name, size, opts)
         size = size,
         field = opts.field,
         text = opts.text,
+        sub = opts.sub,
         color = opts.color,
         align = opts.align
     })
@@ -233,6 +236,82 @@ function ListPanel:addListColumn(name, size, opts)
         pos = math.floor(self.list.width * size)
     end
     self.list:addColumn(name, pos)
+end
+
+---------------------------------------------------------------------------
+-- Names
+--
+-- Keys are precise and unreadable. pool_shedsandcommoners_t1 tells you nothing
+-- at a glance, and the information that would fix it exists only as a Lua
+-- comment above the block that no admin ever sees. A definition can carry a
+-- `title` now, shown in place of the key with the key trailing in grey, so
+-- nothing is lost for the people who think in keys.
+---------------------------------------------------------------------------
+
+--- The name an admin gave this definition, or nil when it only has a key.
+--- Accepts a translation key so shipped content stays translatable while an
+--- admin can just type something.
+---
+--- Groups had a `label` long before any of this, and it already reads well on
+--- the 21 that have one, so it stands in when there is no title. The two are
+--- not the same field: label is the category heading players see in the shop,
+--- so a group can reasonably want both.
+function ListPanel:titleFor(def)
+    if not def then
+        return nil
+    end
+    local t = def.title
+    if (not t or t == "") and self._defKind == "groups" then
+        t = def.label
+    end
+    if not t or t == "" then
+        return nil
+    end
+    return getTextOrNull(t) or t
+end
+
+--- Compose the first cell of a row: the name if there is one, else the key,
+--- with any status markers appended. Returns the composed text and the title,
+--- since a row needs to know whether it has one to decide what the key does.
+-- @param markers array of suffixes such as "[S]" or "[off]", may be nil
+function ListPanel:rowName(key, def, markers)
+    local title = self:titleFor(def)
+    local name = title or key
+    for _, m in ipairs(markers or {}) do
+        name = name .. " " .. m
+    end
+    return name, title
+end
+
+--- Sort keys by the name each row will show rather than by the key itself.
+--- Once a definition has a name, the key is no longer what you are reading, so
+--- ordering by it makes an otherwise sorted list look shuffled. Ties fall back
+--- to the key so the order stays stable between sessions.
+function ListPanel:sortKeysByName(keys, defs)
+    table.sort(keys, function(a, b)
+        local an = (self:titleFor(defs[a]) or a):lower()
+        local bn = (self:titleFor(defs[b]) or b):lower()
+        if an == bn then
+            return a < b
+        end
+        return an < bn
+    end)
+end
+
+--- The first column of a definition list. Every one of them wants the same
+--- thing, so the only per-list part is the colour rule for its status markers.
+function ListPanel:addNameColumn(color)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Name"), 0, {
+        text = function(d)
+            return d.name or d.key
+        end,
+        -- Only once there is a name to distinguish it from, otherwise the key
+        -- would be printed twice on the same row.
+        sub = function(d)
+            return d.title and d.key or ""
+        end,
+        color = color
+    })
 end
 
 --- Add a button to the bottom bar (left-aligned).
@@ -487,6 +566,16 @@ function ListPanel.defaultDrawRow(listSelf, y, item, alt)
 
             listSelf:setStencilRect(x, clipY, math.max(0, nextX - x), clipY2 - clipY)
             listSelf:drawText(text, tx, textY, r, g, b, a, listSelf.font)
+            -- Secondary text sharing the cell, dimmer: the key trailing the name
+            -- a definition was given. Drawn inside the same stencil so it clips
+            -- against this column rather than running into the next one.
+            if col.sub then
+                local sub = col.sub(data)
+                if sub and sub ~= "" then
+                    local mainW = getTextManager():MeasureStringX(listSelf.font, text)
+                    listSelf:drawText(sub, tx + mainW + 10, textY, 0.45, 0.45, 0.45, a, listSelf.font)
+                end
+            end
             listSelf:clearStencilRect()
         end
     end

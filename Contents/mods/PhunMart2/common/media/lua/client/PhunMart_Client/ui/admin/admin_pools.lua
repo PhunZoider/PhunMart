@@ -265,6 +265,11 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             -- real change the override layer can carry.
             result.enabled = f:getFieldValue("enabled") and true or false
 
+            -- Cleared rather than stored empty, so an unnamed definition does
+            -- not carry the key at all and falls back to showing its key.
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -278,6 +283,10 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
         checked = def.sticky == true,
@@ -361,21 +370,13 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    -- Columns: Key, Sources, Blacklist, Zones
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
-        -- displayKey carries the [S] and [off] suffixes; the plain key is used
-        -- when neither applies so an ordinary row stays uncluttered.
-        text = function(d)
-            return (not d.enabled or d.sticky) and d.displayKey or d.key
-        end,
-        color = function(d)
-            if not d.enabled then
-                return 0.5, 0.5, 0.5
-            elseif d.sticky then
-                return 0.9, 0.85, 0.3
-            end
+    self:addNameColumn(function(d)
+        if not d.enabled then
+            return 0.5, 0.5, 0.5
+        elseif d.sticky then
+            return 0.9, 0.85, 0.3
         end
-    })
+    end)
     self:addListColumn(getText("IGUI_PhunMart_Col_Groups"), 0.46, {field = "sources"})
     -- Blank rather than 0 when there is no blacklist. Most pools have none, and
     -- a column of zeros reads as data when it is really the absence of it.
@@ -398,7 +399,8 @@ function UI:createChildren()
 end
 
 function UI:getFilterText(itemData)
-    local text = (itemData.key or "") .. " " .. (itemData.sources or "")
+    -- Both, so a filter matches whichever of the two the admin thinks in.
+    local text = (itemData.key or "") .. " " .. (itemData.title or "") .. " " .. (itemData.sources or "")
     if itemData.sticky then
         text = text .. " sticky"
     end
@@ -417,16 +419,18 @@ function UI:refreshPools()
     for k in pairs(pools) do
         table.insert(keys, k)
     end
-    table.sort(keys)
+    self:sortKeysByName(keys, pools)
 
     for _, key in ipairs(keys) do
         local def = pools[key]
-        local displayKey = key
-        if def.sticky then displayKey = displayKey .. " [S]" end
-        if def.enabled == false then displayKey = displayKey .. " [off]" end
-        self:addListItem(key, {
+        local markers = {}
+        if def.sticky then table.insert(markers, "[S]") end
+        if def.enabled == false then table.insert(markers, "[off]") end
+        local name, title = self:rowName(key, def, markers)
+        self:addListItem(name, {
             key = key,
-            displayKey = displayKey,
+            name = name,
+            title = title,
             sticky = def.sticky == true,
             enabled = def.enabled ~= false,
             sources = formatSources(def),

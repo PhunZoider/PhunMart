@@ -240,6 +240,9 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             local factor = f:getFieldNumber("factor")
             result.factor = (factor and factor ~= 1) and factor or nil
 
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -253,6 +256,10 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     -- Prices and specials both store a `kind`, but they mean different things:
     -- here it selects how the player pays, there it is the sort of special.
@@ -355,7 +362,7 @@ function UI:createChildren()
     self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {field = "key"})
+    self:addNameColumn()
     self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.38, {field = "kind"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Inherit"), 0.56, {field = "inherit", color = {0.6, 0.8, 0.6}})
     self:addListColumn(getText("IGUI_PhunMart_Col_Amount"), 0.76, {
@@ -383,7 +390,7 @@ function UI:onDeleteClick()
 end
 
 function UI:getFilterText(itemData)
-    return itemData.key .. " " .. itemData.kind .. " " .. itemData.inherit
+    return itemData.key .. " " .. (itemData.title or "") .. " " .. itemData.kind .. " " .. itemData.inherit
 end
 
 function UI:refreshPrices()
@@ -397,12 +404,15 @@ function UI:refreshPrices()
     for k in pairs(prices) do
         table.insert(keys, k)
     end
-    table.sort(keys)
+    self:sortKeysByName(keys, prices)
 
     for _, key in ipairs(keys) do
         local def = prices[key]
-        self:addListItem(key, {
+        local name, title = self:rowName(key, def)
+        self:addListItem(name, {
             key = key,
+            name = name,
+            title = title,
             kind = formatKind(def),
             inherit = def.inherit or "",
             amount = formatAmount(def),

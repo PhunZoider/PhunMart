@@ -122,6 +122,9 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
             -- carry a key it has no use for.
             result.template = f:getFieldValue("template") and true or nil
 
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -135,6 +138,10 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = priceKeys, selected = def.price or priceKeys[1],
@@ -220,22 +227,17 @@ function UI:createChildren()
     self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    -- Key carries the [T] and [off] suffixes, matching what pools already do
-    -- with [S]. A template is not an offer any shop can roll, and until now
+    -- The name carries the [T] and [off] suffixes, matching what pools already
+    -- do with [S]. A template is not an offer any shop can roll, and until now
     -- nothing here read `template` at all, so the four shipped ones sat in the
     -- list looking exactly like live entries.
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
-        text = function(d)
-            return (not d.enabled or d.template) and d.displayKey or d.key
-        end,
-        color = function(d)
-            if not d.enabled then
-                return 0.5, 0.5, 0.5
-            elseif d.template then
-                return 0.9, 0.85, 0.3
-            end
+    self:addNameColumn(function(d)
+        if not d.enabled then
+            return 0.5, 0.5, 0.5
+        elseif d.template then
+            return 0.9, 0.85, 0.3
         end
-    })
+    end)
     self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.38, {field = "price"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Grants"), 0.58, {field = "grants"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.80, {field = "weight"})
@@ -259,7 +261,7 @@ function UI:onDeleteClick()
 end
 
 function UI:getFilterText(itemData)
-    local text = itemData.key .. " " .. itemData.price .. " " .. itemData.grants
+    local text = itemData.key .. " " .. (itemData.title or "") .. " " .. itemData.price .. " " .. itemData.grants
     if itemData.template then
         text = text .. " template"
     end
@@ -275,20 +277,22 @@ function UI:refreshItems()
     for k in pairs(items) do
         table.insert(keys, k)
     end
-    table.sort(keys)
+    self:sortKeysByName(keys, items)
 
     for _, key in ipairs(keys) do
         local def = items[key]
-        local displayKey = key
+        local markers = {}
         if def.template then
-            displayKey = displayKey .. " [T]"
+            table.insert(markers, "[T]")
         end
         if def.enabled == false then
-            displayKey = displayKey .. " [off]"
+            table.insert(markers, "[off]")
         end
-        self:addListItem(key, {
+        local name, title = self:rowName(key, def, markers)
+        self:addListItem(name, {
             key = key,
-            displayKey = displayKey,
+            name = name,
+            title = title,
             template = def.template == true,
             -- Enabled lost its column. It was a wall of "Yes" that told you
             -- nothing, and greying the row with an [off] suffix says the same

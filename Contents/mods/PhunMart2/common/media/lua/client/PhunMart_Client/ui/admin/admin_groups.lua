@@ -228,6 +228,9 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             -- real change the override layer can carry.
             result.enabled = f:getFieldValue("enabled") and true or false
 
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -241,6 +244,10 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     form:addTextField("label", getText("IGUI_PhunMart_Lbl_Label"), {
         default = def.label or "",
@@ -383,16 +390,11 @@ function UI:createChildren()
     self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
-        text = function(d)
-            return d.enabled and d.key or d.displayKey
-        end,
-        color = function(d)
-            if not d.enabled then
-                return 0.5, 0.5, 0.5
-            end
+    self:addNameColumn(function(d)
+        if not d.enabled then
+            return 0.5, 0.5, 0.5
         end
-    })
+    end)
     self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.25, {field = "price"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Include"), 0.42, {field = "include"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Blacklisted"), 0.75, {
@@ -420,7 +422,7 @@ function UI:onDeleteClick()
 end
 
 function UI:getFilterText(itemData)
-    return itemData.key .. " " .. itemData.price .. " " .. itemData.include
+    return itemData.key .. " " .. (itemData.title or "") .. " " .. itemData.price .. " " .. itemData.include
 end
 
 function UI:refreshGroups()
@@ -432,15 +434,17 @@ function UI:refreshGroups()
     for k in pairs(groups) do
         table.insert(keys, k)
     end
-    table.sort(keys)
+    self:sortKeysByName(keys, groups)
 
     for _, key in ipairs(keys) do
         local def = groups[key]
-        local displayKey = key
-        if def.enabled == false then displayKey = displayKey .. " [off]" end
-        self:addListItem(key, {
+        local markers = {}
+        if def.enabled == false then table.insert(markers, "[off]") end
+        local name, title = self:rowName(key, def, markers)
+        self:addListItem(name, {
             key = key,
-            displayKey = displayKey,
+            name = name,
+            title = title,
             enabled = def.enabled ~= false,
             price = formatPrice(def),
             include = formatInclude(def),
