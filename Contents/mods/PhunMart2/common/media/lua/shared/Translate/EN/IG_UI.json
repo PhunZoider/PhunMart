@@ -176,6 +176,7 @@
   "IGUI_PhunMart_Col_Balance": "Balance",
   "IGUI_PhunMart_Title_Locations": "Locations",
   "IGUI_PhunMart_Title_Shops": "Shops",
+  "IGUI_PhunMart_Desc_Shops": "Every shop type and how many machines are standing in the world. Right-click a row for its locations.",
   "IGUI_PhunMart_Title_WalletAdmin": "Wallet Admin",
   "IGUI_PhunMart_Title_PoolDefs": "Pool Definitions",
   "IGUI_PhunMart_Title_SpecialDefs": "Special Definitions",

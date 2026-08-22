@@ -2,35 +2,40 @@ if isServer() then
     return
 end
 
-require "ISUI/ISCollapsableWindowJoypad"
 local Core = PhunMart
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
-
-local FONT_SCALE = FONT_HGT_SMALL / 14
-local HEADER_HGT = FONT_HGT_MEDIUM + 2 * 2
-local BUTTON_HGT = FONT_HGT_SMALL + 6
+local FONT_SCALE = ListPanel.FONT_SCALE
 
 local profileName = "PhunMartUIShopListing"
 
-Core.ui.shop_selector = ISCollapsableWindowJoypad:derive(profileName);
+Core.ui.shop_selector = ListPanel:derive(profileName)
 local UI = Core.ui.shop_selector
+-- Shop definitions are override-backed like the rest, so the list marks the
+-- ones an admin has customised and can filter down to them.
+UI._defKind = "shops"
+
 local instances = {}
 
+---------------------------------------------------------------------------
+-- Data
+---------------------------------------------------------------------------
+
+local function shopLabel(shopType)
+    return getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType
+end
+
 function UI:refreshAll()
-    self.controls.list:clear()
-    self.controls.list.instanceCounts = {}
-    local shops = Core.runtime and Core.runtime.shops or {}
+    self:clearList()
+    self.list.instanceCounts = self.list.instanceCounts or {}
 
     -- Sort by display name so the list holds a stable order between sessions.
     -- pairs() order is undefined, and this is the first list an admin sees.
     local rows = {}
-    for shopType, shopDef in pairs(shops) do
+    for shopType, shopDef in pairs(Core.runtime and Core.runtime.shops or {}) do
         table.insert(rows, {
             type = shopType,
-            label = getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType,
+            label = shopLabel(shopType),
             enabled = shopDef.enabled ~= false
         })
     end
@@ -39,33 +44,34 @@ function UI:refreshAll()
     end)
 
     for _, row in ipairs(rows) do
-        self.controls.list:addItem(row.label, {
-            type = row.type,
-            enabled = row.enabled
-        })
+        self:addListItem(row.label, row)
     end
 
-    -- Fetch instance counts
+    -- Instance counts. Singleplayer can read them straight off Core.instances;
+    -- multiplayer asks the server and fills them in when the reply lands.
     if Core.isLocal then
         local counts = {}
         for _, v in pairs(Core.instances or {}) do
             counts[v.type] = (counts[v.type] or 0) + 1
         end
-        self.controls.list.instanceCounts = counts
+        self.list.instanceCounts = counts
     else
         sendClientCommand(Core.name, Core.commands.getInstanceList, {})
     end
 end
+
+-- Re-read when the definitions recompile, via ListPanel's shared hook.
+UI.refresh = UI.refreshAll
 
 function UI:setInstanceCounts(list)
     local counts = {}
     for _, v in ipairs(list) do
         counts[v.type] = (counts[v.type] or 0) + 1
     end
-    self.controls.list.instanceCounts = counts
+    self.list.instanceCounts = counts
 end
 
--- Class-level: update all open selector instances with instance counts
+--- Push counts into every open selector. Called from the server reply handler.
 function UI.updateInstanceCounts(list)
     for _, inst in pairs(instances) do
         if inst.setInstanceCounts then
@@ -74,93 +80,97 @@ function UI.updateInstanceCounts(list)
     end
 end
 
+---------------------------------------------------------------------------
+-- Window
+---------------------------------------------------------------------------
+
 function UI.open(player)
     local playerIndex = player:getPlayerNum()
     local instance = instances[playerIndex]
 
     if not instance then
         local core = getCore()
-        local width = 350 * FONT_SCALE
-        local height = 300 * FONT_SCALE
-
+        local width = math.floor(420 * FONT_SCALE)
+        local height = math.floor(340 * FONT_SCALE)
         local x = (core:getScreenWidth() - width) / 2
         local y = (core:getScreenHeight() - height) / 2
 
-        instances[playerIndex] = UI:new(x, y, width, height, player, playerIndex);
-        instance = instances[playerIndex]
-        instance:initialise();
+        instance = UI:new(x, y, width, height, player)
+        instance:setTitle(getText("IGUI_PhunMart_Title_Shops"))
+        instance.description = getText("IGUI_PhunMart_Desc_Shops")
+        instance:initialise()
+        instances[playerIndex] = instance
 
         ISLayoutManager.RegisterWindow(profileName, UI, instance)
     end
-    instance:addToUIManager();
-    instance:setVisible(true);
+    instance:addToUIManager()
+    instance:setVisible(true)
     instance:ensureVisible()
     instance:refreshAll()
-    return instance;
+    return instance
 end
 
-function UI:new(x, y, width, height, player, playerIndex)
-    local o = {};
-    o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
-    setmetatable(o, self);
-    self.__index = self;
+function UI:createChildren()
+    ListPanel.createChildren(self)
 
-    o.variableColor = {
-        r = 0.9,
-        g = 0.55,
-        b = 0.1,
-        a = 1
-    };
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    };
-    o.buttonBorderColor = {
-        r = 0.7,
-        g = 0.7,
-        b = 0.7,
-        a = 1
-    };
-    o.controls = {}
-    o.data = {}
-    o.moveWithMouse = false;
-    o.anchorRight = true
-    o.anchorBottom = true
-    o.player = player
-    o.playerIndex = playerIndex
-    o.zOffsetLargeFont = 25;
-    o.zOffsetMediumFont = 20;
-    o.zOffsetSmallFont = 6;
-    o:setWantKeyEvents(true)
-    o:setTitle(getText("IGUI_PhunMart_Title_Shops"))
-    return o;
-end
-
-function UI:RestoreLayout(name, layout)
-
-    -- ISLayoutManager.DefaultRestoreWindow(self, layout)
-    -- if name == profileName then
-    --     ISLayoutManager.DefaultRestoreWindow(self, layout)
-    --     self.userPosition = layout.userPosition == 'true'
-    -- end
-    self:recalcSize();
-end
-
-function UI:SaveLayout(name, layout)
-    ISLayoutManager.DefaultSaveWindow(self, layout)
-    if self.userPosition then
-        layout.userPosition = 'true'
-    else
-        layout.userPosition = 'false'
+    self.list.doDrawItem = ListPanel.defaultDrawRow
+    self.list:setOnMouseDoubleClick(self, self.onEdit)
+    self.list.onRightMouseUp = function(target, x, y)
+        local row = target:rowAt(x, y)
+        if row == -1 then
+            return
+        end
+        target.selected = row
+        target:ensureVisible(row)
+        self:onRowContextMenu(target.items[row].item, getMouseX(), getMouseY())
     end
+
+    self:addListColumn(getText("IGUI_PhunMart_Col_Shop"), 0, {
+        field = "label",
+        color = function(d)
+            if not d.enabled then
+                return 0.5, 0.5, 0.5
+            end
+        end
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_InWorld"), 0.5, {
+        -- Read live rather than baked into the row: in multiplayer the counts
+        -- arrive after the list has already been built.
+        text = function(d)
+            return tostring((self.list.instanceCounts or {})[d.type] or 0)
+        end
+    })
+
+    self._adminBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_AdminTools"), self.onAdminToolsMenu)
+
+    self:refreshAll()
+end
+
+-- Shop rows are keyed by type, not by a `key` field.
+function UI:getRowKey(itemData)
+    return itemData and itemData.type
+end
+
+function UI:getFilterText(itemData)
+    return (itemData.label or "") .. " " .. (itemData.type or "")
+end
+
+function UI:prerender()
+    -- Set visibility before the base lays the button bar out, so a hidden
+    -- Admin Tools button doesn't reserve space.
+    if self._adminBtn then
+        self._adminBtn:setVisible(Core.canEditConfig(self.player))
+    end
+    ListPanel.prerender(self)
 end
 
 function UI:close()
-    if not self.locked then
-        ISCollapsableWindowJoypad.close(self);
+    if self.locked then
+        return
     end
+    ListPanel.close(self)
+    instances[self.playerIndex] = nil
+
     -- Closing the shop list is the natural "done editing" moment, so bring any
     -- outstanding restocks back into view rather than letting them be forgotten.
     local pr = Core.ui.pending_restock
@@ -169,112 +179,18 @@ function UI:close()
     end
 end
 
-function UI:createChildren()
-
-    ISCollapsableWindowJoypad.createChildren(self);
-
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
-
-    local padding = 10
-    local x = 0
-    local y = th
-    local w = self.width
-    local h = self.height - rh - th
-
-    self.controls = {}
-
-    local panel = ISPanel:new(x, y, w, h);
-    panel:initialise();
-    panel:instantiate();
-    self:addChild(panel);
-    self.controls._panel = panel;
-
-    local listPanel = ISPanel:new(0, 0, w, h - BUTTON_HGT + 20);
-    listPanel:initialise();
-    listPanel:instantiate();
-    self.controls._panel:addChild(listPanel);
-    self.controls._listPanel = listPanel;
-
-    local controlPanel = ISPanel:new(0, listPanel:getHeight() - BUTTON_HGT + 20, w, BUTTON_HGT + 20);
-    controlPanel:initialise();
-    controlPanel:instantiate();
-    controlPanel:setAnchorRight(true)
-    controlPanel:setAnchorLeft(true)
-    controlPanel:setAnchorTop(true)
-    controlPanel:setAnchorBottom(true)
-    self.controls._panel:addChild(controlPanel);
-    self.controls._controlPanel = controlPanel;
-
-    local list = ISScrollingListBox:new(0, HEADER_HGT, w, h);
-    list:initialise();
-    list:instantiate();
-    list.itemheight = FONT_HGT_SMALL + 6 * 2
-    list.selected = 0;
-    list.joypadParent = self;
-    list.font = UIFont.NewSmall;
-    list.doDrawItem = self.drawDatas;
-
-    list:setOnMouseDoubleClick(self, self.onEdit);
-    list.onMouseUp = function(list, x, y)
-        local row = list:rowAt(x, y)
-        if row == nil or row == -1 then
-            return
-        end
-        list:ensureVisible(row)
-        local item = list.items[row].item
-        list.selected = row
-    end
-
-    list.onRightMouseUp = function(target, x, y)
-        local row = target:rowAt(x, y)
-        if row == -1 then
-            return
-        end
-        target.selected = row
-        target:ensureVisible(row)
-        local item = target.items[row].item
-        self:onRowContextMenu(item, getMouseX(), getMouseY())
-    end
-    list.drawBorder = true;
-    list.onMouseMove = self.doOnMouseMove
-    list.onMouseMoveOutside = self.doOnMouseMoveOutside
-
-    list:addColumn(getText("IGUI_PhunMart_Col_Shop"), 0);
-    list:addColumn(getText("IGUI_PhunMart_Col_InWorld"), 150);
-    self.controls.list = list;
-    self.controls._listPanel:addChild(list);
-
-    local btnClose = ISButton:new(0, 10, 80, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Close"), self, self.close);
-    btnClose.internal = "CLOSE";
-    btnClose:initialise();
-    btnClose:instantiate();
-    if btnClose.enableCancelColor then
-        btnClose:enableCancelColor()
-    end
-    self.controls.btnClose = btnClose;
-    self.controls._controlPanel:addChild(btnClose);
-
-    local btnAdmin = ISButton:new(0, 10, 100, BUTTON_HGT, getText("IGUI_PhunMart_Btn_AdminTools"), self,
-        self.onAdminToolsMenu);
-    btnAdmin.internal = "ADMIN";
-    btnAdmin:initialise();
-    btnAdmin:instantiate();
-    self.controls.btnAdmin = btnAdmin;
-    self.controls._controlPanel:addChild(btnAdmin);
-
-    self:refreshAll()
+function UI:RestoreLayout(name, layout)
+    self:recalcSize()
 end
 
-function UI:isKeyConsumed(key)
-    return key == Keyboard.KEY_ESCAPE
+function UI:SaveLayout(name, layout)
+    ISLayoutManager.DefaultSaveWindow(self, layout)
+    layout.userPosition = self.userPosition and 'true' or 'false'
 end
 
-function UI:onKeyRelease(key)
-    if key == Keyboard.KEY_ESCAPE then
-        self:close()
-    end
-end
+---------------------------------------------------------------------------
+-- Actions
+---------------------------------------------------------------------------
 
 function UI:onEdit(item)
     -- Double-click opened the shop editor unchecked, which was the easiest of
@@ -282,9 +198,10 @@ function UI:onEdit(item)
     if not Core.canEditConfig(self.player) then
         return
     end
-    local shop = self.controls.list.items[self.controls.list.selected].item
-    if shop and shop.type then
-        Core.ui.admin_shops.OnOpenPanel(self.player, shop.type)
+    local sel = self.list.selected
+    local row = sel and sel > 0 and self.list.items[sel]
+    if row and row.item and row.item.type then
+        Core.ui.admin_shops.OnOpenPanel(self.player, row.item.type)
     end
 end
 
@@ -301,10 +218,7 @@ function UI:onRowContextMenu(item, screenX, screenY)
 end
 
 function UI:onAdminToolsMenu(btn)
-    local screenX = btn:getAbsoluteX()
-    local screenY = btn:getAbsoluteY()
-
-    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    local context = ISContextMenu.get(self.playerIndex, btn:getAbsoluteX(), btn:getAbsoluteY())
 
     -- Anything outstanding goes first and only when there is something to show,
     -- so the one time-sensitive entry isn't buried among the editors.
@@ -373,86 +287,4 @@ function UI:onConfirmRestockAll(button)
     if button.internal == "YES" then
         sendClientCommand(Core.name, Core.commands.restockAllShops, {})
     end
-end
-
-function UI:prerender()
-    ISCollapsableWindowJoypad.prerender(self)
-
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
-
-    -- container
-    self.controls._panel:setWidth(self.width)
-    self.controls._panel:setHeight(self.height - rh - th)
-
-    -- list container
-    self.controls._listPanel:setWidth(self.controls._listPanel.parent.width)
-    self.controls._listPanel:setHeight(self.controls._listPanel.parent.height - self.controls._controlPanel.height)
-
-    -- list
-    self.controls.list:setWidth(self.controls.list.parent.width)
-    self.controls.list:setHeight(self.controls.list.parent.height - HEADER_HGT)
-    self.controls.list.columns[2].size = self.controls.list.width / 2
-
-    -- control container
-    self.controls._controlPanel:setWidth(self.controls._controlPanel.parent.width)
-    self.controls._controlPanel:setHeight(BUTTON_HGT + 20)
-    self.controls._controlPanel:setY(self.controls._controlPanel.parent.height - self.controls._controlPanel.height)
-
-    -- right side: Close
-    self.controls.btnClose:setX(self.controls.btnClose.parent.width - self.controls.btnClose.width - 10)
-
-    -- left side: Admin Tools. Same predicate as the two entry points that open
-    -- this window, so EditorRole cannot be sidestepped by getting in one way
-    -- and then editing from here.
-    local canEdit = Core.canEditConfig(self.player)
-    self.controls.btnAdmin:setVisible(canEdit)
-    if canEdit then
-        self.controls.btnAdmin:setX(10)
-    end
-end
-
-function UI:drawDatas(y, item, alt)
-
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9;
-
-    if self.selected == item.index then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15);
-    end
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local count = (self.instanceCounts or {})[item.item.type] or 0
-    local cw = self.columns[2].size
-    self:drawText(tostring(count), cw + 4, y + 4, 0.8, 0.8, 0.8, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
 end
