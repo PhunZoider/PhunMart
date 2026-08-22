@@ -307,13 +307,18 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end)
         end,
     })
+    -- These two are the group's defaults, applied to every item it contains.
+    -- Their hints both used to read "(optional) Leave blank for default",
+    -- which is circular on a field called Default Price and says nothing at all
+    -- about the far more surprising one below it: that this is what buying
+    -- anything in the group actually hands the player.
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceOpts, selected = defaults.price or "",
-        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+        hint = getText("IGUI_PhunMart_Hint_GroupPrice"),
     })
-    form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Special"), {
+    form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
         value = selectedSpecial, display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
-        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+        hint = getText("IGUI_PhunMart_Hint_GroupGrants"),
         onPick = function(f, field)
             local initial = selectedSpecial and {selectedSpecial} or {}
             KeyPicker.open(getSpecificPlayer(0), specialKeys, initial, function(key)

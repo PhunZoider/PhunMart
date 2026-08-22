@@ -23,6 +23,11 @@ local SCROLLBAR_W = 13
 -- so this owns the list and its controls and nothing about window chrome.
 local ListPanel = ISPanel:derive("PhunMartListPanel")
 
+-- Filter tab states. Shared because prerender assigns them every frame.
+local TAB_ON = {r = 0.3, g = 0.7, b = 0.35, a = 0.4}
+local TAB_OFF = {r = 0, g = 0, b = 0, a = 0.25}
+local TAB_HOVER = {r = 0.3, g = 0.7, b = 0.35, a = 0.2}
+
 -- Open panels, weakly held so closed ones fall out on their own.
 local liveInstances = setmetatable({}, {
     __mode = "k"
@@ -312,6 +317,47 @@ function ListPanel:addNameColumn(color)
         end,
         color = color
     })
+end
+
+---------------------------------------------------------------------------
+-- Filter tabs
+--
+-- A row of buttons above the list for narrowing to one category of row. Built
+-- to read as tabs rather than as a dropdown, because the categories are half
+-- the value: someone asking "why is that vehicle not showing up" needs to see
+-- that there is a Vehicles grouping at all, and a dropdown hides exactly that
+-- until it is opened. They sit inside the list rather than in the shell's tab
+-- strip, which is already carrying eight and would start scrolling.
+---------------------------------------------------------------------------
+
+--- @param tabs array of {key = "xp", label = "XP"}. The first is selected.
+function ListPanel:addFilterTabs(tabs)
+    self._filterTabs = {}
+    for _, t in ipairs(tabs) do
+        local w = getTextManager():MeasureStringX(UIFont.Small, t.label) + PAD * 2
+        local btn = ISButton:new(0, 0, w, BUTTON_HGT, t.label, self, self.onFilterTabClick)
+        btn:initialise()
+        btn:instantiate()
+        btn._tabKey = t.key
+        btn.borderColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.6}
+        self._mainPanel:addChild(btn)
+        table.insert(self._filterTabs, btn)
+    end
+    self._activeFilterTab = tabs[1] and tabs[1].key or nil
+end
+
+function ListPanel:onFilterTabClick(btn)
+    self._activeFilterTab = btn._tabKey
+    -- The selection almost certainly is not in the new set, and keeping it
+    -- would leave the "used by" line describing a row nobody can see.
+    self.list.selected = 0
+    self:applyFilter()
+end
+
+--- Does this row belong in the given tab? Override in a subclass that adds
+--- filter tabs. Called for every row on every filter pass, so keep it cheap.
+function ListPanel:rowInFilterTab(itemData, tabKey)
+    return true
 end
 
 --- Add a button to the bottom bar (left-aligned).
@@ -682,6 +728,10 @@ function ListPanel:applyFilter()
             include = state == "custom" or state == "modified"
         end
 
+        if include and self._activeFilterTab then
+            include = self:rowInFilterTab(entry.data, self._activeFilterTab)
+        end
+
         if include and filterText ~= "" then
             local searchable = self:getFilterText(entry.data) or entry.text
             include = searchable:lower():find(filterText, 1, true) ~= nil
@@ -773,7 +823,28 @@ function ListPanel:prerender()
     -- line when this panel has one. Reserved whether or not there is a
     -- selection, so the list doesn't resize as rows are clicked.
     local refsH = self:showsReferences() and (BUTTON_HGT + PAD) or 0
-    local listY = PAD + descH + HEADER_HGT
+
+    -- Filter tabs sit between the description and the list, laid left to right.
+    local tabsH = 0
+    if self._filterTabs then
+        tabsH = BUTTON_HGT + PAD
+        local tx = PAD
+        local ty = PAD + descH
+        for _, btn in ipairs(self._filterTabs) do
+            btn:setX(tx)
+            btn:setY(ty)
+            -- The active one is filled, the rest are outlines. Same shape, so
+            -- the row still reads as one control rather than a stack of
+            -- unrelated buttons. Shared colour tables rather than fresh ones:
+            -- this runs every frame for every tab.
+            local active = btn._tabKey == self._activeFilterTab
+            btn.backgroundColor = active and TAB_ON or TAB_OFF
+            btn.backgroundColorMouseOver = active and TAB_ON or TAB_HOVER
+            tx = tx + btn.width + 2
+        end
+    end
+
+    local listY = PAD + descH + tabsH + HEADER_HGT
     local listH = contentH - listY - btnBarH - refsH
     self.list:setX(PAD)
     self.list:setY(listY)

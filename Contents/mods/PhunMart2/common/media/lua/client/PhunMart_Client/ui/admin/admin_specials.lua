@@ -117,6 +117,50 @@ local ACTION_GROUPS = {
 local ALL_ACTION_GROUPS = {"act_trait", "act_xp", "act_boost", "act_vehicle", "act_animal", "act_tokens",
                            "act_balance", "act_item"}
 
+-- Which filter tab an action type belongs to. "Special" means nothing to
+-- someone looking for a vehicle, so the list is grouped by what the thing
+-- actually does. Anything not named here falls into "other", which keeps the
+-- row reachable rather than hiding it because it is unusual.
+local ACTION_DOMAINS = {
+    giveXP = "xp",
+    applyBoost = "boost",
+    addTrait = "trait",
+    removeTrait = "trait",
+    spawnVehicle = "vehicle",
+    spawnAnimal = "animal"
+}
+
+local DOMAIN_TABS = {{
+    key = "all",
+    label = "IGUI_PhunMart_Tab_All"
+}, {
+    key = "xp",
+    label = "IGUI_PhunMart_Tab_XP"
+}, {
+    key = "boost",
+    label = "IGUI_PhunMart_Tab_Boosts"
+}, {
+    key = "trait",
+    label = "IGUI_PhunMart_Tab_Traits"
+}, {
+    key = "vehicle",
+    label = "IGUI_PhunMart_Tab_Vehicles"
+}, {
+    key = "animal",
+    label = "IGUI_PhunMart_Tab_Animals"
+}, {
+    key = "other",
+    label = "IGUI_PhunMart_Tab_Other"
+}}
+
+--- Which tab a special belongs in, from its first action. Read off the row's
+--- own actions rather than resolved through inheritance: the shipped templates
+--- carry no actions at all and every child declares its own.
+local function domainOf(def)
+    local act = def.actions and def.actions[1]
+    return (act and ACTION_DOMAINS[act.type]) or "other"
+end
+
 -- Show only the group belonging to `actionType`, hiding the rest.
 local function applyActionGroups(form, actionType, isTemplate)
     local wanted = (not isTemplate) and ACTION_GROUPS[actionType] or nil
@@ -633,6 +677,15 @@ function UI:createChildren()
     self:addListColumn(getText("IGUI_PhunMart_Col_Display"), 0.55, {field = "display"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Action"), 0.78, {field = "action", color = {0.7, 0.7, 0.7}})
 
+    local tabs = {}
+    for _, t in ipairs(DOMAIN_TABS) do
+        table.insert(tabs, {
+            key = t.key,
+            label = getText(t.label)
+        })
+    end
+    self:addFilterTabs(tabs)
+
     self.list.doDrawItem = ListPanel.defaultDrawRow
 
     -- Double-click to edit
@@ -655,6 +708,10 @@ function UI:onDeleteClick()
     DeleteHelper.confirm("specials", selectedItem.item.key, function()
         self:refreshSpecials()
     end)
+end
+
+function UI:rowInFilterTab(itemData, tabKey)
+    return tabKey == "all" or itemData.domain == tabKey
 end
 
 function UI:getFilterText(itemData)
@@ -685,6 +742,7 @@ function UI:refreshSpecials()
                 key = key,
                 name = name,
                 title = title,
+                domain = domainOf(def),
                 enabled = def.enabled ~= false,
                 typeCol = formatType(def),
                 display = formatDisplay(def),
