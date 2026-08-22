@@ -168,17 +168,19 @@ function ListPanel:createChildren()
     end
 
     -- The "used by" line, as a button rather than drawn text so it can be
-    -- clicked through to whatever it names. Chrome stripped off so it reads as
-    -- a line of text; the mouse-over tint is what says it does something.
+    -- clicked through to whatever it names. It keeps real button chrome: as
+    -- flat text it read as a status line and nobody would think to click it,
+    -- and a hover tint is no help when you have to hover to find it. Toned down
+    -- against the action buttons, because it reports as much as it does.
     if self:showsReferences() then
-        local refsBtn = ISButton:new(PAD, 0, 10, FONT_HGT_SMALL, "", self, self.onReferenceClick)
+        local refsBtn = ISButton:new(PAD, 0, 10, BUTTON_HGT, "", self, self.onReferenceClick)
         refsBtn:initialise()
         refsBtn:instantiate()
         refsBtn.font = UIFont.Small
-        refsBtn.backgroundColor = {r = 0, g = 0, b = 0, a = 0}
-        refsBtn.backgroundColorMouseOver = {r = 0.3, g = 0.7, b = 0.35, a = 0.25}
-        refsBtn.borderColor = {r = 0, g = 0, b = 0, a = 0}
-        refsBtn.textColor = {r = 0.75, g = 0.75, b = 0.75, a = 1}
+        refsBtn.backgroundColor = {r = 0, g = 0, b = 0, a = 0.25}
+        refsBtn.backgroundColorMouseOver = {r = 0.3, g = 0.7, b = 0.35, a = 0.35}
+        refsBtn.borderColor = {r = 0.55, g = 0.55, b = 0.55, a = 0.7}
+        refsBtn.textColor = {r = 0.8, g = 0.8, b = 0.8, a = 1}
         -- Held rather than assigned, because prerender takes it off again when
         -- the line has nothing to click through to.
         refsBtn._tip = getText("IGUI_PhunMart_Tip_UsedBy")
@@ -681,7 +683,7 @@ function ListPanel:prerender()
     -- List: fills space between description and button bar, less the "used by"
     -- line when this panel has one. Reserved whether or not there is a
     -- selection, so the list doesn't resize as rows are clicked.
-    local refsH = self:showsReferences() and (FONT_HGT_SMALL + PAD) or 0
+    local refsH = self:showsReferences() and (BUTTON_HGT + PAD) or 0
     local listY = PAD + descH + HEADER_HGT
     local listH = contentH - listY - btnBarH - refsH
     self.list:setX(PAD)
@@ -715,12 +717,10 @@ function ListPanel:prerender()
         if self._refsText and self._refsText ~= "" then
             local textW = getTextManager():MeasureStringX(UIFont.Small, self._refsText)
             btn:setTitle(self._refsText)
-            -- Widened and shifted by the same 4px so the centred label lines up
-            -- with the description text above rather than sitting indented.
-            btn:setX(PAD - 4)
+            btn:setX(PAD)
             btn:setY(listY + listH + math.floor(PAD / 2))
-            btn:setWidth(textW + 8)
-            btn:setHeight(FONT_HGT_SMALL)
+            btn:setWidth(textW + PAD * 2)
+            btn:setHeight(BUTTON_HGT)
             btn:setVisible(true)
             -- Nothing points at it, so there is nowhere to click through to.
             -- Disabled also dims the text, which suits what it is saying.

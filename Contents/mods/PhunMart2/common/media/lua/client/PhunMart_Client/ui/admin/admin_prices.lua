@@ -21,56 +21,69 @@ local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 -- Helpers
 ---------------------------------------------------------------------------
 
--- Format a price amount for display.
+-- Read a field the definition may have inherited rather than set.
+--
+-- Only kind and pool used to be resolved this way, which left the Amount column
+-- reading raw stored numbers: 44 of the 48 shipped prices inherit, so a row
+-- would say "change" under Kind and print 200 under Amount where the Kind
+-- column had already worked out it meant $2.00.
+--
+-- Depth-limited because an override file can name a parent that names it back,
+-- and this runs while drawing.
+local function resolveField(priceDef, field, depth)
+    if priceDef[field] ~= nil then
+        return priceDef[field]
+    end
+    if not priceDef.inherit or (depth or 0) >= 10 then
+        return nil
+    end
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local parent = prices[priceDef.inherit]
+    if not parent then
+        return nil
+    end
+    return resolveField(parent, field, (depth or 0) + 1)
+end
+
+-- Format a price amount for display. Note this shows the amount as stored,
+-- without applying factor, so a scaled child reads as its own base figure.
 local function formatAmount(priceDef)
-    if priceDef.kind == "free" then
+    local kind = resolveField(priceDef, "kind")
+    if kind == "free" then
         return ""
     end
-    if priceDef.kind == "items" then
-        local item = priceDef.item
-        if not item and priceDef.items and priceDef.items[1] then
-            item = priceDef.items[1].item
+    local pool = resolveField(priceDef, "pool")
+    if kind == "items" then
+        local items = resolveField(priceDef, "items")
+        local item = resolveField(priceDef, "item")
+        if not item and items and items[1] then
+            item = items[1].item
         end
-        local amt = priceDef.amount or (priceDef.items and priceDef.items[1] and priceDef.items[1].amount) or 1
+        local amt = priceDef.amount or (items and items[1] and items[1].amount) or 1
         if type(amt) == "table" then
             return tostring(amt.min) .. "-" .. tostring(amt.max) .. "x " .. (item or "?")
         end
         return tostring(amt) .. "x " .. (item or "?")
     end
-    local amount = priceDef.amount
+    local amount = resolveField(priceDef, "amount")
     if amount == nil then
         return ""
     end
     if type(amount) == "table" then
-        if priceDef.pool == "change" then
+        if pool == "change" then
             return tools.formatCents(amount.min) .. " - " .. tools.formatCents(amount.max)
         end
         return tostring(amount.min) .. " - " .. tostring(amount.max)
     end
-    if priceDef.pool == "change" then
+    if pool == "change" then
         return tools.formatCents(amount)
     end
     return tostring(amount)
 end
 
--- Resolve the effective kind for a price def by walking the inheritance chain.
-local function resolveKind(priceDef)
-    if priceDef.kind then
-        return priceDef.kind, priceDef.pool
-    end
-    if priceDef.inherit then
-        local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-        local parent = prices[priceDef.inherit]
-        if parent then
-            return resolveKind(parent)
-        end
-    end
-    return nil, nil
-end
-
 -- Format the kind column display.
 local function formatKind(priceDef)
-    local kind, pool = resolveKind(priceDef)
+    local kind, pool = resolveField(priceDef, "kind"), resolveField(priceDef, "pool")
     local base
     if kind == "free" then
         base = getText("IGUI_PhunMart_Free")
