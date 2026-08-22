@@ -24,6 +24,21 @@ local function listHas(list, key)
     return false
 end
 
+-- Kinds that something else can point at. Shops sit at the top of the chain,
+-- so nothing references one: a "used by" line for a shop would always read as
+-- orphaned, which is true but useless and looks like a fault.
+local REFERENCEABLE = {
+    prices = true,
+    groups = true,
+    pools = true,
+    specials = true,
+    items = true
+}
+
+function refs.canBeReferenced(kind)
+    return REFERENCEABLE[kind] == true
+end
+
 --- Find everything referencing `key` within category `kind`.
 -- @param kind  "prices" | "groups" | "pools" | "specials" | "items"
 -- @return array of {kind, key, via} where `via` names the field that holds the

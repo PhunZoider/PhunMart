@@ -5,6 +5,7 @@ end
 require "ISUI/ISCollapsableWindowJoypad"
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
+require "PhunMart/references"
 
 local FONT_HGT_SMALL = tools.FONT_HGT_SMALL
 local FONT_HGT_MEDIUM = tools.FONT_HGT_MEDIUM
@@ -238,6 +239,58 @@ end
 -- initialise and could be forgotten. Panels backed by something other than the
 -- override files simply leave it unset.
 
+---------------------------------------------------------------------------
+-- "Used by" line
+--
+-- The definition tables only ever store the forward direction, so until now
+-- nothing could answer "what breaks if I change this?". The edit form already
+-- shows what a definition points at, via its own pickers; this is the opposite
+-- direction, which was not available anywhere.
+--
+-- Recomputed only when the selection changes or the definitions recompile:
+-- references.find scans every table, which is fine on a click and wasteful at
+-- sixty frames a second.
+---------------------------------------------------------------------------
+
+--- True when this panel's category is one something else can point at.
+function ListPanel:showsReferences()
+    return self._defKind ~= nil and Core.references.canBeReferenced(self._defKind)
+end
+
+function ListPanel:updateReferenceLine()
+    if not self:showsReferences() then
+        return
+    end
+
+    local key
+    local sel = self.list.selected
+    if sel and sel > 0 and self.list.items[sel] then
+        key = self:getRowKey(self.list.items[sel].item)
+    end
+
+    if key == self._refsKey and not self._refsDirty then
+        return
+    end
+    self._refsKey = key
+    self._refsDirty = false
+
+    if not key then
+        self._refsText = ""
+        self._refsOrphan = false
+        return
+    end
+
+    local found = Core.references.find(self._defKind, key)
+    self._refsOrphan = #found == 0
+    if self._refsOrphan then
+        -- Worth saying out loud: an unreferenced definition is dead weight, and
+        -- there was previously no way to notice.
+        self._refsText = getText("IGUI_PhunMart_Lbl_UsedByNothing")
+    else
+        self._refsText = getText("IGUI_PhunMart_Lbl_UsedBy", Core.references.summarise(found))
+    end
+end
+
 --- Where the key lives in a row's data. Every definition panel stores it as
 --- `key`; override if one ever doesn't.
 function ListPanel:getRowKey(itemData)
@@ -383,6 +436,8 @@ end
 function ListPanel:clearList()
     self._allItems = {}
     self.list:clear()
+    -- The reference counts may have moved with the data.
+    self._refsDirty = true
     -- Clear the box too, not just the cached text. Otherwise a refresh (which
     -- every save triggers) leaves a filter showing that isn't being applied.
     if self._filterEntry then
@@ -488,9 +543,12 @@ function ListPanel:prerender()
         self:applyFilter()
     end
 
-    -- List: fills space between description and button bar
+    -- List: fills space between description and button bar, less the "used by"
+    -- line when this panel has one. Reserved whether or not there is a
+    -- selection, so the list doesn't resize as rows are clicked.
+    local refsH = self:showsReferences() and (FONT_HGT_SMALL + PAD) or 0
     local listY = PAD + descH + HEADER_HGT
-    local listH = contentH - listY - btnBarH
+    local listH = contentH - listY - btnBarH - refsH
     self.list:setX(PAD)
     self.list:setY(listY)
     self.list:setWidth(w - PAD * 2)
@@ -513,6 +571,18 @@ function ListPanel:prerender()
         end
         -- Subtle separator line below description
         self:drawRect(PAD, dy + 2, w - PAD * 2, 1, 0.3, 0.4, 0.4, 0.4)
+    end
+
+    -- "Used by" line, sitting between the list and the buttons.
+    if refsH > 0 then
+        self:updateReferenceLine()
+        if self._refsText and self._refsText ~= "" then
+            local r, g, b = 0.75, 0.75, 0.75
+            if self._refsOrphan then
+                r, g, b = 0.55, 0.55, 0.55
+            end
+            self:drawText(self._refsText, PAD, th + listY + listH + math.floor(PAD / 2), r, g, b, 1, UIFont.Small)
+        end
     end
 end
 
