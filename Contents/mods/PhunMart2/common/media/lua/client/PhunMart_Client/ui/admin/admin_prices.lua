@@ -241,7 +241,10 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             end
         end or nil,
     })
-    form:addComboField("kind", getText("IGUI_PhunMart_Lbl_Kind"), {
+    -- Prices and specials both store a `kind`, but they mean different things:
+    -- here it selects how the player pays, there it is the sort of special.
+    -- Separate strings so neither label has to be vague enough to cover both.
+    form:addComboField("kind", getText("IGUI_PhunMart_Lbl_PriceKind"), {
         options = {"free", "currency", "self", "items"},
         selected = def.kind or "free",
         onChange = function(f) onKindChanged(f) end,
