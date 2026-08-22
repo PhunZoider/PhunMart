@@ -172,6 +172,7 @@ end
 Core.ui.admin_items = ListPanel:derive("PhunItemsAdminUI")
 Core.ui.admin_items.instances = {}
 local UI = Core.ui.admin_items
+UI._defKind = "items"
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -330,6 +331,7 @@ function UI:drawRow(y, item, alt)
 
     local xoffset = 10
     local data = item.item
+    ListPanel.drawStateStripe(self, y, data.key)
     local rightEdge = self.width - SCROLLBAR_W
 
     local col1X = self.columns[1].size

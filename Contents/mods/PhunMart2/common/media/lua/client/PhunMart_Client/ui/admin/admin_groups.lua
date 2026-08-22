@@ -345,6 +345,7 @@ end
 Core.ui.admin_groups = ListPanel:derive("PhunGroupsAdminUI")
 Core.ui.admin_groups.instances = {}
 local UI = Core.ui.admin_groups
+UI._defKind = "groups"
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -504,6 +505,7 @@ function UI:drawRow(y, item, alt)
 
     local xoffset = 10
     local data = item.item
+    ListPanel.drawStateStripe(self, y, data.key)
 
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size

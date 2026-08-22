@@ -99,6 +99,9 @@ function ListPanel:createChildren()
     list.joypadParent = self
     list.font = UIFont.NewSmall
     list.drawBorder = true
+    -- Back-reference: doDrawItem runs with the list box as self, so a row
+    -- renderer has no other route to the panel that owns it.
+    list.panel = self
     self._mainPanel:addChild(list)
     self.list = list
     self._columnDefs = {}
@@ -118,6 +121,28 @@ function ListPanel:createChildren()
     self._buttonBar:addChild(filterEntry)
     self._filterEntry = filterEntry
     self._lastFilterText = ""
+
+    -- Only shown on panels that declare a definition kind, since the other
+    -- lists (token rewards, the global blacklist) are not override-backed and
+    -- have nothing to compare against.
+    if self._defKind then
+        local tick = ISTickBox:new(0, PAD, BUTTON_HGT, BUTTON_HGT, "")
+        tick:initialise()
+        tick:instantiate()
+        tick:addOption(getText("IGUI_PhunMart_Lbl_OnlyChanged"), nil)
+        tick:setSelected(1, false)
+        -- The stripe colours mean nothing on their own, and this is the only
+        -- control that sits next to them.
+        tick.tooltip = getText("IGUI_PhunMart_Tip_OnlyChanged")
+        tick.changeOptionMethod = function()
+            self:applyFilter()
+        end
+        tick.changeOptionTarget = self
+        self._buttonBar:addChild(tick)
+        self._onlyChangedTick = tick
+        self._onlyChangedW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_OnlyChanged")) +
+                                 BUTTON_HGT + PAD
+    end
 
     -- Close button (right-aligned in button bar)
     local closeBtnW = math.max(math.floor(70 * FONT_SCALE),
@@ -188,6 +213,57 @@ end
 -- Filtering
 ---------------------------------------------------------------------------
 
+---------------------------------------------------------------------------
+-- Customisation state
+---------------------------------------------------------------------------
+
+-- A subclass declares which definition category it edits by setting _defKind
+-- on the class table, e.g. `UI._defKind = "pools"`. That enables the row
+-- markers and the "only my changes" filter. It is a field rather than a setter
+-- because createChildren reads it, so a setter would have to be called before
+-- initialise and could be forgotten. Panels backed by something other than the
+-- override files simply leave it unset.
+
+--- Where the key lives in a row's data. Every definition panel stores it as
+--- `key`; override if one ever doesn't.
+function ListPanel:getRowKey(itemData)
+    return itemData and itemData.key
+end
+
+--- "custom" for an admin-created definition, "modified" for a shipped one that
+--- has been edited, "stock" for one nobody has touched. nil when the panel has
+--- no definition kind to ask about.
+function ListPanel:rowState(key)
+    if not self._defKind or not key then
+        return nil
+    end
+    if not Core.isShippedKey(self._defKind, key) then
+        return "custom"
+    end
+    if Core.isOverriddenKey(self._defKind, key) then
+        return "modified"
+    end
+    return "stock"
+end
+
+--- Draw the state marker for a row. Called from a subclass's doDrawItem, so
+--- `listSelf` is the list box rather than the panel.
+--- A stripe down the left edge rather than a text colour, because the row
+--- renderers already use text colour for other things (sticky pools, disabled
+--- entries) and the two meanings would collide.
+function ListPanel.drawStateStripe(listSelf, y, key)
+    local panel = listSelf.panel
+    if not panel then
+        return
+    end
+    local state = panel:rowState(key)
+    if state == "custom" then
+        listSelf:drawRect(0, y, 3, listSelf.itemheight, 0.9, 0.35, 0.7, 1)
+    elseif state == "modified" then
+        listSelf:drawRect(0, y, 3, listSelf.itemheight, 0.9, 0.9, 0.7, 0.25)
+    end
+end
+
 --- Override in subclass to return the searchable text for a list item.
 -- Receives the item data (the second arg passed to list:addItem).
 -- Default: uses the display text (first arg to addItem).
@@ -219,18 +295,24 @@ function ListPanel:applyFilter()
     local filterText = self._filterEntry:getText():lower()
     self._lastFilterText = filterText
 
+    local onlyChanged = self._onlyChangedTick and self._onlyChangedTick:isSelected(1)
+
     self.list:clear()
     for _, entry in ipairs(self._allItems) do
-        if filterText == "" then
+        local include = true
+
+        if onlyChanged then
+            local state = self:rowState(self:getRowKey(entry.data))
+            include = state == "custom" or state == "modified"
+        end
+
+        if include and filterText ~= "" then
+            local searchable = self:getFilterText(entry.data) or entry.text
+            include = searchable:lower():find(filterText, 1, true) ~= nil
+        end
+
+        if include then
             self.list:addItem(entry.text, entry.data)
-        else
-            local searchable = self:getFilterText(entry.data)
-            if not searchable then
-                searchable = entry.text
-            end
-            if searchable:lower():find(filterText, 1, true) then
-                self.list:addItem(entry.text, entry.data)
-            end
         end
     end
 end
@@ -286,11 +368,18 @@ function ListPanel:prerender()
         end
     end
 
-    -- Left side of button bar: filter fills remaining space
+    -- Left side of button bar: filter fills whatever the buttons and the
+    -- only-my-changes tickbox leave behind.
     local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+    if self._onlyChangedTick then
+        local tickX = rightX - self._onlyChangedW
+        self._onlyChangedTick:setX(tickX)
+        self._onlyChangedTick:setY(PAD)
+        rightX = tickX - PAD
+    end
     self._filterLabel:setX(PAD)
     self._filterEntry:setX(PAD + filterLblW)
-    self._filterEntry:setWidth(rightX - PAD - filterLblW)
+    self._filterEntry:setWidth(math.max(math.floor(60 * FONT_SCALE), rightX - PAD - filterLblW))
 
     -- Reapply filter when text changes
     local currentFilter = self._filterEntry:getText()

@@ -18,6 +18,7 @@ local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
 Core.ui.admin_pools = ListPanel:derive("PhunPoolsAdminUI")
 Core.ui.admin_pools.instances = {}
 local UI = Core.ui.admin_pools
+UI._defKind = "pools"
 
 -- Collect sorted keys from a table.
 local function getSortedKeys(tbl)
@@ -500,6 +501,7 @@ function UI:drawDatas(y, item, alt)
 
     local xoffset = 10
     local data = item.item
+    ListPanel.drawStateStripe(self, y, data.key)
 
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size

@@ -746,6 +746,17 @@ function Core.isShippedKey(kind, key)
     return false
 end
 
+--- True when `key` has an entry in the override files, meaning someone changed
+--- it. Independent of isShippedKey: together they give three states, a stock
+--- definition, a shipped one that has been edited, and one an admin created.
+function Core.isOverriddenKey(kind, key)
+    if not key or not Core.overrides then
+        return false
+    end
+    local t = Core.overrides[kind]
+    return (t and t[key] ~= nil) or false
+end
+
 function Core.compileWith(overrides)
     overrides = overrides or {}
     Core.compiler = Core.compiler or require "PhunMart/compiler"
@@ -776,6 +787,10 @@ function Core.compileWith(overrides)
     local runtime, log = Core.compiler.compileAll(ctx)
     Core.runtime = runtime
     Core.defs = ctx
+    -- Kept, not just consumed. Core.defs is defaults and overrides already
+    -- merged, so it cannot answer "did someone change this?". The raw override
+    -- tables can, and the editors use them to mark customised rows.
+    Core.overrides = overrides
     Core.shops = runtime.shops
     Core:reloadShopDefinitions()
     Core.debug("Warn", log.warnings, "Errors", log.errors)

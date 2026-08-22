@@ -20,6 +20,7 @@ local windowName = "PhunSpecialsAdminUI"
 Core.ui.admin_specials = ListPanel:derive(windowName)
 Core.ui.admin_specials.instances = {}
 local UI = Core.ui.admin_specials
+UI._defKind = "specials"
 
 -- Format the kind/inherit column for display.
 local function formatType(def)
@@ -616,6 +617,7 @@ function UI:drawRow(y, item, alt)
 
     local xoffset = 10
     local data = item.item
+    ListPanel.drawStateStripe(self, y, data.key)
 
     local col1X = self.columns[1].size
     local col2X = self.columns[2].size

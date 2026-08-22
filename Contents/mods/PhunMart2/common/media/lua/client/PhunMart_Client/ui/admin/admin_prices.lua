@@ -320,6 +320,7 @@ end
 Core.ui.admin_prices = ListPanel:derive("PhunPricesAdminUI")
 Core.ui.admin_prices.instances = {}
 local UI = Core.ui.admin_prices
+UI._defKind = "prices"
 
 function UI.OnOpenPanel(player)
     local playerIndex = player:getPlayerNum()
@@ -465,6 +466,7 @@ function UI:drawRow(y, item, alt)
 
     local xoffset = 10
     local data = item.item
+    ListPanel.drawStateStripe(self, y, data.key)
     local rightEdge = self.width - SCROLLBAR_W
 
     -- Key column (clipped to column 1 width)

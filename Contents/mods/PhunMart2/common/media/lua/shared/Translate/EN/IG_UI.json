@@ -242,6 +242,8 @@
   "IGUI_PhunMart_Lbl_UnpSprites": "Unp. Sprites:",
   "IGUI_PhunMart_Lbl_PoolSets": "Pool Sets:",
   "IGUI_PhunMart_Lbl_Filter": "Filter: ",
+  "IGUI_PhunMart_Lbl_OnlyChanged": "Only my changes",
+  "IGUI_PhunMart_Tip_OnlyChanged": "Show only what you have customised. Blue stripe: you created it. Amber stripe: you edited one that ships with PhunMart.",
   "IGUI_PhunMart_Lbl_Key": "Key:",
   "IGUI_PhunMart_Lbl_Price": "Price:",
   "IGUI_PhunMart_Lbl_Groups": "Groups:",
