@@ -6,6 +6,8 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
+local Traits = require "PhunMart/traits"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
 local PAD = ListPanel.PAD
@@ -48,9 +50,9 @@ local function formatAction(def)
     end
     local act = def.actions[1]
     if act.type == "addTrait" then
-        return "+" .. (act.trait or "")
+        return "+" .. Traits.getLabel(act.trait or "")
     elseif act.type == "removeTrait" then
-        return "-" .. (act.trait or "")
+        return "-" .. Traits.getLabel(act.trait or "")
     elseif act.type == "spawnVehicle" then
         return "vehicle:" .. (act.script or (act.scripts and act.scripts[1]) or "")
     elseif act.type == "spawnAnimal" then
@@ -73,48 +75,58 @@ local ACTION_TYPES = {"addTrait", "removeTrait", "spawnVehicle", "spawnAnimal", 
                       "giveItem"}
 local KIND_OPTIONS = {"trait", "skill", "boost", "vehicle", "animal", "collector", "pawn"}
 
-local function getActionArgHint(actionType)
-    if actionType == "addTrait" or actionType == "removeTrait" then
-        return getText("IGUI_PhunMart_Hint_TraitKey")
-    elseif actionType == "spawnVehicle" then
-        return getText("IGUI_PhunMart_Hint_ScriptNames")
-    elseif actionType == "spawnAnimal" then
-        return "type/breed (e.g. hen/rhodeisland)"
-    elseif actionType == "grantBoundTokens" then
-        return getText("IGUI_PhunMart_Hint_TokenAmount")
-    elseif actionType == "adjustBalance" then
-        return getText("IGUI_PhunMart_Hint_ChangeAmount")
-    elseif actionType == "giveItem" then
-        return getText("IGUI_PhunMart_Hint_ItemAmount")
-    end
-    return ""
+local function trim(s)
+    return (s or ""):match("^%s*(.-)%s*$")
 end
 
--- Validate the free-text action argument against whatever the Action combo is
--- currently set to. Each action type reads this box differently.
-local function validateActionArg(value, f)
-    local actionType = f:getFieldValue("action")
-    if actionType == "giveItem" then
-        -- Here the box holds the quantity; blank is allowed and means 1.
-        if value ~= "" and not tonumber(value) then
-            return getText("IGUI_PhunMart_Err_Numeric")
-        end
-        return nil
-    end
-    if value == "" then
-        return getText("IGUI_PhunMart_Err_Required")
-    end
-    if actionType == "spawnAnimal" then
-        local aType, aBreed = value:match("^([^:/]+)%s*[:/]%s*(.+)$")
-        if not aType or not aBreed then
-            return getText("IGUI_PhunMart_Err_AnimalFormat")
-        end
-    elseif actionType == "grantBoundTokens" or actionType == "adjustBalance" then
-        if not tonumber(value) then
-            return getText("IGUI_PhunMart_Err_Numeric")
+-- Comma-separated script names into a trimmed list. spawnVehicle stores one
+-- name as `script` and several as `scripts`.
+local function parseScriptList(text)
+    local out = {}
+    for s in (text or ""):gmatch("[^,]+") do
+        s = trim(s)
+        if s ~= "" then
+            table.insert(out, s)
         end
     end
-    return nil
+    return out
+end
+
+-- Which field group each action type needs. Everything not listed here shows
+-- no extra fields at all.
+local ACTION_GROUPS = {
+    addTrait = "act_trait",
+    removeTrait = "act_trait",
+    spawnVehicle = "act_vehicle",
+    spawnAnimal = "act_animal",
+    grantBoundTokens = "act_tokens",
+    adjustBalance = "act_balance",
+    giveItem = "act_item"
+}
+
+local ALL_ACTION_GROUPS = {"act_trait", "act_vehicle", "act_animal", "act_tokens", "act_balance", "act_item"}
+
+-- Show only the group belonging to `actionType`, hiding the rest.
+local function applyActionGroups(form, actionType, isTemplate)
+    local wanted = (not isTemplate) and ACTION_GROUPS[actionType] or nil
+    for _, g in ipairs(ALL_ACTION_GROUPS) do
+        form:setGroupVisible(g, g == wanted)
+    end
+end
+
+-- Traits as {key, display} sorted by label, for the picker.
+local function getTraitOptions()
+    local opts = {}
+    for key, entry in pairs(Traits.cache() or {}) do
+        table.insert(opts, {
+            key = key,
+            display = entry.label or key
+        })
+    end
+    table.sort(opts, function(a, b)
+        return a.display:lower() < b.display:lower()
+    end)
+    return opts
 end
 
 -- Collect sorted price keys for combo.
@@ -138,22 +150,21 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     local def = specialDef or {}
     local isTpl = def.template or false
 
-    -- Pre-compute action arg default
+    -- Each action type reads its own fields off the stored action, rather than
+    -- everything being flattened into one string.
     local curAction = def.actions and def.actions[1]
-    local argDefault = ""
+    local selectedTrait = curAction and curAction.trait or nil
+    local vehicleDefault = ""
     if curAction then
-        if curAction.trait then
-            argDefault = curAction.trait
+        if curAction.scripts then
+            vehicleDefault = table.concat(curAction.scripts, ", ")
         elseif curAction.script then
-            argDefault = curAction.script
-        elseif curAction.scripts then
-            argDefault = table.concat(curAction.scripts, ", ")
-        elseif curAction.animal and curAction.breed then
-            argDefault = curAction.animal .. "/" .. curAction.breed
-        elseif curAction.amount then
-            argDefault = tostring(curAction.amount)
+            vehicleDefault = curAction.script
         end
     end
+    local animalTypeDefault = (curAction and curAction.animal) or ""
+    local animalBreedDefault = (curAction and curAction.breed) or ""
+    local amountDefault = (curAction and curAction.amount) and tostring(curAction.amount) or ""
 
     -- Build inherit options from template keys
     local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
@@ -239,48 +250,40 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     text = dispText
                 } or nil
 
+                -- Each branch reads only its own fields. Validation has already
+                -- run, so anything required here is present and well formed.
                 local actionType = f:getFieldValue("action")
-                local argText = f:getFieldValue("actionArg")
                 local action
 
                 if actionType == "giveItem" then
-                    -- giveItem: item type is the required field; actionArg holds the
-                    -- per-purchase amount (defaults to 1 when blank).
-                    local amt = tonumber(argText)
-                    amt = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
+                    local amt = tonumber(f:getFieldValue("giveItemAmount"))
                     action = {
                         type = "giveItem",
                         item = f:getFieldValue("giveItemItem"),
-                        amount = amt
+                        -- Blank means one per purchase.
+                        amount = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
                     }
                 elseif actionType then
                     action = {
                         type = actionType
                     }
                     if actionType == "addTrait" or actionType == "removeTrait" then
-                        action.trait = argText
+                        action.trait = f:getFieldValue("trait")
                     elseif actionType == "spawnVehicle" then
-                        if argText:find(",") then
-                            local scripts = {}
-                            for s in argText:gmatch("[^,]+") do
-                                s = s:match("^%s*(.-)%s*$")
-                                if s ~= "" then
-                                    table.insert(scripts, s)
-                                end
-                            end
+                        local scripts = parseScriptList(f:getFieldValue("vehicleScripts"))
+                        if #scripts > 1 then
                             action.scripts = scripts
                         else
-                            action.script = argText
+                            action.script = scripts[1]
                         end
                     elseif actionType == "spawnAnimal" then
-                        local aType, aBreed = argText:match("^([^:/]+)%s*[:/]%s*(.+)$")
-                        action.animal = aType:match("^%s*(.-)%s*$")
-                        action.breed = aBreed:match("^%s*(.-)%s*$")
-                        action.size = "medium"
+                        action.animal = trim(f:getFieldValue("animalType"))
+                        action.breed = trim(f:getFieldValue("animalBreed"))
+                        action.size = (curAction and curAction.size) or "medium"
                     elseif actionType == "grantBoundTokens" then
-                        action.amount = math.floor(tonumber(argText))
+                        action.amount = math.floor(f:getFieldNumber("tokenAmount"))
                     elseif actionType == "adjustBalance" then
-                        action.amount = math.floor(tonumber(argText))
+                        action.amount = math.floor(f:getFieldNumber("balanceAmount"))
                         local poolVal = f:getFieldValue("pool")
                         action.pool = (poolVal and poolVal ~= "") and poolVal or "change"
                     end
@@ -396,28 +399,80 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         -- rather than letting them look absent (they are preserved on save).
         hint = extraActions > 0 and getText("IGUI_PhunMart_Hint_MoreActions", tostring(extraActions)) or nil,
         onChange = function(f, field)
-            local actionType = f:getFieldValue("action")
-            f:setHintText("actionArg", getActionArgHint(actionType))
-            f:setGroupVisible("adjustBalance", actionType == "adjustBalance")
-            f:setGroupVisible("giveItem", actionType == "giveItem")
+            applyActionGroups(f, f:getFieldValue("action"))
         end
     })
-    form:addTextField("actionArg", getText("IGUI_PhunMart_Lbl_ActionArg"), {
-        default = argDefault,
-        hint = getActionArgHint(curActionType),
-        group = "instance",
-        validate = validateActionArg
+
+    -- One field per action type rather than a single box whose meaning changed
+    -- with the combo above it. Each lives in its own group, so only the fields
+    -- the chosen action actually uses are on screen.
+    form:addPickerField("trait", getText("IGUI_PhunMart_Lbl_Trait"), {
+        value = selectedTrait,
+        display = selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"),
+        hint = getText("IGUI_PhunMart_Hint_TraitPick"),
+        group = "act_trait",
+        required = true,
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), getTraitOptions(), selectedTrait and {selectedTrait} or {},
+                function(picked)
+                    selectedTrait = picked
+                    f:setPickerValue("trait", selectedTrait,
+                        selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"))
+                end, {
+                    title = getText("IGUI_PhunMart_Admin_PickTrait"),
+                    singleSelect = true
+                })
+        end
+    })
+    form:addTextField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
+        default = vehicleDefault,
+        hint = getText("IGUI_PhunMart_Hint_ScriptNames"),
+        group = "act_vehicle",
+        required = true
+    })
+    form:addTextField("animalType", getText("IGUI_PhunMart_Lbl_AnimalType"), {
+        default = animalTypeDefault,
+        hint = getText("IGUI_PhunMart_Hint_AnimalType"),
+        group = "act_animal",
+        required = true
+    })
+    form:addTextField("animalBreed", getText("IGUI_PhunMart_Lbl_AnimalBreed"), {
+        default = animalBreedDefault,
+        hint = getText("IGUI_PhunMart_Hint_AnimalBreed"),
+        group = "act_animal",
+        required = true
+    })
+    form:addTextField("tokenAmount", getText("IGUI_PhunMart_Lbl_TokenAmount"), {
+        default = amountDefault,
+        hint = getText("IGUI_PhunMart_Hint_TokenAmount"),
+        group = "act_tokens",
+        required = true,
+        integer = true
+    })
+    form:addTextField("balanceAmount", getText("IGUI_PhunMart_Lbl_BalanceAmount"), {
+        default = amountDefault,
+        hint = getText("IGUI_PhunMart_Hint_ChangeAmount"),
+        group = "act_balance",
+        required = true,
+        integer = true
     })
     form:addTextField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
         default = (curAction and curAction.pool) or "change",
         hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
-        group = "adjustBalance"
+        group = "act_balance"
     })
     form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
         default = (curAction and curAction.item) or "",
         hint = getText("IGUI_PhunMart_Hint_ItemKey"),
-        group = "giveItem",
+        group = "act_item",
         required = true
+    })
+    form:addTextField("giveItemAmount", getText("IGUI_PhunMart_Lbl_ItemAmount"), {
+        default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_ItemAmount"),
+        group = "act_item",
+        integer = true,
+        min = 1
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
@@ -456,8 +511,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- tall until the first user-triggered reflow.
     form:setGroupVisible("template", isTpl)
     form:setGroupVisible("instance", not isTpl)
-    form:setGroupVisible("adjustBalance", not isTpl and curActionType == "adjustBalance")
-    form:setGroupVisible("giveItem", not isTpl and curActionType == "giveItem")
+    applyActionGroups(form, curActionType, isTpl)
 
     form:initialise()
 
