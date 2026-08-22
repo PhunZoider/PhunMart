@@ -257,12 +257,23 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    self.list.doDrawItem = self.drawRow
+    self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    self:addListColumn(getText("IGUI_PhunMart_Col_Category"), 0)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Threshold"), 0.30)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Item"), 0.50)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Category"), 0, {
+        field = "category",
+        color = function(d)
+            if d.category == "playtime" then
+                return 0.5, 0.8, 1
+            elseif d.category == "zombieKills" then
+                return 1, 0.6, 0.6
+            elseif d.category == "sprinterKills" then
+                return 1, 0.4, 0.4
+            end
+        end
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Threshold"), 0.30, {field = "threshold"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Item"), 0.50, {field = "rewards", color = {0.7, 0.7, 0.7}})
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
@@ -375,60 +386,6 @@ end
 function UI:close()
     ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
-end
-
-function UI:drawRow(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9
-    local textY = y + (self.itemheight - FONT_HGT_SMALL) / 2
-
-    if self.selected == item.index then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15)
-    end
-    if alt then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.6, 0.5, 0.5)
-    end
-    self:drawRectBorder(0, y, self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b)
-
-    local xoffset = 10
-    local data = item.item
-
-    local col1X = self.columns[1].size
-    local col2X = self.columns[2].size
-    local col3X = self.columns[3].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    -- Category column
-    local catR, catG, catB = 1, 1, 1
-    if data.category == "playtime" then
-        catR, catG, catB = 0.5, 0.8, 1
-    elseif data.category == "zombieKills" then
-        catR, catG, catB = 1, 0.6, 0.6
-    elseif data.category == "sprinterKills" then
-        catR, catG, catB = 1, 0.4, 0.4
-    end
-    self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    self:drawText(data.category, xoffset, textY, catR, catG, catB, a, self.font)
-    self:clearStencilRect()
-
-    -- Threshold column
-    self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
-    self:drawText(data.threshold, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
-    -- Rewards column
-    local rightEdge = self.width - SCROLLBAR_W
-    self:setStencilRect(col3X, clipY, rightEdge - col3X, clipY2 - clipY)
-    self:drawText(data.rewards, col3X + 4, textY, 0.7, 0.7, 0.7, a, self.font)
-    self:clearStencilRect()
-
-    self.itemsHeight = y + self.itemheight
-    return self.itemsHeight
 end
 
 ---------------------------------------------------------------------------

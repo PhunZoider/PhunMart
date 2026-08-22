@@ -217,14 +217,22 @@ end
 function UI:createChildren()
     ListPanel.createChildren(self)
 
-    self.list.doDrawItem = self.drawRow
+    self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.38)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Special"), 0.55)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.72)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Enabled"), 0.85)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {field = "key"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.38, {field = "price"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Special"), 0.55, {field = "special"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.72, {field = "weight"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Enabled"), 0.85, {
+        field = "enabled",
+        color = function(d)
+            if d.enabled == getText("IGUI_PhunMart_Yes") then
+                return 0.4, 0.9, 0.4
+            end
+            return 0.9, 0.4, 0.4
+        end
+    })
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
@@ -310,64 +318,6 @@ end
 function UI:close()
     ISCollapsableWindowJoypad.close(self)
     UI.instances[self.playerIndex] = nil
-end
-
-function UI:drawRow(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9
-    local textY = y + (self.itemheight - FONT_HGT_SMALL) / 2
-
-    if self.selected == item.index then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15)
-    end
-    if alt then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.6, 0.5, 0.5)
-    end
-    self:drawRectBorder(0, y, self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b)
-
-    local xoffset = 10
-    local data = item.item
-    ListPanel.drawStateStripe(self, y, data.key)
-    local rightEdge = self.width - SCROLLBAR_W
-
-    local col1X = self.columns[1].size
-    local col2X = self.columns[2].size
-    local col3X = self.columns[3].size
-    local col4X = self.columns[4].size
-    local col5X = self.columns[5].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    -- Key
-    self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
-    self:clearStencilRect()
-
-    -- Price
-    self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
-    self:drawText(data.price, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
-    -- Special
-    self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
-    self:drawText(data.special, col3X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
-    -- Weight
-    self:setStencilRect(col4X, clipY, col5X - col4X, clipY2 - clipY)
-    self:drawText(data.weight, col4X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
-    -- Enabled
-    local enabledColor = data.enabled == getText("IGUI_PhunMart_Yes") and {0.4, 0.9, 0.4} or {0.9, 0.4, 0.4}
-    self:drawText(data.enabled, col5X + 4, textY, enabledColor[1], enabledColor[2], enabledColor[3], a, self.font)
-
-    self.itemsHeight = y + self.itemheight
-    return self.itemsHeight
 end
 
 UI.refresh = UI.refreshItems

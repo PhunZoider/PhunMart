@@ -366,13 +366,25 @@ function UI:createChildren()
     ListPanel.createChildren(self)
 
     -- Columns: Key, Sources, Blacklist, Zones
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.40)
-    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.70)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.82)
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
+        -- displayKey carries the [S] and [off] suffixes; the plain key is used
+        -- when neither applies so an ordinary row stays uncluttered.
+        text = function(d)
+            return (not d.enabled or d.sticky) and d.displayKey or d.key
+        end,
+        color = function(d)
+            if not d.enabled then
+                return 0.5, 0.5, 0.5
+            elseif d.sticky then
+                return 0.9, 0.85, 0.3
+            end
+        end
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.40, {field = "sources"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.70, {field = "blacklist", color = {0.9, 0.5, 0.5}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.82, {field = "zones", color = {0.7, 0.9, 0.7}})
 
-    -- Custom row renderer
-    self.list.doDrawItem = self.drawDatas
+    self.list.doDrawItem = ListPanel.defaultDrawRow
 
     -- Double-click to edit
     self.list:setOnMouseDoubleClick(self, self.GridDoubleClick)
@@ -480,66 +492,6 @@ function UI:GridDoubleClick(item)
         savePoolDef(key, def)
         self:refreshPools()
     end)
-end
-
-function UI:drawDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9
-    local textY = y + (self.itemheight - FONT_HGT_SMALL) / 2
-
-    if self.selected == item.index then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15)
-    end
-    if alt then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.6, 0.5, 0.5)
-    end
-    self:drawRectBorder(0, y, self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b)
-
-    local xoffset = 10
-    local data = item.item
-    ListPanel.drawStateStripe(self, y, data.key)
-
-    local col1X = self.columns[1].size
-    local col2X = self.columns[2].size
-    local col3X = self.columns[3].size
-    local col4X = self.columns[4].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    -- Key column (sticky = gold, disabled = dimmed)
-    self:setStencilRect(col1X, clipY, col2X - col1X, clipY2 - clipY)
-    if not data.enabled then
-        self:drawText(data.displayKey, xoffset, textY, 0.5, 0.5, 0.5, a, self.font)
-    elseif data.sticky then
-        self:drawText(data.displayKey, xoffset, textY, 0.9, 0.85, 0.3, a, self.font)
-    else
-        self:drawText(data.key, xoffset, textY, 1, 1, 1, a, self.font)
-    end
-    self:clearStencilRect()
-
-    -- Sources column
-    self:setStencilRect(col2X, clipY, col3X - col2X, clipY2 - clipY)
-    self:drawText(data.sources, col2X + 4, textY, 0.8, 0.8, 0.8, a, self.font)
-    self:clearStencilRect()
-
-    -- Blacklist count column
-    self:setStencilRect(col3X, clipY, col4X - col3X, clipY2 - clipY)
-    if data.blacklist ~= "" then
-        self:drawText(data.blacklist, col3X + 4, textY, 0.9, 0.5, 0.5, a, self.font)
-    end
-    self:clearStencilRect()
-
-    -- Zones column
-    if data.zones ~= "" then
-        self:drawText(data.zones, col4X + 4, textY, 0.7, 0.9, 0.7, a, self.font)
-    end
-
-    self.itemsHeight = y + self.itemheight
-    return self.itemsHeight
 end
 
 function UI:close()

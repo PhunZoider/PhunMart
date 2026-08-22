@@ -165,8 +165,22 @@ end
 -- @param name  Column header text
 -- @param size  If 0, starts at left edge. If < 1, treated as a fraction of
 --              list width (recalculated on resize). If >= 1, absolute pixels.
-function ListPanel:addListColumn(name, size)
-    table.insert(self._columnDefs, {name = name, size = size})
+-- @param opts  How defaultDrawRow should render this column:
+--   field  key into the row's data table
+--   text   function(data) -> string, when the cell isn't a plain field
+--   color  {r,g,b} or function(data) -> r,g,b; defaults to white for the first
+--          column and grey for the rest
+--   align  "right" to right-align against the list edge
+function ListPanel:addListColumn(name, size, opts)
+    opts = opts or {}
+    table.insert(self._columnDefs, {
+        name = name,
+        size = size,
+        field = opts.field,
+        text = opts.text,
+        color = opts.color,
+        align = opts.align
+    })
     -- Set initial position; fractional values are recalculated in prerender
     local pos = size
     if size > 0 and size < 1 then
@@ -262,6 +276,93 @@ function ListPanel.drawStateStripe(listSelf, y, key)
     elseif state == "modified" then
         listSelf:drawRect(0, y, 3, listSelf.itemheight, 0.9, 0.9, 0.7, 0.25)
     end
+end
+
+---------------------------------------------------------------------------
+-- Row rendering
+---------------------------------------------------------------------------
+
+--- Generic row renderer driven by the column definitions.
+--- Every panel used to carry its own copy of this: identical cull check,
+--- selection highlight, alternating shade, border and stencilled column loop,
+--- differing only in which field each column read and what colour it drew in.
+--- Those differences are declared on the column now, so a change to row
+--- styling is one edit rather than six, and the lists cannot drift apart.
+--- Runs with the list box as `listSelf`, which is why it reaches the owning
+--- panel through the back-reference rather than through self.
+function ListPanel.defaultDrawRow(listSelf, y, item, alt)
+    local h = listSelf.itemheight
+    if y + listSelf:getYScroll() + h < 0 or y + listSelf:getYScroll() >= listSelf.height then
+        return y + h
+    end
+
+    local panel = listSelf.panel
+    local data = item.item
+    local a = 0.9
+
+    if listSelf.selected == item.index then
+        listSelf:drawRect(0, y, listSelf:getWidth(), h, 0.3, 0.7, 0.35, 0.15)
+    end
+    if alt then
+        listSelf:drawRect(0, y, listSelf:getWidth(), h, 0.3, 0.6, 0.5, 0.5)
+    end
+    listSelf:drawRectBorder(0, y, listSelf:getWidth(), h, a, listSelf.borderColor.r, listSelf.borderColor.g,
+        listSelf.borderColor.b)
+
+    ListPanel.drawStateStripe(listSelf, y, panel and panel:getRowKey(data))
+
+    local cols = (panel and panel._columnDefs) or {}
+    local textY = y + (h - FONT_HGT_SMALL) / 2
+    local rightEdge = listSelf.width - SCROLLBAR_W
+    local clipY = math.max(0, y + listSelf:getYScroll())
+    local clipY2 = math.min(listSelf.height, y + listSelf:getYScroll() + h)
+
+    for i, col in ipairs(cols) do
+        local x = listSelf.columns[i] and listSelf.columns[i].size or 0
+        local nextX = (listSelf.columns[i + 1] and listSelf.columns[i + 1].size) or rightEdge
+
+        local text = ""
+        if col.text then
+            text = col.text(data) or ""
+        elseif col.field then
+            text = data[col.field] or ""
+        end
+        if type(text) ~= "string" then
+            text = tostring(text)
+        end
+
+        if text ~= "" then
+            -- First column reads as the row's identity, so it gets full white.
+            local r, g, b = 0.8, 0.8, 0.8
+            if i == 1 then
+                r, g, b = 1, 1, 1
+            end
+            if type(col.color) == "function" then
+                local cr, cg, cb = col.color(data)
+                if cr then
+                    r, g, b = cr, cg, cb
+                end
+            elseif type(col.color) == "table" then
+                r, g, b = col.color[1], col.color[2], col.color[3]
+            end
+
+            local tx
+            if col.align == "right" then
+                tx = rightEdge - getTextManager():MeasureStringX(listSelf.font, text) - 10
+            elseif i == 1 then
+                tx = 10
+            else
+                tx = x + 4
+            end
+
+            listSelf:setStencilRect(x, clipY, math.max(0, nextX - x), clipY2 - clipY)
+            listSelf:drawText(text, tx, textY, r, g, b, a, listSelf.font)
+            listSelf:clearStencilRect()
+        end
+    end
+
+    listSelf.itemsHeight = y + h
+    return listSelf.itemsHeight
 end
 
 --- Override in subclass to return the searchable text for a list item.
