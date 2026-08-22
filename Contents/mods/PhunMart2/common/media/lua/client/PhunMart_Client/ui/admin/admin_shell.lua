@@ -52,13 +52,16 @@ local TABS = {{
     module = "admin_groups",
     label = "IGUI_PhunMart_Btn_Groups"
 }, {
-    key = "items",
-    module = "admin_items",
-    label = "IGUI_PhunMart_Btn_Items"
-}, {
+    -- Specials before item overrides: an override mostly exists to attach a
+    -- special to an item type, so meeting the special first is the order the
+    -- idea builds in.
     key = "specials",
     module = "admin_specials",
     label = "IGUI_PhunMart_Btn_Specials"
+}, {
+    key = "items",
+    module = "admin_items",
+    label = "IGUI_PhunMart_Btn_Items"
 }, {
     key = "prices",
     module = "admin_prices",

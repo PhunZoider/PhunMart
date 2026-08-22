@@ -31,9 +31,12 @@ local function getSortedKeys(tbl)
 end
 
 -- Format sources summary.
+-- Bare count under a column headed "Groups". It used to read "1 groups" under
+-- a column headed "Sources", which was both ungrammatical and repeated the same
+-- word down fifty rows to say nothing.
 local function formatSources(def)
-    if def.sources and def.sources.groups then
-        return getText("IGUI_PhunMart_NGroups", tostring(#def.sources.groups))
+    if def.sources and def.sources.groups and #def.sources.groups > 0 then
+        return tostring(#def.sources.groups)
     end
     return ""
 end
@@ -373,9 +376,14 @@ function UI:createChildren()
             end
         end
     })
-    self:addListColumn(getText("IGUI_PhunMart_Col_Sources"), 0.40, {field = "sources"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.70, {field = "blacklist", color = {0.9, 0.5, 0.5}})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.82, {field = "zones", color = {0.7, 0.9, 0.7}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Groups"), 0.46, {field = "sources"})
+    -- Blank rather than 0 when there is no blacklist. Most pools have none, and
+    -- a column of zeros reads as data when it is really the absence of it.
+    self:addListColumn(getText("IGUI_PhunMart_Col_Blacklisted"), 0.60, {
+        field = "blacklist",
+        color = {0.9, 0.5, 0.5}
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.74, {field = "zones", color = {0.7, 0.9, 0.7}})
 
     self.list.doDrawItem = ListPanel.defaultDrawRow
 

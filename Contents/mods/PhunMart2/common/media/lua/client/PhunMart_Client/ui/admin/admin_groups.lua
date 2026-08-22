@@ -395,7 +395,10 @@ function UI:createChildren()
     })
     self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.25, {field = "price"})
     self:addListColumn(getText("IGUI_PhunMart_Col_Include"), 0.42, {field = "include"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_BL"), 0.75, {field = "blacklist", color = {0.9, 0.5, 0.5}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Blacklisted"), 0.75, {
+        field = "blacklist",
+        color = {0.9, 0.5, 0.5}
+    })
     self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.87, {field = "weight"})
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)

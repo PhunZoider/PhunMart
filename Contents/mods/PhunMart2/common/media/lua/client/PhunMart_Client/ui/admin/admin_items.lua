@@ -32,7 +32,10 @@ local function formatPrice(itemDef)
     return itemDef.price or ""
 end
 
-local function formatSpecial(itemDef)
+-- The def calls this `reward`, but "Reward" is taken: the Rewards tab is about
+-- earning tokens, which is a different thing entirely. "Grants" says what the
+-- relationship is without borrowing a word that already means something else.
+local function formatGrants(itemDef)
     return itemDef.reward or ""
 end
 
@@ -41,13 +44,6 @@ local function formatWeight(itemDef)
         return tostring(itemDef.offer.weight)
     end
     return ""
-end
-
-local function formatEnabled(itemDef)
-    if itemDef.enabled == false then
-        return getText("IGUI_PhunMart_No")
-    end
-    return getText("IGUI_PhunMart_Yes")
 end
 
 ---------------------------------------------------------------------------
@@ -122,6 +118,10 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
             -- real change the override layer can carry.
             result.enabled = f:getFieldValue("enabled") and true or false
 
+            -- Cleared rather than written false, so an ordinary entry does not
+            -- carry a key it has no use for.
+            result.template = f:getFieldValue("template") and true or nil
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -140,7 +140,7 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
         options = priceKeys, selected = def.price or priceKeys[1],
         hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
     })
-    form:addComboField("special", getText("IGUI_PhunMart_Lbl_Special"), {
+    form:addComboField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
         options = specialKeys, selected = def.reward or specialKeys[1],
         hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
     })
@@ -157,6 +157,13 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
         checked = def.enabled ~= false,
         text = getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"),
+    })
+    -- Items could always be templates, the form just never let you see or set
+    -- it, so the shipped ones were only editable by hand. Same field and
+    -- wording as the specials form.
+    form:addCheckField("template", getText("IGUI_PhunMart_Lbl_IsTemplate"), {
+        checked = def.template == true,
+        text = getText("IGUI_PhunMart_Lbl_IsTemplate"),
     })
 
     form:initialise()
@@ -213,19 +220,25 @@ function UI:createChildren()
     self.list.doDrawItem = ListPanel.defaultDrawRow
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
-    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {field = "key"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.38, {field = "price"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Special"), 0.55, {field = "special"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.72, {field = "weight"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Enabled"), 0.85, {
-        field = "enabled",
+    -- Key carries the [T] and [off] suffixes, matching what pools already do
+    -- with [S]. A template is not an offer any shop can roll, and until now
+    -- nothing here read `template` at all, so the four shipped ones sat in the
+    -- list looking exactly like live entries.
+    self:addListColumn(getText("IGUI_PhunMart_Col_Key"), 0, {
+        text = function(d)
+            return (not d.enabled or d.template) and d.displayKey or d.key
+        end,
         color = function(d)
-            if d.enabled == getText("IGUI_PhunMart_Yes") then
-                return 0.4, 0.9, 0.4
+            if not d.enabled then
+                return 0.5, 0.5, 0.5
+            elseif d.template then
+                return 0.9, 0.85, 0.3
             end
-            return 0.9, 0.4, 0.4
         end
     })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Price"), 0.38, {field = "price"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Grants"), 0.58, {field = "grants"})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Weight"), 0.80, {field = "weight"})
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
@@ -246,7 +259,11 @@ function UI:onDeleteClick()
 end
 
 function UI:getFilterText(itemData)
-    return itemData.key .. " " .. itemData.price .. " " .. itemData.special
+    local text = itemData.key .. " " .. itemData.price .. " " .. itemData.grants
+    if itemData.template then
+        text = text .. " template"
+    end
+    return text
 end
 
 function UI:refreshItems()
@@ -262,12 +279,24 @@ function UI:refreshItems()
 
     for _, key in ipairs(keys) do
         local def = items[key]
+        local displayKey = key
+        if def.template then
+            displayKey = displayKey .. " [T]"
+        end
+        if def.enabled == false then
+            displayKey = displayKey .. " [off]"
+        end
         self:addListItem(key, {
             key = key,
+            displayKey = displayKey,
+            template = def.template == true,
+            -- Enabled lost its column. It was a wall of "Yes" that told you
+            -- nothing, and greying the row with an [off] suffix says the same
+            -- thing in the space the column was taking.
+            enabled = def.enabled ~= false,
             price = formatPrice(def),
-            special = formatSpecial(def),
+            grants = formatGrants(def),
             weight = formatWeight(def),
-            enabled = formatEnabled(def),
             def = def
         })
     end
