@@ -145,14 +145,18 @@ function ItemPicker:doDrawItem(y, item, alt, listSelf)
     end
     cx = cx + CHECK_SZ + PAD
 
-    -- Icon
-    local iy = y + math.floor((ROW_H - ICON_SZ) / 2)
-    if extra.texture then
-        listSelf:drawTextureScaledAspect(extra.texture, cx, iy, ICON_SZ, ICON_SZ, 0.9, 1, 1, 1)
-    else
-        listSelf:drawRect(cx, iy, ICON_SZ, ICON_SZ, 0.9, 0.20, 0.20, 0.20)
+    -- Icon. A subclass whose rows have no textures at all sets _noIcons and
+    -- gets the space back, rather than a column of empty placeholders that
+    -- reads as broken artwork.
+    if not self._noIcons then
+        local iy = y + math.floor((ROW_H - ICON_SZ) / 2)
+        if extra.texture then
+            listSelf:drawTextureScaledAspect(extra.texture, cx, iy, ICON_SZ, ICON_SZ, 0.9, 1, 1, 1)
+        else
+            listSelf:drawRect(cx, iy, ICON_SZ, ICON_SZ, 0.9, 0.20, 0.20, 0.20)
+        end
+        cx = cx + ICON_SZ + PAD
     end
-    cx = cx + ICON_SZ + PAD
 
     local ty = y + math.floor((ROW_H - FONT_HGT_SMALL) / 2)
     local r, g, b = 1, 1, 1

@@ -7,6 +7,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local CategoryPicker = require "PhunMart_Client/ui/base/category_picker"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
+local VehiclePicker = require "PhunMart_Client/ui/base/vehicle_picker"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
@@ -105,6 +106,24 @@ end
 ---------------------------------------------------------------------------
 
 -- Format a list of item keys as "Name1, Name2, Name3 +X more" or "(none)".
+-- Vehicle scripts by their in-game labels, so the field reads as cars rather
+-- than as script identifiers.
+local function formatVehicleList(keys)
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
+    local names = {}
+    local limit = math.min(#keys, 3)
+    for i = 1, limit do
+        names[i] = Core.getVehicleLabel and Core.getVehicleLabel(keys[i]) or keys[i]
+    end
+    local text = table.concat(names, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
+end
+
 local function formatItemList(keys)
     if not keys or #keys == 0 then
         return getText("IGUI_PhunMart_Lbl_None")
@@ -159,8 +178,22 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     -- Copy arrays so picker mutations don't affect original defs
     local selectedCats = {}
     if def.categories then for _, c in ipairs(def.categories) do table.insert(selectedCats, c) end end
+    -- `items` holds two different kinds of key: inventory item types, and
+    -- vehicle script names. They go to different pickers because neither can
+    -- list the other, and they are recombined on save. A key that resolves as
+    -- neither (a typo, or a mod that is not loaded) is treated as an item, so
+    -- it stays in the list rather than being quietly dropped.
     local selectedItems = {}
-    if def.items then for _, item in ipairs(def.items) do table.insert(selectedItems, item) end end
+    local selectedVehicles = {}
+    if def.items then
+        for _, item in ipairs(def.items) do
+            if VehiclePicker.isVehicleScript(item) then
+                table.insert(selectedVehicles, item)
+            else
+                table.insert(selectedItems, item)
+            end
+        end
+    end
     local selectedSpecialItems = {}
     if def.specials then for _, s in ipairs(def.specials) do table.insert(selectedSpecialItems, s) end end
     local selectedSpecialCats = {}
@@ -187,8 +220,8 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         -- A group with nothing to draw from produces no offers. Every shipped
         -- group has exactly one source, so requiring one blocks nothing real.
         validate = function(f)
-            if #selectedCats == 0 and #selectedItems == 0 and #selectedSpecialItems == 0 and #selectedSpecialCats ==
-                0 then
+            if #selectedCats == 0 and #selectedItems == 0 and #selectedVehicles == 0 and #selectedSpecialItems == 0 and
+                #selectedSpecialCats == 0 then
                 return getText("IGUI_PhunMart_Err_NeedItemOrCat")
             end
         end,
@@ -212,7 +245,11 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             result.label = (labelText ~= "") and labelText or nil
 
             result.categories = #selectedCats > 0 and selectedCats or nil
-            result.items = #selectedItems > 0 and selectedItems or nil
+            -- Back into one list, the shape the compiler expects.
+            local allItems = {}
+            for _, k in ipairs(selectedItems) do table.insert(allItems, k) end
+            for _, k in ipairs(selectedVehicles) do table.insert(allItems, k) end
+            result.items = #allItems > 0 and allItems or nil
             result.specials = #selectedSpecialItems > 0 and selectedSpecialItems or nil
             result.specialCategories = #selectedSpecialCats > 0 and selectedSpecialCats or nil
 
@@ -259,6 +296,17 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
                 selectedItems = keys or {}
                 f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
+            end)
+        end,
+    })
+    form:addPickerField("vehicles", getText("IGUI_PhunMart_Lbl_Vehicles"), {
+        value = selectedVehicles,
+        display = formatVehicleList(selectedVehicles),
+        hint = getText("IGUI_PhunMart_Hint_GroupVehicles"),
+        onPick = function(f, field)
+            VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
+                selectedVehicles = keys or {}
+                f:setPickerValue("vehicles", selectedVehicles, formatVehicleList(selectedVehicles))
             end)
         end,
     })

@@ -7,6 +7,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
+local VehiclePicker = require "PhunMart_Client/ui/base/vehicle_picker"
 local Traits = require "PhunMart/traits"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 
@@ -87,17 +88,22 @@ local function trim(s)
     return (s or ""):match("^%s*(.-)%s*$")
 end
 
--- Comma-separated script names into a trimmed list. spawnVehicle stores one
--- name as `script` and several as `scripts`.
-local function parseScriptList(text)
-    local out = {}
-    for s in (text or ""):gmatch("[^,]+") do
-        s = trim(s)
-        if s ~= "" then
-            table.insert(out, s)
-        end
+-- Vehicle script names as their in-game labels, so the field reads as cars
+-- rather than as script identifiers.
+local function formatVehicleList(keys)
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
     end
-    return out
+    local names = {}
+    local limit = math.min(#keys, 3)
+    for i = 1, limit do
+        names[i] = Core.getVehicleLabel and Core.getVehicleLabel(keys[i]) or keys[i]
+    end
+    local text = table.concat(names, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
 end
 
 -- Which field group each action type needs. Everything not listed here shows
@@ -209,12 +215,14 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- everything being flattened into one string.
     local curAction = def.actions and def.actions[1]
     local selectedTrait = curAction and curAction.trait or nil
-    local vehicleDefault = ""
+    local selectedVehicles = {}
     if curAction then
         if curAction.scripts then
-            vehicleDefault = table.concat(curAction.scripts, ", ")
+            for _, s in ipairs(curAction.scripts) do
+                table.insert(selectedVehicles, s)
+            end
         elseif curAction.script then
-            vehicleDefault = curAction.script
+            table.insert(selectedVehicles, curAction.script)
         end
     end
     local animalTypeDefault = (curAction and curAction.animal) or ""
@@ -332,7 +340,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                         action.multiplier = f:getFieldNumber("boostMultiplier")
                         action.hours = f:getFieldNumber("boostHours")
                     elseif actionType == "spawnVehicle" then
-                        local scripts = parseScriptList(f:getFieldValue("vehicleScripts"))
+                        local scripts = f:getFieldValue("vehicleScripts") or {}
                         if #scripts > 1 then
                             action.scripts = scripts
                         else
@@ -550,11 +558,21 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         numeric = true,
         min = 0
     })
-    form:addTextField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
-        default = vehicleDefault,
-        hint = getText("IGUI_PhunMart_Hint_ScriptNames"),
+    -- A picker rather than free text. Script names are not guessable, a typo
+    -- here silently disables the offer at compile time, and there was no list
+    -- of valid ones anywhere in the UI.
+    form:addPickerField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
+        value = selectedVehicles,
+        display = formatVehicleList(selectedVehicles),
+        hint = getText("IGUI_PhunMart_Hint_VehiclePick"),
         group = "act_vehicle",
-        required = true
+        required = true,
+        onPick = function(f, field)
+            VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
+                selectedVehicles = keys or {}
+                f:setPickerValue("vehicleScripts", selectedVehicles, formatVehicleList(selectedVehicles))
+            end)
+        end
     })
     form:addTextField("animalType", getText("IGUI_PhunMart_Lbl_AnimalType"), {
         default = animalTypeDefault,
