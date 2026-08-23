@@ -243,6 +243,26 @@ end
 
 --- Visual separator (horizontal line + optional section label).
 -- opts: { text, group }
+--- A row of pictures, so a choice made from a dropdown of filenames can be
+--- seen rather than imagined.
+--- opts: { group, conditional, height, images = function() -> array of
+---         { texture, label } }
+--- `images` is called on every reflow, because what it should show depends on
+--- the field above it.
+function FormPanel:addImageField(key, label, opts)
+    opts = opts or {}
+    table.insert(self._fields, {
+        type = "image",
+        key = key,
+        label = label,
+        images = opts.images,
+        imageHeight = opts.height or math.floor(48 * FONT_SCALE),
+        group = opts.group,
+        visible = true
+    })
+    return self:_registerField(opts)
+end
+
 function FormPanel:addSeparator(key, opts)
     opts = opts or {}
     table.insert(self._fields, {
@@ -306,12 +326,13 @@ function FormPanel:_applyStep()
     for i, s in ipairs(self._steps) do
         for _, f in ipairs(self._fields) do
             if f.group == s.group then
+                -- A conditional field is on screen only when its step is AND
+                -- whatever controls it still wants it. Hiding it on the way out
+                -- and never restoring it meant stepping back to a page where
+                -- "Other" was chosen showed the combo and none of the fields it
+                -- had revealed.
                 if f.conditional then
-                    -- Its own visibility is not ours to grant, only to revoke
-                    -- when its step is not the one on screen.
-                    if i ~= self._step then
-                        f.visible = false
-                    end
+                    f.visible = (i == self._step) and (f._wanted == true)
                 else
                     f.visible = (i == self._step)
                 end
@@ -358,6 +379,12 @@ function FormPanel:setFieldVisible(key, visible)
     local f = self._fieldsByKey[key]
     if f then
         f.visible = visible
+        -- Remembered separately for a conditional field, because stepping away
+        -- and back rebuilds visibility from the step and would otherwise forget
+        -- that something had asked for this one.
+        if f.conditional then
+            f._wanted = visible and true or false
+        end
         if self._built then
             self:reflowFields()
         end
@@ -571,6 +598,8 @@ function FormPanel:_computeNeededHeight()
                     y = y + FONT_HGT_SMALL + 2
                 end
                 y = y + PAD
+            elseif f.type == "image" then
+                y = y + f.imageHeight + FONT_HGT_SMALL + PAD
             elseif f.type == "check" then
                 y = y + ROW_H + PAD
             elseif f.type == "list" then
@@ -969,8 +998,8 @@ function FormPanel:_createField(f)
         -- Populate initial items
         self:_refreshListField(f)
 
-    elseif f.type == "separator" then
-        -- Separator has no widgets; drawn in prerender
+    elseif f.type == "separator" or f.type == "image" then
+        -- No widgets; both are drawn in prerender
     end
 end
 
@@ -1114,6 +1143,11 @@ function FormPanel:reflowFields()
                     y = y + FONT_HGT_SMALL + 2
                 end
                 y = y + PAD
+
+            elseif f.type == "image" then
+                f._drawY = y
+                f._fieldX = x + labelW
+                y = y + f.imageHeight + FONT_HGT_SMALL + PAD
             end
         end
     end
@@ -1234,6 +1268,35 @@ function FormPanel:prerender()
             if f.text then
                 self:drawText(f.text, PAD, f._drawY + 4, 0.6, 0.6, 0.6, 1, UIFont.Small)
             end
+
+        elseif f.type == "image" and f._drawY then
+            if f.label then
+                self:drawText(f.label .. ":", PAD, f._drawY + (f.imageHeight - FONT_HGT_SMALL) / 2, 1, 1, 1, 1,
+                    UIFont.Small)
+            end
+            local ix = f._fieldX or PAD
+            local sz = f.imageHeight
+            -- Recomputed each frame rather than cached: what to show depends on
+            -- the field above, and this is a handful of draw calls.
+            local ok, images = pcall(f.images or function()
+                return {}
+            end)
+            if ok and images then
+                for _, img in ipairs(images) do
+                    if img.texture then
+                        self:drawTextureScaledAspect(img.texture, ix, f._drawY, sz, sz, 1, 1, 1, 1)
+                    else
+                        -- A slot we could not resolve. Drawn as an empty frame,
+                        -- because silence would read as "there is nothing here"
+                        -- when it means "this name did not match anything".
+                        self:drawRectBorder(ix, f._drawY, sz, sz, 0.5, 0.6, 0.4, 0.4)
+                    end
+                    if img.label then
+                        self:drawTextCentre(img.label, ix + sz / 2, f._drawY + sz, 0.6, 0.6, 0.6, 1, UIFont.Small)
+                    end
+                    ix = ix + sz + PAD
+                end
+            end
         elseif f.type == "list" and f._headerY then
             if f._columns then
                 -- Draw column headers
@@ -1271,7 +1334,7 @@ end
 
 --- Run one field's rules. Returns an error string, or nil when the field is ok.
 local function validateField(form, f)
-    if f.type == "separator" or f.type == "list" or f.type == "check" then
+    if f.type == "separator" or f.type == "image" or f.type == "list" or f.type == "check" then
         return nil
     end
 

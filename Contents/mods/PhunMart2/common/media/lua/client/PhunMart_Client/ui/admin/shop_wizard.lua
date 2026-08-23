@@ -51,6 +51,34 @@ local SPARE_SETS = {{
     first = "phunmart_03_56"
 }}
 
+-- The order the four tiles are read in. ServerObject:getSpriteIndex maps
+-- E to 1, S to 2, W to 3 and anything else to 4, so the list is not the
+-- compass order anyone would guess and the fields say which is which.
+local FACINGS = {"IGUI_PhunMart_Wiz_East", "IGUI_PhunMart_Wiz_South", "IGUI_PhunMart_Wiz_West",
+                 "IGUI_PhunMart_Wiz_North"}
+
+--- The texture for one tile name, or nil when nothing matches. Guarded because
+--- the sprite manager is the game's, not ours, and an unknown name from a mod
+--- that is not loaded should show an empty frame rather than end the wizard.
+local function tileTexture(name)
+    if not name or name == "" then
+        return nil
+    end
+    local ok, tex = pcall(function()
+        local spr = IsoSpriteManager.instance:getSprite(name)
+        return spr and spr:getTextureForCurrentFrame(IsoDirections.S) or nil
+    end)
+    return ok and tex or nil
+end
+
+local function backgroundTexture(name)
+    if not name or name == "" then
+        return nil
+    end
+    local ok, tex = pcall(getTexture, "media/textures/" .. name)
+    return ok and tex or nil
+end
+
 --- Expand a first-tile name into the eight the shop definition needs.
 --- Returns powered, unpowered, or nil when the name is not of the form
 --- <sheet>_<index>.
@@ -135,6 +163,17 @@ local function categoryOptions()
     end
     table.sort(opts)
     return opts
+end
+
+--- A sandbox value if it is readable, otherwise the shipped default. Read here
+--- rather than written into a hint so the number an admin sees is the one their
+--- server is actually using.
+local function sandbox(key, fallback)
+    local v = Core.settings and Core.settings[key]
+    if v == nil and SandboxVars and SandboxVars.PhunMart then
+        v = SandboxVars.PhunMart[key]
+    end
+    return v or fallback
 end
 
 local function priceOptions()
@@ -291,6 +330,7 @@ function ShopWizard.open(player, onDone)
         title = getText("IGUI_PhunMart_Wiz_NewShop"),
         onApply = function(f)
             local name = f:getFieldValue("name")
+            local rollLo, rollHi = f:getFieldRange("roll")
             local groupKey = create({
                 key = keyFromName(name),
                 name = name,
@@ -302,8 +342,8 @@ function ShopWizard.open(player, onDone)
                 unpoweredSprites = chosenSprites(f, tileByLabel, "unpowered"),
                 price = f:getFieldValue("price"),
                 restockFrequency = f:getFieldNumber("restockFrequency"),
-                rollMin = math.floor(f:getFieldNumber("rollMin") or 4),
-                rollMax = math.floor(f:getFieldNumber("rollMax") or 8)
+                rollMin = math.floor(rollLo or 4),
+                rollMax = math.floor(rollHi or 8)
             })
             f:close()
             if onDone then
@@ -373,8 +413,24 @@ function ShopWizard.open(player, onDone)
     -- Eight fields for an admin who has packed their own tileset. Only the
     -- powered four are required: a machine that needs no power has no unpowered
     -- state to draw.
+    -- Shown whatever the choice: the point of a preview is to confirm the
+    -- named set is the one you meant, which matters most when you did not
+    -- type the names yourself.
+    form:addImageField("spritePreview", getText("IGUI_PhunMart_Wiz_Lbl_Preview"), {
+        group = "w_look",
+        images = function()
+            local out = {}
+            for i, name in ipairs(chosenSprites(form, tileByLabel, "sprites") or {}) do
+                table.insert(out, {
+                    texture = tileTexture(name),
+                    label = getText(FACINGS[i] or "")
+                })
+            end
+            return out
+        end
+    })
     for i = 1, 4 do
-        form:addTextField("sprites" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_SpriteN", tostring(i)), {
+        form:addTextField("sprites" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_SpriteN", getText(FACINGS[i])), {
             default = "",
             hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Sprites") or nil,
             group = "w_look",
@@ -387,7 +443,7 @@ function ShopWizard.open(player, onDone)
         })
     end
     for i = 1, 4 do
-        form:addTextField("unpowered" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_UnpoweredN", tostring(i)), {
+        form:addTextField("unpowered" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_UnpoweredN", getText(FACINGS[i])), {
             default = "",
             hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Unpowered") or nil,
             group = "w_look",
@@ -408,6 +464,15 @@ function ShopWizard.open(player, onDone)
         hint = getText("IGUI_PhunMart_Wiz_Hint_BackgroundOther"),
         group = "w_look",
         conditional = true
+    })
+    form:addImageField("backgroundPreview", getText("IGUI_PhunMart_Wiz_Lbl_Preview"), {
+        group = "w_look",
+        height = math.floor(72 * FONT_SCALE),
+        images = function()
+            return {{
+                texture = backgroundTexture(pickOrCustom(form, "background", "backgroundOther"))
+            }}
+        end
     })
 
     ---------------------------------------------------------------- step 3
@@ -433,7 +498,10 @@ function ShopWizard.open(player, onDone)
     -- has a reason to differ from it.
     form:addTextField("minDistance", getText("IGUI_PhunMart_Wiz_Lbl_MinDistance"), {
         default = "",
-        hint = getText("IGUI_PhunMart_Wiz_Hint_MinDistance"),
+        -- The sandbox value goes in the hint rather than into the box: leaving
+        -- it blank means "follow the setting" and pre-filling the number would
+        -- pin it to today's value forever.
+        hint = getText("IGUI_PhunMart_Wiz_Hint_MinDistance", tostring(sandbox("DefaultDistance", 200))),
         group = "w_world",
         integer = true,
         min = 0
@@ -452,30 +520,21 @@ function ShopWizard.open(player, onDone)
     })
     form:addTextField("restockFrequency", getText("IGUI_PhunMart_Wiz_Lbl_Restock"), {
         default = "",
-        hint = getText("IGUI_PhunMart_Wiz_Hint_Restock"),
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Restock", tostring(sandbox("DefaultHoursToRestock", 72))),
         group = "w_stock",
         integer = true,
         min = 1
     })
-    form:addTextField("rollMin", getText("IGUI_PhunMart_Wiz_Lbl_RollMin"), {
-        default = "4",
+    -- One range rather than two stacked boxes. It is a span, and stacking made
+    -- the second look like a separate question.
+    form:addRangeField("roll", getText("IGUI_PhunMart_Wiz_Lbl_Roll"), {
+        minDefault = "4",
+        maxDefault = "8",
         hint = getText("IGUI_PhunMart_Wiz_Hint_Roll"),
         group = "w_stock",
         integer = true,
-        min = 0
-    })
-    form:addTextField("rollMax", getText("IGUI_PhunMart_Wiz_Lbl_RollMax"), {
-        default = "8",
-        group = "w_stock",
-        integer = true,
         min = 0,
-        validate = function(value, f)
-            local lo = f:getFieldNumber("rollMin")
-            local hi = tonumber(value)
-            if lo and hi and hi < lo then
-                return getText("IGUI_PhunMart_Wiz_Err_RollOrder")
-            end
-        end
+        requireBoth = true
     })
 
     form:setSteps({{
