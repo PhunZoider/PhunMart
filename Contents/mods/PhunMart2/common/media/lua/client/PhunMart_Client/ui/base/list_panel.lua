@@ -172,6 +172,27 @@ function ListPanel:createChildren()
                                  BUTTON_HGT + PAD
     end
 
+    -- A second tickbox for lists whose rows are mostly generated variants of
+    -- one another. Declared by the subclass overriding isVariation, and ticked
+    -- by default: a list where nine rows in ten differ only by a skill name
+    -- opens more usefully with them folded away.
+    if self.isVariation ~= ListPanel.isVariation then
+        local vtick = ISTickBox:new(0, PAD, BUTTON_HGT, BUTTON_HGT, "")
+        vtick:initialise()
+        vtick:instantiate()
+        vtick:addOption(getText("IGUI_PhunMart_Lbl_HideVariations"), nil)
+        vtick:setSelected(1, true)
+        vtick.tooltip = getText("IGUI_PhunMart_Tip_HideVariations")
+        vtick.changeOptionMethod = function()
+            self:applyFilter()
+        end
+        vtick.changeOptionTarget = self
+        self._buttonBar:addChild(vtick)
+        self._hideVariationsTick = vtick
+        self._hideVariationsW = getTextManager():MeasureStringX(UIFont.Small,
+            getText("IGUI_PhunMart_Lbl_HideVariations")) + BUTTON_HGT + PAD
+    end
+
     -- The "used by" line, as a button rather than drawn text so it can be
     -- clicked through to whatever it names. It keeps real button chrome: as
     -- flat text it read as a status line and nobody would think to click it,
@@ -358,6 +379,13 @@ end
 --- filter tabs. Called for every row on every filter pass, so keep it cheap.
 function ListPanel:rowInFilterTab(itemData, tabKey)
     return true
+end
+
+--- Is this row one of many near-identical generated entries? A subclass that
+--- overrides this gets a "hide variations" tickbox; the base answer of false
+--- means no such box appears, which is right for a list of distinct things.
+function ListPanel:isVariation(itemData)
+    return false
 end
 
 --- Add a button to the bottom bar (left-aligned).
@@ -718,6 +746,7 @@ function ListPanel:applyFilter()
     local filterText = typed:lower()
 
     local onlyChanged = self._onlyChangedTick and self._onlyChangedTick:isSelected(1)
+    local hideVariations = self._hideVariationsTick and self._hideVariationsTick:isSelected(1)
 
     self.list:clear()
     for _, entry in ipairs(self._allItems) do
@@ -730,6 +759,12 @@ function ListPanel:applyFilter()
 
         if include and self._activeFilterTab then
             include = self:rowInFilterTab(entry.data, self._activeFilterTab)
+        end
+
+        -- Typing a filter means looking for something specific, and a hidden
+        -- variation is still a real entry, so a search reaches past this.
+        if include and hideVariations and filterText == "" then
+            include = not self:isVariation(entry.data)
         end
 
         if include and filterText ~= "" then
@@ -807,6 +842,12 @@ function ListPanel:prerender()
         local tickX = rightX - self._onlyChangedW
         self._onlyChangedTick:setX(tickX)
         self._onlyChangedTick:setY(PAD)
+        rightX = tickX - PAD
+    end
+    if self._hideVariationsTick then
+        local tickX = rightX - self._hideVariationsW
+        self._hideVariationsTick:setX(tickX)
+        self._hideVariationsTick:setY(PAD)
         rightX = tickX - PAD
     end
     self._filterLabel:setX(PAD)

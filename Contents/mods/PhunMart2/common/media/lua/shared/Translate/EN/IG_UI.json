@@ -247,6 +247,8 @@
   "IGUI_PhunMart_Lbl_UsedBy": "Used by %1",
   "IGUI_PhunMart_Lbl_UsedByNothing": "Not used by anything",
   "IGUI_PhunMart_Tip_UsedBy": "Click to go to what uses this.",
+  "IGUI_PhunMart_Lbl_HideVariations": "Hide variations",
+  "IGUI_PhunMart_Tip_HideVariations": "Folds away entries that copy a template and differ only by which skill they name. The template above them is what changes all of them at once. Typing a filter searches them anyway.",
   "IGUI_PhunMart_Tip_OnlyChanged": "Show only what you have customised. Blue stripe: you created it. Amber stripe: you edited one that ships with PhunMart.",
   "IGUI_PhunMart_Lbl_Key": "Key:",
   "IGUI_PhunMart_Lbl_Price": "Price:",

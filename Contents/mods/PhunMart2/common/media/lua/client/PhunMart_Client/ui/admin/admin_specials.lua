@@ -689,6 +689,8 @@ function UI:createChildren()
     self:addNameColumn(function(d)
         if not d.enabled then
             return 0.5, 0.5, 0.5
+        elseif d.template then
+            return 0.9, 0.85, 0.3
         end
     end)
     self:addListColumn(getText("IGUI_PhunMart_Col_Type"), 0.32, {field = "typeCol"})
@@ -732,6 +734,19 @@ function UI:rowInFilterTab(itemData, tabKey)
     return tabKey == "all" or itemData.domain == tabKey
 end
 
+--- Is this row one of a family that differs only by which skill it names?
+--- True when it copies from a template, which is what generation produces:
+--- 35 children per base, identical but for a skill. Something an admin wrote
+--- by hand has no inherit and is never hidden.
+function UI:isVariation(itemData)
+    if not itemData.inherit then
+        return false
+    end
+    local specials = Core.defs and Core.defs.specials or {}
+    local parent = specials[itemData.inherit]
+    return parent ~= nil and parent.template == true
+end
+
 function UI:getFilterText(itemData)
     return (itemData.key or "") .. " " .. (itemData.title or "") .. " " .. (itemData.typeCol or "") .. " " ..
                (itemData.action or "")
@@ -748,26 +763,36 @@ function UI:refreshSpecials()
     end
     self:sortKeysByName(keys, specials)
 
+    -- Templates used to be filtered out here, which hid the only entries worth
+    -- editing: the six XP and boost bases stand behind 209 children that differ
+    -- from each other by a skill name. Editing a base changes all of them at
+    -- once, so it has to be reachable. Marked [T] the way item overrides mark
+    -- theirs, and the children fold away behind the variations tickbox.
     for _, key in ipairs(keys) do
         local def = specials[key]
-        if not def.template then
-            local markers = {}
-            if def.enabled == false then
-                table.insert(markers, "[off]")
-            end
-            local name, title = self:rowName(key, def, markers)
-            self:addListItem(name, {
-                key = key,
-                name = name,
-                title = title,
-                domain = domainOf(def),
-                enabled = def.enabled ~= false,
-                typeCol = formatType(def),
-                display = formatDisplay(def),
-                action = formatAction(def),
-                def = def
-            })
+        local markers = {}
+        if def.template then
+            table.insert(markers, "[T]")
         end
+        if def.enabled == false then
+            table.insert(markers, "[off]")
+        end
+        local name, title = self:rowName(key, def, markers)
+        self:addListItem(name, {
+            key = key,
+            name = name,
+            title = title,
+            domain = domainOf(def),
+            template = def.template == true,
+            -- What it copies from, so the variations filter can tell a
+            -- generated child from something an admin wrote.
+            inherit = def.inherit,
+            enabled = def.enabled ~= false,
+            typeCol = formatType(def),
+            display = formatDisplay(def),
+            action = formatAction(def),
+            def = def
+        })
     end
 end
 
