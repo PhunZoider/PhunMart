@@ -153,18 +153,6 @@ local function keyFromName(name)
     return (out:gsub("^%l", string.upper))
 end
 
-local function categoryOptions()
-    local seen, opts = {}, {}
-    for _, def in pairs(Core.defs and Core.defs.shops or {}) do
-        if def.category and not seen[def.category] then
-            seen[def.category] = true
-            table.insert(opts, def.category)
-        end
-    end
-    table.sort(opts)
-    return opts
-end
-
 --- A sandbox value if it is readable, otherwise the shipped default. Read here
 --- rather than written into a hint so the number an admin sees is the one their
 --- server is actually using.
@@ -234,7 +222,6 @@ local function create(values)
     sendClientCommand(Core.name, Core.commands.upsertShopDefinition, {
         type = key,
         title = values.name,
-        category = values.category,
         probability = values.probability,
         minDistance = values.minDistance,
         background = values.background,
@@ -277,6 +264,19 @@ local function isOther(value)
     return value == getText(OTHER)
 end
 
+--- Comma-separated names into a trimmed list, skipping blanks so a trailing
+--- comma or a double one does not become an empty tile name.
+local function parseCsv(text)
+    local out = {}
+    for s in tostring(text or ""):gmatch("[^,]+") do
+        s = s:match("^%s*(.-)%s*$")
+        if s ~= "" then
+            table.insert(out, s)
+        end
+    end
+    return out
+end
+
 --- A combo's value, unless it is the Other entry, in which case whatever was
 --- typed into the companion field.
 local function pickOrCustom(form, comboKey, textKey)
@@ -289,18 +289,11 @@ local function pickOrCustom(form, comboKey, textKey)
 end
 
 --- The four tile names for one state of the machine. A named set expands from
---- its first tile; Other reads four fields typed by hand, and returns however
---- many were filled in, since unpowered art is optional.
+--- its first tile; Other reads the comma-separated field, which may be empty
+--- for unpowered because that art is optional.
 local function chosenSprites(form, tileByLabel, which)
     if isOther(form:getFieldValue("appearance")) then
-        local out = {}
-        for i = 1, 4 do
-            local v = form:getFieldValue(which .. tostring(i))
-            if v and v ~= "" then
-                table.insert(out, v)
-            end
-        end
-        return out
+        return parseCsv(form:getFieldValue(which == "sprites" and "spritesCsv" or "unpoweredCsv"))
     end
     local powered, unpowered = spritesFrom(tileByLabel[form:getFieldValue("appearance")] or "phunmart_01_0")
     return which == "sprites" and powered or unpowered
@@ -314,7 +307,6 @@ function ShopWizard.open(player, onDone)
     local shops = Core.defs and Core.defs.shops or {}
     local appearances, tileByLabel = appearanceOptions()
     local backgrounds = backgroundOptions()
-    local categories = categoryOptions()
     local prices = priceOptions()
 
     -- Last on every list, so what already exists reads as the suggestion and
@@ -322,7 +314,6 @@ function ShopWizard.open(player, onDone)
     -- you trip over.
     table.insert(appearances, getText(OTHER))
     table.insert(backgrounds, getText(OTHER))
-    table.insert(categories, getText(OTHER))
 
     local form
     form = FormPanel:new({
@@ -334,7 +325,6 @@ function ShopWizard.open(player, onDone)
             local groupKey = create({
                 key = keyFromName(name),
                 name = name,
-                category = pickOrCustom(f, "category", "categoryOther"),
                 probability = math.floor(f:getFieldNumber("probability") or 15),
                 minDistance = f:getFieldNumber("minDistance"),
                 background = pickOrCustom(f, "background", "backgroundOther"),
@@ -376,21 +366,11 @@ function ShopWizard.open(player, onDone)
             end
         end
     })
-    form:addComboField("category", getText("IGUI_PhunMart_Lbl_Category"), {
-        options = categories,
-        selected = categories[1],
-        hint = getText("IGUI_PhunMart_Wiz_Hint_Category"),
-        group = "w_name",
-        onChange = function(f)
-            f:setFieldVisible("categoryOther", isOther(f:getFieldValue("category")))
-        end
-    })
-    form:addTextField("categoryOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
-        default = "",
-        hint = getText("IGUI_PhunMart_Wiz_Hint_CategoryOther"),
-        group = "w_name",
-        conditional = true
-    })
+    -- No category. A shop's type is its key, which is what minDistance spaces
+    -- machines by, so there is no second grouping to ask about. The definition
+    -- field still exists and the shop editor still exposes it, but nothing
+    -- reads it, and asking a newcomer to fill in something inert is worse than
+    -- not asking.
 
     ---------------------------------------------------------------- step 2
     form:addSeparator("s_look", {
@@ -404,18 +384,53 @@ function ShopWizard.open(player, onDone)
         group = "w_look",
         onChange = function(f)
             local other = isOther(f:getFieldValue("appearance"))
-            for i = 1, 4 do
-                f:setFieldVisible("sprites" .. tostring(i), other)
-                f:setFieldVisible("unpowered" .. tostring(i), other)
-            end
+            f:setFieldVisible("spritesCsv", other)
+            f:setFieldVisible("unpoweredCsv", other)
         end
     })
     -- Eight fields for an admin who has packed their own tileset. Only the
     -- powered four are required: a machine that needs no power has no unpowered
     -- state to draw.
-    -- Shown whatever the choice: the point of a preview is to confirm the
-    -- named set is the one you meant, which matters most when you did not
-    -- type the names yourself.
+    -- Two comma-separated fields rather than eight boxes. Eight made the step
+    -- taller than the screen at some resolutions, which pushed the unpowered
+    -- ones out of sight and made them look broken. The preview below carries
+    -- the facing labels, so nothing is lost by not naming each box, and this
+    -- matches how the existing shop editor already takes its sprite lists.
+    form:addTextField("spritesCsv", getText("IGUI_PhunMart_Wiz_Lbl_Sprites"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Sprites"),
+        group = "w_look",
+        conditional = true,
+        validate = function(value, f)
+            if not isOther(f:getFieldValue("appearance")) then
+                return nil
+            end
+            local n = #parseCsv(value)
+            if n == 0 then
+                return getText("IGUI_PhunMart_Err_Required")
+            end
+            if n ~= 4 then
+                return getText("IGUI_PhunMart_Wiz_Err_FourTiles", tostring(n))
+            end
+        end
+    })
+    form:addTextField("unpoweredCsv", getText("IGUI_PhunMart_Wiz_Lbl_Unpowered"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Unpowered"),
+        group = "w_look",
+        conditional = true,
+        validate = function(value, f)
+            if not isOther(f:getFieldValue("appearance")) then
+                return nil
+            end
+            local n = #parseCsv(value)
+            if n > 0 and n ~= 4 then
+                return getText("IGUI_PhunMart_Wiz_Err_FourTiles", tostring(n))
+            end
+        end
+    })
+    -- Shown whatever the choice: the point of a preview is to confirm the set
+    -- is the one you meant, which matters most when you typed the names.
     form:addImageField("spritePreview", getText("IGUI_PhunMart_Wiz_Lbl_Preview"), {
         group = "w_look",
         images = function()
@@ -429,27 +444,6 @@ function ShopWizard.open(player, onDone)
             return out
         end
     })
-    for i = 1, 4 do
-        form:addTextField("sprites" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_SpriteN", getText(FACINGS[i])), {
-            default = "",
-            hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Sprites") or nil,
-            group = "w_look",
-            conditional = true,
-            validate = function(value, f)
-                if isOther(f:getFieldValue("appearance")) and value == "" then
-                    return getText("IGUI_PhunMart_Err_Required")
-                end
-            end
-        })
-    end
-    for i = 1, 4 do
-        form:addTextField("unpowered" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_UnpoweredN", getText(FACINGS[i])), {
-            default = "",
-            hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Unpowered") or nil,
-            group = "w_look",
-            conditional = true
-        })
-    end
     form:addComboField("background", getText("IGUI_PhunMart_Wiz_Lbl_Background"), {
         options = backgrounds,
         selected = backgrounds[1],
@@ -550,12 +544,9 @@ function ShopWizard.open(player, onDone)
     -- Nothing starts on Other, so none of the fields it reveals should be on
     -- screen. They stay hidden until a combo asks for them, and stepping leaves
     -- that decision alone.
-    form:setFieldVisible("categoryOther", false)
     form:setFieldVisible("backgroundOther", false)
-    for i = 1, 4 do
-        form:setFieldVisible("sprites" .. tostring(i), false)
-        form:setFieldVisible("unpowered" .. tostring(i), false)
-    end
+    form:setFieldVisible("spritesCsv", false)
+    form:setFieldVisible("unpoweredCsv", false)
 
     form:initialise()
     form:addToUIManager()
