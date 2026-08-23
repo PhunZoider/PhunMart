@@ -127,6 +127,37 @@ end
 -- -----------------------------
 -- defsTable: map[key] = entry
 -- returns: mergedEntry, traceKeys (child->...->root)
+--- Merge a child's actions over its parent's, element by element.
+---
+--- deepMerge replaces a sequence wholesale, which is right nearly everywhere:
+--- a child saying "my blacklist is these three" must not inherit the parent's.
+--- Actions are the exception. Without this a base can only carry the parts of a
+--- definition that are not the action, so every variant has to repeat the
+--- action type and its arguments in full. That is why the shipped XP rewards
+--- each restate `type = "giveXP"` a hundred and five times.
+---
+--- The child decides how many actions there are: declaring fewer than the
+--- parent means fewer, not "the rest are inherited". Only the shape of each one
+--- is shared.
+local function mergeActions(parentActions, childActions)
+    if type(childActions) ~= "table" then
+        return parentActions
+    end
+    if type(parentActions) ~= "table" then
+        return childActions
+    end
+    local out = {}
+    for i = 1, #childActions do
+        local c, p = childActions[i], parentActions[i]
+        if type(c) == "table" and type(p) == "table" then
+            out[i] = deepMerge(p, c)
+        else
+            out[i] = c
+        end
+    end
+    return out
+end
+
 local function resolveWithInheritance(defsTable, key, logger)
     local visited = {}
     local trace = {}
@@ -160,6 +191,18 @@ local function resolveWithInheritance(defsTable, key, logger)
             end
             -- parent first, then child overrides
             local merged = deepMerge(parentResolved, entry)
+
+            -- Actions merge per element instead of being replaced wholesale.
+            -- No shipped definition is affected: every inherit target is a
+            -- template and no template declares actions, so the child's list
+            -- has always been the only one present. Warn when both sides have
+            -- them, because that combination did not previously merge and an
+            -- override relying on the old behaviour would want to know.
+            if type(parentResolved.actions) == "table" and type(entry.actions) == "table" then
+                logger:warn("'" .. tostring(k) .. "' and its parent '" .. tostring(parentKey) ..
+                                "' both define actions; they now merge per action rather than the child replacing the parent")
+            end
+            merged.actions = mergeActions(parentResolved.actions, entry.actions)
 
             -- template should NOT inherit; only explicit on the child
             merged.template = (entry.template == true)
