@@ -572,11 +572,15 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         numeric = true,
         min = 0
     })
+    -- Not required, because nothing reads it. grantReward's applyBoost branch
+    -- calls setPerkBoost(perk, level) and never looks at hours, so a boost
+    -- lasts as long as the game decides. Kept as a field because the shipped
+    -- data carries it and dropping it would discard the intent, but demanding
+    -- a number for something inert was the wrong thing to ask.
     form:addTextField("boostHours", getText("IGUI_PhunMart_Lbl_BoostHours"), {
         default = (curAction and curAction.hours) and tostring(curAction.hours) or "",
         hint = getText("IGUI_PhunMart_Hint_BoostHours"),
         group = "act_boost",
-        required = true,
         numeric = true,
         min = 0
     })

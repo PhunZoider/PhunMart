@@ -413,7 +413,7 @@
   "IGUI_PhunMart_Hint_Skill": "Perk name as the game spells it, e.g. Cooking or Aiming",
   "IGUI_PhunMart_Hint_XPAmount": "XP granted on purchase",
   "IGUI_PhunMart_Hint_BoostMultiplier": "XP rate multiplier while the boost lasts",
-  "IGUI_PhunMart_Hint_BoostHours": "In-game hours the boost lasts",
+  "IGUI_PhunMart_Hint_BoostHours": "Optional. Nothing reads this yet; the game decides how long a boost lasts",
   "IGUI_PhunMart_Hint_Label": "Display name for this group's category in the shop UI",
   "IGUI_PhunMart_Hint_RollMode": "How to choose items in pool",
   "IGUI_PhunMart_Hint_RollMin": "Minimum number of items per restock",
