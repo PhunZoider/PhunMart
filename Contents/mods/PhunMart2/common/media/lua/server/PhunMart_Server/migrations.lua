@@ -14,13 +14,17 @@ end
 -- with the same lifetime, rather than in ModData. ModData is per save, while
 -- these files are shared by every save on the machine, and a version that
 -- outlives or under-lives the thing it describes is worse than none.
+--
+-- The stamp is one key in the shared state file rather than a file of its own,
+-- because it will not be the only thing that wants this scope.
 
 local Core = PhunMart
 local fileUtils = require "PhunMart_Server/utils_file"
+local State = require "PhunMart_Server/state"
 
 local Migrations = {}
 
-local VERSION_FILE = "PhunMart_Version.txt"
+local VERSION_KEY = "overrideVersion"
 
 --- Bump this when adding a migration. A file stamped lower than this runs
 --- everything above its stamp, in order.
@@ -98,9 +102,7 @@ local function everyOverrideFile()
 end
 
 local function stamp(version)
-    fileUtils.saveTable(VERSION_FILE, {
-        version = version
-    })
+    State.set(VERSION_KEY, version)
 end
 
 --- Everything as it was before we touched it, in one file rather than a .bak
@@ -128,8 +130,7 @@ function Migrations.run()
     end
     Migrations._done = true
 
-    local stored = fileUtils.loadTable(VERSION_FILE)
-    local from = stored and tonumber(stored.version) or nil
+    local from = tonumber(State.get(VERSION_KEY))
 
     local files, hasOverrides = {}, false
     for _, name in ipairs(everyOverrideFile()) do
