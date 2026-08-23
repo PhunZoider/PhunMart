@@ -261,9 +261,9 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
             result.sticky = f:getFieldValue("sticky") and true or nil
 
-            -- Written explicitly rather than only on false, so re-enabling is a
-            -- real change the override layer can carry.
-            result.enabled = f:getFieldValue("enabled") and true or false
+            -- Only written when disabled; absent already means enabled.
+            -- Clearing the key tombstones it, so re-enabling still carries.
+            result.enabled = f:getFieldValue("enabled") and nil or false
 
             -- Cleared rather than stored empty, so an unnamed definition does
             -- not carry the key at all and falls back to showing its key.

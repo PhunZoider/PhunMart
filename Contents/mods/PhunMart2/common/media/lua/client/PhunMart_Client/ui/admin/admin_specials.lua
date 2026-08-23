@@ -454,7 +454,6 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     elseif actionType == "applyBoost" then
                         action.skill = trim(f:getFieldValue("boostSkill"))
                         action.multiplier = f:getFieldNumber("boostMultiplier")
-                        action.hours = f:getFieldNumber("boostHours")
                     elseif actionType == "spawnVehicle" then
                         local scripts = f:getFieldValue("vehicleScripts") or {}
                         if #scripts > 1 then
@@ -512,9 +511,9 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     result.offer = nil
                 end
 
-                -- Written explicitly rather than only on false, so re-enabling is
-                -- a real change the override layer can carry.
-                result.enabled = f:getFieldValue("enabled") and true or false
+                -- Only written when disabled; absent already means enabled.
+                -- Clearing the key tombstones it, so re-enabling still carries.
+                result.enabled = f:getFieldValue("enabled") and nil or false
 
                 -- Template-only shape doesn't belong on an instance.
                 result.kind = nil
@@ -694,13 +693,6 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- lasts as long as the game decides. Kept as a field because the shipped
     -- data carries it and dropping it would discard the intent, but demanding
     -- a number for something inert was the wrong thing to ask.
-    form:addTextField("boostHours", getText("IGUI_PhunMart_Lbl_BoostHours"), {
-        default = (curAction and curAction.hours) and tostring(curAction.hours) or "",
-        hint = getText("IGUI_PhunMart_Hint_BoostHours"),
-        group = "act_boost",
-        numeric = true,
-        min = 0
-    })
     -- A picker rather than free text. Script names are not guessable, a typo
     -- here silently disables the offer at compile time, and there was no list
     -- of valid ones anywhere in the UI.

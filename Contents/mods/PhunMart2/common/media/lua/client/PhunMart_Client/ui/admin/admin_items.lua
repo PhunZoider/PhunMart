@@ -114,9 +114,9 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
                 result.offer.stock = nil
             end
 
-            -- Written explicitly rather than only on false, so re-enabling is a
-            -- real change the override layer can carry.
-            result.enabled = f:getFieldValue("enabled") and true or false
+            -- Only written when disabled; absent already means enabled.
+            -- Clearing the key tombstones it, so re-enabling still carries.
+            result.enabled = f:getFieldValue("enabled") and nil or false
 
             -- Cleared rather than written false, so an ordinary entry does not
             -- carry a key it has no use for.

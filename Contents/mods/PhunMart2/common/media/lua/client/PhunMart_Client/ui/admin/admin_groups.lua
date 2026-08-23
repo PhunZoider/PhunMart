@@ -261,9 +261,12 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             result.blacklist = #selectedBlItems > 0 and selectedBlItems or nil
             result.blacklistCategories = #selectedBlCats > 0 and selectedBlCats or nil
 
-            -- Written explicitly rather than only on false, so re-enabling is a
-            -- real change the override layer can carry.
-            result.enabled = f:getFieldValue("enabled") and true or false
+            -- Only written when disabled. Absent already means enabled, so
+            -- writing true put a key in the override that said nothing and
+            -- differed from a default that simply omits it. Re-enabling still
+            -- carries: clearing the key tombstones it, which strips whatever
+            -- was underneath and restores the implicit true.
+            result.enabled = f:getFieldValue("enabled") and nil or false
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil

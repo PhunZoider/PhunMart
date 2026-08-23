@@ -306,7 +306,9 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             -- and tombstones what we clear below.
             local result = Core.utils.deepCopy(preserveBase or {})
 
-            result.enabled = f:getFieldValue("enabled") and true or false
+            -- Only written when disabled; absent already means enabled. Clearing the
+    -- key tombstones it, so re-enabling still carries.
+    result.enabled = f:getFieldValue("enabled") and nil or false
             result.probability = f:getFieldNumber("probability")
             result.minDistance = f:getFieldNumber("minDistance")
             result.restockFrequency = f:getFieldNumber("restockFrequency")

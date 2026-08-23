@@ -71,15 +71,13 @@ return {
                 restockHours = 48
             }
         },
+        -- No hours here, deliberately. It used to sit on 34 of the 35 tier one
+        -- boosts and on none of the tiers above, and nothing ever read it:
+        -- grantReward's applyBoost branch calls setPerkBoost(perk, level) and
+        -- the game decides how long a boost lasts.
         actions = {{
             type = "applyBoost",
-            multiplier = 1,
-            -- Nothing reads this. grantReward's applyBoost branch calls
-            -- setPerkBoost(perk, level) and the game decides how long a boost
-            -- lasts. Kept because it records an intent, not because it works:
-            -- 34 of the 35 tier one boosts carried it and the tiers above
-            -- carried none, which is what a value nobody consumes looks like.
-            hours = 24
+            multiplier = 1
         }}
     },
     boost_reward_t2_base = {

@@ -104,6 +104,29 @@ end
 --- table (see utils.deepCopy) rather than only the fields they manage, or the
 --- unmanaged ones will be unset.
 --- Returns nil if there are no differences.
+--- Structural equality. Lua compares tables by identity, so two tables holding
+--- the same things are never equal to each other, which is not what anyone
+--- diffing configuration means by "unchanged".
+function utils.deepEquals(a, b)
+    if a == b then
+        return true
+    end
+    if type(a) ~= "table" or type(b) ~= "table" then
+        return false
+    end
+    for k, v in pairs(a) do
+        if not utils.deepEquals(v, b[k]) then
+            return false
+        end
+    end
+    for k in pairs(b) do
+        if a[k] == nil then
+            return false
+        end
+    end
+    return true
+end
+
 function utils.diffTable(original, edited)
     if original == nil then
         return utils.shallowClone(edited)
@@ -123,8 +146,14 @@ function utils.diffTable(original, edited)
         if #original ~= #edited then
             return utils.shallowClone(edited)
         end
+        -- Compared structurally, not by identity. A list of tables, which is
+        -- what actions, price items and shop pool sets all are, could never
+        -- match itself under ==, so every save wrote the list back into the
+        -- override whether or not anything had changed. That is noise at best,
+        -- and at worst it freezes a value against a later change to the
+        -- defaults it was copied from.
         for i = 1, #original do
-            if original[i] ~= edited[i] then
+            if not utils.deepEquals(original[i], edited[i]) then
                 return utils.shallowClone(edited)
             end
         end
