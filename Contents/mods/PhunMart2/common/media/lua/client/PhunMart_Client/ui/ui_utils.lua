@@ -263,4 +263,57 @@ function tools.resolvePriceField(priceDef, field, depth)
     return tools.resolvePriceField(parent, field, (depth or 0) + 1)
 end
 
+--- Resolve a definition through its `inherit` chain, the way the compiler
+--- does, so an editor can show what a row actually resolves to rather than
+--- only what it stores.
+---
+--- This matters because a child may store almost nothing. After the XP and
+--- boost templates took on what their variants share, a child holds a skill
+--- name and little else, and a form reading the raw table sees blanks where
+--- there are real values. Worse, a combo cannot show a blank: it falls to its
+--- first option, and saving then writes that over the inherited answer.
+---
+--- Actions merge per element, matching mergeActions in compiler.lua, so a base
+--- carrying `type` and a child carrying `skill` come back as one whole action.
+function tools.resolveInherited(defs, key, depth)
+    local def = defs and defs[key]
+    if type(def) ~= "table" then
+        return nil
+    end
+    if not def.inherit or (depth or 0) >= 20 then
+        return Core.utils.deepCopy(def)
+    end
+    local parent = tools.resolveInherited(defs, def.inherit, (depth or 0) + 1)
+    if not parent then
+        return Core.utils.deepCopy(def)
+    end
+
+    local merged = Core.utils.deepMerge(parent, def)
+    if type(parent.actions) == "table" and type(def.actions) == "table" then
+        local acts = {}
+        for i = 1, #def.actions do
+            local c, p = def.actions[i], parent.actions[i]
+            if type(c) == "table" and type(p) == "table" then
+                acts[i] = Core.utils.deepMerge(p, c)
+            else
+                acts[i] = Core.utils.deepCopy(c)
+            end
+        end
+        merged.actions = acts
+    end
+    -- template is never inherited; only what the child itself declares.
+    merged.template = (def.template == true)
+    return merged
+end
+
+--- The resolved parent of `def`, or nil when it has none. What a child would
+--- be if it declared nothing at all, which is the yardstick for telling
+--- whether a value on a form is the child's own or borrowed.
+function tools.resolveParent(defs, def)
+    if not def or not def.inherit then
+        return nil
+    end
+    return tools.resolveInherited(defs, def.inherit)
+end
+
 return tools

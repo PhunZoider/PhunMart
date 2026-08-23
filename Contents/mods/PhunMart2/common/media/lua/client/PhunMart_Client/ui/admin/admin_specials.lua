@@ -10,6 +10,7 @@ local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local VehiclePicker = require "PhunMart_Client/ui/base/vehicle_picker"
 local Traits = require "PhunMart/traits"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -229,9 +230,101 @@ local function getPriceKeys()
     return keys
 end
 
+local function sameValue(a, b)
+    if type(a) ~= type(b) then
+        return false
+    end
+    if type(a) ~= "table" then
+        return a == b
+    end
+    for k, v in pairs(a) do
+        if not sameValue(v, b[k]) then
+            return false
+        end
+    end
+    for k in pairs(b) do
+        if a[k] == nil then
+            return false
+        end
+    end
+    return true
+end
+
+local function isEmptyTable(t)
+    for _ in pairs(t) do
+        return false
+    end
+    return true
+end
+
+--- Strip from `node` anything `parentNode` already provides, so a child keeps
+--- only what makes it different.
+---
+--- The form shows resolved values, which means it hands back inherited ones
+--- too. Writing those onto the child would freeze them: change the template
+--- later and this one entry would stop following it, which is the opposite of
+--- why the templates exist.
+---
+--- Maps are walked key by key. Comparing a whole `display` would never match,
+--- since the parent holds a texture and the child a text, and the child would
+--- come away with a copy of the parent's texture.
+local function pruneInherited(node, parentNode)
+    if type(node) ~= "table" or type(parentNode) ~= "table" then
+        return
+    end
+    for k, v in pairs(node) do
+        local pv = parentNode[k]
+        if pv ~= nil then
+            if type(v) == "table" and type(pv) == "table" and not Core.utils.isSequence(v) and
+                not Core.utils.isSequence(pv) then
+                pruneInherited(v, pv)
+                if isEmptyTable(v) then
+                    node[k] = nil
+                end
+            elseif sameValue(v, pv) then
+                node[k] = nil
+            end
+        end
+    end
+end
+
 local function createEditModal(specialKey, specialDef, isNew, cb)
-    local def = specialDef or {}
-    local isTpl = def.template or false
+    local raw = specialDef or {}
+    local isTpl = raw.template or false
+
+    -- Two views of the same row. `raw` is what this entry stores; `def` is what
+    -- it resolves to once its template has been folded in. The form reads the
+    -- resolved one, because a child of a template stores a skill name and
+    -- almost nothing else, and a form fed the raw table shows blanks where
+    -- there are real values. A combo cannot show a blank at all: it falls to
+    -- its first option, so editing a boost offered addTrait and saving wrote
+    -- that over the inherited action.
+    local allSpecials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local def = (specialKey and tools.resolveInherited(allSpecials, specialKey)) or raw
+    -- What this entry would be if it declared nothing: the yardstick for
+    -- deciding, on save, whether a value is its own or borrowed.
+    local parentDef = tools.resolveParent(allSpecials, raw)
+
+    -- Marks a hint when the value shown came from the template rather than
+    -- from this entry. Without it the form looks like every field belongs to
+    -- the row, and there is no way to tell what editing one would actually
+    -- change.
+    local function hint(key, path, actionField)
+        local text = getText(key)
+        if not parentDef then
+            return text
+        end
+        local own
+        if actionField then
+            own = raw.actions and raw.actions[1] and raw.actions[1][actionField] ~= nil
+        else
+            own = raw[path] ~= nil
+        end
+        if own then
+            return text
+        end
+        return text .. " " .. getText("IGUI_PhunMart_Lbl_FromTemplate", tostring(raw.inherit))
+    end
 
     -- Each action type reads its own fields off the stored action, rather than
     -- everything being flattened into one string.
@@ -292,9 +385,10 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         onApply = function(f)
             local key = f:getFieldValue("key")
 
-            -- Start from the existing definition so anything this form doesn't
-            -- model survives the round trip; diffTable drops what's unchanged.
-            local result = Core.utils.deepCopy(def)
+            -- Start from what this entry stores, not from what it resolves to.
+            -- Copying the resolved view would bake every inherited value into
+            -- the child on the first save.
+            local result = Core.utils.deepCopy(raw)
             local tpl = f:getFieldValue("template")
 
             if tpl then
@@ -430,6 +524,29 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
 
+            -- Give back everything the parent already provides. Actions go
+            -- first and element by element, because the sequence as a whole
+            -- rarely matches and the child would otherwise keep a copy of the
+            -- type and amount it only borrowed.
+            if parentDef then
+                if type(result.actions) == "table" and type(parentDef.actions) == "table" then
+                    local anyLeft = false
+                    for i, act in ipairs(result.actions) do
+                        local pact = parentDef.actions[i]
+                        if type(act) == "table" and type(pact) == "table" then
+                            pruneInherited(act, pact)
+                        end
+                        if type(act) ~= "table" or not isEmptyTable(act) then
+                            anyLeft = true
+                        end
+                    end
+                    if not anyLeft then
+                        result.actions = nil
+                    end
+                end
+                pruneInherited(result, parentDef)
+            end
+
             if cb then
                 cb(key, result)
             end
@@ -552,7 +669,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     })
     form:addTextField("xpAmount", getText("IGUI_PhunMart_Lbl_XPAmount"), {
         default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
-        hint = getText("IGUI_PhunMart_Hint_XPAmount"),
+        hint = hint("IGUI_PhunMart_Hint_XPAmount", nil, "amount"),
         group = "act_xp",
         required = true,
         numeric = true,
@@ -566,7 +683,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     })
     form:addTextField("boostMultiplier", getText("IGUI_PhunMart_Lbl_BoostMultiplier"), {
         default = (curAction and curAction.multiplier) and tostring(curAction.multiplier) or "",
-        hint = getText("IGUI_PhunMart_Hint_BoostMultiplier"),
+        hint = hint("IGUI_PhunMart_Hint_BoostMultiplier", nil, "multiplier"),
         group = "act_boost",
         required = true,
         numeric = true,
@@ -647,11 +764,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
         selected = def.price or "",
+        hint = hint("IGUI_PhunMart_Hint_PriceOverride", "price"),
         group = "instance"
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
-        hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
+        hint = hint("IGUI_PhunMart_Hint_WeightOverride", "offer"),
         group = "instance",
         numeric = true,
         min = 0

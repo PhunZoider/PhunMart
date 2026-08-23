@@ -74,6 +74,11 @@ return {
         actions = {{
             type = "applyBoost",
             multiplier = 1,
+            -- Nothing reads this. grantReward's applyBoost branch calls
+            -- setPerkBoost(perk, level) and the game decides how long a boost
+            -- lasts. Kept because it records an intent, not because it works:
+            -- 34 of the 35 tier one boosts carried it and the tiers above
+            -- carried none, which is what a value nobody consumes looks like.
             hours = 24
         }}
     },

@@ -423,6 +423,8 @@
   "IGUI_PhunMart_Hint_FixedAmount": "Leave blank for fixed amount",
   "IGUI_PhunMart_Hint_UnlimitedStock": "Leave blank for unlimited stock",
   "IGUI_PhunMart_Hint_OptionalDefault": "(optional) Leave blank for default",
+  "IGUI_PhunMart_Lbl_FromTemplate": "(from %1)",
+  "IGUI_PhunMart_Hint_PriceOverride": "What it costs. Leave as it is to follow the template",
   "IGUI_PhunMart_Hint_WeightOverride": "(optional) weight: how often this appears. Higher is more common",
   "IGUI_PhunMart_Hint_DisplayCategories": "Comma-separated display categories",
   "IGUI_PhunMart_Hint_ItemIDs": "Comma-separated item IDs (%1 current)",
