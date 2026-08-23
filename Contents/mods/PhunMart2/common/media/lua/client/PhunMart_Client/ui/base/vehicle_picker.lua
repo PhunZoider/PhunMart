@@ -15,6 +15,41 @@ local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 
 local VehiclePicker = ItemPicker:derive("PhunMartVehiclePicker")
 
+-- Vehicle labels are not unique. Van and VanSeats are both "Franklin
+-- Valuline", so a field listing both reads as the same vehicle twice and a
+-- picker offers two identical rows. Only the colliding labels get their script
+-- name appended, so the common case stays clean.
+local ambiguousLabels = nil
+
+local function buildAmbiguity()
+    ambiguousLabels = {}
+    local counts = {}
+    for _, v in ipairs(Core.getAllVehicles() or {}) do
+        local l = v.label or ""
+        counts[l] = (counts[l] or 0) + 1
+    end
+    for l, n in pairs(counts) do
+        if n > 1 then
+            ambiguousLabels[l] = true
+        end
+    end
+end
+
+--- Display name for a vehicle script, disambiguated only when it needs to be.
+function VehiclePicker.labelFor(key)
+    if not key or key == "" then
+        return ""
+    end
+    if not ambiguousLabels then
+        buildAmbiguity()
+    end
+    local label = (Core.getVehicleLabel and Core.getVehicleLabel(key)) or key
+    if ambiguousLabels[label] then
+        return label .. " (" .. key .. ")"
+    end
+    return label
+end
+
 function VehiclePicker:populateItems()
     -- No icons: vehicle scripts have no inventory texture, and a column of
     -- empty placeholders reads as broken artwork rather than as absence.
@@ -32,7 +67,7 @@ function VehiclePicker:populateItems()
             key = bare
         end
 
-        self:addPickerItem(key, v.label or key, {
+        self:addPickerItem(key, VehiclePicker.labelFor(key), {
             category = v.category
         })
         if v.category and v.category ~= "" then

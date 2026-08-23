@@ -97,7 +97,7 @@ local function formatVehicleList(keys)
     local names = {}
     local limit = math.min(#keys, 3)
     for i = 1, limit do
-        names[i] = Core.getVehicleLabel and Core.getVehicleLabel(keys[i]) or keys[i]
+        names[i] = VehiclePicker.labelFor(keys[i])
     end
     local text = table.concat(names, ", ")
     if #keys > limit then
