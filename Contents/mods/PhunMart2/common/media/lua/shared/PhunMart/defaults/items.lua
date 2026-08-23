@@ -4,6 +4,21 @@ return {
     -- VEHICLE OFFER ITEMS
     -- stock=1 with long restock keeps vehicles feeling rare
     -- =========================================================
+    --
+    -- These exist to put one vehicle in a different CLASS from the rest of its
+    -- group: CarStationWagon leaves the small-car class, PickUpTruck leaves the
+    -- van class. See the comment above the vehicles_* groups in groups.lua for
+    -- what a class supplies and what it does not.
+    --
+    -- The entries below that name the same reward their group already defaults
+    -- to, SmallCar and SmallCar02 among them, are doing nothing. They are left
+    -- alone only because removing a shipped default is a migration rather than
+    -- a deletion.
+    --
+    -- Every entry in this file is a vehicle, which makes the tab look like a
+    -- vehicle mapping table. It is not. An item override adjusts the price,
+    -- weight or stock of any single item an offer is built from, most usefully
+    -- one a group pulled in by category, and nothing shipped demonstrates that.
 
     SmallCar = {
         price = "vehicle_common",

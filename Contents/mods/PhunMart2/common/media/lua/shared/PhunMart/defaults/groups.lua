@@ -519,6 +519,35 @@ return {
     -- =========================================================
     -- WrentAWreck  (vehicles - clean only, no smashed/burnt/trailers)
     -- =========================================================
+    --
+    -- Vehicles work differently from everything else here, and it is not
+    -- obvious from either end, so:
+    --
+    -- The strings in `items` below are vehicle SCRIPT names, not inventory
+    -- item types. Nothing validates them (compiler.lua only checks keys
+    -- containing a dot, and these have none) and the item picker cannot show
+    -- them, because getAllItems() has no vehicles in it. The Groups editor
+    -- offers a separate Vehicles field for exactly this reason.
+    --
+    -- `defaults.reward` names a CLASS of vehicle offer, not the vehicle. The
+    -- special it points at supplies the price, the display name, and the
+    -- condition and fuel ranges. It also carries a script list, which is
+    -- almost always ignored, because two places deliberately prefer the offer's
+    -- own key over it:
+    --
+    --   server/main.lua      grantReward() spawns context.offerItem when it is
+    --                        a real script, so buying VanMail gives a VanMail
+    --                        and not whatever vehicle_van lists.
+    --   client/ui_utils.lua  the offer label is getVehicleLabel(offer.item),
+    --                        so each row is named after its own vehicle.
+    --
+    -- So a script needs an entry in items.lua only to move it to a DIFFERENT
+    -- class, the way CarStationWagon leaves the small-car class. Adding a new
+    -- vehicle to an existing class is one string in the list below.
+    --
+    -- Replacing all of this with one special per vehicle inheriting a class
+    -- template was considered and parked. If it is ever revisited, the agreed
+    -- key format is vehicle_<ScriptName>.
 
     -- Budget tier: small cars (gold 5-10)
     vehicles_small = {
