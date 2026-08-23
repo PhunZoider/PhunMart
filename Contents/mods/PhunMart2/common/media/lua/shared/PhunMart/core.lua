@@ -731,6 +731,20 @@ Core.defaultPaths = {
     shops = {"PhunMart/defaults/shops"}
 }
 
+--- Which files on disk hold the overrides for each category. Server-side only
+--- in practice, but declared here beside defaultPaths because two things now
+--- need the same list: the compile that reads them, and the migrations that
+--- rewrite them. Having it in one place is what stops those two disagreeing.
+Core.overridePaths = {
+    prices = {"PhunMart_Prices.txt"},
+    specials = {"PhunMart_Specials.txt", "PhunMart_XP_Rewards.txt"},
+    conditionsDefs = {"PhunMart_Conditions.txt", "PhunMart_XP_Conditions.txt"},
+    items = {"PhunMart_Items.txt", "PhunMart_XP_Items.txt"},
+    groups = {"PhunMart_Groups.txt"},
+    pools = {"PhunMart_Pools.txt"},
+    shops = {"PhunMart_Shops.txt"}
+}
+
 --- True when `key` is defined by the mod's own defaults for `kind`.
 --- Such a key can be disabled but never deleted: the override layer sits on top
 --- of the defaults, so removing the override just restores the shipped version.

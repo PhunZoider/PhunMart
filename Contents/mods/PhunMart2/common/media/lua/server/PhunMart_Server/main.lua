@@ -3,6 +3,7 @@ if isClient() then
 end
 local Core = PhunMart
 Core.fileUtils = require "PhunMart_Server/utils_file"
+local Migrations = require "PhunMart_Server/migrations"
 Core.instances = {}
 
 -- Load an optional server-side override file from disk. Returns {} if absent.
@@ -23,18 +24,17 @@ local function overridePatch(filenames)
 end
 
 function Core.compile()
+    -- Bring the override files up to date before reading them. Does its work at
+    -- most once per session, so the recompile on every save costs nothing.
+    Migrations.run()
+
     -- Read server override files and store the patch tables.
     -- These are sent to clients via requestShopDefs so they can recompile locally
     -- using their own shared defaults + these overrides (no FS access on clients).
-    local overrides = {
-        prices = overridePatch({"PhunMart_Prices.txt"}),
-        specials = overridePatch({"PhunMart_Specials.txt", "PhunMart_XP_Rewards.txt"}),
-        conditionsDefs = overridePatch({"PhunMart_Conditions.txt", "PhunMart_XP_Conditions.txt"}),
-        items = overridePatch({"PhunMart_Items.txt", "PhunMart_XP_Items.txt"}),
-        groups = overridePatch({"PhunMart_Groups.txt"}),
-        pools = overridePatch({"PhunMart_Pools.txt"}),
-        shops = overridePatch({"PhunMart_Shops.txt"})
-    }
+    local overrides = {}
+    for kind, filenames in pairs(Core.overridePaths) do
+        overrides[kind] = overridePatch(filenames)
+    end
     Core._lastOverrides = overrides
     return Core.compileWith(overrides)
 end
