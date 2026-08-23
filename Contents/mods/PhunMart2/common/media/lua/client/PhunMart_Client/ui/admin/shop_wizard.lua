@@ -146,6 +146,20 @@ local function priceOptions()
     return opts
 end
 
+--- Which price to start on. Alphabetical order put animals_cheap first, which
+--- is a strange thing to suggest as a shop's default. currency_mid is the
+--- middle of the shipped ladder and the least surprising starting point.
+local function defaultPrice(prices)
+    for _, preferred in ipairs({"currency_mid", "currency_low", "currency_base"}) do
+        for _, k in ipairs(prices) do
+            if k == preferred then
+                return k
+            end
+        end
+    end
+    return prices[1]
+end
+
 ---------------------------------------------------------------------------
 -- Creation
 ---------------------------------------------------------------------------
@@ -178,7 +192,6 @@ local function create(values)
         }
     })
 
-    local powered, unpowered = spritesFrom(values.firstTile)
     sendClientCommand(Core.name, Core.commands.upsertShopDefinition, {
         type = key,
         title = values.name,
@@ -186,8 +199,13 @@ local function create(values)
         probability = values.probability,
         minDistance = values.minDistance,
         background = values.background,
-        sprites = powered,
-        unpoweredSprites = unpowered,
+        sprites = values.sprites,
+        -- Left off entirely when there are none. A machine that does not need
+        -- power has nothing to draw in its unpowered state, and an empty list
+        -- would be stored as a real, wrong answer.
+        unpoweredSprites = (values.unpoweredSprites and #values.unpoweredSprites > 0) and values.unpoweredSprites or
+            nil,
+        restockFrequency = values.restockFrequency,
         roll = {
             mode = "weighted",
             count = {
@@ -209,6 +227,47 @@ local function create(values)
 end
 
 ---------------------------------------------------------------------------
+-- Reading the form
+---------------------------------------------------------------------------
+
+-- Every dropdown here ends with this, so an admin shipping their own tileset
+-- or artwork is not limited to what happens to be in the base mod.
+local OTHER = "IGUI_PhunMart_Wiz_Other"
+
+local function isOther(value)
+    return value == getText(OTHER)
+end
+
+--- A combo's value, unless it is the Other entry, in which case whatever was
+--- typed into the companion field.
+local function pickOrCustom(form, comboKey, textKey)
+    local chosen = form:getFieldValue(comboKey)
+    if isOther(chosen) then
+        local typed = form:getFieldValue(textKey)
+        return (typed ~= "") and typed or nil
+    end
+    return chosen
+end
+
+--- The four tile names for one state of the machine. A named set expands from
+--- its first tile; Other reads four fields typed by hand, and returns however
+--- many were filled in, since unpowered art is optional.
+local function chosenSprites(form, tileByLabel, which)
+    if isOther(form:getFieldValue("appearance")) then
+        local out = {}
+        for i = 1, 4 do
+            local v = form:getFieldValue(which .. tostring(i))
+            if v and v ~= "" then
+                table.insert(out, v)
+            end
+        end
+        return out
+    end
+    local powered, unpowered = spritesFrom(tileByLabel[form:getFieldValue("appearance")] or "phunmart_01_0")
+    return which == "sprites" and powered or unpowered
+end
+
+---------------------------------------------------------------------------
 -- The form
 ---------------------------------------------------------------------------
 
@@ -219,6 +278,13 @@ function ShopWizard.open(player, onDone)
     local categories = categoryOptions()
     local prices = priceOptions()
 
+    -- Last on every list, so what already exists reads as the suggestion and
+    -- bringing your own is the deliberate choice rather than the first thing
+    -- you trip over.
+    table.insert(appearances, getText(OTHER))
+    table.insert(backgrounds, getText(OTHER))
+    table.insert(categories, getText(OTHER))
+
     local form
     form = FormPanel:new({
         width = math.floor(420 * FONT_SCALE),
@@ -228,12 +294,14 @@ function ShopWizard.open(player, onDone)
             local groupKey = create({
                 key = keyFromName(name),
                 name = name,
-                category = f:getFieldValue("category"),
+                category = pickOrCustom(f, "category", "categoryOther"),
                 probability = math.floor(f:getFieldNumber("probability") or 15),
-                minDistance = f:getFieldNumber("minDistance") or 300,
-                background = f:getFieldValue("background"),
-                firstTile = tileByLabel[f:getFieldValue("appearance")] or "phunmart_01_0",
+                minDistance = f:getFieldNumber("minDistance"),
+                background = pickOrCustom(f, "background", "backgroundOther"),
+                sprites = chosenSprites(f, tileByLabel, "sprites"),
+                unpoweredSprites = chosenSprites(f, tileByLabel, "unpowered"),
                 price = f:getFieldValue("price"),
+                restockFrequency = f:getFieldNumber("restockFrequency"),
                 rollMin = math.floor(f:getFieldNumber("rollMin") or 4),
                 rollMax = math.floor(f:getFieldNumber("rollMax") or 8)
             })
@@ -272,7 +340,16 @@ function ShopWizard.open(player, onDone)
         options = categories,
         selected = categories[1],
         hint = getText("IGUI_PhunMart_Wiz_Hint_Category"),
-        group = "w_name"
+        group = "w_name",
+        onChange = function(f)
+            f:setFieldVisible("categoryOther", isOther(f:getFieldValue("category")))
+        end
+    })
+    form:addTextField("categoryOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_CategoryOther"),
+        group = "w_name",
+        conditional = true
     })
 
     ---------------------------------------------------------------- step 2
@@ -284,13 +361,53 @@ function ShopWizard.open(player, onDone)
         options = appearances,
         selected = appearances[1],
         hint = getText("IGUI_PhunMart_Wiz_Hint_Appearance"),
-        group = "w_look"
+        group = "w_look",
+        onChange = function(f)
+            local other = isOther(f:getFieldValue("appearance"))
+            for i = 1, 4 do
+                f:setFieldVisible("sprites" .. tostring(i), other)
+                f:setFieldVisible("unpowered" .. tostring(i), other)
+            end
+        end
     })
+    -- Eight fields for an admin who has packed their own tileset. Only the
+    -- powered four are required: a machine that needs no power has no unpowered
+    -- state to draw.
+    for i = 1, 4 do
+        form:addTextField("sprites" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_SpriteN", tostring(i)), {
+            default = "",
+            hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Sprites") or nil,
+            group = "w_look",
+            conditional = true,
+            validate = function(value, f)
+                if isOther(f:getFieldValue("appearance")) and value == "" then
+                    return getText("IGUI_PhunMart_Err_Required")
+                end
+            end
+        })
+    end
+    for i = 1, 4 do
+        form:addTextField("unpowered" .. tostring(i), getText("IGUI_PhunMart_Wiz_Lbl_UnpoweredN", tostring(i)), {
+            default = "",
+            hint = i == 1 and getText("IGUI_PhunMart_Wiz_Hint_Unpowered") or nil,
+            group = "w_look",
+            conditional = true
+        })
+    end
     form:addComboField("background", getText("IGUI_PhunMart_Wiz_Lbl_Background"), {
         options = backgrounds,
         selected = backgrounds[1],
         hint = getText("IGUI_PhunMart_Wiz_Hint_Background"),
-        group = "w_look"
+        group = "w_look",
+        onChange = function(f)
+            f:setFieldVisible("backgroundOther", isOther(f:getFieldValue("background")))
+        end
+    })
+    form:addTextField("backgroundOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_BackgroundOther"),
+        group = "w_look",
+        conditional = true
     })
 
     ---------------------------------------------------------------- step 3
@@ -309,8 +426,13 @@ function ShopWizard.open(player, onDone)
         integer = true,
         min = 0
     })
+    -- Compared against other machines of this same type only.
+    -- getInstanceDistancesFrom keys by shop type, so category has nothing to do
+    -- with it. Blank rather than 300, because blank falls back to the
+    -- DefaultDistance sandbox setting, which is the better answer until someone
+    -- has a reason to differ from it.
     form:addTextField("minDistance", getText("IGUI_PhunMart_Wiz_Lbl_MinDistance"), {
-        default = "300",
+        default = "",
         hint = getText("IGUI_PhunMart_Wiz_Hint_MinDistance"),
         group = "w_world",
         integer = true,
@@ -324,9 +446,16 @@ function ShopWizard.open(player, onDone)
     })
     form:addComboField("price", getText("IGUI_PhunMart_Wiz_Lbl_Price"), {
         options = prices,
-        selected = prices[1],
+        selected = defaultPrice(prices),
         hint = getText("IGUI_PhunMart_Wiz_Hint_Price"),
         group = "w_stock"
+    })
+    form:addTextField("restockFrequency", getText("IGUI_PhunMart_Wiz_Lbl_Restock"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Restock"),
+        group = "w_stock",
+        integer = true,
+        min = 1
     })
     form:addTextField("rollMin", getText("IGUI_PhunMart_Wiz_Lbl_RollMin"), {
         default = "4",
@@ -358,6 +487,16 @@ function ShopWizard.open(player, onDone)
     }, {
         group = "w_stock"
     }})
+
+    -- Nothing starts on Other, so none of the fields it reveals should be on
+    -- screen. They stay hidden until a combo asks for them, and stepping leaves
+    -- that decision alone.
+    form:setFieldVisible("categoryOther", false)
+    form:setFieldVisible("backgroundOther", false)
+    for i = 1, 4 do
+        form:setFieldVisible("sprites" .. tostring(i), false)
+        form:setFieldVisible("unpowered" .. tostring(i), false)
+    end
 
     form:initialise()
     form:addToUIManager()

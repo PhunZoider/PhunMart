@@ -106,6 +106,10 @@ function FormPanel:_registerField(opts)
     f.max = opts.max
     f.requireBoth = opts.requireBoth
     f.validate = opts.validate
+    -- A conditional field belongs to a step but is not shown just because that
+    -- step is. Something else decides, usually a combo above it choosing
+    -- "Other", and stepping must not override that decision.
+    f.conditional = opts.conditional
     f.hasMessageRow = (f.hint ~= nil) or f.required == true or f.numeric == true or f.integer == true or f.min ~=
                           nil or f.max ~= nil or f.validate ~= nil
     self._fieldsByKey[f.key] = f
@@ -284,6 +288,10 @@ function FormPanel:setSteps(steps)
     self._steps = steps
     self._step = 1
     self._baseTitle = self:getTitle() or ""
+    -- Hide the later steps now rather than in createChildren. initialise sizes
+    -- the window from the visible fields, so leaving them all visible until
+    -- after that opened the first step at the height of the whole form.
+    self:_applyStep()
 end
 
 function FormPanel:currentStep()
@@ -298,7 +306,15 @@ function FormPanel:_applyStep()
     for i, s in ipairs(self._steps) do
         for _, f in ipairs(self._fields) do
             if f.group == s.group then
-                f.visible = (i == self._step)
+                if f.conditional then
+                    -- Its own visibility is not ours to grant, only to revoke
+                    -- when its step is not the one on screen.
+                    if i ~= self._step then
+                        f.visible = false
+                    end
+                else
+                    f.visible = (i == self._step)
+                end
             end
         end
     end
@@ -581,7 +597,58 @@ function FormPanel:_computeNeededHeight()
     return y
 end
 
+--- Widen the form until the longest hint fits, capped at something that still
+--- reads as a dialog. Hints are single-line ISLabels with no wrapping, so text
+--- that does not fit simply runs off the edge of the window. Growing sideways
+--- is what a person would do, and it costs nothing on forms whose hints are
+--- already short.
+function FormPanel:_computeNeededWidth()
+    local labelW = self._labelW
+    if not labelW then
+        local maxLabelW = 0
+        for _, f in ipairs(self._fields) do
+            if f.label then
+                local lw = getTextManager():MeasureStringX(UIFont.Small, f.label .. ": ")
+                if lw > maxLabelW then
+                    maxLabelW = lw
+                end
+            end
+        end
+        labelW = maxLabelW + 8
+    end
+
+    -- Measured one at a time: a table literal holding a nil would end an ipairs
+    -- at the gap and silently skip whatever came after it.
+    local widest = 0
+    local function consider(text)
+        if type(text) == "string" and text ~= "" then
+            local w = getTextManager():MeasureStringX(UIFont.Small, text)
+            if w > widest then
+                widest = w
+            end
+        end
+    end
+    for _, f in ipairs(self._fields) do
+        consider(f.hint)
+        if f.type == "separator" then
+            consider(f.text)
+        end
+    end
+
+    local needed = labelW + widest + PAD * 3
+    local cap = math.floor(680 * FONT_SCALE)
+    return math.max(self._formWidth or 0, math.min(needed, cap))
+end
+
 function FormPanel:initialise()
+    local neededW = self:_computeNeededWidth()
+    if neededW > self.width then
+        self.width = neededW
+        self._formWidth = neededW
+        local core = getCore()
+        self:setX((core:getScreenWidth() - neededW) / 2)
+    end
+
     -- Compute the real height before the parent lays out chrome
     local neededH = self:_computeNeededHeight()
     self.height = neededH
@@ -1084,10 +1151,12 @@ function FormPanel:reflowFields()
 
     y = y + ROW_H + PAD
 
-    -- Resize window to fit
+    -- Resize window to fit. setHeight rather than assigning self.height: the
+    -- frame and the resize widget are drawn from the java element, so a direct
+    -- assignment moved the contents and left the border at its old size.
     local newH = y
     if newH ~= self.height then
-        self.height = newH
+        self:setHeight(newH)
         -- Re-center vertically
         local core = getCore()
         self:setY((core:getScreenHeight() - newH) / 2)
