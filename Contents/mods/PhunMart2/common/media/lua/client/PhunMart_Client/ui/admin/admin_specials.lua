@@ -159,12 +159,34 @@ local DOMAIN_TABS = {{
     label = "IGUI_PhunMart_Tab_Other"
 }}
 
---- Which tab a special belongs in, from its first action. Read off the row's
---- own actions rather than resolved through inheritance: the shipped templates
---- carry no actions at all and every child declares its own.
+-- Same domains, reached from `kind` instead. Templates declare no actions at
+-- all, so an action alone put every one of them in Other, which is where the
+-- XP and Boosts tabs went empty the moment their children were folded away:
+-- the only rows left were the templates that represent them.
+local KIND_DOMAINS = {
+    skill = "xp",
+    boost = "boost",
+    trait = "trait",
+    vehicle = "vehicle",
+    animal = "animal"
+}
+
+--- Which tab a special belongs in. Its own first action when it has one, since
+--- every generated child declares one; otherwise its kind, which is what a
+--- template carries instead.
 local function domainOf(def)
     local act = def.actions and def.actions[1]
-    return (act and ACTION_DOMAINS[act.type]) or "other"
+    local byAction = act and ACTION_DOMAINS[act.type]
+    if byAction then
+        return byAction
+    end
+    local kind = def.kind
+    if not kind and def.inherit then
+        local specials = Core.defs and Core.defs.specials or {}
+        local parent = specials[def.inherit]
+        kind = parent and parent.kind
+    end
+    return KIND_DOMAINS[kind] or "other"
 end
 
 -- Show only the group belonging to `actionType`, hiding the rest.

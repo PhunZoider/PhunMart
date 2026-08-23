@@ -810,17 +810,36 @@ function ListPanel:prerender()
         descH = #self._descLines * FONT_HGT_SMALL + PAD
     end
 
-    -- Button bar at bottom
-    local btnBarH = BUTTON_HGT + PAD * 2
+    -- The bar splits onto two lines when one will not hold everything. Narrowing
+    -- controls above, acting ones below. It used to squeeze the filter box to a
+    -- minimum and let it sit underneath whatever it collided with, which was
+    -- how a second tickbox made the Filter label overlap it.
+    local hasSelection = self.list.selected and self.list.selected > 0
+    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+    local filterMinW = math.floor(150 * FONT_SCALE)
+
+    local actionsW = self._closeBtn.width + PAD
+    for _, btn in ipairs(self._bottomButtons) do
+        if btn:isVisible() then
+            actionsW = actionsW + btn.width + PAD
+        end
+    end
+    local narrowW = PAD + filterLblW + filterMinW + PAD + (self._onlyChangedW or 0) + (self._hideVariationsW or 0)
+    local twoRows = (narrowW + actionsW + PAD) > w
+
+    local topY = PAD
+    local actionY = twoRows and (PAD * 2 + BUTTON_HGT) or PAD
+
+    -- Button bar at bottom, tall enough for however many lines it needs.
+    local btnBarH = twoRows and (BUTTON_HGT * 2 + PAD * 3) or (BUTTON_HGT + PAD * 2)
     self._buttonBar:setX(0)
     self._buttonBar:setY(contentH - btnBarH)
     self._buttonBar:setWidth(w)
     self._buttonBar:setHeight(btnBarH)
 
-    -- Right side of button bar: Close, then action buttons right-to-left
-    local hasSelection = self.list.selected and self.list.selected > 0
     local rightX = w - PAD
     self._closeBtn:setX(rightX - self._closeBtn.width)
+    self._closeBtn:setY(actionY)
     rightX = rightX - self._closeBtn.width - PAD
 
     for i = #self._bottomButtons, 1, -1 do
@@ -828,6 +847,7 @@ function ListPanel:prerender()
         if btn:isVisible() then
             rightX = rightX - btn.width
             btn:setX(rightX)
+            btn:setY(actionY)
             if btn._requiresSelection then
                 btn:setEnable(hasSelection)
             end
@@ -835,24 +855,26 @@ function ListPanel:prerender()
         end
     end
 
-    -- Left side of button bar: filter fills whatever the buttons and the
-    -- only-my-changes tickbox leave behind.
-    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+    -- On two lines the narrowing controls own the whole upper line, so they
+    -- measure from the right edge rather than from wherever the buttons ended.
+    local narrowRight = twoRows and (w - PAD) or rightX
     if self._onlyChangedTick then
-        local tickX = rightX - self._onlyChangedW
+        local tickX = narrowRight - self._onlyChangedW
         self._onlyChangedTick:setX(tickX)
-        self._onlyChangedTick:setY(PAD)
-        rightX = tickX - PAD
+        self._onlyChangedTick:setY(topY)
+        narrowRight = tickX - PAD
     end
     if self._hideVariationsTick then
-        local tickX = rightX - self._hideVariationsW
+        local tickX = narrowRight - self._hideVariationsW
         self._hideVariationsTick:setX(tickX)
-        self._hideVariationsTick:setY(PAD)
-        rightX = tickX - PAD
+        self._hideVariationsTick:setY(topY)
+        narrowRight = tickX - PAD
     end
     self._filterLabel:setX(PAD)
+    self._filterLabel:setY(topY)
     self._filterEntry:setX(PAD + filterLblW)
-    self._filterEntry:setWidth(math.max(math.floor(60 * FONT_SCALE), rightX - PAD - filterLblW))
+    self._filterEntry:setY(topY)
+    self._filterEntry:setWidth(math.max(filterMinW, narrowRight - PAD - filterLblW))
 
     -- Reapply filter when text changes
     local currentFilter = self._filterEntry:getText()
