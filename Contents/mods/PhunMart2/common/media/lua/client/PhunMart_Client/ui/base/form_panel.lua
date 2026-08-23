@@ -405,7 +405,18 @@ function FormPanel:getFieldValue(key)
     end
 
     if f.type == "text" then
-        return f._entry and f._entry:getText() or f.default
+        if not f._entry then
+            return f.default
+        end
+        -- getInternalText, not getText: during a keystroke getText still holds
+        -- what was there before, so anything reacting to typing read one edit
+        -- behind. The game's own text-change handlers use the internal one for
+        -- the same reason. Outside a keystroke the two agree, so this changes
+        -- nothing for validation or apply.
+        if f._entry.getInternalText then
+            return f._entry:getInternalText() or ""
+        end
+        return f._entry:getText() or f.default
     elseif f.type == "combo" then
         return f._combo and f._combo:getSelectedText() or ""
     elseif f.type == "picker" then

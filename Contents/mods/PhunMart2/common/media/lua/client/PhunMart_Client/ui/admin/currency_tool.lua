@@ -234,6 +234,17 @@ function CurrencyTool.open(player, onDone)
             local item = isItemMode()
             f:setFieldVisible("item", item)
             f:setFieldVisible("factor", item)
+            -- currency_base ships with factor 1, which is right for cents and
+            -- absurd for items: a five cent price would ask for five of them.
+            -- Switching to items suggests the guide's 0.04, but only while the
+            -- factor is still the untouched 1, so a number someone chose is
+            -- never overwritten.
+            local factor = tonumber(f:getFieldValue("factor"))
+            if item and (factor == nil or factor == 1) then
+                f:setFieldValue("factor", "0.04")
+            elseif not item and factor ~= 1 then
+                f:setFieldValue("factor", "1")
+            end
             refreshTable()
         end
     })
