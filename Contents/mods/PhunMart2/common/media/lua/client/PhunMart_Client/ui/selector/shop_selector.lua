@@ -4,6 +4,7 @@ end
 
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
+local ShopWizard = require "PhunMart_Client/ui/admin/shop_wizard"
 
 Core.ui.shop_selector = ListPanel:derive("PhunMartUIShopListing")
 Core.ui.shop_selector.instances = {}
@@ -17,7 +18,7 @@ UI._defKind = "shops"
 ---------------------------------------------------------------------------
 
 local function shopLabel(shopType)
-    return getTextOrNull("IGUI_PhunMart_Shop_" .. shopType) or shopType
+    return Core.shopLabel(shopType)
 end
 
 function UI:refreshAll()
@@ -124,6 +125,10 @@ function UI:createChildren()
         end
     })
 
+    -- New sits where New sits on every other tab. It was missing entirely:
+    -- nothing in the UI could create a shop, only edit one that already existed.
+    self._newBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onNewShop)
+    self._editBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEdit, true)
     self._adminBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_AdminTools"), self.onAdminToolsMenu)
 
     self:refreshAll()
@@ -139,12 +144,39 @@ function UI:getFilterText(itemData)
 end
 
 function UI:prerender()
-    -- Set visibility before the base lays the button bar out, so a hidden
-    -- Admin Tools button doesn't reserve space.
+    -- Set visibility before the base lays the button bar out, so hidden
+    -- buttons don't reserve space.
+    local canEdit = Core.canEditConfig(self.player)
     if self._adminBtn then
-        self._adminBtn:setVisible(Core.canEditConfig(self.player))
+        self._adminBtn:setVisible(canEdit)
+    end
+    if self._newBtn then
+        self._newBtn:setVisible(canEdit)
+    end
+    if self._editBtn then
+        self._editBtn:setVisible(canEdit)
     end
     ListPanel.prerender(self)
+end
+
+--- Create a shop, then hand straight over to its group. The machine, its pool
+--- and an empty group all get written; the only question left open is what it
+--- sells, and that is the group's to answer.
+function UI:onNewShop()
+    if not Core.canEditConfig(self.player) then
+        return
+    end
+    ShopWizard.open(self.player, function(groupKey)
+        if self.shell then
+            local view = self.shell:activateTab("groups")
+            if view and view.selectKey then
+                view:selectKey(groupKey)
+            end
+            if Core.ui.admin_groups.OnEditGroup then
+                Core.ui.admin_groups.OnEditGroup(self.player, groupKey)
+            end
+        end
+    end)
 end
 
 ---------------------------------------------------------------------------

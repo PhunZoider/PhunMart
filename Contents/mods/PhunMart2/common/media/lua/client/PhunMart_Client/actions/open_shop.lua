@@ -29,7 +29,7 @@ function action:isValidStart()
                                  SandboxVars.ElecShutModifier)
         if not hasPower then
             self.character:Say(getText("IGUI_PhunMart_Open_X_nopower_tooltip",
-                getText("IGUI_PhunMart_Shop_" .. self.shopObj.type)))
+                Core.shopLabel(self.shopObj.type)))
             return false
         end
     end

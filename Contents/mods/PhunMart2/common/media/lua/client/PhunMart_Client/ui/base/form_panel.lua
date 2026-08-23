@@ -266,6 +266,78 @@ function FormPanel:setGroupVisible(groupName, visible)
     end
 end
 
+---------------------------------------------------------------------------
+-- Steps
+--
+-- A wizard is this form with one group of fields visible at a time. Nothing
+-- else had to change for that: validateAll already skips hidden fields, so a
+-- step validates itself and nothing ahead of it, and setGroupVisible already
+-- reflows. Apply becomes Next until the last step, and Back appears once there
+-- is something to go back to.
+--
+-- The point is not the navigation, it is that a newcomer sees four fields and
+-- a question rather than fourteen fields and no idea which matter.
+---------------------------------------------------------------------------
+
+--- @param steps array of {group = "basics", title = "What is this shop called?"}
+function FormPanel:setSteps(steps)
+    self._steps = steps
+    self._step = 1
+    self._baseTitle = self:getTitle() or ""
+end
+
+function FormPanel:currentStep()
+    return self._steps and self._steps[self._step] or nil
+end
+
+--- Show only the current step, and relabel the buttons to match where we are.
+function FormPanel:_applyStep()
+    if not self._steps then
+        return
+    end
+    for i, s in ipairs(self._steps) do
+        for _, f in ipairs(self._fields) do
+            if f.group == s.group then
+                f.visible = (i == self._step)
+            end
+        end
+    end
+
+    -- How far through, in the title bar. Without it a wizard is just a form
+    -- that keeps changing, with no sense of how much is left.
+    if self._baseTitle then
+        self:setTitle(self._baseTitle .. "  (" .. tostring(self._step) .. "/" .. tostring(#self._steps) .. ")")
+    end
+
+    local last = self._step >= #self._steps
+    if self._applyBtn then
+        self._applyBtn:setTitle(last and getText("IGUI_PhunMart_Btn_Create") or getText("IGUI_PhunMart_Btn_Next"))
+    end
+    if self._backBtn then
+        self._backBtn:setVisible(self._step > 1)
+    end
+
+    -- Errors are per step: arriving somewhere new should not open with
+    -- complaints about fields nobody has reached yet.
+    self._showErrors = false
+    self._formError = nil
+    for _, f in ipairs(self._fields) do
+        f._error = nil
+    end
+
+    if self._built then
+        self:reflowFields()
+        self:_refreshMessages()
+    end
+end
+
+function FormPanel:_onBackClick()
+    if self._steps and self._step > 1 then
+        self._step = self._step - 1
+        self:_applyStep()
+    end
+end
+
 function FormPanel:setFieldVisible(key, visible)
     local f = self._fieldsByKey[key]
     if f then
@@ -570,6 +642,16 @@ function FormPanel:createChildren()
             self._deleteBtn:enableCancelColor()
         end
         self:addChild(self._deleteBtn)
+    end
+
+    -- Back sits with the pair rather than hard left: it is part of moving
+    -- through the form, not an escape from it like Cancel or Delete.
+    if self._steps then
+        self._backBtn = ISButton:new(PAD, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Back"), self,
+            FormPanel._onBackClick)
+        self._backBtn:initialise()
+        self:addChild(self._backBtn)
+        self:_applyStep()
     end
 
     -- Initial layout
@@ -982,6 +1064,15 @@ function FormPanel:reflowFields()
     local totalBtnW = btnW * 2 + btnGap
     local btnX = (self.width - totalBtnW) / 2
 
+    -- With a Back button the row is three wide, so the pair shifts left to keep
+    -- the whole group centred rather than Apply drifting off centre.
+    if self._backBtn and self._backBtn:isVisible() then
+        btnX = (self.width - (btnW * 3 + btnGap * 2)) / 2
+        self._backBtn:setX(btnX)
+        self._backBtn:setY(y)
+        btnX = btnX + btnW + btnGap
+    end
+
     self._applyBtn:setX(btnX)
     self._applyBtn:setY(y)
     self._cancelBtn:setX(btnX + btnW + btnGap)
@@ -1226,6 +1317,13 @@ function FormPanel:_onApplyClick()
     -- appearing on click.
     self._showErrors = true
     if not self:validateAll() then
+        return
+    end
+    -- Mid-wizard this button is Next, and validateAll has just checked the
+    -- current step, since it only looks at what is visible.
+    if self._steps and self._step < #self._steps then
+        self._step = self._step + 1
+        self:_applyStep()
         return
     end
     if self._onApply then

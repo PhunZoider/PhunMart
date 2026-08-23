@@ -66,13 +66,14 @@ Core.contexts.open = function(player, context, worldobjects, test)
         if obj then
             isShop = true
             wsq = wObj:getSquare()
-            local text = getText("IGUI_PhunMart_Open_X", getText("IGUI_PhunMart_Shop_" .. obj.type))
-            local desc = getText("IGUI_PhunMart_Shop_" .. obj.type .. "_tooltip")
+            local shopName = Core.shopLabel(obj.type)
+            local text = getText("IGUI_PhunMart_Open_X", shopName)
+            local desc = getTextOrNull("IGUI_PhunMart_Shop_" .. obj.type .. "_tooltip") or ""
             local disabled = false
             if obj.powered then
                 if not obj:getSquare():haveElectricity() and SandboxVars.ElecShutModifier > -1 and
                     GameTime:getInstance():getNightsSurvived() > SandboxVars.ElecShutModifier then
-                    desc = getText("IGUI_PhunMart_Open_X_nopower_tooltip", getText("IGUI_PhunMart_Shop_" .. obj.type))
+                    desc = getText("IGUI_PhunMart_Open_X_nopower_tooltip", shopName)
                     disabled = true
                 end
             end
@@ -92,7 +93,7 @@ Core.contexts.open = function(player, context, worldobjects, test)
 
             local toolTip = ISToolTip:new();
             toolTip:setVisible(false);
-            toolTip:setName(getText("IGUI_PhunMart_Shop_" .. obj.type));
+            toolTip:setName(shopName);
             toolTip.description = desc;
             option.notAvailable = disabled
             option.toolTip = toolTip;

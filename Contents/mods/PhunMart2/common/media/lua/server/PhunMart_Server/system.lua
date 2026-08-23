@@ -393,7 +393,7 @@ function ServerSystem:getShopList()
     for k, v in pairs(Core.shops) do
         table.insert(shops, {
             type = k,
-            label = getTextOrNull("IGUI_PhunMart_Shop_" .. k) or k,
+            label = Core.shopLabel(k),
             group = v.group or "NONE",
             enabled = v.enabled == false and "false" or "true"
         })

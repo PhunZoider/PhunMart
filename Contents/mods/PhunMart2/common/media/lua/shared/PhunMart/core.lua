@@ -745,6 +745,32 @@ Core.overridePaths = {
     shops = {"PhunMart_Shops.txt"}
 }
 
+--- What to call a shop type on screen.
+---
+--- Shipped shops are named by a translation key, which a shop an admin creates
+--- can never have: nothing writes to the translation files. So a definition may
+--- carry its own `title`, and that is what the wizard fills in. Without this
+--- fallback a new shop would be labelled by its key everywhere it appeared,
+--- which made the wizard's name field decorative.
+---
+--- Order is deliberate. The translation wins so a shipped shop stays
+--- translated even if someone sets a title on it, and the key is the last
+--- resort rather than an error.
+function Core.shopLabel(shopType)
+    if not shopType or shopType == "" then
+        return ""
+    end
+    local translated = getTextOrNull("IGUI_PhunMart_Shop_" .. shopType)
+    if translated then
+        return translated
+    end
+    local def = Core.defs and Core.defs.shops and Core.defs.shops[shopType]
+    if def and def.title and def.title ~= "" then
+        return def.title
+    end
+    return shopType
+end
+
 --- True when `key` is defined by the mod's own defaults for `kind`.
 --- Such a key can be disabled but never deleted: the override layer sits on top
 --- of the defaults, so removing the override just restores the shipped version.

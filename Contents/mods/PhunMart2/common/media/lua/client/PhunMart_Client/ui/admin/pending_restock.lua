@@ -37,7 +37,7 @@ local checked = {} -- shop type -> true, defaults on when first added
 local panel = nil
 
 local function shopLabel(t)
-    return getTextOrNull("IGUI_PhunMart_Shop_" .. t) or t
+    return Core.shopLabel(t)
 end
 
 local function pendingList()

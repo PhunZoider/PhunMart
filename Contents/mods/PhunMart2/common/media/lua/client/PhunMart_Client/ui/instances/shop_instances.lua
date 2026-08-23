@@ -129,7 +129,7 @@ function UI:new(x, y, width, height, player, playerIndex, shopKey)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    local title = (shopKey and (getTextOrNull("IGUI_PhunMart_Shop_" .. shopKey) or shopKey)) or getText("IGUI_PhunMart_Title_Locations")
+    local title = (shopKey and Core.shopLabel(shopKey)) or getText("IGUI_PhunMart_Title_Locations")
     o:setTitle(title)
     return o;
 end
