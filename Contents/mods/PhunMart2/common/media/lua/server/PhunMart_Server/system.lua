@@ -351,7 +351,7 @@ end
 -- or whose pools are all zone-filtered out at this location
 function ServerSystem:getRandomShop(x, y)
 
-    local options = Core:getInstanceDistancesFrom(x, y)
+    local options, byCategory = Core:getInstanceDistancesFrom(x, y)
     local candidates = {}
 
     local shops = Core.shops
@@ -363,7 +363,14 @@ function ServerSystem:getRandomShop(x, y)
         local probability = shopDef and (shopDef.probability or 1) or 0
         if shopDef and shopDef.enabled ~= false and probability > 0 then
             local minDist = shopDef.minDistance or defaultDistance
-            if minDist <= v and shopHasEligiblePool(shopDef, x, y) then
+            -- Against the nearest of its own type, and against the nearest of
+            -- anything sharing its category. The category test is the stricter
+            -- of the two whenever a shop has one, since a machine of the same
+            -- type is also of the same category; a shop without a category
+            -- falls back to the type test alone, which is what every shop used
+            -- to get.
+            local catDist = shopDef.category and byCategory[shopDef.category] or 9999999
+            if minDist <= v and minDist <= catDist and shopHasEligiblePool(shopDef, x, y) then
                 table.insert(candidates, {
                     shop = k,
                     p = probability

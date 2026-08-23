@@ -164,6 +164,18 @@ local function sandbox(key, fallback)
     return v or fallback
 end
 
+local function categoryOptions()
+    local seen, opts = {}, {}
+    for _, def in pairs(Core.defs and Core.defs.shops or {}) do
+        if def.category and not seen[def.category] then
+            seen[def.category] = true
+            table.insert(opts, def.category)
+        end
+    end
+    table.sort(opts)
+    return opts
+end
+
 local function priceOptions()
     local opts = {}
     for k in pairs(Core.defs and Core.defs.prices or {}) do
@@ -222,6 +234,7 @@ local function create(values)
     sendClientCommand(Core.name, Core.commands.upsertShopDefinition, {
         type = key,
         title = values.name,
+        category = values.category,
         probability = values.probability,
         minDistance = values.minDistance,
         background = values.background,
@@ -307,6 +320,7 @@ function ShopWizard.open(player, onDone)
     local shops = Core.defs and Core.defs.shops or {}
     local appearances, tileByLabel = appearanceOptions()
     local backgrounds = backgroundOptions()
+    local categories = categoryOptions()
     local prices = priceOptions()
 
     -- Last on every list, so what already exists reads as the suggestion and
@@ -314,6 +328,7 @@ function ShopWizard.open(player, onDone)
     -- you trip over.
     table.insert(appearances, getText(OTHER))
     table.insert(backgrounds, getText(OTHER))
+    table.insert(categories, getText(OTHER))
 
     local form
     form = FormPanel:new({
@@ -325,6 +340,7 @@ function ShopWizard.open(player, onDone)
             local groupKey = create({
                 key = keyFromName(name),
                 name = name,
+                category = pickOrCustom(f, "category", "categoryOther"),
                 probability = math.floor(f:getFieldNumber("probability") or 15),
                 minDistance = f:getFieldNumber("minDistance"),
                 background = pickOrCustom(f, "background", "backgroundOther"),
@@ -366,11 +382,24 @@ function ShopWizard.open(player, onDone)
             end
         end
     })
-    -- No category. A shop's type is its key, which is what minDistance spaces
-    -- machines by, so there is no second grouping to ask about. The definition
-    -- field still exists and the shop editor still exposes it, but nothing
-    -- reads it, and asking a newcomer to fill in something inert is worse than
-    -- not asking.
+    -- Category is a real question again: placement now keeps two shops of the
+    -- same category apart, not just two of the same type. Two food machines on
+    -- one street was the thing minDistance was meant to prevent.
+    form:addComboField("category", getText("IGUI_PhunMart_Lbl_Category"), {
+        options = categories,
+        selected = categories[1],
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Category"),
+        group = "w_name",
+        onChange = function(f)
+            f:setFieldVisible("categoryOther", isOther(f:getFieldValue("category")))
+        end
+    })
+    form:addTextField("categoryOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_CategoryOther"),
+        group = "w_name",
+        conditional = true
+    })
 
     ---------------------------------------------------------------- step 2
     form:addSeparator("s_look", {
@@ -441,6 +470,16 @@ function ShopWizard.open(player, onDone)
                     label = getText(FACINGS[i] or "")
                 })
             end
+            -- Unpowered on the same row, after a gap. A second row would have
+            -- cost the height this step was already short of, and the two sets
+            -- read as a pair anyway: same four facings, lights off.
+            for i, name in ipairs(chosenSprites(form, tileByLabel, "unpowered") or {}) do
+                table.insert(out, {
+                    texture = tileTexture(name),
+                    label = getText(FACINGS[i] or ""),
+                    gap = (i == 1)
+                })
+            end
             return out
         end
     })
@@ -485,11 +524,10 @@ function ShopWizard.open(player, onDone)
         integer = true,
         min = 0
     })
-    -- Compared against other machines of this same type only.
-    -- getInstanceDistancesFrom keys by shop type, so category has nothing to do
-    -- with it. Blank rather than 300, because blank falls back to the
-    -- DefaultDistance sandbox setting, which is the better answer until someone
-    -- has a reason to differ from it.
+    -- One number, checked twice: against the nearest machine of this same type
+    -- and against the nearest of anything sharing its category. Blank rather
+    -- than 300, because blank falls back to the DefaultDistance sandbox
+    -- setting, which is the better answer until someone has a reason to differ.
     form:addTextField("minDistance", getText("IGUI_PhunMart_Wiz_Lbl_MinDistance"), {
         default = "",
         -- The sandbox value goes in the hint rather than into the box: leaving

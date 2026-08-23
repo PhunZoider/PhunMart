@@ -1283,6 +1283,12 @@ function FormPanel:prerender()
             end)
             if ok and images then
                 for _, img in ipairs(images) do
+                    -- Extra space before an entry that starts a second group,
+                    -- so one row can hold two related sets without a caption
+                    -- explaining where one ends.
+                    if img.gap then
+                        ix = ix + PAD * 2
+                    end
                     if img.texture then
                         self:drawTextureScaledAspect(img.texture, ix, f._drawY, sz, sz, 1, 1, 1, 1)
                     else

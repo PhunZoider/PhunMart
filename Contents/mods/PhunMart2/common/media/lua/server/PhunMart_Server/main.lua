@@ -289,29 +289,43 @@ function Core:removeInstance(instance)
     self.instances[instanceId(instance)] = nil
 end
 
+--- How far the nearest machine of each shop type is, and of each category.
+---
+--- Two results because spacing wants both questions answered. Type keeps two
+--- of the same machine apart. Category keeps two of a kind apart: WrentAWreck
+--- and CarAParts are both Vehicle, and putting them on the same street is the
+--- thing minDistance was meant to prevent but never could, because it only
+--- ever compared a shop against others of its own type.
 function Core:getInstanceDistancesFrom(x, y)
-    local results = {}
+    local byType, byCategory = {}, {}
     for k, v in pairs(self.shops) do
         if v.enabled ~= false then
-            results[k] = 9999999
+            byType[k] = 9999999
+            if v.category then
+                byCategory[v.category] = 9999999
+            end
         end
     end
 
     for k, v in pairs(self.instances) do
         local shopType = v.type
-        if results[shopType] then
+        if byType[shopType] then
             local dx = x - v.x
             local dy = y - v.y
             local distance = math.sqrt(dx * dx + dy * dy)
-            if distance < results[shopType] then
-                results[shopType] = distance
+            if distance < byType[shopType] then
+                byType[shopType] = distance
+            end
+            local cat = self.shops[shopType] and self.shops[shopType].category
+            if cat and byCategory[cat] and distance < byCategory[cat] then
+                byCategory[cat] = distance
             end
         else
             Core.debugLn("No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
         end
     end
 
-    return results
+    return byType, byCategory
 end
 
 function Core:ini()
