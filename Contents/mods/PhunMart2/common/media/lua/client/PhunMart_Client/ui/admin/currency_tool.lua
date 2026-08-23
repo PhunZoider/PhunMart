@@ -162,9 +162,29 @@ function CurrencyTool.open(player, onDone)
         form:setListItems("preview", out)
     end
 
+    -- Only when there is something to undo. Its presence is itself the answer
+    -- to "have I changed this", and offering a reset on an untouched install
+    -- would suggest there is a mess to clean up.
+    local customised = Core.isOverriddenKey and Core.isOverriddenKey("prices", BASE_KEY)
+
     form = FormPanel:new({
         width = math.floor(560 * FONT_SCALE),
         title = getText("IGUI_PhunMart_Cur_Title"),
+        deleteLabel = getText("IGUI_PhunMart_Cur_Btn_Reset"),
+        -- Deleting the override rather than writing the shipped values back.
+        -- currency_base is a shipped key, so removing what sits on top of it
+        -- restores the original by definition, and cannot drift from it later.
+        onDelete = customised and function(f)
+            sendClientCommand(Core.name, Core.commands.revertDefinition, {
+                kind = "prices",
+                key = BASE_KEY
+            })
+            PendingRestock.noteAllShops()
+            f:close()
+            if onDone then
+                onDone()
+            end
+        end or nil,
         onApply = function(f)
             local result = Core.utils.deepCopy(base)
             if f:getFieldValue("kind") == KIND_ITEM then

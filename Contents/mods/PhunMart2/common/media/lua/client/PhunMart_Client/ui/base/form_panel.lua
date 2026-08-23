@@ -68,6 +68,7 @@ function FormPanel:new(opts)
     o._onApply = opts.onApply -- function(values)
     o._onCancel = opts.onCancel -- function() (optional)
     o._onDelete = opts.onDelete -- function(form), optional; omit on an Add form
+    o._deleteLabel = opts.deleteLabel -- when "Delete" is the wrong word for it
     o._validateForm = opts.validate -- function(form) -> errorText (cross-field rules)
     o._showErrors = false -- set on the first Apply; errors then track live edits
     o:setWantKeyEvents(true)
@@ -606,7 +607,13 @@ function FormPanel:_computeNeededHeight()
             elseif f.type == "list" then
                 y = y + FONT_HGT_SMALL + 2 -- header row (columns or label)
                 y = y + (f._rows or 4) * ROW_H -- list rows
-                y = y + 4 + ROW_H -- button row
+                y = y + 4
+                -- Button row only when the list has buttons. Read off the
+                -- handlers rather than f._editable, which the widgets have not
+                -- been built to set yet at this point.
+                if f.onAdd or f.onEdit or f.onRemove then
+                    y = y + ROW_H
+                end
                 y = y + PAD
             else
                 y = y + ROW_H
@@ -732,8 +739,12 @@ function FormPanel:createChildren()
     -- Delete sits hard left, away from the centred Apply/Cancel pair, so it
     -- can't be hit by aiming at either of them.
     if self._onDelete then
-        self._deleteBtn = ISButton:new(PAD, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Delete"), self,
-            FormPanel._onDeleteClick)
+        -- Labelled by the caller when "Delete" is the wrong word for what the
+        -- button undoes. Same position and same colour either way: it is the
+        -- destructive one, kept away from Apply.
+        local label = self._deleteLabel or getText("IGUI_PhunMart_Btn_Delete")
+        local w = math.max(btnW, getTextManager():MeasureStringX(UIFont.Small, label) + PAD * 2)
+        self._deleteBtn = ISButton:new(PAD, 0, w, ROW_H, label, self, FormPanel._onDeleteClick)
         self._deleteBtn:initialise()
         if self._deleteBtn.enableCancelColor then
             self._deleteBtn:enableCancelColor()
@@ -966,46 +977,53 @@ function FormPanel:_createField(f)
         end
         self:addChild(f._list)
 
-        local btnW = math.floor(60 * FONT_SCALE)
-        f._addBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, function()
-            if f.onAdd then
-                f.onAdd(self, f)
-            end
-        end)
-        f._addBtn:initialise()
-        self:addChild(f._addBtn)
-
-        f._editBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, function()
-            local sel = f._list.selected
-            if sel and sel > 0 and f._items[sel] then
-                if f.onEdit then
-                    f.onEdit(self, f, sel, f._items[sel])
+        -- Only when the list can actually be edited. A read-only list, such as
+        -- one used to show what an edit is about to do, was still growing Add,
+        -- Edit and Delete buttons that did nothing when pressed.
+        f._editable = (f.onAdd ~= nil) or (f.onEdit ~= nil) or (f.onRemove ~= nil)
+        if f._editable then
+            local btnW = math.floor(60 * FONT_SCALE)
+            f._addBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, function()
+                if f.onAdd then
+                    f.onAdd(self, f)
                 end
-            end
-        end)
-        f._editBtn:initialise()
-        f._editBtn:setEnable(false)
-        self:addChild(f._editBtn)
+            end)
+            f._addBtn:initialise()
+            self:addChild(f._addBtn)
 
-        f._removeBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Delete"), self, function()
-            local sel = f._list.selected
-            if sel and sel > 0 and f._items[sel] then
-                if f.onRemove then
-                    f.onRemove(self, f, sel, f._items[sel])
-                else
-                    table.remove(f._items, sel)
-                    self:_refreshListField(f)
+            f._editBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, function()
+                local sel = f._list.selected
+                if sel and sel > 0 and f._items[sel] then
+                    if f.onEdit then
+                        f.onEdit(self, f, sel, f._items[sel])
+                    end
                 end
+            end)
+            f._editBtn:initialise()
+            f._editBtn:setEnable(false)
+            self:addChild(f._editBtn)
+
+            f._removeBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Delete"), self, function()
+                local sel = f._list.selected
+                if sel and sel > 0 and f._items[sel] then
+                    if f.onRemove then
+                        f.onRemove(self, f, sel, f._items[sel])
+                    else
+                        table.remove(f._items, sel)
+                        self:_refreshListField(f)
+                    end
+                end
+            end)
+            f._removeBtn:initialise()
+            f._removeBtn:setEnable(false)
+            if f._removeBtn.enableCancelColor then
+                f._removeBtn:enableCancelColor()
             end
-        end)
-        f._removeBtn:initialise()
-        f._removeBtn:setEnable(false)
-        if f._removeBtn.enableCancelColor then
-            f._removeBtn:enableCancelColor()
+            self:addChild(f._removeBtn)
         end
-        self:addChild(f._removeBtn)
 
-        -- Populate initial items
+        -- Populate initial items. Outside the branch above: a read-only list
+        -- still has rows to show.
         self:_refreshListField(f)
 
     elseif f.type == "separator" or f.type == "image" then
@@ -1133,16 +1151,21 @@ function FormPanel:reflowFields()
                 f._list:setWidth(w)
                 f._list:setHeight(listH)
                 y = y + listH + 4
-                -- Position buttons in a row
-                local btnW2 = math.floor(60 * FONT_SCALE)
-                local gap = 4
-                f._addBtn:setX(x)
-                f._addBtn:setY(y)
-                f._editBtn:setX(x + btnW2 + gap)
-                f._editBtn:setY(y)
-                f._removeBtn:setX(x + (btnW2 + gap) * 2)
-                f._removeBtn:setY(y)
-                y = y + ROW_H + PAD
+                -- Position buttons in a row, when there are any. A read-only
+                -- list also gets its row of space back.
+                if f._addBtn then
+                    local btnW2 = math.floor(60 * FONT_SCALE)
+                    local gap = 4
+                    f._addBtn:setX(x)
+                    f._addBtn:setY(y)
+                    f._editBtn:setX(x + btnW2 + gap)
+                    f._editBtn:setY(y)
+                    f._removeBtn:setX(x + (btnW2 + gap) * 2)
+                    f._removeBtn:setY(y)
+                    y = y + ROW_H + PAD
+                else
+                    y = y + PAD
+                end
 
             elseif f.type == "separator" then
                 y = y + PAD

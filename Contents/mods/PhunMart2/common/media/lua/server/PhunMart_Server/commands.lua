@@ -146,6 +146,34 @@ Commands[Core.commands.deleteDefinition] = function(playerObj, args)
     Core.ServerSystem.instance:deleteDefinition(filename, key)
 end
 
+--- Drop the override for a shipped key, restoring what the mod ships.
+---
+--- The mirror of deleteDefinition, and the opposite guard. Deleting a shipped
+--- key is refused because the default would come straight back and look like
+--- the delete failed. Reverting wants exactly that outcome, so it is only
+--- allowed for shipped keys: for anything an admin created there is no default
+--- underneath to return to, and delete is the right verb.
+---
+--- Removing the override rather than writing the shipped values back on top of
+--- it, so a later change to those values is picked up instead of being masked
+--- by a copy of what they used to be.
+Commands[Core.commands.revertDefinition] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    local kind = args and args.kind
+    local key = args and args.key
+    local filename = kind and DEF_OVERRIDE_FILES[kind]
+    if not (filename and key) then
+        return
+    end
+    if not Core.isShippedKey(kind, key) then
+        Core.debugLn("revertDefinition refused for non-shipped key " .. kind .. "/" .. tostring(key))
+        return
+    end
+    Core.ServerSystem.instance:deleteDefinition(filename, key)
+end
+
 Commands[Core.commands.getTokenRewards] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return

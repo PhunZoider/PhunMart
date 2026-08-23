@@ -277,6 +277,7 @@
   "IGUI_PhunMart_Btn_Create": "Create",
   "IGUI_PhunMart_Wiz_NewShop": "New shop",
   "IGUI_PhunMart_Cur_Btn": "Currency...",
+  "IGUI_PhunMart_Cur_Btn_Reset": "Reset to default",
   "IGUI_PhunMart_Cur_Title": "What counts as money",
   "IGUI_PhunMart_Cur_Blurb": "Everything priced from currency_base follows this. Shops quote the old money until they restock.",
   "IGUI_PhunMart_Cur_Change": "PhunMart change (the built in wallet)",
