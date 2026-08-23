@@ -129,6 +129,7 @@ function FormPanel:addTextField(key, label, opts)
         group = opts.group,
         editable = opts.editable,
         numbersOnly = opts.numbersOnly,
+        onChange = opts.onChange,
         visible = true
     })
     return self:_registerField(opts)
@@ -771,6 +772,15 @@ function FormPanel:_createField(f)
         end
         if f.numbersOnly then
             f._entry:setOnlyNumbers(true)
+        end
+        -- Text fields can react to typing now, the way combos already reacted
+        -- to picking. Wanted twice before this: once to derive a key from a
+        -- name, and again to recost a table live as a multiplier is typed.
+        if f.onChange then
+            f._entry.onTextChangeFunction = function()
+                f.onChange(self, f)
+            end
+            f._entry.target = self
         end
         self:addChild(f._entry)
 

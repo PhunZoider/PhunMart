@@ -9,6 +9,7 @@ local tools = require "PhunMart_Client/ui/ui_utils"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local CurrencyTool = require "PhunMart_Client/ui/admin/currency_tool"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -30,20 +31,10 @@ local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 --
 -- Depth-limited because an override file can name a parent that names it back,
 -- and this runs while drawing.
-local function resolveField(priceDef, field, depth)
-    if priceDef[field] ~= nil then
-        return priceDef[field]
-    end
-    if not priceDef.inherit or (depth or 0) >= 10 then
-        return nil
-    end
-    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-    local parent = prices[priceDef.inherit]
-    if not parent then
-        return nil
-    end
-    return resolveField(parent, field, (depth or 0) + 1)
-end
+-- Shared, because the currency tool needs the same walk and two copies of this
+-- rule drifting apart is exactly how the Kind and Amount columns came to
+-- disagree about the same row.
+local resolveField = tools.resolvePriceField
 
 -- Format a price amount for display. Note this shows the amount as stored,
 -- without applying factor, so a scaled child reads as its own base figure.
@@ -371,9 +362,20 @@ function UI:createChildren()
         align = "right"
     })
 
+    -- On the Prices tab because that is what it edits, and first because it is
+    -- the one thing here a server owner is most likely to want and least
+    -- likely to find: it is a single edit to currency_base that reprices
+    -- everything inheriting from it.
+    self:addBottomButton(getText("IGUI_PhunMart_Cur_Btn"), self.onCurrencyClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), self.onDeleteClick, true)
+end
+
+function UI:onCurrencyClick()
+    CurrencyTool.open(self.player, function()
+        self:refreshPrices()
+    end)
 end
 
 function UI:onDeleteClick()

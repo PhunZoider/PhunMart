@@ -238,4 +238,29 @@ function tools.wrapText(text, maxWidth, font)
     return lines
 end
 
+--- Read a field off a price definition, following `inherit` when the
+--- definition does not set it itself.
+---
+--- Most shipped prices carry only an amount and lean on currency_base for the
+--- rest, so reading a field directly gets nil far more often than not. Two
+--- copies of this walk drifting apart is how the prices list came to show
+--- "change" under Kind and a raw cent count under Amount on the same row.
+---
+--- Depth-limited: an override file can name a parent that names it back, and
+--- this runs while drawing.
+function tools.resolvePriceField(priceDef, field, depth)
+    if not priceDef or priceDef[field] ~= nil then
+        return priceDef and priceDef[field]
+    end
+    if not priceDef.inherit or (depth or 0) >= 10 then
+        return nil
+    end
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local parent = prices[priceDef.inherit]
+    if not parent then
+        return nil
+    end
+    return tools.resolvePriceField(parent, field, (depth or 0) + 1)
+end
+
 return tools
