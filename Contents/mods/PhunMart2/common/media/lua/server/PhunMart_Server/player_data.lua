@@ -29,11 +29,12 @@ local PlayerData = {}
 -- it happens for the first save loaded after upgrading and never again.
 local IMPORTED_KEY = "trackersImported"
 
+-- Printed once, unconditionally. debugLn prefixes "[PhunMart] " and prints too,
+-- so calling both put every line out twice with slightly different spacing.
+-- These are one-off, consequential events, so they earn a line whether or not
+-- debug output is switched on.
 local function log(msg)
     print("[PhunMart][playerdata] " .. msg)
-    if Core.debugLn then
-        Core.debugLn("[playerdata] " .. msg)
-    end
 end
 
 local function countKeys(tbl)

@@ -30,11 +30,10 @@ local VERSION_KEY = "overrideVersion"
 --- everything above its stamp, in order.
 Migrations.CURRENT = 1
 
+-- Printed once, unconditionally. debugLn prefixes "[PhunMart] " and prints too,
+-- so calling both put every line out twice with slightly different spacing.
 local function log(msg)
     print("[PhunMart][migrate] " .. msg)
-    if Core.debugLn then
-        Core.debugLn("[migrate] " .. msg)
-    end
 end
 
 ---------------------------------------------------------------------------

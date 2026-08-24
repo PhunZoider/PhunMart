@@ -32,7 +32,12 @@ Events.OnCharacterDeath.Add(function(character)
     if Core.settings.DropOnDeath then
         local walletData = Core.wallet:get(character)
         local current = walletData and walletData.current or {}
-        local rate = Core.settings.WalletReturnRate
+        -- ReturnRate, which is what sandbox-options.txt actually declares.
+        -- This read WalletReturnRate, which is the translation key rather than
+        -- the option name, so it was always nil and always fell through to 100.
+        -- Anybody who set the option to keep some of a dead player's money back
+        -- has been handing all of it over since the option shipped.
+        local rate = Core.settings.ReturnRate
         if rate == nil then
             rate = 100
         end
