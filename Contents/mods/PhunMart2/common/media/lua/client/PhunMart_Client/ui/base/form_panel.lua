@@ -770,10 +770,11 @@ function FormPanel:initialise()
         self:setX((core:getScreenWidth() - neededW) / 2)
     end
 
-    -- Compute the real height before the parent lays out chrome
-    local neededH = self:_computeNeededHeight()
-    self.height = neededH
+    -- Compute the real height before the parent lays out chrome, capped at the
+    -- screen. reflowFields settles the scroll range once the fields are placed.
     local core = getCore()
+    local neededH = math.min(self:_computeNeededHeight(), math.floor(core:getScreenHeight() * 0.9))
+    self.height = neededH
     self:setY((core:getScreenHeight() - neededH) / 2)
     ISCollapsableWindowJoypad.initialise(self)
 end
@@ -1136,10 +1137,39 @@ end
 -- Reflow: reposition all visible fields and resize the window
 ---------------------------------------------------------------------------
 
+--- Height of the pinned footer: the form-level message row and the button row.
+function FormPanel:footerHeight()
+    return FONT_HGT_SMALL + 2 + PAD + ROW_H + PAD
+end
+
 function FormPanel:reflowFields()
     local th = self:titleBarHeight()
+    local footerH = self:footerHeight()
+
+    -- Size to the content, but never past the screen. A form taller than the
+    -- display used to run its buttons off the bottom edge, which on the longer
+    -- editors is reachable at 720p or a large UI font scale.
+    local neededH = self:_computeNeededHeight()
+    local newH = math.min(neededH, math.floor(getCore():getScreenHeight() * 0.9))
+    if newH ~= self.height then
+        -- setHeight rather than assigning self.height: the frame and the resize
+        -- widget are drawn from the java element, so a direct assignment moved
+        -- the contents and left the border at its old size.
+        self:setHeight(newH)
+        self:setY((getCore():getScreenHeight() - newH) / 2)
+    end
+
+    -- Whatever did not fit is what there is to scroll through.
+    self._scrollRange = math.max(0, neededH - newH)
+    self._scrollY = math.max(0, math.min(self._scrollY or 0, self._scrollRange))
+
+    -- Fields live between the title bar and the footer. The footer does not
+    -- scroll: Apply and Cancel have to stay reachable no matter where you are.
+    local viewTop = th
+    local viewBottom = newH - footerH
+
     local x = PAD
-    local y = th + PAD
+    local y = th + PAD - self._scrollY
     local w = self.width - PAD * 2
     local labelW = self._labelW
 
@@ -1147,8 +1177,12 @@ function FormPanel:reflowFields()
         if not f.visible then
             -- Hide all widgets for this field
             self:_setFieldWidgetsVisible(f, false)
+            f._inView = false
         else
+            -- Shown for now so the branches below can position it; whether it is
+            -- actually on screen is decided once its height is known.
             self:_setFieldWidgetsVisible(f, true)
+            local rowTop = y
 
             if f.type == "text" then
                 f._label:setX(x)
@@ -1301,10 +1335,21 @@ function FormPanel:reflowFields()
                 f._fieldX = x + labelW
                 y = y + f.imageHeight + FONT_HGT_SMALL + PAD
             end
+
+            -- Now that the row's extent is known, take it back off screen if it
+            -- has scrolled out. Whole rows only: nothing clips a child widget to
+            -- its parent here, so a half-shown field would draw straight over
+            -- the title bar or the buttons.
+            f._inView = rowTop >= viewTop and y <= viewBottom
+            if not f._inView then
+                self:_setFieldWidgetsVisible(f, false)
+            end
         end
     end
 
-    -- Form-level message row (reserved whether or not an error is showing)
+    -- Form-level message row, pinned with the buttons rather than following the
+    -- last field.
+    y = viewBottom
     self._formMsgY = y
     y = y + FONT_HGT_SMALL + 2
 
@@ -1335,18 +1380,19 @@ function FormPanel:reflowFields()
         self._deleteBtn:setY(y)
     end
 
-    y = y + ROW_H + PAD
+    -- The window was already sized at the top of this function, from the content
+    -- rather than from wherever the last field happened to land.
+end
 
-    -- Resize window to fit. setHeight rather than assigning self.height: the
-    -- frame and the resize widget are drawn from the java element, so a direct
-    -- assignment moved the contents and left the border at its old size.
-    local newH = y
-    if newH ~= self.height then
-        self:setHeight(newH)
-        -- Re-center vertically
-        local core = getCore()
-        self:setY((core:getScreenHeight() - newH) / 2)
+--- Scroll the fields. Only when there is something to scroll, so a form that
+--- fits leaves the wheel alone for whatever is underneath.
+function FormPanel:onMouseWheel(del)
+    if (self._scrollRange or 0) <= 0 then
+        return false
     end
+    self._scrollY = math.max(0, math.min((self._scrollY or 0) + del * ROW_H * 2, self._scrollRange))
+    self:reflowFields()
+    return true
 end
 
 function FormPanel:_setFieldWidgetsVisible(f, vis)
@@ -1425,8 +1471,8 @@ function FormPanel:prerender()
     -- taken the row over and the two would overlap.
     if self._hasInherited then
         for _, f in ipairs(self._fields) do
-            if f.visible and f._hint and f._inheritNote and not (self._showErrors and f._error) and
-                self:_isShowingInherited(f) then
+            if f.visible and f._inView ~= false and f._hint and f._inheritNote and
+                not (self._showErrors and f._error) and self:_isShowingInherited(f) then
                 local x = f._fieldX or PAD
                 local hintText = f.hint or ""
                 if hintText ~= "" then
@@ -1437,9 +1483,25 @@ function FormPanel:prerender()
         end
     end
 
+    -- Where there is more form than window, a bar on the right edge saying so.
+    -- Otherwise the only clue that a field has scrolled out of reach is that it
+    -- is not there.
+    if (self._scrollRange or 0) > 0 then
+        local th = self:titleBarHeight()
+        local trackTop = th + 2
+        local trackH = self.height - self:footerHeight() - trackTop - 2
+        if trackH > 0 then
+            local total = trackH + self._scrollRange
+            local thumbH = math.max(math.floor(20 * FONT_SCALE), math.floor(trackH * trackH / total))
+            local thumbY = trackTop + math.floor((trackH - thumbH) * (self._scrollY / self._scrollRange))
+            self:drawRect(self.width - 6, trackTop, 4, trackH, 0.25, 1, 1, 1)
+            self:drawRect(self.width - 6, thumbY, 4, thumbH, 0.5, 1, 1, 1)
+        end
+    end
+
     for _, f in ipairs(self._fields) do
-        if not f.visible then
-            -- skip
+        if not f.visible or f._inView == false then
+            -- skip: hidden, or scrolled out of the field area
         elseif f.type == "separator" and f._drawY then
             local w = self.width - PAD * 2
             self:drawRect(PAD, f._drawY, w, 1, 0.3, 0.4, 0.4, 0.4)
