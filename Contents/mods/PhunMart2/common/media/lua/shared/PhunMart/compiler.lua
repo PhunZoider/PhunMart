@@ -192,16 +192,17 @@ local function resolveWithInheritance(defsTable, key, logger)
             -- parent first, then child overrides
             local merged = deepMerge(parentResolved, entry)
 
-            -- Actions merge per element instead of being replaced wholesale.
-            -- No shipped definition is affected: every inherit target is a
-            -- template and no template declares actions, so the child's list
-            -- has always been the only one present. Warn when both sides have
-            -- them, because that combination did not previously merge and an
-            -- override relying on the old behaviour would want to know.
-            if type(parentResolved.actions) == "table" and type(entry.actions) == "table" then
-                logger:warn("'" .. tostring(k) .. "' and its parent '" .. tostring(parentKey) ..
-                                "' both define actions; they now merge per action rather than the child replacing the parent")
-            end
+            -- Actions merge per element instead of being replaced wholesale,
+            -- which is what lets a template own the shape of an action while
+            -- each child fills in the one field that differs. The XP and boost
+            -- templates are built exactly that way: the parent carries the type
+            -- and amount, the child carries the skill name.
+            --
+            -- There was a warning here for a parent and child that both declare
+            -- actions, from when that combination was anomalous and no template
+            -- declared any. Moving the shared fields up into the templates made
+            -- it the normal case and the warning fired 210 times per compile,
+            -- on every save, describing the design working as intended.
             merged.actions = mergeActions(parentResolved.actions, entry.actions)
 
             -- template should NOT inherit; only explicit on the child
