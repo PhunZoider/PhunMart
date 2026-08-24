@@ -516,6 +516,55 @@ function FormPanel:setFieldValue(key, value)
     end
 end
 
+---------------------------------------------------------------------------
+-- Inherited values
+--
+-- A form filled from a definition that inherits shows the resolved value, so
+-- what you read is what the thing actually does. That is right, and it is also
+-- silent about where the value came from: a field holding its template's answer
+-- looks exactly like one holding its own. With most shipped specials inheriting
+-- almost everything, that is most of the form lying about itself.
+--
+-- A marked field says so in its message row until its value stops matching what
+-- it was loaded with. Edit it and the marker goes, because it is now yours.
+-- Put the old value back and the marker returns, because it is not.
+---------------------------------------------------------------------------
+
+--- Mark a field as currently showing a value that came from `sourceLabel`.
+--- Call after the fields are declared and before initialise, since a marked
+--- field needs a message row and that decides how tall the form is.
+function FormPanel:setFieldInherited(key, sourceLabel)
+    local f = self._fieldsByKey[key]
+    if not f then
+        return self
+    end
+    f.inheritedFrom = sourceLabel
+    -- The value itself is captured on the first refresh: the widgets do not
+    -- exist yet, so there is nothing to read here.
+    f._inheritCaptured = false
+    f.hasMessageRow = true
+    -- Only a form that has marked something pays for the per-frame repaint.
+    self._hasInherited = true
+    return self
+end
+
+--- Is this field still showing the value it was loaded with?
+function FormPanel:_isShowingInherited(f)
+    if not f.inheritedFrom or not self._built then
+        return false
+    end
+    if not f._inheritCaptured then
+        f.inheritedValue = self:getFieldValue(f.key)
+        f._inheritCaptured = true
+        return true
+    end
+    local current = self:getFieldValue(f.key)
+    if type(current) == "table" or type(f.inheritedValue) == "table" then
+        return PhunMart.utils.deepEquals(current, f.inheritedValue)
+    end
+    return current == f.inheritedValue
+end
+
 --- Update a field's hint text. Re-applies position after setName to work
 -- around PZ ISLabel quirk where setName resets x.
 function FormPanel:setHintText(key, text)
@@ -688,6 +737,11 @@ function FormPanel:_computeNeededWidth()
     end
     for _, f in ipairs(self._fields) do
         consider(f.hint)
+        if f.inheritedFrom then
+            -- The provenance message takes the hint's place, so the form has to
+            -- be wide enough for whichever of the two is longer.
+            consider(getText("IGUI_PhunMart_Hint_Inherited", tostring(f.inheritedFrom)))
+        end
         if f.type == "separator" then
             consider(f.text)
         end
@@ -1325,6 +1379,11 @@ function FormPanel:prerender()
     -- so a corrected field clears without another click.
     if self._showErrors then
         self:validateAll()
+    elseif self._hasInherited then
+        -- validateAll refreshes the messages itself. Without it, the provenance
+        -- markers still have to be repainted, because whether a field is showing
+        -- an inherited value changes with every keystroke.
+        self:_refreshMessages()
     end
 
     if self._formError and self._formMsgY then
@@ -1472,15 +1531,24 @@ function FormPanel._builtinChecks(form, f, value)
     return nil
 end
 
---- Push each field's current error (or its hint) into its message label.
+--- Push each field's current error, provenance, or hint into its message label.
+---
+--- Three states in priority order. An error is the most urgent. Then where the
+--- value came from, which replaces the hint rather than being appended to it:
+--- while a field is showing somebody else's answer, that is the more useful of
+--- the two, and typing brings the explanation straight back.
 function FormPanel:_refreshMessages()
     for _, f in ipairs(self._fields) do
         if f._hint then
             local showError = self._showErrors and f._error
-            f._hint:setName(showError or f.hint or "")
             if showError then
+                f._hint:setName(showError)
                 f._hint.r, f._hint.g, f._hint.b = 0.95, 0.45, 0.4
+            elseif self:_isShowingInherited(f) then
+                f._hint:setName(getText("IGUI_PhunMart_Hint_Inherited", tostring(f.inheritedFrom)))
+                f._hint.r, f._hint.g, f._hint.b = 0.45, 0.72, 0.78
             else
+                f._hint:setName(f.hint or "")
                 f._hint.r, f._hint.g, f._hint.b = 0.5, 0.5, 0.5
             end
             -- Re-apply position after setName (PZ ISLabel resets x)

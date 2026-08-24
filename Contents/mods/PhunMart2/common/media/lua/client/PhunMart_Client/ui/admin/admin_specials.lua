@@ -288,6 +288,74 @@ local function pruneInherited(node, parentNode)
     end
 end
 
+---------------------------------------------------------------------------
+-- Provenance
+--
+-- Where each field on the form reads from, so the form can say whether the
+-- value on screen belongs to this entry or came down from its template. Only
+-- four fields used to carry that marker, and `action` was not one of them,
+-- which is the field whose inherited value looked like a real choice of
+-- addTrait and got saved as one.
+---------------------------------------------------------------------------
+
+--- A test for "the first action carries this field".
+local function fromAction(name)
+    return function(d)
+        local a = d.actions and d.actions[1]
+        return a ~= nil and a[name] ~= nil
+    end
+end
+
+local FIELD_SOURCE = {
+    displayText = function(d)
+        return d.display ~= nil and d.display.text ~= nil
+    end,
+    price = function(d)
+        return d.price ~= nil
+    end,
+    weight = function(d)
+        return d.offer ~= nil and d.offer.weight ~= nil
+    end,
+    stockMin = function(d)
+        return d.offer ~= nil and d.offer.stock ~= nil and d.offer.stock.min ~= nil
+    end,
+    stockMax = function(d)
+        return d.offer ~= nil and d.offer.stock ~= nil and d.offer.stock.max ~= nil
+    end,
+    enabled = function(d)
+        return d.enabled ~= nil
+    end,
+    action = fromAction("type"),
+    trait = fromAction("trait"),
+    xpSkill = fromAction("skill"),
+    xpAmount = fromAction("amount"),
+    boostSkill = fromAction("skill"),
+    boostMultiplier = fromAction("multiplier"),
+    animalType = fromAction("animal"),
+    animalBreed = fromAction("breed"),
+    tokenAmount = fromAction("amount"),
+    balanceAmount = fromAction("amount"),
+    pool = fromAction("pool"),
+    giveItemItem = fromAction("item"),
+    giveItemAmount = fromAction("amount")
+}
+
+--- Mark every field whose value the resolved definition has but the raw entry
+--- does not. Tested against the resolved copy rather than the parent so a field
+--- that is simply blank on both stays unmarked: "inherited" has to mean an
+--- actual value arrived from somewhere, not that nobody set one.
+local function markInheritedFields(form, raw, def)
+    local from = raw.inherit
+    if not from or from == "" then
+        return
+    end
+    for key, hasValue in pairs(FIELD_SOURCE) do
+        if not hasValue(raw) and hasValue(def) then
+            form:setFieldInherited(key, from)
+        end
+    end
+end
+
 local function createEditModal(specialKey, specialDef, isNew, cb)
     local raw = specialDef or {}
     local isTpl = raw.template or false
@@ -305,26 +373,9 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- deciding, on save, whether a value is its own or borrowed.
     local parentDef = tools.resolveParent(allSpecials, raw)
 
-    -- Marks a hint when the value shown came from the template rather than
-    -- from this entry. Without it the form looks like every field belongs to
-    -- the row, and there is no way to tell what editing one would actually
-    -- change.
-    local function hint(key, path, actionField)
-        local text = getText(key)
-        if not parentDef then
-            return text
-        end
-        local own
-        if actionField then
-            own = raw.actions and raw.actions[1] and raw.actions[1][actionField] ~= nil
-        else
-            own = raw[path] ~= nil
-        end
-        if own then
-            return text
-        end
-        return text .. " " .. getText("IGUI_PhunMart_Lbl_FromTemplate", tostring(raw.inherit))
-    end
+    -- Provenance used to be four hand-marked hints appended at build time, which
+    -- covered four of twenty-eight fields and never updated once you typed. It
+    -- is markInheritedFields plus FormPanel now, for every field and live.
 
     -- Each action type reads its own fields off the stored action, rather than
     -- everything being flattened into one string.
@@ -668,7 +719,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     })
     form:addTextField("xpAmount", getText("IGUI_PhunMart_Lbl_XPAmount"), {
         default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
-        hint = hint("IGUI_PhunMart_Hint_XPAmount", nil, "amount"),
+        hint = getText("IGUI_PhunMart_Hint_XPAmount"),
         group = "act_xp",
         required = true,
         numeric = true,
@@ -682,7 +733,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     })
     form:addTextField("boostMultiplier", getText("IGUI_PhunMart_Lbl_BoostMultiplier"), {
         default = (curAction and curAction.multiplier) and tostring(curAction.multiplier) or "",
-        hint = hint("IGUI_PhunMart_Hint_BoostMultiplier", nil, "multiplier"),
+        hint = getText("IGUI_PhunMart_Hint_BoostMultiplier"),
         group = "act_boost",
         required = true,
         numeric = true,
@@ -756,12 +807,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
         selected = def.price or "",
-        hint = hint("IGUI_PhunMart_Hint_PriceOverride", "price"),
+        hint = getText("IGUI_PhunMart_Hint_PriceOverride"),
         group = "instance"
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
-        hint = hint("IGUI_PhunMart_Hint_WeightOverride", "offer"),
+        hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
         group = "instance",
         numeric = true,
         min = 0
@@ -792,6 +843,8 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:setGroupVisible("template", isTpl)
     form:setGroupVisible("instance", not isTpl)
     applyActionGroups(form, curActionType, isTpl)
+
+    markInheritedFields(form, raw, def)
 
     form:initialise()
 
