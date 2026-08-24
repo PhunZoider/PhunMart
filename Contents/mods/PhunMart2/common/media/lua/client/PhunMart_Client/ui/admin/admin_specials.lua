@@ -230,63 +230,9 @@ local function getPriceKeys()
     return keys
 end
 
-local function sameValue(a, b)
-    if type(a) ~= type(b) then
-        return false
-    end
-    if type(a) ~= "table" then
-        return a == b
-    end
-    for k, v in pairs(a) do
-        if not sameValue(v, b[k]) then
-            return false
-        end
-    end
-    for k in pairs(b) do
-        if a[k] == nil then
-            return false
-        end
-    end
-    return true
-end
-
-local function isEmptyTable(t)
-    for _ in pairs(t) do
-        return false
-    end
-    return true
-end
-
---- Strip from `node` anything `parentNode` already provides, so a child keeps
---- only what makes it different.
----
---- The form shows resolved values, which means it hands back inherited ones
---- too. Writing those onto the child would freeze them: change the template
---- later and this one entry would stop following it, which is the opposite of
---- why the templates exist.
----
---- Maps are walked key by key. Comparing a whole `display` would never match,
---- since the parent holds a texture and the child a text, and the child would
---- come away with a copy of the parent's texture.
-local function pruneInherited(node, parentNode)
-    if type(node) ~= "table" or type(parentNode) ~= "table" then
-        return
-    end
-    for k, v in pairs(node) do
-        local pv = parentNode[k]
-        if pv ~= nil then
-            if type(v) == "table" and type(pv) == "table" and not Core.utils.isSequence(v) and
-                not Core.utils.isSequence(pv) then
-                pruneInherited(v, pv)
-                if isEmptyTable(v) then
-                    node[k] = nil
-                end
-            elseif sameValue(v, pv) then
-                node[k] = nil
-            end
-        end
-    end
-end
+-- sameValue, isEmptyTable and pruneInherited moved to ui_utils when the price
+-- editor turned out to need the same rule.
+local pruneInherited = tools.pruneInherited
 
 ---------------------------------------------------------------------------
 -- Provenance

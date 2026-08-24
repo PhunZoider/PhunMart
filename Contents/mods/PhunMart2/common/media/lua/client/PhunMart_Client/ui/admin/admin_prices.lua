@@ -128,9 +128,44 @@ local function onKindChanged(form)
     form:setFieldVisible("items", isItems)
 end
 
+--- Where each form field reads from, for saying whether the value on screen is
+--- this price's own or its parent's. See markInheritedFields below.
+local PRICE_FIELD_SOURCE = {
+    kind = function(d)
+        return d.kind ~= nil
+    end,
+    pool = function(d)
+        return d.pool ~= nil
+    end,
+    amount = function(d)
+        return d.amount ~= nil
+    end,
+    max = function(d)
+        return type(d.amount) == "table" and d.amount.max ~= nil
+    end,
+    factor = function(d)
+        return d.factor ~= nil
+    end,
+    items = function(d)
+        return d.item ~= nil or d.items ~= nil
+    end
+}
+
 local function createEditModal(priceKey, priceDef, isNew, cb)
-    local def = priceDef or {}
+    -- `raw` is what this price stores; `def` is what it resolves to once its
+    -- parent has been folded in. The form reads the resolved one.
+    --
+    -- It used to read the raw table, and 44 of the 48 shipped prices declare
+    -- neither kind nor pool. A combo cannot show a blank: it sits on its first
+    -- option, so every one of those opened reading "free", and Apply wrote that
+    -- back along with clearing the amount. Opening an inheriting price and
+    -- pressing Apply made it free.
+    local raw = priceDef or {}
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local def = (priceKey and tools.resolveInherited(prices, priceKey)) or raw
+    -- What this price would be if it declared nothing: the yardstick for
+    -- deciding, on save, whether a value is its own or borrowed.
+    local parentDef = tools.resolveParent(prices, raw)
 
     -- Pre-compute amount default (convert cents to dollars for display)
     local amountDefault = ""
@@ -180,9 +215,11 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             local key = f:getFieldValue("key")
 
             local kind = f:getFieldValue("kind")
-            -- Start from the existing definition so keys this form doesn't model
-            -- (substitutes, and anything added later) survive the edit.
-            local result = Core.utils.deepCopy(def)
+            -- From the raw definition, not the resolved one: starting from
+            -- resolved would copy every inherited value onto this entry and
+            -- freeze it there. Keys this form does not model (substitutes, and
+            -- anything added later) still survive the edit.
+            local result = Core.utils.deepCopy(raw)
             result.kind = kind
             -- Each branch below owns a different shape; clear the other shapes'
             -- fields so switching kind doesn't leave stale ones behind.
@@ -234,6 +271,13 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
 
+            -- Drop anything the parent already says, so this entry keeps only
+            -- what makes it different and keeps following the parent for the
+            -- rest. Without this every save freezes the whole resolved price.
+            if parentDef then
+                tools.pruneInherited(result, parentDef)
+            end
+
             if cb then cb(key, result) end
             f:close()
         end,
@@ -249,7 +293,9 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         end or nil,
     })
     form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
+        -- Raw, not resolved: a name is this entry's own or it has none, and
+        -- showing the parent's would suggest it had been given one.
+        default = raw.title or "",
         hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     -- Prices and specials both store a `kind`, but they mean different things:
@@ -298,7 +344,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         end,
     })
     form:addTextField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
-        default = def.inherit or "",
+        default = raw.inherit or "",
         hint = getText("IGUI_PhunMart_Hint_InheritKey"),
         validate = function(value)
             if value ~= "" and not prices[value] then
@@ -314,6 +360,16 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         hint = getText("IGUI_PhunMart_Hint_Factor"),
         numeric = true, min = 0,
     })
+
+    -- Say which values came from the parent, before initialise: a marked field
+    -- needs a message row and that decides how tall the form is.
+    if raw.inherit and raw.inherit ~= "" then
+        for fieldKey, hasValue in pairs(PRICE_FIELD_SOURCE) do
+            if not hasValue(raw) and hasValue(def) then
+                form:setFieldInherited(fieldKey, raw.inherit)
+            end
+        end
+    end
 
     form:initialise()
     -- Apply initial visibility based on kind

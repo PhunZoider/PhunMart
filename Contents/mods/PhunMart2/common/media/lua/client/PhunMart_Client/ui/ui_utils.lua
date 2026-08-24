@@ -306,6 +306,67 @@ function tools.resolveInherited(defs, key, depth)
     return merged
 end
 
+local function sameValue(a, b)
+    if type(a) ~= type(b) then
+        return false
+    end
+    if type(a) ~= "table" then
+        return a == b
+    end
+    for k, v in pairs(a) do
+        if not sameValue(v, b[k]) then
+            return false
+        end
+    end
+    for k in pairs(b) do
+        if a[k] == nil then
+            return false
+        end
+    end
+    return true
+end
+
+local function isEmptyTable(t)
+    for _ in pairs(t) do
+        return false
+    end
+    return true
+end
+
+--- Strip from `node` anything `parentNode` already provides, so a child keeps
+--- only what makes it different.
+---
+--- An edit form shows resolved values, which means it hands back inherited ones
+--- too. Writing those onto the child would freeze them: change the parent later
+--- and this one entry would stop following it, which is the opposite of why
+--- inheritance exists.
+---
+--- Maps are walked key by key. Comparing a whole `display` would never match,
+--- since the parent holds a texture and the child a text, and the child would
+--- come away with a copy of the parent's texture.
+---
+--- Lives here rather than in one editor because both the editors that support
+--- inheritance need it, and two copies of a rule this fiddly would drift.
+function tools.pruneInherited(node, parentNode)
+    if type(node) ~= "table" or type(parentNode) ~= "table" then
+        return
+    end
+    for k, v in pairs(node) do
+        local pv = parentNode[k]
+        if pv ~= nil then
+            if type(v) == "table" and type(pv) == "table" and not Core.utils.isSequence(v) and
+                not Core.utils.isSequence(pv) then
+                tools.pruneInherited(v, pv)
+                if isEmptyTable(v) then
+                    node[k] = nil
+                end
+            elseif sameValue(v, pv) then
+                node[k] = nil
+            end
+        end
+    end
+end
+
 --- The resolved parent of `def`, or nil when it has none. What a child would
 --- be if it declared nothing at all, which is the yardstick for telling
 --- whether a value on a form is the child's own or borrowed.
