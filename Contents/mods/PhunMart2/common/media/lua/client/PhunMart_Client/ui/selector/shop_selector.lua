@@ -129,7 +129,10 @@ function UI:createChildren()
     -- nothing in the UI could create a shop, only edit one that already existed.
     self._newBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onNewShop)
     self._editBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEdit, true)
-    self._adminBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_AdminTools"), self.onAdminToolsMenu)
+    -- An "Admin Tools" button used to sit here, opening a context menu holding
+    -- the wallet editor, recompile and restock-all. They live on the Tools tab
+    -- now, where each one is a labelled row rather than a bare verb in a menu
+    -- that had to be opened before it would say what was in it.
 
     self:refreshAll()
 end
@@ -147,9 +150,6 @@ function UI:prerender()
     -- Set visibility before the base lays the button bar out, so hidden
     -- buttons don't reserve space.
     local canEdit = Core.canEditConfig(self.player)
-    if self._adminBtn then
-        self._adminBtn:setVisible(canEdit)
-    end
     if self._newBtn then
         self._newBtn:setVisible(canEdit)
     end
@@ -159,24 +159,13 @@ function UI:prerender()
     ListPanel.prerender(self)
 end
 
---- Create a shop, then hand straight over to its group. The machine, its pool
---- and an empty group all get written; the only question left open is what it
---- sells, and that is the group's to answer.
+--- Create a shop, then hand straight over to its group. The same entry point
+--- as the Tools tab offers, so the two cannot drift apart.
 function UI:onNewShop()
     if not Core.canEditConfig(self.player) then
         return
     end
-    ShopWizard.open(self.player, function(groupKey)
-        if self.shell then
-            local view = self.shell:activateTab("groups")
-            if view and view.selectKey then
-                view:selectKey(groupKey)
-            end
-            if Core.ui.admin_groups.OnEditGroup then
-                Core.ui.admin_groups.OnEditGroup(self.player, groupKey)
-            end
-        end
-    end)
+    ShopWizard.openThenEdit(self.player, self.shell)
 end
 
 ---------------------------------------------------------------------------
@@ -208,46 +197,3 @@ function UI:onRowContextMenu(item, screenX, screenY)
     end
 end
 
-function UI:onAdminToolsMenu(btn)
-    local context = ISContextMenu.get(self.playerIndex, btn:getAbsoluteX(), btn:getAbsoluteY())
-
-    -- Anything outstanding goes first and only when there is something to show,
-    -- so the one time-sensitive entry isn't buried among the editors.
-    local pr = Core.ui.pending_restock
-    if pr and pr.count() > 0 then
-        context:addOption(getText("IGUI_PhunMart_Btn_PendingN", tostring(pr.count())), self, function()
-            pr.show()
-        end)
-    end
-
-    -- The definition editors used to live here as a submenu. They are tabs now,
-    -- so what is left is the handful of things that are not a definition list:
-    -- one player-facing tool and two maintenance actions.
-    context:addOption(getText("IGUI_PhunMart_Btn_Wallet"), self, function()
-        Core.ui.admin.OnOpenPanel(self.player)
-    end)
-
-    -- Recompile and Restock All are not editing actions, and sitting alongside
-    -- the editors made Recompile read as the commit step for an edit. It isn't:
-    -- every save already recompiles. Its real job is picking up override files
-    -- hand-edited on disk, which is a maintenance task.
-    local maintMenu = ISContextMenu:getNew(context)
-    context:addSubMenu(context:addOption(getText("IGUI_PhunMart_Menu_Maintenance")), maintMenu)
-    maintMenu:addOption(getText("IGUI_PhunMart_Btn_Recompile"), self, function()
-        sendClientCommand(Core.name, Core.commands.compile, {})
-    end)
-    maintMenu:addOption(getText("IGUI_PhunMart_Btn_RestockAll"), self, function()
-        local w = 300
-        local h = 150
-        local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - w / 2, getCore():getScreenHeight() / 2 - h / 2,
-            w, h, getText("IGUI_PhunMart_Confirm_RestockAll"), true, self, self.onConfirmRestockAll)
-        modal:initialise()
-        modal:addToUIManager()
-    end)
-end
-
-function UI:onConfirmRestockAll(button)
-    if button.internal == "YES" then
-        sendClientCommand(Core.name, Core.commands.restockAllShops, {})
-    end
-end

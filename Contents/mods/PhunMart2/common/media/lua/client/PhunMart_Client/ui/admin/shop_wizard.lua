@@ -592,5 +592,30 @@ function ShopWizard.open(player, onDone)
     return form
 end
 
+--- Run the wizard, then hand over to the group it created.
+---
+--- A new shop is a machine, a pool and an empty group, and the wizard answers
+--- everything about the first two. The only question left open is what the
+--- thing sells, which is the group's to answer, so dropping the admin back on
+--- a list to go and find it themselves is a step that need not exist.
+---
+--- Lives here rather than at either call site because both the Shops tab and
+--- the Tools tab offer this, and two copies of the follow-on would be two
+--- places to forget.
+function ShopWizard.openThenEdit(player, shell)
+    ShopWizard.open(player, function(groupKey)
+        if not groupKey or not shell then
+            return
+        end
+        local view = shell:activateTab("groups")
+        if view and view.selectKey then
+            view:selectKey(groupKey)
+        end
+        if Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
+            Core.ui.admin_groups.OnEditGroup(player, groupKey)
+        end
+    end)
+end
+
 Core.ui.shop_wizard = ShopWizard
 return ShopWizard

@@ -135,19 +135,23 @@ function ListPanel:createChildren()
     self._columnDefs = {}
     self._allItems = {}
 
-    -- Filter entry (in button bar, left side)
-    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
-    local filterLbl = ISLabel:new(PAD, PAD, BUTTON_HGT, getText("IGUI_PhunMart_Lbl_Filter"), 0.8, 0.8, 0.8, 1, UIFont.Small, true)
-    filterLbl:initialise()
-    self._buttonBar:addChild(filterLbl)
-    self._filterLabel = filterLbl
+    -- Filter entry (in button bar, left side). A subclass sets _noFilter when
+    -- its list is a fixed handful of rows: a search box over six of them is one
+    -- more control to read past for no gain.
+    if not self._noFilter then
+        local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
+        local filterLbl = ISLabel:new(PAD, PAD, BUTTON_HGT, getText("IGUI_PhunMart_Lbl_Filter"), 0.8, 0.8, 0.8, 1, UIFont.Small, true)
+        filterLbl:initialise()
+        self._buttonBar:addChild(filterLbl)
+        self._filterLabel = filterLbl
 
-    local filterEntry = ISTextEntryBox:new("", PAD + filterLblW, PAD, 100, BUTTON_HGT)
-    filterEntry:initialise()
-    filterEntry:instantiate()
-    filterEntry:setClearButton(true)
-    self._buttonBar:addChild(filterEntry)
-    self._filterEntry = filterEntry
+        local filterEntry = ISTextEntryBox:new("", PAD + filterLblW, PAD, 100, BUTTON_HGT)
+        filterEntry:initialise()
+        filterEntry:instantiate()
+        filterEntry:setClearButton(true)
+        self._buttonBar:addChild(filterEntry)
+        self._filterEntry = filterEntry
+    end
     self._lastFilterText = ""
 
     -- Only shown on panels that declare a definition kind, since the other
@@ -741,7 +745,7 @@ function ListPanel:applyFilter()
     -- Remember the text as typed. prerender compares against the box verbatim,
     -- so storing the lowered copy had any capitalised filter reapplying itself
     -- on every frame.
-    local typed = self._filterEntry:getText()
+    local typed = self._filterEntry and self._filterEntry:getText() or ""
     self._lastFilterText = typed
     local filterText = typed:lower()
 
@@ -815,8 +819,10 @@ function ListPanel:prerender()
     -- minimum and let it sit underneath whatever it collided with, which was
     -- how a second tickbox made the Filter label overlap it.
     local hasSelection = self.list.selected and self.list.selected > 0
-    local filterLblW = getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8
-    local filterMinW = math.floor(150 * FONT_SCALE)
+    local hasFilter = self._filterEntry ~= nil
+    local filterLblW = hasFilter and
+                           (getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Lbl_Filter")) + 8) or 0
+    local filterMinW = hasFilter and math.floor(150 * FONT_SCALE) or 0
 
     local actionsW = self._closeBtn.width + PAD
     for _, btn in ipairs(self._bottomButtons) do
@@ -870,14 +876,18 @@ function ListPanel:prerender()
         self._hideVariationsTick:setY(topY)
         narrowRight = tickX - PAD
     end
-    self._filterLabel:setX(PAD)
-    self._filterLabel:setY(topY)
-    self._filterEntry:setX(PAD + filterLblW)
-    self._filterEntry:setY(topY)
-    self._filterEntry:setWidth(math.max(filterMinW, narrowRight - PAD - filterLblW))
+    if hasFilter then
+        self._filterLabel:setX(PAD)
+        self._filterLabel:setY(topY)
+        self._filterEntry:setX(PAD + filterLblW)
+        self._filterEntry:setY(topY)
+        self._filterEntry:setWidth(math.max(filterMinW, narrowRight - PAD - filterLblW))
+    end
 
-    -- Reapply filter when text changes
-    local currentFilter = self._filterEntry:getText()
+    -- Reapply filter when text changes. Also covers the first pass after a
+    -- refresh, which clears _lastFilterText to force one; a panel with no
+    -- filter box still needs that pass to run.
+    local currentFilter = hasFilter and self._filterEntry:getText() or ""
     if currentFilter ~= self._lastFilterText then
         self:applyFilter()
     end

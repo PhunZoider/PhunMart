@@ -27,6 +27,7 @@ require "PhunMart_Client/ui/admin/admin_specials"
 require "PhunMart_Client/ui/admin/admin_prices"
 require "PhunMart_Client/ui/admin/admin_blacklist"
 require "PhunMart_Client/ui/admin/admin_rewards"
+require "PhunMart_Client/ui/admin/admin_tools"
 
 local FONT_SCALE = ListPanel.FONT_SCALE
 local profileName = "PhunMartAdminShell"
@@ -74,6 +75,12 @@ local TABS = {{
     key = "rewards",
     module = "admin_rewards",
     label = "IGUI_PhunMart_Btn_Rewards"
+}, {
+    -- Last, and deliberately outside the chain: nothing on this tab edits a
+    -- definition, so it does not belong anywhere among the ones that do.
+    key = "tools",
+    module = "admin_tools",
+    label = "IGUI_PhunMart_Btn_Tools"
 }}
 
 Core.ui.admin_shell = ISCollapsableWindowJoypad:derive("PhunMartAdminShell")
