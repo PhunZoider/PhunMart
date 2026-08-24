@@ -20,6 +20,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 -- Required so the panel modules have registered themselves on Core.ui before
 -- the first open, whatever order the game happened to load the folder in.
 require "PhunMart_Client/ui/selector/shop_selector"
+require "PhunMart_Client/ui/instances/shop_instances"
 require "PhunMart_Client/ui/admin/admin_pools"
 require "PhunMart_Client/ui/admin/admin_groups"
 require "PhunMart_Client/ui/admin/admin_items"
@@ -45,6 +46,12 @@ local TABS = {{
     module = "shop_selector",
     label = "IGUI_PhunMart_Title_Shops",
     admin = false
+}, {
+    -- Beside Shops rather than in the chain below it: a machine standing in the
+    -- world is an instance of a shop type, not a step in how one resolves.
+    key = "locations",
+    module = "shop_instances",
+    label = "IGUI_PhunMart_Title_Locations"
 }, {
     key = "pools",
     module = "admin_pools",
@@ -163,7 +170,41 @@ function Shell:createChildren()
         end
     end
 
+    self:fitToTabs()
     self:layoutViews()
+end
+
+--- Grow the window until the whole tab strip is visible.
+---
+--- ISTabPanel scrolls its tabs when they overrun, which is a graceful failure
+--- but still a failure: a tab you cannot see is a tab you do not know exists,
+--- and that was the complaint the tabbed shell was built to answer. The strip
+--- has grown from eight entries to eleven and the default width stopped being
+--- enough somewhere in between.
+---
+--- Measured rather than guessed, because the answer depends on the font scale
+--- and on how long the labels are in whatever language is loaded. Only ever
+--- grows, and only up to most of the screen, so a small display ends up
+--- scrolling rather than opening a window it cannot show.
+function Shell:fitToTabs()
+    if not self.tabs then
+        return
+    end
+    local needed = self.tabs:getWidthOfAllTabs() + ListPanel.PAD * 2
+    if needed <= self.width then
+        return
+    end
+    local maxW = math.floor(getCore():getScreenWidth() * 0.92)
+    local w = math.min(needed, maxW)
+    if w <= self.width then
+        return
+    end
+    -- Keep it on screen: growing from a window already near the right edge
+    -- would otherwise push the far side off it.
+    local x = math.max(0, math.min(self:getX(), getCore():getScreenWidth() - w))
+    self:setX(x)
+    self:setWidth(w)
+    self.tabs:setWidth(w)
 end
 
 ---------------------------------------------------------------------------

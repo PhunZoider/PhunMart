@@ -2,391 +2,255 @@ if isServer() then
     return
 end
 
-require "ISUI/ISCollapsableWindowJoypad"
+-- Every machine standing in the world, and where it is.
+--
+-- This was a standalone window opened by right-clicking one shop, showing only
+-- that shop's machines. Two columns headed "Shop" and "Group" held a location
+-- and a distance, neither of which is either of those things, and there was no
+-- way to see the whole set at once or to tell two shops' machines apart.
+--
+-- It is a tab now, listing every machine with the shop it belongs to. Arriving
+-- from a shop row puts that shop's name in the filter box, which narrows the
+-- list to the old behaviour while leaving it obvious what has been narrowed and
+-- how to undo it.
+
 local Core = PhunMart
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_HGT_LARGE = getTextManager():getFontHeight(UIFont.Large)
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local FONT_SCALE = FONT_HGT_SMALL / 14
-local HEADER_HGT = FONT_HGT_MEDIUM + 2 * 2
-local BUTTON_HGT = FONT_HGT_SMALL + 6
-
-local profileName = "PhunMartUIShopInstances"
-
-Core.ui.shop_instances = ISCollapsableWindowJoypad:derive(profileName);
+Core.ui.shop_instances = ListPanel:derive("PhunMartShopInstances")
+Core.ui.shop_instances.instances = {}
 local UI = Core.ui.shop_instances
-local instances = {}
 
+-- PhunZones is optional; when present it names the region a machine sits in,
+-- which is far more use than a coordinate pair. Resolved once, on first use,
+-- because load order between mods is not ours to assume.
 local pz = nil
-
-function UI.setData(player, list)
+local function zoneTitle(x, y)
     if pz == nil then
         pz = PhunZones or false
     end
+    if not pz then
+        return nil
+    end
+    local ok, loc = pcall(pz.getLocation, x, y)
+    if ok and loc and loc.title and loc.title ~= "" then
+        return loc.title
+    end
+    return nil
+end
 
+local function whereText(x, y)
+    local title = zoneTitle(x, y)
+    local coords = "(" .. tostring(x) .. ", " .. tostring(y) .. ")"
+    return title and (title .. " " .. coords) or coords
+end
+
+---------------------------------------------------------------------------
+-- Tab
+---------------------------------------------------------------------------
+
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
-    -- find any open instance for this player
-    local inst = nil
-    for _, v in pairs(instances) do
-        if v.playerIndex == playerIndex then
-            inst = v
-            break
-        end
+    local instance = UI.instances[playerIndex]
+    if not instance then
+        instance = UI:new(0, 0, 100, 100, player)
+        instance.description = getText("IGUI_PhunMart_Desc_Locations")
+        instance:initialise()
+        UI.instances[playerIndex] = instance
     end
-    if not inst then
-        return
-    end
-
-    local px, py = player:getX(), player:getY()
-    local data = {}
-    for _, v in ipairs(list) do
-        if inst.shopKey == nil or inst.shopKey == v.type then
-            local x, y, z = v.x, v.y, v.z or 0
-            table.insert(data, {
-                key = v.key,
-                location = {
-                    x = x,
-                    y = y,
-                    z = z
-                },
-                label = (pz and (pz.getLocation(x, y).title .. " ") or "") .. "(" .. x .. ", " .. y .. ")",
-                distance = math.sqrt((x - px) ^ 2 + (y - py) ^ 2)
-            })
-        end
-    end
-
-    table.sort(data, function(a, b)
-        return a.distance < b.distance
-    end)
-
-    inst.controls.list:clear()
-    for _, v in ipairs(data) do
-        inst.controls.list:addItem(v.label, v)
-    end
-end
-
-function UI.open(player, shopKey)
-
-    local playerIndex = player:getPlayerNum()
-
-    local core = getCore()
-    local width = 300 * FONT_SCALE
-    local height = 300 * FONT_SCALE
-
-    local x = (core:getScreenWidth() - width) / 2
-    local y = (core:getScreenHeight() - height) / 2
-
-    local instance = UI:new(x, y, width, height, player, playerIndex, shopKey);
-    instance:initialise();
-
-    ISLayoutManager.RegisterWindow(profileName, UI, instance)
-
-    instances[playerIndex] = instance
-    instance.shopKey = shopKey or nil
-    instance:addToUIManager();
-    instance:setVisible(true);
-    instance:ensureVisible()
-
-    sendClientCommand(Core.name, Core.commands.getInstanceList, {})
-
-    return instance;
-end
-
-function UI:new(x, y, width, height, player, playerIndex, shopKey)
-    local o = {};
-    o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
-    setmetatable(o, self);
-    self.__index = self;
-
-    o.variableColor = {
-        r = 0.9,
-        g = 0.55,
-        b = 0.1,
-        a = 1
-    };
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    };
-    o.buttonBorderColor = {
-        r = 0.7,
-        g = 0.7,
-        b = 0.7,
-        a = 1
-    };
-    o.controls = {}
-    o.data = {}
-    o.moveWithMouse = false;
-    o.anchorRight = true
-    o.anchorBottom = true
-    o.player = player
-    o.playerIndex = playerIndex
-    o.shopKey = shopKey
-    o.zOffsetLargeFont = 25;
-    o.zOffsetMediumFont = 20;
-    o.zOffsetSmallFont = 6;
-    o:setWantKeyEvents(true)
-    local title = (shopKey and Core.shopLabel(shopKey)) or getText("IGUI_PhunMart_Title_Locations")
-    o:setTitle(title)
-    return o;
-end
-
-function UI:RestoreLayout(name, layout)
-
-    -- ISLayoutManager.DefaultRestoreWindow(self, layout)
-    -- if name == profileName then
-    --     ISLayoutManager.DefaultRestoreWindow(self, layout)
-    --     self.userPosition = layout.userPosition == 'true'
-    -- end
-    self:recalcSize();
-end
-
-function UI:SaveLayout(name, layout)
-    ISLayoutManager.DefaultSaveWindow(self, layout)
-    if self.userPosition then
-        layout.userPosition = 'true'
-    else
-        layout.userPosition = 'false'
-    end
-end
-
-function UI:close()
-    if not self.locked then
-        ISCollapsableWindowJoypad.close(self);
-    end
+    return instance
 end
 
 function UI:createChildren()
+    ListPanel.createChildren(self)
 
-    ISCollapsableWindowJoypad.createChildren(self);
+    self.list.doDrawItem = ListPanel.defaultDrawRow
+    self.list:setOnMouseDoubleClick(self, self.onTeleport)
 
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
+    self:addListColumn(getText("IGUI_PhunMart_Col_Shop"), 0, {
+        field = "shopLabel"
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Where"), 0.4, {
+        field = "where"
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Distance"), 0.78, {
+        -- Measured live rather than baked in at refresh. You walk while this is
+        -- open, and a distance that was true a minute ago is worse than none.
+        -- Only drawn rows call this, so it is a handful of square roots a frame.
+        text = function(d)
+            return Core.utils.formatWholeNumber(self:distanceTo(d)) .. "m"
+        end,
+        color = {1, 1, 1},
+        align = "right"
+    })
 
-    local padding = 10
-    local x = 0
-    local y = th
-    local w = self.width
-    local h = self.height - rh - th
+    self._portBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Teleport"), self.onTeleport, true)
+    self._refreshBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Refresh"), self.refresh)
 
-    self.controls = {}
-
-    local panel = ISPanel:new(x, y, w, h);
-    panel:initialise();
-    panel:instantiate();
-    self:addChild(panel);
-    self.controls._panel = panel;
-
-    local listPanel = ISPanel:new(0, 0, w, h - BUTTON_HGT + 20);
-    listPanel:initialise();
-    listPanel:instantiate();
-    self.controls._panel:addChild(listPanel);
-    self.controls._listPanel = listPanel;
-
-    local controlPanel = ISPanel:new(0, listPanel:getHeight() - BUTTON_HGT + 20, w, BUTTON_HGT + 20);
-    controlPanel:initialise();
-    controlPanel:instantiate();
-    controlPanel:setAnchorRight(true)
-    controlPanel:setAnchorLeft(true)
-    controlPanel:setAnchorTop(true)
-    controlPanel:setAnchorBottom(true)
-    self.controls._panel:addChild(controlPanel);
-    self.controls._controlPanel = controlPanel;
-
-    local list = ISScrollingListBox:new(0, HEADER_HGT, w, h);
-    list:initialise();
-    list:instantiate();
-    list.itemheight = FONT_HGT_SMALL + 6 * 2
-    list.selected = 0;
-    list.joypadParent = self;
-    list.font = UIFont.NewSmall;
-    list.doDrawItem = self.drawDatas;
-    list.onMouseUp = function(list, x, y)
-        local row = list:rowAt(x, y)
-        if row == nil or row == -1 then
-            return
-        end
-        list:ensureVisible(row)
-        local item = list.items[row].item
-        list.selected = row
-    end
-
-    list.onRightMouseUp = function(target, x, y, a, b)
-        local row = target:rowAt(x, y)
-        if row == -1 then
-            return
-        end
-        if self.selected ~= row then
-            self.selected = row
-            target.selected = row
-            target:ensureVisible(target.selected)
-        end
-        local item = target.items[target.selected].item
-
-    end
-    list.drawBorder = true;
-    list.onMouseMove = self.doOnMouseMove
-    list.onMouseMoveOutside = self.doOnMouseMoveOutside
-
-    list.onMouseDoubleClick = function()
-        if self.controls.list.selected and self.controls.list.selected > 0 and
-            self.controls.list.items[self.controls.list.selected] then
-            local item = self.controls.list.items[self.controls.list.selected].item
-            self:doPort(item.location.x, item.location.y, item.location.z or 0)
-        end
-    end
-
-    list:addColumn(getText("IGUI_PhunMart_Col_Shop"), 0);
-    list:addColumn(getText("IGUI_PhunMart_Col_Group"), 150);
-    self.controls.list = list;
-    self.controls._listPanel:addChild(list);
-
-    local btnPort = ISButton:new(0, 10, 100, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Port"), self, function()
-        if self.controls.list.selected and self.controls.list.selected > 0 and
-            self.controls.list.items[self.controls.list.selected] then
-            local item = self.controls.list.items[self.controls.list.selected].item
-            self:doPort(item.location.x, item.location.y, item.location.z or 0)
-        end
-    end);
-    btnPort.internal = "EDIT";
-    btnPort:initialise();
-    btnPort:instantiate();
-    btnPort:setEnable(false);
-    self.controls.btnPort = btnPort;
-    self.controls._controlPanel:addChild(btnPort);
+    self:refresh()
 end
 
-function UI:prerender()
-    ISCollapsableWindowJoypad.prerender(self)
+---------------------------------------------------------------------------
+-- Data
+---------------------------------------------------------------------------
 
-    local th = self:titleBarHeight()
-    local rh = self:resizeWidgetHeight()
-
-    -- container
-    self.controls._panel:setWidth(self.width)
-    self.controls._panel:setHeight(self.height - rh - th)
-
-    -- list container
-    self.controls._listPanel:setWidth(self.controls._listPanel.parent.width)
-    self.controls._listPanel:setHeight(self.controls._listPanel.parent.height - self.controls._controlPanel.height)
-
-    -- list
-    self.controls.list:setWidth(self.controls.list.parent.width)
-    self.controls.list:setHeight(self.controls.list.parent.height - HEADER_HGT)
-    self.controls.list.columns[2].size = self.controls.list.width / 2
-
-    -- control container
-    self.controls._controlPanel:setWidth(self.controls._controlPanel.parent.width)
-    self.controls._controlPanel:setHeight(BUTTON_HGT + 20)
-    self.controls._controlPanel:setY(self.controls._controlPanel.parent.height - self.controls._controlPanel.height)
-
-    -- port button
-    self.controls.btnPort:setX(self.controls.btnPort.parent.width - self.controls.btnPort.width - 10)
-    self.controls.btnPort:setEnable(self.controls.list.selected > 0)
-
+function UI:distanceTo(row)
+    local player = self.player
+    if not player or not row then
+        return 0
+    end
+    local dx = row.x - player:getX()
+    local dy = row.y - player:getY()
+    return math.sqrt(dx * dx + dy * dy)
 end
 
-function UI:drawDatas(y, item, alt)
-
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9;
-
-    if self.selected == item.index then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15);
-    end
-
-    if alt then
-        self:drawRect(0, (y), self:getWidth(), self.itemheight, 0.2, 0.6, 0.5, 0.5);
-    end
-
-    self:drawRectBorder(0, (y), self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b);
-
-    local iconX = 4
-    local iconSize = FONT_HGT_SMALL;
-    local xoffset = 10;
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-
-    if item.item.texture then
-        local textured = self:drawTextureScaledAspect(item.item.texture, xoffset, y, self.itemheight - 4,
-            self.itemheight - 4, 1, 1, 1, 1)
-        xoffset = xoffset + self.itemheight + 4
-    end
-
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
-    self:clearStencilRect()
-
-    local value = Core.utils.formatWholeNumber(item.item.distance) .. "m"
-
-    local valueWidth = getTextManager():MeasureStringX(self.font, value)
-    local w = self.width
-    local cw = self.columns[2].size
-    self:drawText(value, w - valueWidth - xoffset - 4, y + 4, 1, 1, 1, a, self.font);
-    self.itemsHeight = y + self.itemheight;
-    return self.itemsHeight;
+--- Ask the server for the machine list. The reply lands in setData, so the rows
+--- already on screen stay put until it does.
+function UI:refresh()
+    sendClientCommand(Core.name, Core.commands.getInstanceList, {})
 end
+
+function UI:setRows(list)
+    self:clearList()
+
+    local rows = {}
+    for _, v in ipairs(list or {}) do
+        local x, y, z = v.x, v.y, v.z or 0
+        table.insert(rows, {
+            key = v.key,
+            type = v.type,
+            shopLabel = Core.shopLabel(v.type),
+            where = whereText(x, y),
+            x = x,
+            y = y,
+            z = z
+        })
+    end
+
+    -- Nearest first, worked out once. The displayed distance updates as you
+    -- move but the order does not, so rows do not shuffle under the cursor
+    -- while you are reaching for one.
+    table.sort(rows, function(a, b)
+        return self:distanceTo(a) < self:distanceTo(b)
+    end)
+
+    for _, row in ipairs(rows) do
+        self:addListItem(row.shopLabel, row)
+    end
+end
+
+--- Push a fresh list into every open tab. Called from the command handlers,
+--- which is why it takes the player: in multiplayer the reply is addressed.
+function UI.setData(player, list)
+    local instance = player and UI.instances[player:getPlayerNum()]
+    if instance and instance.setRows then
+        instance:setRows(list)
+    end
+end
+
+function UI:getFilterText(itemData)
+    return (itemData.shopLabel or "") .. " " .. (itemData.where or "") .. " " .. (itemData.type or "")
+end
+
+---------------------------------------------------------------------------
+-- Actions
+---------------------------------------------------------------------------
+
+--- Narrow to one shop by typing its name into the filter, rather than by
+--- holding a hidden mode. The box shows what was done and clearing it undoes
+--- it, which a hidden filter cannot manage.
+function UI:showShop(shopType)
+    if self._filterEntry and shopType then
+        self._filterEntry:setText(Core.shopLabel(shopType))
+        self:applyFilter()
+    end
+end
+
+function UI:selectedRow()
+    local sel = self.list.selected
+    local entry = sel and sel > 0 and self.list.items[sel]
+    return entry and entry.item or nil
+end
+
+function UI:onTeleport()
+    local row = self:selectedRow()
+    if row then
+        self:doPort(row.x, row.y, row.z or 0)
+    end
+end
+
+---------------------------------------------------------------------------
+-- Teleport
+---------------------------------------------------------------------------
 
 function UI:doPort(destinationX, destinationY, destinationZ)
-
     local player = self.player
-    player:setX(destinationX)
-    player:setY(destinationY)
-    player:setZ(destinationZ)
-    if player.setLx then
-        player:setLx(destinationX)
-        player:setLy(destinationY)
-        player:setLz(destinationZ)
-    else
-        player:setLastX(destinationX)
-        player:setLastY(destinationY)
-        player:setLastZ(destinationZ)
-        getWorld():update()
+    if not player then
+        return
     end
+
+    local function place()
+        player:setX(destinationX)
+        player:setY(destinationY)
+        player:setZ(destinationZ)
+        if player.setLx then
+            player:setLx(destinationX)
+            player:setLy(destinationY)
+            player:setLz(destinationZ)
+        else
+            player:setLastX(destinationX)
+            player:setLastY(destinationY)
+            player:setLastZ(destinationZ)
+            getWorld():update()
+        end
+    end
+
+    place()
+
+    -- The destination square does not exist until the cell streams in, so the
+    -- position is reapplied once there is somewhere to stand. Bounded, because
+    -- a square that never loads would otherwise leave this running for the rest
+    -- of the session.
     local retries = 100
-    local playerPorting
-    playerPorting = function()
-        -- wait for square to load
+    local settle
+    settle = function()
         local square = player:getCurrentSquare()
         if square == nil then
             return
         end
         retries = retries - 1
         if retries <= 0 then
-            player:Say("Failed to port")
-            Events.OnPlayerUpdate.Remove(playerPorting)
+            Events.OnPlayerUpdate.Remove(settle)
+            player:Say(getText("IGUI_PhunMart_Msg_PortFailed"))
             return
         end
-
-        local free = AdjacentFreeTileFinder.FindClosest(square, player)
-        if free then
-            Events.OnPlayerUpdate.Remove(playerPorting)
-            player:setX(destinationX)
-            player:setY(destinationY)
-            player:setZ(destinationZ)
-            if player.setLx then
-                player:setLx(destinationX)
-                player:setLy(destinationY)
-                player:setLz(destinationZ)
-            else
-                player:setLastX(destinationX)
-                player:setLastY(destinationY)
-                player:setLastZ(destinationZ)
-                getWorld():update()
-            end
-
+        if AdjacentFreeTileFinder.FindClosest(square, player) then
+            Events.OnPlayerUpdate.Remove(settle)
+            place()
         end
-
     end
-    Events.OnPlayerUpdate.Add(playerPorting)
+    Events.OnPlayerUpdate.Add(settle)
 end
+
+---------------------------------------------------------------------------
+-- Entry point
+---------------------------------------------------------------------------
+
+--- Open the shell on this tab, optionally narrowed to one shop. Kept so the
+--- Shops tab's right-click reads the same as it always did.
+function UI.open(player, shopType)
+    local shell = Core.ui.admin_shell
+    if not shell then
+        return
+    end
+    -- open already activates the tab, and activating one refreshes it, so there
+    -- is no need to ask for the list a second time here.
+    local instance = shell.open(player, "locations")
+    local view = instance and instance:getTabView("locations")
+    if view then
+        view:showShop(shopType)
+    end
+    return view
+end
+
+return UI
