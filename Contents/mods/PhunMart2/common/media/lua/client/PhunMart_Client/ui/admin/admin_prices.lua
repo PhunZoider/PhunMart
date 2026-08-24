@@ -36,6 +36,10 @@ local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 -- disagree about the same row.
 local resolveField = tools.resolvePriceField
 
+-- The "inherits nothing" entry in the Inherits combo. Held once so the option
+-- text and the test on save cannot drift apart.
+local NONE = getText("IGUI_PhunMart_Lbl_None")
+
 -- Format a price amount for display. Note this shows the amount as stored,
 -- without applying factor, so a scaled child reads as its own base figure.
 local function formatAmount(priceDef)
@@ -116,8 +120,15 @@ local function formatItemList(keys)
     return text
 end
 
-local function onKindChanged(form)
-    local kind = form:getFieldValue("kind")
+--- Show only the fields the chosen payment kind uses.
+---
+--- `kind` may be passed in, and has to be for the first call. Widgets are built
+--- when the window is added to the UI manager, and getFieldValue on a combo
+--- that does not exist yet returns "" rather than failing. That matched none of
+--- the branches below, so on open the Pool row was always hidden and Amount and
+--- Max were always shown, whatever the price actually was.
+local function onKindChanged(form, kind)
+    kind = kind or form:getFieldValue("kind")
     local isCurrency = kind == "currency"
     local isFree = kind == "free"
     local isItems = kind == "items"
@@ -263,7 +274,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             end
 
             local inherit = f:getFieldValue("inherit")
-            result.inherit = (inherit ~= "") and inherit or nil
+            result.inherit = (inherit ~= "" and inherit ~= NONE) and inherit or nil
 
             local factor = f:getFieldNumber("factor")
             result.factor = (factor and factor ~= 1) and factor or nil
@@ -343,17 +354,40 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             end)
         end,
     })
-    form:addTextField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
-        default = raw.inherit or "",
+    -- A combo rather than a typed key, matching the specials editor. It cannot
+    -- name a price that does not exist and cannot name itself, which is what
+    -- the two validations underneath it used to be for.
+    local inheritOptions = {NONE}
+    local inheritKeys = {}
+    for k in pairs(prices) do
+        if k ~= priceKey then
+            table.insert(inheritKeys, k)
+        end
+    end
+    table.sort(inheritKeys)
+    for _, k in ipairs(inheritKeys) do
+        table.insert(inheritOptions, k)
+    end
+    -- An override naming a price that has since gone would otherwise drop off
+    -- the list and read as "(none)", quietly unparenting itself on the next save.
+    if raw.inherit and raw.inherit ~= "" and not prices[raw.inherit] then
+        table.insert(inheritOptions, raw.inherit)
+    end
+
+    form:addComboField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
+        options = inheritOptions,
+        selected = (raw.inherit and raw.inherit ~= "") and raw.inherit or NONE,
         hint = getText("IGUI_PhunMart_Hint_InheritKey"),
-        validate = function(value)
-            if value ~= "" and not prices[value] then
-                return getText("IGUI_PhunMart_Err_NoSuchPrice")
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local parentKey = f:getFieldValue("inherit")
+                local parentRaw = parentKey and parentKey ~= NONE and prices[parentKey]
+                if parentRaw then
+                    createEditModal(parentKey, parentRaw, false, cb)
+                end
             end
-            if value ~= "" and value == priceKey then
-                return getText("IGUI_PhunMart_Err_InheritSelf")
-            end
-        end,
+        }
     })
     form:addTextField("factor", getText("IGUI_PhunMart_Lbl_Factor"), {
         default = factorDefault,
@@ -371,9 +405,12 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         end
     end
 
+    -- Before initialise, and told the kind rather than asked for it: the combo
+    -- does not exist yet. Also means the window height is computed from the
+    -- fields that will actually be on screen.
+    onKindChanged(form, def.kind or "free")
+
     form:initialise()
-    -- Apply initial visibility based on kind
-    onKindChanged(form)
 
     form:addToUIManager()
     form:bringToTop()

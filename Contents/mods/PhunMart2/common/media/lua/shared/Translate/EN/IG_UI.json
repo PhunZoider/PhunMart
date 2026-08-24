@@ -425,8 +425,6 @@
   "IGUI_PhunMart_Err_KeyInUse": "That key is already used",
   "IGUI_PhunMart_Err_PickOne": "Pick at least one",
   "IGUI_PhunMart_Err_NeedItemOrCat": "Add at least one item, category or special",
-  "IGUI_PhunMart_Err_NoSuchPrice": "No price with that key",
-  "IGUI_PhunMart_Err_InheritSelf": "A price can't inherit from itself",
   "IGUI_PhunMart_Hint_MoreActions": "Editing the first action; %1 more will be kept unchanged",
   "IGUI_PhunMart_Hint_CategoryShown": "Display category shown in admin tools",
   "IGUI_PhunMart_Hint_Probability": "probability: relative chance in the placement lottery. 0 = manual placement only",
