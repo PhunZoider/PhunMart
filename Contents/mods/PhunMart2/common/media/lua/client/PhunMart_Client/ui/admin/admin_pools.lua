@@ -316,7 +316,7 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     form:addPickerField("groups", getText("IGUI_PhunMart_Lbl_Groups"), {
         value = selectedGroups, display = formatKeyList(selectedGroups),
         hint = getText("IGUI_PhunMart_Hint_PoolGroups"),
-        group = "p_basics",
+        section = "p_basics",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), groupOptions, selectedGroups, function(keys)
                 selectedGroups = keys or {}
@@ -324,34 +324,12 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickGroups") })
         end,
     })
-    form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
-        options = priceKeys, selected = currentPrice,
-        hint = getText("IGUI_PhunMart_Hint_PoolDefaultPrice"),
-        group = "p_basics",
-    })
-    form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
-        default = zonesDefault,
-        hint = getText("IGUI_PhunMart_Hint_Zones"),
-        validate = validateZones,
-        group = "p_basics",
-    })
-    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
-        checked = def.sticky == true,
-        text = getText("IGUI_PhunMart_Lbl_Sticky"),
-        hint = getText("IGUI_PhunMart_Hint_Sticky"),
-        group = "p_basics",
-    })
-    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
-        checked = def.enabled ~= false,
-        hint = getText("IGUI_PhunMart_Hint_PoolEnabled"),
-        group = "p_basics",
-    })
-
+    -- What the pool will not draw, next to what it draws from.
     form:addPickerField("blacklist", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
         value = selectedBlacklist,
         display = formatBlacklistDisplay(selectedBlacklist),
         hint = getText("IGUI_PhunMart_Hint_PoolBlacklist"),
-        group = "p_more",
+        section = "p_basics",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), getBlacklistOptions(poolKey, selectedBlacklist), selectedBlacklist,
                 function(keys)
@@ -362,25 +340,50 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 })
         end,
     })
+    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
+        checked = def.sticky == true,
+        text = getText("IGUI_PhunMart_Lbl_Sticky"),
+        hint = getText("IGUI_PhunMart_Hint_Sticky"),
+        section = "p_basics",
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
+        hint = getText("IGUI_PhunMart_Hint_PoolEnabled"),
+        section = "p_basics",
+    })
+
+    -- A price only used where an item names none, and a difficulty gate that
+    -- needs PhunZones to mean anything: real settings, rarely the reason you
+    -- opened a pool.
+    form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+        options = priceKeys, selected = currentPrice,
+        hint = getText("IGUI_PhunMart_Hint_PoolDefaultPrice"),
+        section = "p_more",
+    })
+    form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
+        default = zonesDefault,
+        hint = getText("IGUI_PhunMart_Hint_Zones"),
+        validate = validateZones,
+        section = "p_more",
+    })
     -- Last resorts, below the group's own. No shipped pool sets either, and a
-    -- pool only reaches for them when the group has nothing to offer, so they
-    -- were two boxes of nothing at the front of every pool anyone opened.
+    -- pool only reaches for them when the group has nothing to offer.
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
         default = def.fallbackTexture or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultTexture"),
-        group = "p_more",
+        section = "p_more",
     })
     form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_DefaultCategory"), {
         default = def.fallbackCategory or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
-        group = "p_more",
+        section = "p_more",
     })
 
     form:setSections({{
-        group = "p_basics",
+        section = "p_basics",
         label = getText("IGUI_PhunMart_Sec_Basics")
     }, {
-        group = "p_more",
+        section = "p_more",
         label = getText("IGUI_PhunMart_Sec_Advanced")
     }})
 

@@ -387,8 +387,6 @@
   "IGUI_PhunMart_Hint_VehiclePick": "Choose one, or several for a random pick",
   "IGUI_PhunMart_Lbl_Weight": "How often:",
   "IGUI_PhunMart_Lbl_Stock": "Stock:",
-  "IGUI_PhunMart_Lbl_StockMin": "Stock Min:",
-  "IGUI_PhunMart_Lbl_StockMax": "Stock Max:",
   "IGUI_PhunMart_Lbl_DefaultPrice": "Default Price:",
   "IGUI_PhunMart_Lbl_Title": "Name:",
   "IGUI_PhunMart_Lbl_Skill": "Skill:",

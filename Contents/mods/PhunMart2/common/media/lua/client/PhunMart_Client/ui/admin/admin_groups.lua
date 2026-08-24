@@ -283,6 +283,11 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         end,
     })
 
+    -- Identity above the tabs, name first, the same two rows as everywhere else.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = groupKey or "", editable = isNew,
         required = true,
@@ -292,16 +297,16 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end
         end or nil,
     })
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- The heading players see in the shop, which is not the same thing as the
+    -- name this group goes by in these lists.
     form:addTextField("label", getText("IGUI_PhunMart_Lbl_Label"), {
         default = def.label or "",
         hint = getText("IGUI_PhunMart_Hint_Label"),
+        section = "g_basics",
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
         value = selectedItems, display = formatItemList(selectedItems),
+        section = "g_basics",
         onPick = function(f, field)
             ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
                 selectedItems = keys or {}
@@ -313,6 +318,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         value = selectedVehicles,
         display = formatVehicleList(selectedVehicles),
         hint = getText("IGUI_PhunMart_Hint_GroupVehicles"),
+        section = "g_basics",
         onPick = function(f, field)
             VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
                 selectedVehicles = keys or {}
@@ -322,6 +328,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     })
     form:addPickerField("cats", getText("IGUI_PhunMart_Lbl_Categories"), {
         value = selectedCats, display = formatCatList(selectedCats),
+        section = "g_basics",
         onPick = function(f, field)
             CategoryPicker.open(getSpecificPlayer(0), selectedCats, function(keys)
                 selectedCats = keys or {}
@@ -331,6 +338,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     })
     form:addPickerField("specialItems", getText("IGUI_PhunMart_Lbl_SpecialItems"), {
         value = selectedSpecialItems, display = formatItemList(selectedSpecialItems),
+        section = "g_basics",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), specialKeys, selectedSpecialItems, function(keys)
                 selectedSpecialItems = keys or {}
@@ -340,6 +348,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     })
     form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_SpecialCats"), {
         value = selectedSpecialCats, display = formatCatList(selectedSpecialCats),
+        section = "g_basics",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecialCats, function(keys)
                 selectedSpecialCats = keys or {}
@@ -349,6 +358,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     })
     form:addPickerField("blItems", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
         value = selectedBlItems, display = formatItemList(selectedBlItems),
+        section = "g_basics",
         onPick = function(f, field)
             ItemPicker.open(getSpecificPlayer(0), selectedBlItems, function(keys)
                 selectedBlItems = keys or {}
@@ -358,6 +368,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     })
     form:addPickerField("blCats", getText("IGUI_PhunMart_Lbl_BlacklistCats"), {
         value = selectedBlCats, display = formatCatList(selectedBlCats),
+        section = "g_basics",
         onPick = function(f, field)
             CategoryPicker.open(getSpecificPlayer(0), selectedBlCats, function(keys)
                 selectedBlCats = keys or {}
@@ -373,10 +384,17 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceOpts, selected = defaults.price or "",
         hint = getText("IGUI_PhunMart_Hint_GroupPrice"),
+        section = "g_basics",
     })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
+        section = "g_basics",
+    })
+
     form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
         value = selectedSpecial, display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
         hint = getText("IGUI_PhunMart_Hint_GroupGrants"),
+        section = "g_more",
         onPick = function(f, field)
             local initial = selectedSpecial and {selectedSpecial} or {}
             KeyPicker.open(getSpecificPlayer(0), specialKeys, initial, function(key)
@@ -389,18 +407,26 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         default = tostring(offer.weight or "1.0"),
         hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
         numeric = true, min = 0,
+        section = "g_more",
     })
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
         default = def.fallbackTexture or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultTexture"),
+        section = "g_more",
     })
     form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_DefaultCategory"), {
         default = def.fallbackCategory or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
+        section = "g_more",
     })
-    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
-        checked = def.enabled ~= false,
-    })
+
+    form:setSections({{
+        section = "g_basics",
+        label = getText("IGUI_PhunMart_Sec_Basics")
+    }, {
+        section = "g_more",
+        label = getText("IGUI_PhunMart_Sec_Advanced")
+    }})
 
     form:initialise()
     form:addToUIManager()

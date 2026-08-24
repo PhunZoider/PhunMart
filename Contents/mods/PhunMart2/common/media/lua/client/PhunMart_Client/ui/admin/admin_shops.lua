@@ -378,27 +378,14 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         hint = getText("IGUI_PhunMart_Hint_Probability"),
         numeric = true,
         min = 0,
-        group = "s_basics"
+        section = "s_basics"
     })
     form:addTextField("minDistance", getText("IGUI_PhunMart_Lbl_MinDistance"), {
         default = def.minDistance and tostring(def.minDistance) or "",
         hint = getText("IGUI_PhunMart_Hint_MinDistance"),
         integer = true,
         min = 0,
-        group = "s_basics"
-    })
-    form:addTextField("restockFrequency", getText("IGUI_PhunMart_Lbl_RestockFrequency"), {
-        default = def.restockFrequency and tostring(def.restockFrequency) or "",
-        hint = getText("IGUI_PhunMart_Hint_RestockFrequency"),
-        numeric = true,
-        min = 0,
-        group = "s_basics"
-    })
-    form:addComboField("defaultView", getText("IGUI_PhunMart_Lbl_DefaultView"), {
-        options = {"grid", "list"},
-        selected = def.defaultView or "grid",
-        hint = getText("IGUI_PhunMart_Hint_ViewMode"),
-        group = "s_basics"
+        section = "s_basics"
     })
     -- Last in Basics rather than first in the form: a switch you flip rarely,
     -- not the thing you came to read.
@@ -406,18 +393,26 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         checked = def.enabled ~= false,
         text = getText("IGUI_PhunMart_Lbl_Enabled"),
         hint = getText("IGUI_PhunMart_Hint_ShopEnabled"),
-        group = "s_basics"
+        section = "s_basics"
     })
 
+    -- Grid or list is how the shop looks when opened, so it belongs with the
+    -- rest of the machine's appearance rather than among the placement rules.
+    form:addComboField("defaultView", getText("IGUI_PhunMart_Lbl_DefaultView"), {
+        options = {"grid", "list"},
+        selected = def.defaultView or "grid",
+        hint = getText("IGUI_PhunMart_Hint_ViewMode"),
+        section = "s_look"
+    })
     form:addTextField("background", getText("IGUI_PhunMart_Lbl_Background"), {
         default = def.background or "",
         hint = getText("IGUI_PhunMart_Hint_Background"),
-        group = "s_look"
+        section = "s_look"
     })
     form:addTextField("sprites", getText("IGUI_PhunMart_Lbl_Sprites"), {
         default = def.sprites and table.concat(def.sprites, ", ") or "",
         hint = getText("IGUI_PhunMart_Hint_Sprites"),
-        group = "s_look",
+        section = "s_look",
         onChange = function(f)
             f:reflowFields()
         end
@@ -425,7 +420,7 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
     form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_UnpSprites"), {
         default = def.unpoweredSprites and table.concat(def.unpoweredSprites, ", ") or "",
         hint = getText("IGUI_PhunMart_Hint_UnpSprites"),
-        group = "s_look",
+        section = "s_look",
         onChange = function(f)
             f:reflowFields()
         end
@@ -433,7 +428,7 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
     -- The tiles themselves, so a sprite name typed wrong is visibly wrong rather
     -- than discovered by walking to a machine that renders as nothing.
     form:addImageField("spritePreview", getText("IGUI_PhunMart_Lbl_Preview"), {
-        group = "s_look",
+        section = "s_look",
         height = math.floor(64 * FONT_SCALE),
         images = function()
             local out = {}
@@ -457,6 +452,14 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         end
     })
 
+    -- How often it restocks sits with what it restocks, not with where it spawns.
+    form:addTextField("restockFrequency", getText("IGUI_PhunMart_Lbl_RestockFrequency"), {
+        default = def.restockFrequency and tostring(def.restockFrequency) or "",
+        hint = getText("IGUI_PhunMart_Hint_RestockFrequency"),
+        numeric = true,
+        min = 0,
+        section = "s_stock"
+    })
     form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_RollMin"), {
         minDefault = rollMinDefault,
         maxDefault = rollMaxDefault,
@@ -464,12 +467,12 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         integer = true,
         min = 0,
         requireBoth = true,
-        group = "s_stock"
+        section = "s_stock"
     })
 
     form:addListField("poolSets", getText("IGUI_PhunMart_Lbl_PoolSets"), {
         items = editPoolSets,
-        group = "s_stock",
+        section = "s_stock",
         rows = 3,
         columns = {{
             name = getText("IGUI_PhunMart_Col_Pool"),
@@ -498,13 +501,13 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
     -- Before initialise: only one section's fields are visible, and the window
     -- is sized from what is on screen.
     form:setSections({{
-        group = "s_basics",
+        section = "s_basics",
         label = getText("IGUI_PhunMart_Sec_Basics")
     }, {
-        group = "s_look",
+        section = "s_look",
         label = getText("IGUI_PhunMart_Sec_Appearance")
     }, {
-        group = "s_stock",
+        section = "s_stock",
         label = getText("IGUI_PhunMart_Sec_Stock")
     }})
 

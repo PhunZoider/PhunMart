@@ -121,6 +121,8 @@ function FormPanel:_registerField(opts)
     -- step is. Something else decides, usually a combo above it choosing
     -- "Other", and stepping must not override that decision.
     f.conditional = opts.conditional
+    -- Which tab this field lives on, independent of `group`. See setSections.
+    f.section = opts.section
     f.hasMessageRow = (f.hint ~= nil) or f.required == true or f.numeric == true or f.integer == true or f.min ~=
                           nil or f.max ~= nil or f.validate ~= nil
     self._fieldsByKey[f.key] = f
@@ -304,7 +306,8 @@ end
 function FormPanel:setGroupVisible(groupName, visible)
     for _, f in ipairs(self._fields) do
         if f.group == groupName then
-            f.visible = visible
+            f._groupOn = visible
+            applyVisibility(f)
         end
     end
     if self._built then
@@ -339,19 +342,44 @@ end
 -- should not be on a tab you might not be looking at.
 ---------------------------------------------------------------------------
 
---- @param sections array of {group = "appearance", label = "Appearance"}
+--- A field is on screen when its section is the active one AND whatever else
+--- controls it still wants it. Two independent answers, because `group` is
+--- already spoken for: the specials form uses it to show the fields belonging
+--- to the chosen action type, and which tab a field sits on is a different
+--- question from whether that tab currently has any use for it.
+local function applyVisibility(f)
+    f.visible = (f._groupOn ~= false) and (f._sectionOn ~= false)
+end
+
+--- Put fields in sections by key, rather than a section= on all of them.
+---
+--- For a form where nearly everything belongs to one section and a handful do
+--- not, which is the usual shape. `map` names the exceptions; anything else
+--- carrying a `group` goes to `default`. A field with neither a group nor an
+--- entry in the map has no section and stays above the tabs, which is how
+--- identity fields keep out of this without having to say so.
+-- @param map     {fieldKey = "section"}
+-- @param default section for every other grouped field, optional
+function FormPanel:assignSections(map, default)
+    for _, f in ipairs(self._fields) do
+        if map and map[f.key] then
+            f.section = map[f.key]
+        elseif default and f.group then
+            f.section = default
+        end
+    end
+    return self
+end
+
+--- @param sections array of {section = "appearance", label = "Appearance"}
 function FormPanel:setSections(sections)
     if self._steps then
-        -- A form is one or the other. Steps already own group visibility and the
+        -- A form is one or the other. Steps already own visibility and the
         -- button row, and the two would fight over both.
         return self
     end
     self._sections = sections
     self._section = 1
-    self._sectionGroups = {}
-    for _, s in ipairs(sections or {}) do
-        self._sectionGroups[s.group] = true
-    end
     self:_applySection()
     return self
 end
@@ -364,8 +392,9 @@ function FormPanel:_applySection()
     end
     for i, s in ipairs(self._sections) do
         for _, f in ipairs(self._fields) do
-            if f.group == s.group then
-                f.visible = (i == self._section)
+            if f.section == s.section then
+                f._sectionOn = (i == self._section)
+                applyVisibility(f)
             end
         end
     end
@@ -456,7 +485,8 @@ end
 function FormPanel:setFieldVisible(key, visible)
     local f = self._fieldsByKey[key]
     if f then
-        f.visible = visible
+        f._groupOn = visible
+        applyVisibility(f)
         -- Remembered separately for a conditional field, because stepping away
         -- and back rebuilds visibility from the step and would otherwise forget
         -- that something had asked for this one.
@@ -1281,7 +1311,7 @@ function FormPanel:reflowFields()
     local stripPlaced = (self._sectionBtns == nil)
 
     for _, f in ipairs(self._fields) do
-        if not stripPlaced and f.group and self._sectionGroups[f.group] then
+        if not stripPlaced and f.section ~= nil then
             local tx = x
             for i, btn in ipairs(self._sectionBtns) do
                 btn:setX(tx)

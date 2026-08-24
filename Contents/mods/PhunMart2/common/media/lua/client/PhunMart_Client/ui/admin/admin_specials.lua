@@ -262,11 +262,10 @@ local FIELD_SOURCE = {
     weight = function(d)
         return d.offer ~= nil and d.offer.weight ~= nil
     end,
-    stockMin = function(d)
-        return d.offer ~= nil and d.offer.stock ~= nil and d.offer.stock.min ~= nil
-    end,
-    stockMax = function(d)
-        return d.offer ~= nil and d.offer.stock ~= nil and d.offer.stock.max ~= nil
+    -- One key, matching the one range field that replaced the two boxes.
+    stock = function(d)
+        return d.offer ~= nil and d.offer.stock ~= nil and
+                   (d.offer.stock.min ~= nil or d.offer.stock.max ~= nil)
     end,
     enabled = function(d)
         return d.enabled ~= nil
@@ -488,8 +487,8 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
 
                 -- Offer: weight and stock
                 local weightVal = f:getFieldNumber("weight")
-                local stockMin = f:getFieldNumber("stockMin")
-                local stockMax = f:getFieldNumber("stockMax")
+                -- One range field now, so both bounds come back together.
+                local stockMin, stockMax = f:getFieldRange("stock")
                 if weightVal or stockMin or stockMax then
                     result.offer = {}
                     if weightVal then
@@ -756,8 +755,17 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         required = true,
         integer = true
     })
-    form:addTextField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
-        default = (curAction and curAction.pool) or "change",
+    -- The currency pools, read off the wallet rather than typed. There are two
+    -- and they are defined in code, so no Open button: there is no editor to
+    -- open, unlike the price and inherit fields this sits near.
+    local poolOptions = {}
+    for poolKey in pairs(Core.wallet and Core.wallet.pools or {}) do
+        table.insert(poolOptions, poolKey)
+    end
+    table.sort(poolOptions)
+    form:addComboField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
+        options = poolOptions,
+        selected = (curAction and curAction.pool) or "change",
         hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
         group = "act_balance"
     })
@@ -787,15 +795,11 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         numeric = true,
         min = 0
     })
-    form:addTextField("stockMin", getText("IGUI_PhunMart_Lbl_StockMin"), {
-        default = (def.offer and def.offer.stock and def.offer.stock.min) and tostring(def.offer.stock.min) or "",
-        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        group = "instance",
-        integer = true,
-        min = 0
-    })
-    form:addTextField("stockMax", getText("IGUI_PhunMart_Lbl_StockMax"), {
-        default = (def.offer and def.offer.stock and def.offer.stock.max) and tostring(def.offer.stock.max) or "",
+    -- One range rather than two boxes: a minimum and a maximum of the same thing
+    -- read as a pair, and side by side they cannot be filled in half.
+    form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
+        minDefault = (def.offer and def.offer.stock and def.offer.stock.min) and tostring(def.offer.stock.min) or "",
+        maxDefault = (def.offer and def.offer.stock and def.offer.stock.max) and tostring(def.offer.stock.max) or "",
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
         group = "instance",
         integer = true,
@@ -805,6 +809,32 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         checked = def.enabled ~= false,
         group = "instance"
     })
+
+    -- Sections are independent of the groups above: `group` says whether a field
+    -- applies to the chosen action type at all, `section` says which tab it sits
+    -- on. Named by exception, since everything not listed belongs on Basics.
+    --
+    -- What a special is and does stays on Basics. What it costs, how often it
+    -- shows up, how many exist, and the whole template apparatus go to Advanced:
+    -- real settings, none of them the reason anybody opened this.
+    form:assignSections({
+        template = "sp_more",
+        kind = "sp_more",
+        category = "sp_more",
+        texture = "sp_more",
+        overlay = "sp_more",
+        price = "sp_more",
+        weight = "sp_more",
+        stock = "sp_more"
+    }, "sp_basics")
+
+    form:setSections({{
+        section = "sp_basics",
+        label = getText("IGUI_PhunMart_Sec_Basics")
+    }, {
+        section = "sp_more",
+        label = getText("IGUI_PhunMart_Sec_Advanced")
+    }})
 
     -- Apply initial group visibility BEFORE initialise so the window height is
     -- computed from only the visible fields. Done after initialise, the hidden
