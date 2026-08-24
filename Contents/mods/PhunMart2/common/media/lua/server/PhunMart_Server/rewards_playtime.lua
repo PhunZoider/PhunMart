@@ -8,19 +8,17 @@ local Core = PhunMart
 Core.playtimeRewards = {}
 local R = Core.playtimeRewards
 
-local SAVE_FILE = "PhunMart_PlaytimeTracking.txt"
-
--- Persistent data loaded from / saved to SAVE_FILE.
--- username → { totalMinutes = N, playtimeRewards = { ["60"] = lastMultiple, ... } }
+-- Held in ModData, so it belongs to the save the progress was earned in.
+-- username → { previousHours = N, claimed = { ["playtime_60"] = true, ... } }
+--
+-- This was PhunMart_PlaytimeTracking.txt, which had the install lifetime
+-- rather than the save's: milestones stayed claimed across a wipe, and every
+-- world on the machine shared one set of them.
 R.data = {}
 
 function R:load()
-    self.data = Core.fileUtils.loadTable(SAVE_FILE) or {}
+    self.data = ModData.getOrCreate("PhunMart_PlaytimeTracking")
     self.loaded = true
-end
-
-function R:save()
-    Core.fileUtils.saveTable(SAVE_FILE, self.data)
 end
 
 -- Returns the persistent data record for a player, creating it if absent.
@@ -118,5 +116,4 @@ function R:tick()
             self:checkPlaytimeRewards(player)
         end
     end
-    self:save()
 end

@@ -307,7 +307,6 @@ Commands[Core.commands.buy] = function(playerObj, args)
 
     -- Record purchase history
     Core.purchases:add(playerObj, offerId, qty)
-    Core.purchases:save()
 
     -- Send confirmation to client (include price so client can remove inventory items)
     local wallet = Core.wallet:get(playerObj)
@@ -616,7 +615,6 @@ Commands[Core.commands.consumeCoin] = function(playerObj, args)
     if not adjusted then
         return
     end
-    Core.wallet:save()
 
     -- Remove one coin of this type from player inventory
     local inv = playerObj:getInventory()
@@ -653,8 +651,6 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
             end
         end
     end
-
-    Core.wallet:save()
 
     -- Race condition: the client fires onComplete when the client-side transfer
     -- animation ends, but the server may not have processed the transfer packet
@@ -729,7 +725,6 @@ Commands[Core.commands.dropWallet] = function(playerObj, args)
     }}, {
         anyone = true
     })
-    Core.wallet:save()
 
     if not Core.isLocal then
         sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {
@@ -849,37 +844,33 @@ Commands[Core.commands.getAllWallets] = function(player, args)
 end
 
 ---------------------------------------------------------------------------
--- Wipe detection
+-- Player data
 ---------------------------------------------------------------------------
 
-local function wipeStatus()
+local function playerDataStatus()
     return {
-        pending = Core.wipe and Core.wipe.isPending() or false,
-        counts = Core.wipe and Core.wipe.counts() or {}
+        counts = Core.playerData and Core.playerData.counts() or {}
     }
 end
 
--- Both of these bail out in singleplayer, where the wipe tool reads Core.wipe
+-- Both of these bail out in singleplayer, where the tool reads Core.playerData
 -- directly from the shared Lua state. Same split as the wallet commands.
-Commands[Core.commands.getWipeStatus] = function(player, args)
+Commands[Core.commands.getPlayerDataStatus] = function(player, args)
     if Core.isLocal or not Core.utils.isAdmin(player) then
         return
     end
-    sendServerCommand(player, Core.name, Core.commands.getWipeStatus, wipeStatus())
+    sendServerCommand(player, Core.name, Core.commands.getPlayerDataStatus, playerDataStatus())
 end
 
---- Clear the trackers the admin ticked. Applying with nothing ticked is a
---- deliberate "keep it all", and still counts as having dealt with the prompt,
---- so either way the flag comes down.
-Commands[Core.commands.wipeTrackers] = function(player, args)
+Commands[Core.commands.resetPlayerData] = function(player, args)
     if Core.isLocal or not Core.utils.isAdmin(player) then
         return
     end
-    if not Core.wipe then
+    if not Core.playerData then
         return
     end
-    Core.wipe.clear(args or {})
-    sendServerCommand(player, Core.name, Core.commands.getWipeStatus, wipeStatus())
+    Core.playerData.clear(args or {})
+    sendServerCommand(player, Core.name, Core.commands.getPlayerDataStatus, playerDataStatus())
     -- Balances almost certainly moved, so the wallet grid is now wrong.
     sendServerCommand(player, Core.name, Core.commands.getAllWallets, {
         wallets = allWallets()

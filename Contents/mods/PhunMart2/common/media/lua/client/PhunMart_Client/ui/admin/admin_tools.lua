@@ -19,7 +19,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local ShopWizard = require "PhunMart_Client/ui/admin/shop_wizard"
 local CurrencyTool = require "PhunMart_Client/ui/admin/currency_tool"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
-local WipeTool = require "PhunMart_Client/ui/admin/wipe_tool"
+local PlayerDataTool = require "PhunMart_Client/ui/admin/player_data_tool"
 local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
@@ -110,26 +110,19 @@ local TOOLS = {{
         PendingRestock.show()
     end
 }, {
-    key = "wipe",
-    label = "IGUI_PhunMart_Tool_Wipe",
-    -- Says something different once the server has noticed a wipe, because at
-    -- that point it is not an offer, it is an answer to a question the admin is
-    -- about to ask.
-    desc = function()
-        if WipeTool.pending then
-            return getText("IGUI_PhunMart_ToolDesc_WipeDetected", tostring(WipeTool.total()))
-        end
-        return getText("IGUI_PhunMart_ToolDesc_Wipe")
-    end,
+    key = "playerdata",
+    label = "IGUI_PhunMart_Tool_ResetData",
+    desc = "IGUI_PhunMart_ToolDesc_ResetData",
     action = "IGUI_PhunMart_Btn_Review",
-    warn = function()
-        return WipeTool.pending
-    end,
+    warn = true,
+    -- How much there is to lose, which is the one thing worth knowing before
+    -- opening a form whose every option is destructive.
     suffix = function()
-        return WipeTool.pending and (" " .. getText("IGUI_PhunMart_Lbl_ActionNeeded")) or ""
+        local n = PlayerDataTool.total()
+        return n > 0 and (" (" .. tostring(n) .. ")") or ""
     end,
     run = function(panel)
-        WipeTool.open(panel.player)
+        PlayerDataTool.open(panel.player)
     end
 }, {
     key = "restockall",
@@ -201,9 +194,9 @@ function UI:createChildren()
     self:refresh()
 end
 
---- Rebuild the rows. Separate from refresh because fresh wipe status arrives
---- asynchronously and has to rebuild them again without asking for it a second
---- time, which is what refresh does.
+--- Rebuild the rows. Separate from refresh because the record counts arrive
+--- asynchronously and have to rebuild them again without asking for them a
+--- second time, which is what refresh does.
 function UI:refreshRows()
     self:clearList()
     for _, spec in ipairs(TOOLS) do
@@ -219,13 +212,13 @@ function UI:refreshRows()
 end
 
 function UI:refresh()
-    -- Whether a wipe is outstanding is the server's to know, and the answer
-    -- changes what one of the rows says. The reply rebuilds the rows again.
-    WipeTool.request()
+    -- How much player data there is to lose is the server's to know, and it is
+    -- on one of the rows below. The reply rebuilds the rows again.
+    PlayerDataTool.request()
     self:refreshRows()
 end
 
-WipeTool.onStatus(function()
+PlayerDataTool.onStatus(function()
     for _, instance in pairs(UI.instances or {}) do
         if instance.list then
             instance:refreshRows()

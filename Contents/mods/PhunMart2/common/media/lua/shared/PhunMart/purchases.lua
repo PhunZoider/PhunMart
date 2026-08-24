@@ -71,10 +71,16 @@ function Core.purchases:getCount(scope, username, charId, key, windowSeconds)
     return total
 end
 
+--- Bind to the store.
+---
+--- This was PhunMart_Purchases.txt, which sits beside the mod rather than
+--- inside the save, so it was one history shared by every world on the machine
+--- and it survived them all. Buy-once offers stayed bought after a wipe, and
+--- two singleplayer saves counted against each other.
+---
+--- ModData has the lifetime this data actually has. Safe to call more than
+--- once: getOrCreate hands back the same table, which is what the token
+--- rewards editor relies on when it reloads after a config change.
 function Core.purchases:load()
-    self.histories = Core.fileUtils.loadTable("PhunMart_Purchases.txt")
-end
-
-function Core.purchases:save()
-    Core.fileUtils.saveTable("PhunMart_Purchases.txt", self.histories or {})
+    self.histories = ModData.getOrCreate("PhunMart_Purchases")
 end

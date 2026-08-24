@@ -343,17 +343,16 @@ function Core:ini()
     require "PhunMart_Server/rewards_playtime"
     require "PhunMart_Server/rewards_kill"
 
-    -- Before the loads, not after. Detection asks whether the tracker files
-    -- outlived the save they belong to, and Core.wallet:load below is the very
-    -- thing that hides the answer: it merges those files back over the empty
-    -- ModData of a new world.
-    require "PhunMart_Server/wipe"
-    Core.wipe.check()
+    require "PhunMart_Server/player_data"
 
+    -- All four bind to their ModData table, so they belong to this save. The
+    -- import that follows is a one-off for anyone upgrading from the version
+    -- that kept them in files, and needs the tables to exist first.
     Core.playtimeRewards:load()
     Core.killRewards:load()
     Core.purchases:load()
     Core.wallet:load()
+    Core.playerData.importLegacy()
     Core.debug("Server System initialized")
     triggerEvent(self.events.OnReady, self)
 end

@@ -61,12 +61,13 @@ Events.OnCharacterDeath.Add(function(character)
 
     -- Reset wallet (zero unbound, restore bound)
     Core.wallet:reset(character)
-    Core.wallet:save()
 end)
 
+-- The wallet used to be flushed to disk here as well. It lives only in ModData
+-- now, which the game persists on its own schedule, so there is nothing to
+-- flush and this tick is the playtime check alone.
 Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
-    Core.wallet:save()
 end)
 
 -- Check power state every minute so sprite swaps within ~1 minute of electricity changing.

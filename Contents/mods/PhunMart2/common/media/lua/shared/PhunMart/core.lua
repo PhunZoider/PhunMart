@@ -91,9 +91,9 @@ PhunMart = {
         -- used to ask for the names and then for one wallet at a time, which is
         -- why getPlayerList and getPlayersWallet are no longer here.
         getAllWallets = "PhunMartGetAllWallets",
-        -- Wipe detection and the tracker reset it offers
-        getWipeStatus = "PhunMartGetWipeStatus",
-        wipeTrackers = "PhunMartWipeTrackers",
+        -- Clearing wallets, purchase history and reward tracking
+        getPlayerDataStatus = "PhunMartGetPlayerDataStatus",
+        resetPlayerData = "PhunMartResetPlayerData",
         adjustPlayerWallet = "PhunMartAdjustPlayerWallet",
         claimVehicle = "PhunMartClaimVehicle",
         claimAnimal = "PhunMartClaimAnimal",

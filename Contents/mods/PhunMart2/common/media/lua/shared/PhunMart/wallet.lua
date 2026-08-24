@@ -353,43 +353,29 @@ function Core.wallet:spawnDroppedItem(player, square, entries, opts)
     end
 end
 
--- File-based persistence (server-only, mirrors purchases pattern).
--- Survives server crashes between game saves.
-function Core.wallet:save()
-    if Core.fileUtils then
-        Core.fileUtils.saveTable("PhunMart_Wallet.txt", self.data or {})
-    end
-end
-
+--- Bind to the store. ModData is the whole of it; there is nothing to read off
+--- disk and nothing to write back.
+---
+--- There used to be a mirror in PhunMart_Wallet.txt, saved on a ten minute
+--- tick, so a crash between game saves would not cost anybody their balance.
+--- It cost more than it saved, in two ways.
+---
+--- The file lives beside the mod rather than inside the save, so it outlived
+--- the world it described: wiping the map left everybody's money behind, and
+--- opening a second save merged the first one's balances into it.
+---
+--- And the two stores were reconciled by preferring the higher of each pair,
+--- which can only ever create currency. Spend a hundred, let the world save,
+--- restart before the next ten minute tick, and the merge hands the hundred
+--- back while the goods stay bought.
+---
+--- What that resilience was worth is also less than it looks: a crash already
+--- rolls back the player's inventory, skills and position. A wallet more
+--- durable than the item it bought is precisely what made the duplication
+--- possible. The save's own granularity is the correct one.
 function Core.wallet:load()
-    if not Core.fileUtils then
-        return
-    end
-    local saved = Core.fileUtils.loadTable("PhunMart_Wallet.txt")
-    if not saved then
-        return
-    end
-    -- Merge file-backed data into ModData, preferring higher balances
-    -- so a crash between file-save and game-save doesn't lose progress.
     if self.data == nil then
         self.data = ModData.getOrCreate(self.name)
-    end
-    for key, fileWallet in pairs(saved) do
-        local mdWallet = self.data[key]
-        if not mdWallet then
-            self.data[key] = fileWallet
-        else
-            -- Take the higher of each pool balance
-            for _, wType in ipairs({"current", "bound"}) do
-                if fileWallet[wType] then
-                    mdWallet[wType] = mdWallet[wType] or {}
-                    for pool, val in pairs(fileWallet[wType]) do
-                        if (val or 0) > (mdWallet[wType][pool] or 0) then
-                            mdWallet[wType][pool] = val
-                        end
-                    end
-                end
-            end
-        end
+        self:repairKeys()
     end
 end

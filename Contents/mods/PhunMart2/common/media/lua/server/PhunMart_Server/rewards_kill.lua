@@ -8,9 +8,12 @@ local Core = PhunMart
 Core.killRewards = {}
 local R = Core.killRewards
 
-local SAVE_FILE = "PhunMart_KillTracking.txt"
-
--- Persistent data loaded from / saved to SAVE_FILE.
+-- Held in ModData, so it belongs to the save the kills were made in.
+--
+-- This was PhunMart_KillTracking.txt, which had the install lifetime rather
+-- than the save's: totals and claimed milestones carried across a wipe, and
+-- every world on the machine shared one set of them.
+--
 -- username → {
 --   zombieKills  = N,   -- total cumulative normal zombie kills
 --   sprinterKills = N,  -- total cumulative sprinter kills
@@ -23,12 +26,8 @@ local SAVE_FILE = "PhunMart_KillTracking.txt"
 R.data = {}
 
 function R:load()
-    self.data = Core.fileUtils.loadTable(SAVE_FILE) or {}
+    self.data = ModData.getOrCreate("PhunMart_KillTracking")
     self.loaded = true
-end
-
-function R:save()
-    Core.fileUtils.saveTable(SAVE_FILE, self.data)
 end
 
 -- Returns the persistent data record for a player, creating it if absent.
@@ -125,6 +124,4 @@ function R:reportKills(player, normal, sprinter)
         checkMilestones(player, pd, cfg.zombieKills, pd.zombieKills, "zombie")
         checkMilestones(player, pd, cfg.sprinterKills, pd.sprinterKills, "sprinter")
     end
-
-    self:save()
 end
