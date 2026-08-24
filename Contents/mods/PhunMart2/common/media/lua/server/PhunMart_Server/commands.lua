@@ -747,9 +747,64 @@ Commands[Core.commands.addToWallet] = function(_, args)
     end
 end
 
+--- Every player's balances, keyed the way the wallet table is keyed.
+---
+--- Balances only. A wallet record also carries `purchases`, which is an
+--- unbounded per-player history, and shipping all of them to draw a table of
+--- numbers would put the biggest payload in the mod behind a button nobody
+--- thinks of as expensive.
+---
+--- Declared here rather than beside getAllWallets because the reset handler
+--- below closes over it, and a local declared later would resolve to a nil
+--- global at call time.
+local function allWallets()
+    local wallets = {}
+    for name, w in pairs(Core.wallet.data or {}) do
+        wallets[tostring(name)] = {
+            current = w.current or {},
+            bound = w.bound or {}
+        }
+    end
+    return wallets
+end
+
 Commands[Core.commands.resetWallet] = function(playerObj, args)
-    Core.debugLn("Resetting wallet for " .. playerObj:getUsername())
-    Core.wallet:reset(playerObj)
+    -- Singleplayer runs the server files in the same Lua state as the client,
+    -- so the wallet panel's own handler would reset a second time. Same split
+    -- as adjustPlayerWallet below, and for the same reason.
+    if Core.isLocal then
+        return
+    end
+
+    -- The target was always being sent (Core.wallet:reset passes it) and always
+    -- being ignored, so an admin asking to clear someone else's wallet cleared
+    -- their own instead. Resetting your own needs no permission; resetting
+    -- anybody else's is an admin action.
+    local target = args and args.username
+    if not target or target == playerObj:getUsername() then
+        target = playerObj:getUsername()
+    elseif not Core.utils.isAdmin(playerObj) then
+        return
+    end
+
+    Core.debugLn("Resetting wallet for " .. tostring(target))
+    Core.wallet:reset(target)
+
+    local wallet = Core.wallet:get(target)
+    -- The admin who asked, so their grid catches up.
+    if Core.utils.isAdmin(playerObj) then
+        sendServerCommand(playerObj, Core.name, Core.commands.getAllWallets, {
+            wallets = allWallets()
+        })
+    end
+    -- And the player it happened to, whose balance display is now wrong.
+    local targetPlayer = Core.utils.getPlayerByUsername(target)
+    if targetPlayer then
+        sendServerCommand(targetPlayer, Core.name, Core.commands.getWallet, {
+            username = target,
+            wallet = wallet
+        })
+    end
 end
 
 Commands[Core.commands.playerSetup] = function(playerObj, args)
@@ -778,23 +833,6 @@ end
 
 Commands[Core.commands.reportKills] = function(playerObj, args)
     Core.killRewards:reportKills(playerObj, args.normal or 0, args.sprinter or 0)
-end
-
---- Every player's balances, keyed the way the wallet table is keyed.
----
---- Balances only. A wallet record also carries `purchases`, which is an
---- unbounded per-player history, and shipping all of them to draw a table of
---- numbers would put the biggest payload in the mod behind a button nobody
---- thinks of as expensive.
-local function allWallets()
-    local wallets = {}
-    for name, w in pairs(Core.wallet.data or {}) do
-        wallets[tostring(name)] = {
-            current = w.current or {},
-            bound = w.bound or {}
-        }
-    end
-    return wallets
 end
 
 -- getPlayerList and getPlayersWallet used to serve the wallet editor, which

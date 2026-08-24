@@ -64,20 +64,95 @@ function Core.wallet:isBound(item)
     return (Core.wallet.currencies[item] or {}).bound == true
 end
 
+--- The key a wallet record is filed under.
+---
+--- Singleplayer keeps one record under 0, because there is only ever one
+--- wallet and the name a call happens to pass in is not always the same string.
+--- Multiplayer files by username. Every read and write has to agree on this,
+--- which is the whole reason it is a function rather than four lines repeated
+--- at each call site: setPlayerData had its own copy that skipped the
+--- singleplayer case, so it filed under the username while get read from 0 and
+--- the same character ended up with two records.
+function Core.wallet:keyFor(player)
+    if Core.isLocal then
+        return 0
+    elseif type(player) == "string" then
+        return player
+    elseif player then
+        return player:getUsername()
+    end
+    return nil
+end
+
+--- Fold stray records back into the one this game actually reads.
+---
+--- Any save made before keyFor existed carries the duplicates described above.
+--- They were invisible until the admin wallet grid started listing rows rather
+--- than filling a dropdown, at which point the same character appeared twice.
+---
+--- Balances merge by taking the larger of each pair rather than picking a
+--- winner outright. In every case seen the two records hold the same figures,
+--- so the merge is a no-op; where they could differ, crediting the higher one
+--- is the harmless direction to be wrong in, and silently deleting somebody's
+--- balance is not.
+---
+--- Singleplayer only: multiplayer files by username at both ends and never had
+--- the problem. Idempotent, since it leaves no stray keys behind.
+function Core.wallet:repairKeys()
+    if not Core.isLocal or not self.data then
+        return
+    end
+    -- Collected before anything is touched. Assigning self.data[0] inside the
+    -- traversal would be adding a key during pairs(), which Lua leaves
+    -- undefined; clearing keys is allowed, but doing both is not worth the
+    -- argument.
+    local strays = {}
+    for key, w in pairs(self.data) do
+        if key ~= 0 and type(w) == "table" then
+            table.insert(strays, {
+                key = key,
+                wallet = w
+            })
+        end
+    end
+    if #strays == 0 then
+        return
+    end
+
+    local keep = self.data[0]
+    for _, stray in ipairs(strays) do
+        local w = stray.wallet
+        if not keep then
+            -- Nothing at 0 yet, so the first record simply moves there.
+            keep = w
+            self.data[0] = w
+        elseif w ~= keep then
+            for _, walletType in ipairs({"current", "bound"}) do
+                keep[walletType] = keep[walletType] or {}
+                for pool, amount in pairs(w[walletType] or {}) do
+                    if (amount or 0) > (keep[walletType][pool] or 0) then
+                        keep[walletType][pool] = amount
+                    end
+                end
+            end
+        end
+    end
+    for _, stray in ipairs(strays) do
+        self.data[stray.key] = nil
+    end
+end
+
 -- Returns (or creates) the wallet record for a player.
 -- Balance stored as pool totals: { current={change=0,tokens=0}, bound={tokens=0}, purchases={} }
 function Core.wallet:get(player)
     if self.data == nil then
         self.data = ModData.getOrCreate(self.name)
+        -- Once, as the table is first pulled in, so no caller has to know the
+        -- repair exists and a save that has already been through it pays only
+        -- the cost of finding nothing to do.
+        self:repairKeys()
     end
-    local key
-    if Core.isLocal then
-        key = 0
-    elseif type(player) == "string" then
-        key = player
-    else
-        key = player:getUsername()
-    end
+    local key = self:keyFor(player)
     if key ~= nil then
         if not self.data[key] then
             self.data[key] = {
@@ -97,7 +172,11 @@ end
 
 function Core.wallet:setPlayerData(player, data)
     self:get(player) -- ensure default record exists first
-    self.data[player] = data
+    -- keyFor, not the name as given. See the note on keyFor.
+    local key = self:keyFor(player)
+    if key ~= nil then
+        self.data[key] = data
+    end
 end
 
 -- Reset: zeroes unbound pools, restores bound pools to their bound amount.

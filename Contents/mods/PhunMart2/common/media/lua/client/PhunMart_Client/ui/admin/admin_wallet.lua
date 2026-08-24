@@ -332,6 +332,10 @@ function UI:createChildren()
     end
 
     self._editBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+    -- A button rather than a right-click entry. Reset is the one thing here
+    -- that destroys something, and burying the only destructive action in a
+    -- menu you have to already know about is backwards.
+    self._resetBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_ResetWallet"), self.onResetClick, true)
     self._refreshBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Refresh"), self.refresh)
 
     self:refresh()
@@ -456,6 +460,30 @@ function UI:onEditClick()
     self:openPoolMenu(row, self._editBtn:getAbsoluteX(), self._editBtn:getAbsoluteY())
 end
 
+--- Clear a player's unbound balances and restore the bound ones.
+---
+--- The confirmation spells out what survives, because "reset" on its own
+--- reads as "set everything to zero" and the bound total staying put would
+--- otherwise look like the reset failing.
+function UI:onResetClick()
+    local row = self:selectedRow()
+    if not row then
+        return
+    end
+    local w = math.floor(400 * FONT_SCALE)
+    local h = math.floor(200 * FONT_SCALE)
+    local modal = ISModalDialog:new((getCore():getScreenWidth() - w) / 2, (getCore():getScreenHeight() - h) / 2, w, h,
+        getText("IGUI_PhunMart_Confirm_ResetWallet", row.name), true, self, function(_, button)
+            if button.internal == "YES" then
+                sendClientCommand(Core.name, Core.commands.resetWallet, {
+                    username = row.key
+                })
+            end
+        end)
+    modal:initialise()
+    modal:addToUIManager()
+end
+
 ---------------------------------------------------------------------------
 -- Commands
 ---------------------------------------------------------------------------
@@ -486,6 +514,13 @@ if Core.isLocal then
     -- twice. Don't restore it there without removing it here.
     Commands[Core.commands.adjustPlayerWallet] = function(player, args)
         Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
+        UI.updateAll(localWallets())
+    end
+
+    -- Same split: the server handler bails out under Core.isLocal so the reset
+    -- does not run twice.
+    Commands[Core.commands.resetWallet] = function(player, args)
+        Core.wallet:reset(args.username)
         UI.updateAll(localWallets())
     end
 

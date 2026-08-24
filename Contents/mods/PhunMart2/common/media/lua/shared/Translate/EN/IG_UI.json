@@ -211,6 +211,8 @@
   "IGUI_PhunMart_Btn_Blacklist": "Blacklist",
   "IGUI_PhunMart_Btn_Wallets": "Wallets",
   "IGUI_PhunMart_Desc_Wallets": "What every player is holding. Double-click a balance to change it, or right-click a name to pick which one. A bound balance is the part that survives a wallet reset.",
+  "IGUI_PhunMart_Btn_ResetWallet": "Reset wallet",
+  "IGUI_PhunMart_Confirm_ResetWallet": "Reset %1's wallet? Their change and unbound balances are cleared. Bound balances stay, since those are the part a reset is meant to preserve.",
   "IGUI_PhunMart_Col_Player": "Player",
   "IGUI_PhunMart_Col_BoundOf": "%1 (bound)",
   "IGUI_PhunMart_Lbl_ThisPlayer": "This player",
