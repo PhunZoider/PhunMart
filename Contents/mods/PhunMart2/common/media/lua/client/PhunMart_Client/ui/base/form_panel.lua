@@ -137,8 +137,11 @@ function FormPanel:addTextField(key, label, opts)
 end
 
 --- Combo box field.
--- opts: { options, selected, hint, group, onChange }
+-- opts: { options, selected, hint, group, onChange, button }
 -- options: array of strings; selected: 1-based index or string value
+-- button: { text, onClick = function(form, fieldDesc) }, a small action sitting
+--         to the right of the combo. For a field that names another thing, so
+--         you can go and look at it without leaving to find it.
 function FormPanel:addComboField(key, label, opts)
     opts = opts or {}
     table.insert(self._fields, {
@@ -150,6 +153,7 @@ function FormPanel:addComboField(key, label, opts)
         hint = opts.hint,
         group = opts.group,
         onChange = opts.onChange,
+        button = opts.button,
         visible = true
     })
     return self:_registerField(opts)
@@ -539,6 +543,7 @@ function FormPanel:setFieldInherited(key, sourceLabel)
         return self
     end
     f.inheritedFrom = sourceLabel
+    f._inheritNote = getText("IGUI_PhunMart_Hint_Inherited", tostring(sourceLabel))
     -- The value itself is captured on the first refresh: the widgets do not
     -- exist yet, so there is nothing to read here.
     f._inheritCaptured = false
@@ -736,11 +741,12 @@ function FormPanel:_computeNeededWidth()
         end
     end
     for _, f in ipairs(self._fields) do
-        consider(f.hint)
+        -- Hint and provenance share a line, so it is the pair that has to fit.
         if f.inheritedFrom then
-            -- The provenance message takes the hint's place, so the form has to
-            -- be wide enough for whichever of the two is longer.
-            consider(getText("IGUI_PhunMart_Hint_Inherited", tostring(f.inheritedFrom)))
+            consider(((f.hint or "") ~= "" and (f.hint .. "  ") or "") ..
+                         getText("IGUI_PhunMart_Hint_Inherited", tostring(f.inheritedFrom)))
+        else
+            consider(f.hint)
         end
         if f.type == "separator" then
             consider(f.text)
@@ -748,7 +754,10 @@ function FormPanel:_computeNeededWidth()
     end
 
     local needed = labelW + widest + PAD * 3
-    local cap = math.floor(680 * FONT_SCALE)
+    -- Raised from 680 when provenance started sharing the hint's line: hints do
+    -- not wrap, so a pair that does not fit runs off the edge rather than
+    -- folding. Still dialog-sized, and only reached by a form that asks for it.
+    local cap = math.floor(820 * FONT_SCALE)
     return math.max(self._formWidth or 0, math.min(needed, cap))
 end
 
@@ -885,7 +894,18 @@ function FormPanel:_createField(f)
         local comboFn = f.onChange and function(combo)
             f.onChange(self, f)
         end or nil
-        f._combo = ISComboBox:new(0, 0, w - labelW, ROW_H, comboTarget, comboFn)
+        if f.button then
+            f._btnW = math.max(math.floor(50 * FONT_SCALE),
+                getTextManager():MeasureStringX(UIFont.Small, f.button.text) + PAD)
+            f._btn = ISButton:new(0, 0, f._btnW, ROW_H, f.button.text, self, function()
+                f.button.onClick(self, f)
+            end)
+            f._btn:initialise()
+            f._btn:instantiate()
+            self:addChild(f._btn)
+        end
+
+        f._combo = ISComboBox:new(0, 0, w - labelW - (f._btnW and (f._btnW + 4) or 0), ROW_H, comboTarget, comboFn)
         f._combo:initialise()
         for _, opt in ipairs(f.options) do
             f._combo:addOption(opt)
@@ -1150,9 +1170,15 @@ function FormPanel:reflowFields()
                 f._label:setX(x)
                 f._label:setY(y)
                 f._fieldX = x + labelW
+                local comboW = w - labelW
+                if f._btn then
+                    comboW = comboW - f._btnW - 4
+                    f._btn:setX(f._fieldX + comboW + 4)
+                    f._btn:setY(y)
+                end
                 f._combo:setX(f._fieldX)
                 f._combo:setY(y)
-                f._combo:setWidth(w - labelW)
+                f._combo:setWidth(comboW)
                 y = y + ROW_H
                 if f._hint then
                     y = y + 2
@@ -1333,6 +1359,9 @@ function FormPanel:_setFieldWidgetsVisible(f, vis)
     if f._combo then
         f._combo:setVisible(vis)
     end
+    if f._btn then
+        f._btn:setVisible(vis)
+    end
     if f._pickBtn then
         f._pickBtn:setVisible(vis)
     end
@@ -1388,6 +1417,24 @@ function FormPanel:prerender()
 
     if self._formError and self._formMsgY then
         self:drawText(self._formError, PAD, self._formMsgY, 0.95, 0.45, 0.4, 1, UIFont.Small)
+    end
+
+    -- Provenance, drawn after each hint rather than in place of it. Two colours
+    -- on one line needs two draws, and an ISLabel only has one, so this is a
+    -- draw rather than a widget. Skipped where an error is showing: that has
+    -- taken the row over and the two would overlap.
+    if self._hasInherited then
+        for _, f in ipairs(self._fields) do
+            if f.visible and f._hint and f._inheritNote and not (self._showErrors and f._error) and
+                self:_isShowingInherited(f) then
+                local x = f._fieldX or PAD
+                local hintText = f.hint or ""
+                if hintText ~= "" then
+                    x = x + getTextManager():MeasureStringX(UIFont.Small, hintText) + PAD
+                end
+                self:drawText(f._inheritNote, x, f._hint:getY(), 0.45, 0.72, 0.78, 1, UIFont.Small)
+            end
+        end
     end
 
     for _, f in ipairs(self._fields) do
@@ -1533,10 +1580,11 @@ end
 
 --- Push each field's current error, provenance, or hint into its message label.
 ---
---- Three states in priority order. An error is the most urgent. Then where the
---- value came from, which replaces the hint rather than being appended to it:
---- while a field is showing somebody else's answer, that is the more useful of
---- the two, and typing brings the explanation straight back.
+--- An error replaces the hint, because a field you have got wrong has nothing
+--- more useful to say. Provenance does not: it is drawn after the hint in
+--- prerender, in its own colour, so a field can say both what it is for and
+--- where its value came from. Replacing the hint cost the explanation on
+--- exactly the fields most likely to need one.
 function FormPanel:_refreshMessages()
     for _, f in ipairs(self._fields) do
         if f._hint then
@@ -1544,9 +1592,6 @@ function FormPanel:_refreshMessages()
             if showError then
                 f._hint:setName(showError)
                 f._hint.r, f._hint.g, f._hint.b = 0.95, 0.45, 0.4
-            elseif self:_isShowingInherited(f) then
-                f._hint:setName(getText("IGUI_PhunMart_Hint_Inherited", tostring(f.inheritedFrom)))
-                f._hint.r, f._hint.g, f._hint.b = 0.45, 0.72, 0.78
             else
                 f._hint:setName(f.hint or "")
                 f._hint.r, f._hint.g, f._hint.b = 0.5, 0.5, 0.5

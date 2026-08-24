@@ -654,10 +654,26 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addComboField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
         options = inheritOptions,
         selected = inheritSelected,
-        group = "instance"
+        hint = getText("IGUI_PhunMart_Hint_Inherit"),
+        group = "instance",
+        -- Half the fields below can be showing this entry's values, and the
+        -- only way to see them was to cancel out, find it in the list and open
+        -- it. Reads the combo at click time rather than the value it loaded
+        -- with, so it follows a parent you have just picked.
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local parentKey = f:getFieldValue("inherit")
+                local parentRaw = parentKey and parentKey ~= "" and allSpecials[parentKey]
+                if parentRaw then
+                    createEditModal(parentKey, parentRaw, false, cb)
+                end
+            end
+        }
     })
     form:addTextField("displayText", getText("IGUI_PhunMart_Lbl_Label"), {
         default = (def.display and def.display.text) or "",
+        hint = getText("IGUI_PhunMart_Hint_DisplayText"),
         group = "instance"
     })
     local curActionType = curAction and curAction.type or ACTION_TYPES[1]
@@ -684,7 +700,8 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         group = "instance",
         -- Only the first action is editable here. Say so when there are more,
         -- rather than letting them look absent (they are preserved on save).
-        hint = extraActions > 0 and getText("IGUI_PhunMart_Hint_MoreActions", tostring(extraActions)) or nil,
+        hint = extraActions > 0 and getText("IGUI_PhunMart_Hint_MoreActions", tostring(extraActions)) or
+            getText("IGUI_PhunMart_Hint_ActionType"),
         onChange = function(f, field)
             applyActionGroups(f, f:getFieldValue("action"))
         end
