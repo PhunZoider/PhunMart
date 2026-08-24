@@ -303,6 +303,20 @@ end
 -- Group visibility
 ---------------------------------------------------------------------------
 
+--- A field is on screen when its section is the active one AND whatever else
+--- controls it still wants it. Two independent answers, because `group` is
+--- already spoken for: the specials form uses it to show the fields belonging
+--- to the chosen action type, and which tab a field sits on is a different
+--- question from whether that tab currently has any use for it.
+---
+--- Declared here rather than beside setSections, which is where it is
+--- conceptually at home but is several hundred lines further down. A local is
+--- only in scope after its declaration, so from up here the name resolved to a
+--- nil global and every setGroupVisible call died on it.
+local function applyVisibility(f)
+    f.visible = (f._groupOn ~= false) and (f._sectionOn ~= false)
+end
+
 function FormPanel:setGroupVisible(groupName, visible)
     for _, f in ipairs(self._fields) do
         if f.group == groupName then
@@ -341,15 +355,6 @@ end
 -- the strip, always visible. That is where identity goes: what you are editing
 -- should not be on a tab you might not be looking at.
 ---------------------------------------------------------------------------
-
---- A field is on screen when its section is the active one AND whatever else
---- controls it still wants it. Two independent answers, because `group` is
---- already spoken for: the specials form uses it to show the fields belonging
---- to the chosen action type, and which tab a field sits on is a different
---- question from whether that tab currently has any use for it.
-local function applyVisibility(f)
-    f.visible = (f._groupOn ~= false) and (f._sectionOn ~= false)
-end
 
 --- Put fields in sections by key, rather than a section= on all of them.
 ---
