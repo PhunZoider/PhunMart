@@ -636,31 +636,42 @@ end
 -- admin actions
 -- ─────────────────────────────────────────────────────────────────────────────
 
-function UI:getClientObject()
-    local loc = self.data and self.data.location
-    if not loc then
-        return nil
-    end
-    return Core.ClientSystem.instance:getLuaObjectAt(loc.x, loc.y, loc.z)
-end
+-- Restock and reroll used to look up the client-side Lua object at this shop's
+-- coordinates, then hand it to ClientSystem, which read x, y and z back off it
+-- and sent them to the server. A whole round trip to recover the coordinates
+-- the panel was already holding, and it failed whenever the client's global
+-- object registry had no entry at that spot, reporting "no location data" about
+-- a location it knew perfectly well.
+--
+-- They send the command straight from self.data.location now, which is what
+-- onBuy and onChangeTo have always done.
 
 function UI:onAdminRestock()
-    local obj = self:getClientObject()
-    if not obj then
+    local loc = self.data and self.data.location
+    if not loc then
         self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
-    obj:restock(self.player)
+    -- Flat x/y/z: what the restock handler reads.
+    sendClientCommand(Core.name, Core.commands.restock, {
+        x = loc.x,
+        y = loc.y,
+        z = loc.z
+    })
     self:showFeedback(getText("IGUI_PhunMart_Msg_Restocking"), 0.9, 0.6, 0.2)
 end
 
 function UI:onAdminReroll()
-    local obj = self:getClientObject()
-    if not obj then
+    local loc = self.data and self.data.location
+    if not loc then
         self:showFeedback(getText("IGUI_PhunMart_Msg_NoLocationData"), 0.9, 0.3, 0.3)
         return
     end
-    obj:reroll()
+    -- Nested under `location`: what the reroll handler reads. The two commands
+    -- disagree on shape, which is why this is not one helper.
+    sendClientCommand(Core.name, Core.commands.reroll, {
+        location = loc
+    })
     self:showFeedback(getText("IGUI_PhunMart_Msg_Rerolling"), 0.3, 0.5, 0.9)
 end
 

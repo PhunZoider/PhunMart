@@ -546,8 +546,16 @@ end
 function UI:onMouseWheel(del)
     local viewH = self.height - TOGGLE_H
     local maxScroll = math.max(0, self:totalContentH() - viewH)
+    if maxScroll <= 0 then
+        -- Nothing to scroll, so leave the wheel to whatever is underneath
+        -- rather than swallowing it.
+        return false
+    end
     local step = self.viewMode == VIEW_GRID and (self:cellSize() + PAD_GAP) or (self:listRowH() + PAD_GAP)
-    self.scrollY = math.max(0, math.min(maxScroll, self.scrollY - del * step))
+    -- Plus, not minus. del is positive when the wheel turns towards you, and
+    -- scrollY is a positive offset subtracted from each row's y, so wheeling
+    -- down has to increase it. Subtracting ran the list backwards.
+    self.scrollY = math.max(0, math.min(maxScroll, self.scrollY + del * step))
     return true
 end
 
@@ -811,13 +819,19 @@ function UI:render()
     self:clearStencilRect()
 
     -- ── scroll indicator ──────────────────────────────────────────────────────
+    -- Two pixels of half-transparent grey, which is what this was, disappears
+    -- against a shop's background art. A track behind the thumb as well, so the
+    -- bar says how far down the list you are rather than only that it moved.
     local totalH = self:totalContentH()
     local viewH = self.height - TOGGLE_H
     if totalH > viewH then
-        local dotH = math.max(20, math.floor(viewH * viewH / totalH))
+        local barW = 4
+        local barX = self.width - barW - 2
+        local dotH = math.max(math.floor(20 * FONT_SCALE), math.floor(viewH * viewH / totalH))
         local maxSc = totalH - viewH
         local dotY = TOGGLE_H + math.floor((viewH - dotH) * self.scrollY / maxSc)
-        self:drawRect(self.width - 3, dotY, 2, dotH, 0.5, 0.5, 0.5, 0.5)
+        self:drawRect(barX, TOGGLE_H, barW, viewH, 0.25, 0, 0, 0)
+        self:drawRect(barX, dotY, barW, dotH, 0.85, 0.85, 0.85, 0.85)
     end
 
 end
