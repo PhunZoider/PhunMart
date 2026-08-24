@@ -342,6 +342,14 @@ function Core:ini()
     -- Wire playtime and kill-tracking modules.
     require "PhunMart_Server/rewards_playtime"
     require "PhunMart_Server/rewards_kill"
+
+    -- Before the loads, not after. Detection asks whether the tracker files
+    -- outlived the save they belong to, and Core.wallet:load below is the very
+    -- thing that hides the answer: it merges those files back over the empty
+    -- ModData of a new world.
+    require "PhunMart_Server/wipe"
+    Core.wipe.check()
+
     Core.playtimeRewards:load()
     Core.killRewards:load()
     Core.purchases:load()

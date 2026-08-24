@@ -19,6 +19,7 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local ShopWizard = require "PhunMart_Client/ui/admin/shop_wizard"
 local CurrencyTool = require "PhunMart_Client/ui/admin/currency_tool"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local WipeTool = require "PhunMart_Client/ui/admin/wipe_tool"
 local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
@@ -61,10 +62,14 @@ end
 -- maintenance actions that act on the world rather than on the definitions.
 --
 --   label     row heading
---   desc      the sentence under it, saying what it does and when to use it
+--   desc      the sentence under it, saying what it does and when to use it.
+--             A function when what it should say depends on the state of
+--             something, in which case the row is rebuilt when that changes
+--             rather than the text being resolved every frame.
 --   action    verb for the run button, defaults to Open
 --   warn      draws the heading amber, for anything that changes the world for
---             every player at once
+--             every player at once. A function for a row that is only sometimes
+--             worth shouting about.
 --   suffix    function(panel) -> string appended to the heading, read live
 --   available function(panel) -> boolean; false greys the row and its button
 --   run       function(panel)
@@ -103,6 +108,28 @@ local TOOLS = {{
     end,
     run = function()
         PendingRestock.show()
+    end
+}, {
+    key = "wipe",
+    label = "IGUI_PhunMart_Tool_Wipe",
+    -- Says something different once the server has noticed a wipe, because at
+    -- that point it is not an offer, it is an answer to a question the admin is
+    -- about to ask.
+    desc = function()
+        if WipeTool.pending then
+            return getText("IGUI_PhunMart_ToolDesc_WipeDetected", tostring(WipeTool.total()))
+        end
+        return getText("IGUI_PhunMart_ToolDesc_Wipe")
+    end,
+    action = "IGUI_PhunMart_Btn_Review",
+    warn = function()
+        return WipeTool.pending
+    end,
+    suffix = function()
+        return WipeTool.pending and (" " .. getText("IGUI_PhunMart_Lbl_ActionNeeded")) or ""
+    end,
+    run = function(panel)
+        WipeTool.open(panel.player)
     end
 }, {
     key = "restockall",
@@ -174,19 +201,37 @@ function UI:createChildren()
     self:refresh()
 end
 
-function UI:refresh()
+--- Rebuild the rows. Separate from refresh because fresh wipe status arrives
+--- asynchronously and has to rebuild them again without asking for it a second
+--- time, which is what refresh does.
+function UI:refreshRows()
     self:clearList()
     for _, spec in ipairs(TOOLS) do
         self:addListItem(getText(spec.label), {
             key = spec.key,
             spec = spec,
-            -- Resolved once. The row renderer runs every frame for every row,
-            -- and getText is not free enough to call twelve times a frame for
-            -- strings that cannot change while the tab is open.
-            desc = getText(spec.desc)
+            -- Resolved once per rebuild. The row renderer runs every frame for
+            -- every row, and getText is not free enough to call twelve times a
+            -- frame for strings that only change between rebuilds.
+            desc = type(spec.desc) == "function" and spec.desc(self) or getText(spec.desc)
         })
     end
 end
+
+function UI:refresh()
+    -- Whether a wipe is outstanding is the server's to know, and the answer
+    -- changes what one of the rows says. The reply rebuilds the rows again.
+    WipeTool.request()
+    self:refreshRows()
+end
+
+WipeTool.onStatus(function()
+    for _, instance in pairs(UI.instances or {}) do
+        if instance.list then
+            instance:refreshRows()
+        end
+    end
+end)
 
 ---------------------------------------------------------------------------
 -- Rows
@@ -220,7 +265,11 @@ function UI.drawRow(listSelf, y, item, alt)
     -- the two rows that do are told apart before they are clicked rather than
     -- by reading the confirmation they raise.
     local r, g, b = 1, 1, 1
-    if spec.warn then
+    local warn = spec.warn
+    if type(warn) == "function" then
+        warn = warn(panel)
+    end
+    if warn then
         r, g, b = 0.95, 0.8, 0.35
     end
     if not available then

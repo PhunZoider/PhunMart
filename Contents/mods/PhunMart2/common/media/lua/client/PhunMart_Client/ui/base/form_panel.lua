@@ -175,8 +175,13 @@ function FormPanel:addPickerField(key, label, opts)
 end
 
 --- Checkbox field.
--- opts: { checked, text, group, onChange }
+-- opts: { checked, text, hint, group, onChange }
 -- text: checkbox label (defaults to label param)
+--
+-- A tickbox is the field type most likely to need a hint and was the only one
+-- that dropped it: a box reading "Bound balances too" says what it is called,
+-- not what ticking it does. The label alone carries the whole meaning here,
+-- which is exactly when a second line earns its space.
 function FormPanel:addCheckField(key, label, opts)
     opts = opts or {}
     table.insert(self._fields, {
@@ -185,6 +190,7 @@ function FormPanel:addCheckField(key, label, opts)
         label = label,
         checked = opts.checked or false,
         text = opts.text or label,
+        hint = opts.hint,
         group = opts.group,
         onChange = opts.onChange,
         visible = true
@@ -614,7 +620,11 @@ function FormPanel:_computeNeededHeight()
             elseif f.type == "image" then
                 y = y + f.imageHeight + FONT_HGT_SMALL + PAD
             elseif f.type == "check" then
-                y = y + ROW_H + PAD
+                y = y + ROW_H
+                if f.hasMessageRow then
+                    y = y + 2 + FONT_HGT_SMALL
+                end
+                y = y + PAD
             elseif f.type == "list" then
                 y = y + FONT_HGT_SMALL + 2 -- header row (columns or label)
                 y = y + (f._rows or 4) * ROW_H -- list rows
@@ -884,6 +894,12 @@ function FormPanel:_createField(f)
         end
         self:addChild(f._tick)
 
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+            f._hint:initialise()
+            self:addChild(f._hint)
+        end
+
     elseif f.type == "range" then
         f._label = ISLabel:new(0, 0, ROW_H, f.label .. ":", 1, 1, 1, 1, UIFont.Small, true)
         f._label:initialise()
@@ -1118,7 +1134,19 @@ function FormPanel:reflowFields()
             elseif f.type == "check" then
                 f._tick:setX(x)
                 f._tick:setY(y)
-                y = y + ROW_H + PAD
+                y = y + ROW_H
+                if f._hint then
+                    y = y + 2
+                    -- Indented past the box itself so the hint reads as
+                    -- belonging to this option rather than heading the next
+                    -- one. There is no label column here to align to, so it
+                    -- lines up with the tick's own text instead.
+                    f._fieldX = x + ROW_H
+                    f._hint:setX(f._fieldX)
+                    f._hint:setY(y)
+                    y = y + FONT_HGT_SMALL
+                end
+                y = y + PAD
 
             elseif f.type == "range" then
                 f._label:setX(x)

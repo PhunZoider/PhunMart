@@ -64,6 +64,17 @@ function Core.wallet:isBound(item)
     return (Core.wallet.currencies[item] or {}).bound == true
 end
 
+--- Whatever a caller passed in, as a name string. A player object, a username,
+--- or a raw key off self.data, which in singleplayer is the number 0. Shared
+--- because three functions each had their own "a string, or else call
+--- getUsername on it", which turns an integer key into a crash.
+function Core.wallet:nameOf(player)
+    if type(player) == "string" or type(player) == "number" then
+        return tostring(player)
+    end
+    return player and player:getUsername() or nil
+end
+
 --- The key a wallet record is filed under.
 ---
 --- Singleplayer keeps one record under 0, because there is only ever one
@@ -180,8 +191,12 @@ function Core.wallet:setPlayerData(player, data)
 end
 
 -- Reset: zeroes unbound pools, restores bound pools to their bound amount.
+--
+-- Accepts a player, a username, or a raw key from the wallet table. That last
+-- one matters because singleplayer files everything under the number 0, so a
+-- caller walking self.data hands this a number.
 function Core.wallet:reset(player)
-    local name = type(player) == "string" and player or player:getUsername()
+    local name = self:nameOf(player)
 
     if isClient() and not Core.isLocal then
         sendClientCommand(Core.name, Core.commands.resetWallet, {
@@ -214,7 +229,7 @@ end
 -- Direct pool adjustment, used by admin commands and purchase deduction.
 -- walletType is "current" or "bound".
 function Core.wallet:adjustByPool(player, walletType, pool, amount)
-    local name = type(player) == "string" and player or player:getUsername()
+    local name = self:nameOf(player)
     local w = self:get(name)
     if w then
         w[walletType][pool] = (w[walletType][pool] or 0) + amount
@@ -233,7 +248,7 @@ function Core.wallet:adjust(player, item, amount)
         return false, false
     end
 
-    local name = type(player) == "string" and player or player:getUsername()
+    local name = self:nameOf(player)
     local w = self:get(name)
     if not w then
         return false, false
