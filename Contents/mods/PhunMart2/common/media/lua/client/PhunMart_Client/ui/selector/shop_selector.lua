@@ -27,8 +27,15 @@ function UI:refreshAll()
 
     -- Sort by display name so the list holds a stable order between sessions.
     -- pairs() order is undefined, and this is the first list an admin sees.
+    -- Definitions, not the compiled runtime. The compiler drops anything with
+    -- enabled=false, so a shop disabled here vanished from the only list that
+    -- could reach its editor: there was no way back to the tickbox that
+    -- disabled it short of hand-editing PhunMart_Shops.txt.
+    --
+    -- Disabled rows draw grey, which the column colour below has always been
+    -- written to do and never had the chance to.
     local rows = {}
-    for shopType, shopDef in pairs(Core.runtime and Core.runtime.shops or {}) do
+    for shopType, shopDef in pairs(Core.defs and Core.defs.shops or {}) do
         table.insert(rows, {
             type = shopType,
             label = shopLabel(shopType),

@@ -306,9 +306,18 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             -- and tombstones what we clear below.
             local result = Core.utils.deepCopy(preserveBase or {})
 
-            -- Only written when disabled; absent already means enabled. Clearing the
-    -- key tombstones it, so re-enabling still carries.
-    result.enabled = f:getFieldValue("enabled") and nil or false
+            -- Only written when disabled; absent already means enabled. Clearing
+            -- the key tombstones it, so re-enabling still carries.
+            --
+            -- Spelled out rather than `x and nil or false`: that idiom cannot
+            -- yield nil, because `and nil` is falsy and `or false` then takes
+            -- over. It returned false for both answers, so every save disabled
+            -- whatever it was saving.
+            if f:getFieldValue("enabled") then
+                result.enabled = nil
+            else
+                result.enabled = false
+            end
             result.probability = f:getFieldNumber("probability")
             result.minDistance = f:getFieldNumber("minDistance")
             result.restockFrequency = f:getFieldNumber("restockFrequency")

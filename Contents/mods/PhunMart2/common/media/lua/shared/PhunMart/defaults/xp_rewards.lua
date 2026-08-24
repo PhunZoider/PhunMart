@@ -1609,7 +1609,7 @@ return {
         actions = {{
             skill = "Glassmaking"
         }}
-    },
+    },s
     skill_Glassmaking_t3 = {
         inherit = "xp_reward_t3_base",
         conditions = {"perk_Glassmaking_high"},

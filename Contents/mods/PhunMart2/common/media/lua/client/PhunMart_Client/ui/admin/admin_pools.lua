@@ -263,7 +263,14 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
 
             -- Only written when disabled; absent already means enabled.
             -- Clearing the key tombstones it, so re-enabling still carries.
-            result.enabled = f:getFieldValue("enabled") and nil or false
+            -- Spelled out rather than `x and nil or false`: that idiom cannot
+            -- yield nil, so it returned false for both answers and every save
+            -- disabled whatever it was saving.
+            if f:getFieldValue("enabled") then
+                result.enabled = nil
+            else
+                result.enabled = false
+            end
 
             -- Cleared rather than stored empty, so an unnamed definition does
             -- not carry the key at all and falls back to showing its key.

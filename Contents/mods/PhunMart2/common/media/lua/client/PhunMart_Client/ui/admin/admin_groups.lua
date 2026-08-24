@@ -266,7 +266,14 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             -- differed from a default that simply omits it. Re-enabling still
             -- carries: clearing the key tombstones it, which strips whatever
             -- was underneath and restores the implicit true.
-            result.enabled = f:getFieldValue("enabled") and nil or false
+            -- Spelled out rather than `x and nil or false`: that idiom cannot
+            -- yield nil, so it returned false for both answers and every save
+            -- disabled whatever it was saving.
+            if f:getFieldValue("enabled") then
+                result.enabled = nil
+            else
+                result.enabled = false
+            end
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
