@@ -6,8 +6,11 @@ local Core = PhunMart
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_SCALE = FormPanel.FONT_SCALE
+local FACINGS = tools.TILE_FACINGS
+local tileTexture = tools.tileTexture
 
 Core.ui.admin_shops = {}
 local AdminShops = Core.ui.admin_shops
@@ -322,6 +325,9 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             result.minDistance = f:getFieldNumber("minDistance")
             result.restockFrequency = f:getFieldNumber("restockFrequency")
 
+            local title = f:getFieldValue("title")
+            result.title = (title ~= "") and title or nil
+
             local view = f:getFieldValue("defaultView")
             result.defaultView = (view == "list") and "list" or nil
 
@@ -354,56 +360,116 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         end
     })
 
-    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
-        checked = def.enabled ~= false,
-        text = getText("IGUI_PhunMart_Lbl_Enabled")
+    -- Identity, above the tabs. What you are editing should not be on a tab you
+    -- might not be looking at. The form used to open on the Enabled tickbox,
+    -- which is a state, not a name.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_ShopTitle")
     })
+    form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
+        default = shopKey or "",
+        editable = false,
+        hint = getText("IGUI_PhunMart_Hint_ShopKey")
+    })
+
     form:addTextField("probability", getText("IGUI_PhunMart_Lbl_Probability"), {
         default = tostring(def.probability or 1),
         hint = getText("IGUI_PhunMart_Hint_Probability"),
         numeric = true,
-        min = 0
+        min = 0,
+        group = "s_basics"
     })
     form:addTextField("minDistance", getText("IGUI_PhunMart_Lbl_MinDistance"), {
         default = def.minDistance and tostring(def.minDistance) or "",
         hint = getText("IGUI_PhunMart_Hint_MinDistance"),
         integer = true,
-        min = 0
+        min = 0,
+        group = "s_basics"
     })
     form:addTextField("restockFrequency", getText("IGUI_PhunMart_Lbl_RestockFrequency"), {
         default = def.restockFrequency and tostring(def.restockFrequency) or "",
         hint = getText("IGUI_PhunMart_Hint_RestockFrequency"),
         numeric = true,
-        min = 0
+        min = 0,
+        group = "s_basics"
     })
     form:addComboField("defaultView", getText("IGUI_PhunMart_Lbl_DefaultView"), {
         options = {"grid", "list"},
         selected = def.defaultView or "grid",
-        hint = getText("IGUI_PhunMart_Hint_ViewMode")
+        hint = getText("IGUI_PhunMart_Hint_ViewMode"),
+        group = "s_basics"
     })
+    -- Last in Basics rather than first in the form: a switch you flip rarely,
+    -- not the thing you came to read.
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
+        checked = def.enabled ~= false,
+        text = getText("IGUI_PhunMart_Lbl_Enabled"),
+        hint = getText("IGUI_PhunMart_Hint_ShopEnabled"),
+        group = "s_basics"
+    })
+
     form:addTextField("background", getText("IGUI_PhunMart_Lbl_Background"), {
         default = def.background or "",
-        hint = getText("IGUI_PhunMart_Hint_Background")
+        hint = getText("IGUI_PhunMart_Hint_Background"),
+        group = "s_look"
     })
     form:addTextField("sprites", getText("IGUI_PhunMart_Lbl_Sprites"), {
         default = def.sprites and table.concat(def.sprites, ", ") or "",
-        hint = getText("IGUI_PhunMart_Hint_Sprites")
+        hint = getText("IGUI_PhunMart_Hint_Sprites"),
+        group = "s_look",
+        onChange = function(f)
+            f:reflowFields()
+        end
     })
     form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_UnpSprites"), {
         default = def.unpoweredSprites and table.concat(def.unpoweredSprites, ", ") or "",
-        hint = getText("IGUI_PhunMart_Hint_UnpSprites")
+        hint = getText("IGUI_PhunMart_Hint_UnpSprites"),
+        group = "s_look",
+        onChange = function(f)
+            f:reflowFields()
+        end
     })
+    -- The tiles themselves, so a sprite name typed wrong is visibly wrong rather
+    -- than discovered by walking to a machine that renders as nothing.
+    form:addImageField("spritePreview", getText("IGUI_PhunMart_Lbl_Preview"), {
+        group = "s_look",
+        height = math.floor(64 * FONT_SCALE),
+        images = function()
+            local out = {}
+            local function add(csv, gap)
+                local first = true
+                for i, name in ipairs(parseCSV(csv) or {}) do
+                    table.insert(out, {
+                        texture = tileTexture(name),
+                        -- Which way the tile faces, not its name: the names are
+                        -- already in the box above, and the order is not the
+                        -- compass order anyone would guess.
+                        label = getText(FACINGS[i] or ""),
+                        gap = first and gap or false
+                    })
+                    first = false
+                end
+            end
+            add(form:getFieldValue("sprites"), false)
+            add(form:getFieldValue("unpSprites"), true)
+            return out
+        end
+    })
+
     form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_RollMin"), {
         minDefault = rollMinDefault,
         maxDefault = rollMaxDefault,
         hint = getText("IGUI_PhunMart_Hint_ShopRoll"),
         integer = true,
         min = 0,
-        requireBoth = true
+        requireBoth = true,
+        group = "s_stock"
     })
 
     form:addListField("poolSets", getText("IGUI_PhunMart_Lbl_PoolSets"), {
         items = editPoolSets,
+        group = "s_stock",
         rows = 3,
         columns = {{
             name = getText("IGUI_PhunMart_Col_Pool"),
@@ -428,6 +494,19 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             end)
         end
     })
+
+    -- Before initialise: only one section's fields are visible, and the window
+    -- is sized from what is on screen.
+    form:setSections({{
+        group = "s_basics",
+        label = getText("IGUI_PhunMart_Sec_Basics")
+    }, {
+        group = "s_look",
+        label = getText("IGUI_PhunMart_Sec_Appearance")
+    }, {
+        group = "s_stock",
+        label = getText("IGUI_PhunMart_Sec_Stock")
+    }})
 
     form:initialise()
     form:addToUIManager()

@@ -19,6 +19,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_SCALE = ListPanel.FONT_SCALE
 
@@ -54,22 +55,10 @@ local SPARE_SETS = {{
 -- The order the four tiles are read in. ServerObject:getSpriteIndex maps
 -- E to 1, S to 2, W to 3 and anything else to 4, so the list is not the
 -- compass order anyone would guess and the fields say which is which.
-local FACINGS = {"IGUI_PhunMart_Wiz_East", "IGUI_PhunMart_Wiz_South", "IGUI_PhunMart_Wiz_West",
-                 "IGUI_PhunMart_Wiz_North"}
+-- Shared with the shop editor's tile preview, which needs the same two things.
+local FACINGS = tools.TILE_FACINGS
 
---- The texture for one tile name, or nil when nothing matches. Guarded because
---- the sprite manager is the game's, not ours, and an unknown name from a mod
---- that is not loaded should show an empty frame rather than end the wizard.
-local function tileTexture(name)
-    if not name or name == "" then
-        return nil
-    end
-    local ok, tex = pcall(function()
-        local spr = IsoSpriteManager.instance:getSprite(name)
-        return spr and spr:getTextureForCurrentFrame(IsoDirections.S) or nil
-    end)
-    return ok and tex or nil
-end
+local tileTexture = tools.tileTexture
 
 local function backgroundTexture(name)
     if not name or name == "" then

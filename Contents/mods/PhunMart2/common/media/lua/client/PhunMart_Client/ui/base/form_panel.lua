@@ -40,6 +40,13 @@ FormPanel.FONT_HGT_SMALL = FONT_HGT_SMALL
 FormPanel.FONT_HGT_MEDIUM = FONT_HGT_MEDIUM
 FormPanel.BUTTON_HGT = BUTTON_HGT
 
+-- Section tab states. Shared tables because reflow assigns them every pass, and
+-- deliberately the same colours the list panel's filter tabs use: a row of tabs
+-- should mean the same thing wherever it appears.
+local SECTION_ON = {r = 0.3, g = 0.7, b = 0.35, a = 0.4}
+local SECTION_OFF = {r = 0, g = 0, b = 0, a = 0.25}
+local SECTION_HOVER = {r = 0.3, g = 0.7, b = 0.35, a = 0.2}
+
 ---------------------------------------------------------------------------
 -- Construction
 ---------------------------------------------------------------------------
@@ -69,6 +76,9 @@ function FormPanel:new(opts)
     o._onCancel = opts.onCancel -- function() (optional)
     o._onDelete = opts.onDelete -- function(form), optional; omit on an Add form
     o._deleteLabel = opts.deleteLabel -- when "Delete" is the wrong word for it
+    -- {text, onClick = function(form)}: one extra button on the left, for a form
+    -- that can show you something about what you are editing.
+    o._extraButton = opts.extraButton
     o._validateForm = opts.validate -- function(form) -> errorText (cross-field rules)
     o._showErrors = false -- set on the first Apply; errors then track live edits
     o:setWantKeyEvents(true)
@@ -316,6 +326,62 @@ end
 ---------------------------------------------------------------------------
 
 --- @param steps array of {group = "basics", title = "What is this shop called?"}
+---------------------------------------------------------------------------
+-- Sections
+--
+-- A row of tabs inside the form, one group of fields at a time. Steps are the
+-- same machinery pointed at a different problem: a step gates you until you
+-- have filled it in, a section is just somewhere to put the things you rarely
+-- touch. Apply stays available throughout.
+--
+-- Fields declared before the first sectioned one have no section and sit above
+-- the strip, always visible. That is where identity goes: what you are editing
+-- should not be on a tab you might not be looking at.
+---------------------------------------------------------------------------
+
+--- @param sections array of {group = "appearance", label = "Appearance"}
+function FormPanel:setSections(sections)
+    if self._steps then
+        -- A form is one or the other. Steps already own group visibility and the
+        -- button row, and the two would fight over both.
+        return self
+    end
+    self._sections = sections
+    self._section = 1
+    self._sectionGroups = {}
+    for _, s in ipairs(sections or {}) do
+        self._sectionGroups[s.group] = true
+    end
+    self:_applySection()
+    return self
+end
+
+--- Show one section's fields and hide the rest. Called before initialise, so
+--- the window is sized from the section that will actually be on screen.
+function FormPanel:_applySection()
+    if not self._sections then
+        return
+    end
+    for i, s in ipairs(self._sections) do
+        for _, f in ipairs(self._fields) do
+            if f.group == s.group then
+                f.visible = (i == self._section)
+            end
+        end
+    end
+    if self._built then
+        self:reflowFields()
+    end
+end
+
+function FormPanel:_onSectionClick(btn)
+    self._section = btn._sectionIndex or 1
+    -- Back to the top: the new section's first field is what you asked to see,
+    -- and keeping the old offset can leave a short section scrolled past itself.
+    self._scrollY = 0
+    self:_applySection()
+end
+
 function FormPanel:setSteps(steps)
     self._steps = steps
     self._step = 1
@@ -663,6 +729,13 @@ function FormPanel:_computeNeededHeight()
     local th = self:titleBarHeight()
     local y = th + PAD
 
+    -- The section strip, which reflowFields places before the first sectioned
+    -- field. Counted once whether or not any of those fields are visible, since
+    -- the strip is how you reach the ones that are not.
+    if self._sections then
+        y = y + ROW_H + PAD
+    end
+
     for _, f in ipairs(self._fields) do
         if f.visible then
             if f.type == "separator" then
@@ -797,6 +870,21 @@ function FormPanel:createChildren()
         self._labelW = maxLabelW + 8
     end
 
+    -- Section tabs, before the fields so they sit behind nothing.
+    if self._sections then
+        self._sectionBtns = {}
+        for i, s in ipairs(self._sections) do
+            local w = getTextManager():MeasureStringX(UIFont.Small, s.label) + PAD * 2
+            local btn = ISButton:new(0, 0, w, ROW_H, s.label, self, FormPanel._onSectionClick)
+            btn:initialise()
+            btn:instantiate()
+            btn._sectionIndex = i
+            btn.borderColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.6}
+            self:addChild(btn)
+            table.insert(self._sectionBtns, btn)
+        end
+    end
+
     -- Create all field widgets
     for _, f in ipairs(self._fields) do
         self:_createField(f)
@@ -835,6 +923,20 @@ function FormPanel:createChildren()
             self._deleteBtn:enableCancelColor()
         end
         self:addChild(self._deleteBtn)
+    end
+
+    -- One optional extra on the left, for a form that can show you something
+    -- about what you are editing. Beside Delete rather than near Apply, because
+    -- it neither commits nor cancels.
+    if self._extraButton then
+        local label = self._extraButton.text
+        local w = math.max(btnW, getTextManager():MeasureStringX(UIFont.Small, label) + PAD * 2)
+        self._extraBtn = ISButton:new(PAD, 0, w, ROW_H, label, self, function()
+            self._extraButton.onClick(self)
+        end)
+        self._extraBtn:initialise()
+        self._extraBtn:instantiate()
+        self:addChild(self._extraBtn)
     end
 
     -- Back sits with the pair rather than hard left: it is part of moving
@@ -1173,7 +1275,27 @@ function FormPanel:reflowFields()
     local w = self.width - PAD * 2
     local labelW = self._labelW
 
+    -- The strip goes in immediately before the first field that belongs to a
+    -- section, which puts it under the identity fields and above everything a
+    -- tab owns, without the caller having to say where.
+    local stripPlaced = (self._sectionBtns == nil)
+
     for _, f in ipairs(self._fields) do
+        if not stripPlaced and f.group and self._sectionGroups[f.group] then
+            local tx = x
+            for i, btn in ipairs(self._sectionBtns) do
+                btn:setX(tx)
+                btn:setY(y)
+                local active = (i == self._section)
+                btn.backgroundColor = active and SECTION_ON or SECTION_OFF
+                btn.backgroundColorMouseOver = active and SECTION_ON or SECTION_HOVER
+                btn:setVisible(y >= viewTop and y + ROW_H <= viewBottom)
+                tx = tx + btn.width + 2
+            end
+            y = y + ROW_H + PAD
+            stripPlaced = true
+        end
+
         if not f.visible then
             -- Hide all widgets for this field
             self:_setFieldWidgetsVisible(f, false)
@@ -1375,9 +1497,15 @@ function FormPanel:reflowFields()
     self._applyBtn:setY(y)
     self._cancelBtn:setX(btnX + btnW + btnGap)
     self._cancelBtn:setY(y)
+    local leftX = PAD
     if self._deleteBtn then
-        self._deleteBtn:setX(PAD)
+        self._deleteBtn:setX(leftX)
         self._deleteBtn:setY(y)
+        leftX = leftX + self._deleteBtn.width + PAD
+    end
+    if self._extraBtn then
+        self._extraBtn:setX(leftX)
+        self._extraBtn:setY(y)
     end
 
     -- The window was already sized at the top of this function, from the content

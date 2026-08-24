@@ -205,6 +205,27 @@ function tools.formatCents(n)
     end
 end
 
+--- The order the four machine tiles are read in. ServerObject:getSpriteIndex
+--- maps E to 1, S to 2, W to 3 and anything else to 4, so the list is not the
+--- compass order anyone would guess and a preview has to say which is which.
+tools.TILE_FACINGS = {"IGUI_PhunMart_Wiz_East", "IGUI_PhunMart_Wiz_South", "IGUI_PhunMart_Wiz_West",
+                      "IGUI_PhunMart_Wiz_North"}
+
+--- The texture for one tile name, or nil when nothing matches. Guarded because
+--- the sprite manager is the game's, not ours, and an unknown name from a mod
+--- that is not loaded should show an empty frame rather than end whatever was
+--- drawing it.
+function tools.tileTexture(name)
+    if not name or name == "" then
+        return nil
+    end
+    local ok, tex = pcall(function()
+        local spr = IsoSpriteManager.instance:getSprite(name)
+        return spr and spr:getTextureForCurrentFrame(IsoDirections.S) or nil
+    end)
+    return ok and tex or nil
+end
+
 -- Truncate text with "..." if it exceeds maxWidth.
 function tools.truncate(text, maxWidth, font)
     if getTextManager():MeasureStringX(font, text) <= maxWidth then

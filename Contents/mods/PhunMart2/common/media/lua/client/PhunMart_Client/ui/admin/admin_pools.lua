@@ -221,6 +221,19 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 end
             end)
         end or nil,
+        -- The pool viewer, from inside the pool. It was on the list behind a
+        -- View button, which means leaving the thing you are editing to find out
+        -- what it currently yields. Existing pools only: a new one has drawn
+        -- nothing yet and the runtime has never heard of it.
+        extraButton = (not isNew) and {
+            text = getText("IGUI_PhunMart_Btn_ViewContents"),
+            onClick = function(f)
+                local poolData = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+                if poolData then
+                    Core.ui.client.poolViewer.open(getSpecificPlayer(0), poolKey, poolData)
+                end
+            end
+        } or nil,
         onApply = function(f)
             local key = f:getFieldValue("key")
 
@@ -282,6 +295,13 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         end,
     })
 
+    -- Identity above the tabs, name first. The name is what the lists show and
+    -- what you think in; the key is the machine-readable half and mostly fixed
+    -- once created, so leading with it put the least editable thing first.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = poolKey or "", editable = isNew,
         required = true,
@@ -291,16 +311,12 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             end
         end or nil,
     })
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
-    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
-        checked = def.sticky == true,
-        text = getText("IGUI_PhunMart_Hint_Sticky"),
-    })
+
+    -- What the pool draws from, which is the whole of what a pool is for.
     form:addPickerField("groups", getText("IGUI_PhunMart_Lbl_Groups"), {
         value = selectedGroups, display = formatKeyList(selectedGroups),
+        hint = getText("IGUI_PhunMart_Hint_PoolGroups"),
+        group = "p_basics",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), groupOptions, selectedGroups, function(keys)
                 selectedGroups = keys or {}
@@ -308,10 +324,34 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickGroups") })
         end,
     })
+    form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+        options = priceKeys, selected = currentPrice,
+        hint = getText("IGUI_PhunMart_Hint_PoolDefaultPrice"),
+        group = "p_basics",
+    })
+    form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
+        default = zonesDefault,
+        hint = getText("IGUI_PhunMart_Hint_Zones"),
+        validate = validateZones,
+        group = "p_basics",
+    })
+    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
+        checked = def.sticky == true,
+        text = getText("IGUI_PhunMart_Lbl_Sticky"),
+        hint = getText("IGUI_PhunMart_Hint_Sticky"),
+        group = "p_basics",
+    })
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
+        hint = getText("IGUI_PhunMart_Hint_PoolEnabled"),
+        group = "p_basics",
+    })
+
     form:addPickerField("blacklist", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
         value = selectedBlacklist,
         display = formatBlacklistDisplay(selectedBlacklist),
         hint = getText("IGUI_PhunMart_Hint_PoolBlacklist"),
+        group = "p_more",
         onPick = function(f, field)
             KeyPicker.open(getSpecificPlayer(0), getBlacklistOptions(poolKey, selectedBlacklist), selectedBlacklist,
                 function(keys)
@@ -322,25 +362,27 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 })
         end,
     })
-    form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
-        default = zonesDefault,
-        hint = getText("IGUI_PhunMart_Hint_Zones"),
-        validate = validateZones,
-    })
-    form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
-        options = priceKeys, selected = currentPrice,
-    })
+    -- Last resorts, below the group's own. No shipped pool sets either, and a
+    -- pool only reaches for them when the group has nothing to offer, so they
+    -- were two boxes of nothing at the front of every pool anyone opened.
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {
         default = def.fallbackTexture or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultTexture"),
+        group = "p_more",
     })
     form:addTextField("fallbackCategory", getText("IGUI_PhunMart_Lbl_DefaultCategory"), {
         default = def.fallbackCategory or "",
         hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
+        group = "p_more",
     })
-    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
-        checked = def.enabled ~= false,
-    })
+
+    form:setSections({{
+        group = "p_basics",
+        label = getText("IGUI_PhunMart_Sec_Basics")
+    }, {
+        group = "p_more",
+        label = getText("IGUI_PhunMart_Sec_Advanced")
+    }})
 
     form:initialise()
     form:addToUIManager()
