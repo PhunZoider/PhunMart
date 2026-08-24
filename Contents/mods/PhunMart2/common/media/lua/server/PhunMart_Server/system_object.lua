@@ -188,10 +188,11 @@ local function poolPassesZoneFilter(pool, x, y)
     if not PZ then
         return true
     end
-    -- Colon: PhunZones declares this as "function Core:getLocation", so a dot
-    -- call passes x as self and errors indexing a number. Zone gating has never
-    -- worked on a server that actually has PhunZones installed.
-    local loc = PZ:getLocation(x, y)
+    -- Dot, not colon. PhunZones 2 declares this as "function Core.getLocation"
+    -- and closes over Core itself rather than taking self. PhunZones 1 used a
+    -- colon, so a copy of that version on disk will suggest otherwise; the mod
+    -- this integrates with is phunzones2, which pool_restock.lua checks by name.
+    local loc = PZ.getLocation(x, y)
     local difficulty = loc and loc.difficulty
     if difficulty == nil then
         return true

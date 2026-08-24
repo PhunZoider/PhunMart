@@ -63,10 +63,12 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
         end
 
         Core.getCoinChance = function(zed)
-            -- Colon, not dot. See the note in system_object.lua: a dot call
-            -- hands the x coordinate to getLocation as self and errors, which
-            -- here would have been once per zombie killed.
-            local location = PZ:getLocation(zed:getX(), zed:getY())
+            -- getLocation falls back to the _default zone and returns nil when
+            -- even that is missing, which is reachable before the zone data has
+            -- loaded. Every read below already has an "or option" fallback, so
+            -- an empty table lets them all take it instead of erroring here,
+            -- on a path that runs once per zombie killed.
+            local location = PZ.getLocation(zed:getX(), zed:getY()) or {}
             local chance = (location.coinchance or Core.getOption("ChanceToDropChange")) * 0.01
             local minCents = location.coinmin or Core.getOption("MinCoinsToDrop")
             local maxCents = location.coinmax or Core.getOption("MaxCoinsToDrop")

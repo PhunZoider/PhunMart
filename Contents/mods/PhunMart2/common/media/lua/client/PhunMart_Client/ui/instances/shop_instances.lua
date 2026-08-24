@@ -32,11 +32,11 @@ local function zoneTitle(x, y)
     if not pz then
         return nil
     end
-    -- A colon call. getLocation is declared "function Core:getLocation" in
-    -- PhunZones, so it wants the module as its first argument; a dot call hands
-    -- it the x coordinate as self and dies indexing a number. Every call site in
-    -- PhunMart had it wrong, which is why the zone name never appeared.
-    local ok, loc = pcall(pz.getLocation, pz, x, y)
+    -- A dot call: PhunZones 2 declares getLocation on Core rather than as a
+    -- method, matching the other two call sites in this mod. pcall because an
+    -- optional dependency's internals are not ours to depend on, and this runs
+    -- once per machine on every refresh.
+    local ok, loc = pcall(pz.getLocation, x, y)
     if ok and loc and loc.title and loc.title ~= "" then
         return loc.title
     end
