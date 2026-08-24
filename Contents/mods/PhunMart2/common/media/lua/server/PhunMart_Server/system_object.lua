@@ -522,9 +522,9 @@ end
 -- one left by Restock All, or a per-type one left by a targeted restock after a
 -- definition edit. Returns nil when neither applies.
 function ServerObject:forcedRestockStamp()
-    local md = ModData.getOrCreate("PhunMart")
-    local stamp = md.forceRestockAt or 0
-    local byType = md.forceRestockTypeAt and md.forceRestockTypeAt[self.type]
+    local stamps = Core.restockStamps()
+    local stamp = stamps.forceRestockAt or 0
+    local byType = stamps.forceRestockTypeAt and stamps.forceRestockTypeAt[self.type]
     if byType and byType > stamp then
         stamp = byType
     end
@@ -559,7 +559,7 @@ function ServerObject:restock()
     self.lastRestock = lastRestock + (times * frequency)
 
     -- Admin-forced restock: the grid-aligned lastRestock above can still land
-    -- before md.forceRestockAt (a shop only 10h into a 24h cycle keeps
+    -- before the forceRestockAt stamp (a shop only 10h into a 24h cycle keeps
     -- lastRestock unchanged), so requiresRestock() would keep firing on every
     -- open. Snap to now so this shop's forced restock counts as serviced. The
     -- global stamp itself must stay set for shops still in unloaded chunks.

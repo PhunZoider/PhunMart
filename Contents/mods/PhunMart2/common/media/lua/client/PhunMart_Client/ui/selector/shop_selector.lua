@@ -55,7 +55,11 @@ function UI:refreshAll()
     if Core.isLocal then
         local counts = {}
         for _, v in pairs(Core.instances or {}) do
-            counts[v.type] = (counts[v.type] or 0) + 1
+            -- Machines only. A stray key in this ModData table would otherwise
+            -- reach counts[nil], which is an error rather than a wrong number.
+            if Core.isShopInstance(v) then
+                counts[v.type] = (counts[v.type] or 0) + 1
+            end
         end
         self.list.instanceCounts = counts
     else

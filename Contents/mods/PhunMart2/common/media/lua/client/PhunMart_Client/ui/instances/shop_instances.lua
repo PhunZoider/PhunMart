@@ -29,7 +29,9 @@ local function zoneTitle(x, y)
     if pz == nil then
         pz = PhunZones or false
     end
-    if not pz then
+    -- getLocation divides the coordinates, so a nil reaches it as an arithmetic
+    -- error inside somebody else's mod. Ours to not ask.
+    if not pz or not x or not y then
         return nil
     end
     -- A dot call: PhunZones 2 declares getLocation on Core rather than as a
@@ -111,7 +113,10 @@ end
 
 function UI:distanceTo(row)
     local player = self.player
-    if not player or not row then
+    -- Coordinates checked, not just the row. This runs from a column renderer
+    -- and from the sort comparator, both of which are called for every row on
+    -- every pass, so one row without an x took the whole list down.
+    if not player or not row or not row.x or not row.y then
         return 0
     end
     local dx = row.x - player:getX()
@@ -130,16 +135,21 @@ function UI:setRows(list)
 
     local rows = {}
     for _, v in ipairs(list or {}) do
-        local x, y, z = v.x, v.y, v.z or 0
-        table.insert(rows, {
-            key = v.key,
-            type = v.type,
-            shopLabel = Core.shopLabel(v.type),
-            where = whereText(x, y),
-            x = x,
-            y = y,
-            z = z
-        })
+        -- Skip anything without a position. The server filters non-machines out
+        -- now, but this list is the thing that shows the damage when it does
+        -- not, so it checks rather than trusts.
+        if v.x and v.y then
+            local x, y, z = v.x, v.y, v.z or 0
+            table.insert(rows, {
+                key = v.key,
+                type = v.type,
+                shopLabel = Core.shopLabel(v.type),
+                where = whereText(x, y),
+                x = x,
+                y = y,
+                z = z
+            })
+        end
     end
 
     -- Ordering is the sort's job now, applied when the list is filtered. The

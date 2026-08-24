@@ -579,13 +579,15 @@ end
 Commands[Core.commands.getInstanceList] = function(playerObj, args)
     local list = {}
     for k, v in pairs(Core.instances or {}) do
-        table.insert(list, {
-            key = k,
-            type = v.type,
-            x = v.x,
-            y = v.y,
-            z = v.z
-        })
+        if Core.isShopInstance(v) then
+            table.insert(list, {
+                key = k,
+                type = v.type,
+                x = v.x,
+                y = v.y,
+                z = v.z
+            })
+        end
     end
     if Core.isLocal then
         Core.ui.shop_instances.setData(playerObj, list)

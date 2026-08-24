@@ -308,8 +308,8 @@ function Core:getInstanceDistancesFrom(x, y)
     end
 
     for k, v in pairs(self.instances) do
-        local shopType = v.type
-        if byType[shopType] then
+        local shopType = Core.isShopInstance(v) and v.type or nil
+        if shopType and byType[shopType] then
             local dx = x - v.x
             local dy = y - v.y
             local distance = math.sqrt(dx * dx + dy * dy)
@@ -328,9 +328,46 @@ function Core:getInstanceDistancesFrom(x, y)
     return byType, byCategory
 end
 
+local restockStamps = nil
+
+--- Admin-forced restock stamps, in a ModData table of their own.
+---
+--- These were two keys on the "PhunMart" table, which is also the shop instance
+--- table: Core.instances is that same object, and four places walk it expecting
+--- every value to be a machine. forceRestockTypeAt is a map of shop type to
+--- timestamp, so the locations list drew it as a machine with no coordinates,
+--- getInstanceDistancesFrom subtracted from a nil x, and removeInvalidInstanceData
+--- deleted both stamps on every boot for not matching a loaded object. That last
+--- one means a forced restock has never survived a restart, which is the one job
+--- the stamps exist to do.
+---
+--- Moved rather than guarded at each walk, because the next thing stored beside
+--- the instances would break them again the same way.
+function Core.restockStamps()
+    if restockStamps then
+        return restockStamps
+    end
+    restockStamps = ModData.getOrCreate("PhunMart_Restock")
+    -- One-time move of whatever the old layout left behind. Cheap, and the
+    -- alternative is every existing save losing a pending forced restock.
+    local old = ModData.getOrCreate("PhunMart")
+    if old.forceRestockAt ~= nil then
+        restockStamps.forceRestockAt = old.forceRestockAt
+        old.forceRestockAt = nil
+    end
+    if old.forceRestockTypeAt ~= nil then
+        restockStamps.forceRestockTypeAt = old.forceRestockTypeAt
+        old.forceRestockTypeAt = nil
+    end
+    return restockStamps
+end
+
 function Core:ini()
     self.inied = true
     self.instances = ModData.getOrCreate(self.name)
+    -- Before removeInvalidInstanceData, which would otherwise delete the old
+    -- stamp keys as unrecognised instances before they could be moved.
+    Core.restockStamps()
     self.lastStart = getTimestamp()
     Core.ServerSystem.instance:removeInvalidInstanceData()
     Core.compile()

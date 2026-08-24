@@ -20,11 +20,16 @@ end
 
 function ServerSystem:removeInvalidInstanceData()
 
+    -- Machines only. Everything collected here that does not match a loaded
+    -- object is deleted below, so anything else living in this ModData table
+    -- would be wiped on every boot for the crime of not being a shop.
     local checked = {}
     local instanceCount = 0
     for k, v in pairs(Core.instances) do
-        checked[k] = true
-        instanceCount = instanceCount + 1
+        if Core.isShopInstance(v) then
+            checked[k] = true
+            instanceCount = instanceCount + 1
+        end
     end
     local objectCount = 0
     for i = 1, self:getLuaObjectCount() do
@@ -195,8 +200,7 @@ function ServerSystem:restockAll()
     -- lastRestock that still looks older than the stamp.
     local now = tonumber(string.format("%.1f", GameTime:getInstance():getWorldAgeHours()))
     -- Stamp global ModData so unloaded-chunk shops restock when their chunk loads
-    local md = ModData.getOrCreate("PhunMart")
-    md.forceRestockAt = now
+    Core.restockStamps().forceRestockAt = now
 
     -- Immediately restock every loaded shop object
     local count = 0
@@ -231,10 +235,10 @@ function ServerSystem:restockTypes(types)
     -- Per-type stamp so machines in unloaded chunks catch up when their chunk
     -- loads, without dragging in every other shop type the way forceRestockAt
     -- would.
-    local md = ModData.getOrCreate("PhunMart")
-    md.forceRestockTypeAt = md.forceRestockTypeAt or {}
+    local stamps = Core.restockStamps()
+    stamps.forceRestockTypeAt = stamps.forceRestockTypeAt or {}
     for t in pairs(wanted) do
-        md.forceRestockTypeAt[t] = now
+        stamps.forceRestockTypeAt[t] = now
     end
 
     local count = 0

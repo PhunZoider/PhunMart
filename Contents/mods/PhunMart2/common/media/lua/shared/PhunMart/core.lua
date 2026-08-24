@@ -795,6 +795,17 @@ end
 ---
 --- One predicate for every entry point. There were three, which disagreed: the
 --- debug menu checked nothing at all, the admin panel button checked only the
+--- Is this entry from the instance table an actual machine?
+---
+--- Core.instances is a raw ModData table, so anything else stored under the
+--- same name lands in it and every walk sees it. That has already happened
+--- once, with the forced-restock stamps, and cost a crash in the distance
+--- calculation and a phantom row in the locations list. The stamps have moved
+--- out; this is so the next one costs nothing.
+function Core.isShopInstance(v)
+    return type(v) == "table" and v.type ~= nil and v.x ~= nil and v.y ~= nil
+end
+
 --- EditorRole sandbox option, and the Admin Tools button inside checked only
 --- isAdmin. So EditorRole could be bypassed by using a different door.
 ---
