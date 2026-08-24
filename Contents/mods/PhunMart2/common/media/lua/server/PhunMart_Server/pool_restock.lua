@@ -63,7 +63,10 @@ if (activeMods:contains("phunzones2") or activeMods:contains("phunzones2test")) 
         end
 
         Core.getCoinChance = function(zed)
-            local location = PZ.getLocation(zed:getX(), zed:getY())
+            -- Colon, not dot. See the note in system_object.lua: a dot call
+            -- hands the x coordinate to getLocation as self and errors, which
+            -- here would have been once per zombie killed.
+            local location = PZ:getLocation(zed:getX(), zed:getY())
             local chance = (location.coinchance or Core.getOption("ChanceToDropChange")) * 0.01
             local minCents = location.coinmin or Core.getOption("MinCoinsToDrop")
             local maxCents = location.coinmax or Core.getOption("MaxCoinsToDrop")

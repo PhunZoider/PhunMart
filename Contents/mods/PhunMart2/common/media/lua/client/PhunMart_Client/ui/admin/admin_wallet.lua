@@ -306,7 +306,8 @@ function UI:createChildren()
     end
 
     self:addListColumn(getText("IGUI_PhunMart_Col_Player"), 0, {
-        field = "name"
+        field = "name",
+        sort = true
     })
 
     -- The player column takes a fixed share and the balances split what is
@@ -317,6 +318,12 @@ function UI:createChildren()
         self:addListColumn(col.label, first + step * (i - 1), {
             text = function(d)
                 return formatBalance(d.balances[i], col.format)
+            end,
+            -- On the raw amount, not the formatted string: "$9.00" sorts after
+            -- "$100.00" as text, and finding who is richest is most of why you
+            -- would click a balance header.
+            sort = function(d)
+                return d.balances[i] or 0
             end,
             color = function(d)
                 -- A zero is worth reading past rather than reading, and dimming

@@ -188,7 +188,10 @@ local function poolPassesZoneFilter(pool, x, y)
     if not PZ then
         return true
     end
-    local loc = PZ.getLocation(x, y)
+    -- Colon: PhunZones declares this as "function Core:getLocation", so a dot
+    -- call passes x as self and errors indexing a number. Zone gating has never
+    -- worked on a server that actually has PhunZones installed.
+    local loc = PZ:getLocation(x, y)
     local difficulty = loc and loc.difficulty
     if difficulty == nil then
         return true

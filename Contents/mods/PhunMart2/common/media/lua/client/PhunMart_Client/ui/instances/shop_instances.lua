@@ -32,7 +32,11 @@ local function zoneTitle(x, y)
     if not pz then
         return nil
     end
-    local ok, loc = pcall(pz.getLocation, x, y)
+    -- A colon call. getLocation is declared "function Core:getLocation" in
+    -- PhunZones, so it wants the module as its first argument; a dot call hands
+    -- it the x coordinate as self and dies indexing a number. Every call site in
+    -- PhunMart had it wrong, which is why the zone name never appeared.
+    local ok, loc = pcall(pz.getLocation, pz, x, y)
     if ok and loc and loc.title and loc.title ~= "" then
         return loc.title
     end
@@ -68,10 +72,12 @@ function UI:createChildren()
     self.list:setOnMouseDoubleClick(self, self.onTeleport)
 
     self:addListColumn(getText("IGUI_PhunMart_Col_Shop"), 0, {
-        field = "shopLabel"
+        field = "shopLabel",
+        sort = true
     })
     self:addListColumn(getText("IGUI_PhunMart_Col_Where"), 0.4, {
-        field = "where"
+        field = "where",
+        sort = true
     })
     self:addListColumn(getText("IGUI_PhunMart_Col_Distance"), 0.78, {
         -- Measured live rather than baked in at refresh. You walk while this is
@@ -80,9 +86,18 @@ function UI:createChildren()
         text = function(d)
             return Core.utils.formatWholeNumber(self:distanceTo(d)) .. "m"
         end,
+        -- Sorted on the number, not on "612m", which would put 9m after 612m.
+        sort = function(d)
+            return self:distanceTo(d)
+        end,
         color = {1, 1, 1},
         align = "right"
     })
+
+    -- Nearest first to begin with, which is what this list was always ordered
+    -- by and still the most useful answer before anyone asks a different one.
+    self._sortColumn = 3
+    self._sortDesc = false
 
     self._portBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Teleport"), self.onTeleport, true)
     self._refreshBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Refresh"), self.refresh)
@@ -127,13 +142,9 @@ function UI:setRows(list)
         })
     end
 
-    -- Nearest first, worked out once. The displayed distance updates as you
-    -- move but the order does not, so rows do not shuffle under the cursor
-    -- while you are reaching for one.
-    table.sort(rows, function(a, b)
-        return self:distanceTo(a) < self:distanceTo(b)
-    end)
-
+    -- Ordering is the sort's job now, applied when the list is filtered. The
+    -- displayed distance still updates as you move while the order does not,
+    -- so rows do not shuffle under the cursor while you reach for one.
     for _, row in ipairs(rows) do
         self:addListItem(row.shopLabel, row)
     end

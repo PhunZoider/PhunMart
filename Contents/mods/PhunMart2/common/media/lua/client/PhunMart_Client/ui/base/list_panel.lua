@@ -106,6 +106,12 @@ function ListPanel:createChildren()
     local mainPanel = ISPanel:new(0, 0, w, h)
     mainPanel:initialise()
     mainPanel:instantiate()
+    -- The column header sits above the list's own top edge, so the list never
+    -- sees a click on it. This panel covers the same area and does, and it
+    -- shares a coordinate origin with the list's parent, so no translation.
+    mainPanel.onMouseDown = function(_, x, y)
+        return self:onHeaderClick(x, y)
+    end
     self:addChild(mainPanel)
     self._mainPanel = mainPanel
 
@@ -249,16 +255,24 @@ end
 --   sub    function(data) -> string, drawn dim after the main text in the same
 --          cell. Used for the key trailing a name.
 --   align  "right" to right-align against the list edge
+--   sort   makes the header clickable. `true` sorts on whatever the cell
+--          renders, which is right for text. A function(data) -> value sorts on
+--          that instead, for a column whose text is formatted ("612m") or
+--          computed live and would otherwise sort as a string.
 function ListPanel:addListColumn(name, size, opts)
     opts = opts or {}
     table.insert(self._columnDefs, {
         name = name,
+        -- Kept because the header text gains a direction marker when this is
+        -- the column being sorted on, and it has to be able to go back.
+        baseName = name,
         size = size,
         field = opts.field,
         text = opts.text,
         sub = opts.sub,
         color = opts.color,
-        align = opts.align
+        align = opts.align,
+        sort = opts.sort
     })
     -- Set initial position; fractional values are recalculated in prerender
     local pos = size
@@ -525,6 +539,108 @@ function ListPanel:onReferenceClick()
     end
 end
 
+---------------------------------------------------------------------------
+-- Sorting
+--
+-- Click a header to sort by it, click it again to reverse. Which is what a
+-- table of rows has meant everywhere else for thirty years, and the lists here
+-- have been arriving in one fixed order with no way to ask a different
+-- question of them.
+--
+-- ISScrollingListBox draws its header above its own top edge, at negative y,
+-- so the click never reaches the list. The owning panel picks it up instead.
+---------------------------------------------------------------------------
+
+--- Sort on a column, or reverse it when it is already the one being sorted on.
+function ListPanel:sortByColumn(index)
+    local col = self._columnDefs[index]
+    if not col or not col.sort then
+        return
+    end
+    if self._sortColumn == index then
+        self._sortDesc = not self._sortDesc
+    else
+        self._sortColumn = index
+        self._sortDesc = false
+    end
+    self:applyFilter()
+end
+
+--- The value a row sorts by in the active column.
+function ListPanel:sortValue(col, data)
+    if type(col.sort) == "function" then
+        return col.sort(data)
+    end
+    if col.text then
+        return col.text(data) or ""
+    end
+    if col.field then
+        return data[col.field] or ""
+    end
+    return ""
+end
+
+--- Order _allItems by the active column. Called from applyFilter, so it runs
+--- when the list is rebuilt or the sort changes rather than every frame.
+function ListPanel:applySort()
+    local col = self._sortColumn and self._columnDefs[self._sortColumn]
+    if not col or not col.sort then
+        return
+    end
+    local desc = self._sortDesc
+    table.sort(self._allItems, function(x, y)
+        local a = self:sortValue(col, x.data)
+        local b = self:sortValue(col, y.data)
+        if type(a) ~= type(b) then
+            -- Mixed types would make the comparison error rather than merely
+            -- order oddly, and table.sort is not forgiving about that.
+            a, b = tostring(a), tostring(b)
+        end
+        if type(a) == "string" then
+            a, b = a:lower(), b:lower()
+        end
+        if a == b then
+            -- Ties keep a stable order rather than whatever the sort happens to
+            -- do with them, which otherwise reshuffles equal rows on every pass.
+            return tostring(x.text) < tostring(y.text)
+        end
+        if desc then
+            return a > b
+        end
+        return a < b
+    end)
+end
+
+--- Mark the sorted column in its header. ASCII rather than an arrow glyph,
+--- because the fonts here are not guaranteed to carry one.
+function ListPanel:updateSortHeaders()
+    for i, col in ipairs(self._columnDefs) do
+        local listCol = self.list.columns[i]
+        if listCol then
+            if i == self._sortColumn then
+                listCol.name = col.baseName .. (self._sortDesc and "  v" or "  ^")
+            else
+                listCol.name = col.baseName
+            end
+        end
+    end
+end
+
+--- Header clicks. Delivered here by the content panel, since the header is
+--- drawn outside the list's own bounds.
+function ListPanel:onHeaderClick(x, y)
+    local list = self.list
+    if not list or #self._columnDefs == 0 then
+        return false
+    end
+    local top = list.y - list.itemheight
+    if y < top or y >= list.y or x < list.x or x >= list.x + list.width then
+        return false
+    end
+    self:sortByColumn(self:columnAt(x - list.x))
+    return true
+end
+
 --- Which column an x offset inside the list falls in. Column entries hold their
 --- left edge in `size`, so the answer is the last one that starts at or before
 --- x. Lets a row act on the cell that was clicked rather than the whole row,
@@ -772,6 +888,11 @@ function ListPanel:applyFilter()
 
     local onlyChanged = self._onlyChangedTick and self._onlyChangedTick:isSelected(1)
     local hideVariations = self._hideVariationsTick and self._hideVariationsTick:isSelected(1)
+
+    -- Before filtering, so the visible rows come out in order. This runs on a
+    -- rebuild or a sort change, not per frame.
+    self:applySort()
+    self:updateSortHeaders()
 
     self.list:clear()
     for _, entry in ipairs(self._allItems) do
