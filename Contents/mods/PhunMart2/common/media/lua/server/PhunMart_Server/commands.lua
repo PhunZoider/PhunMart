@@ -780,25 +780,33 @@ Commands[Core.commands.reportKills] = function(playerObj, args)
     Core.killRewards:reportKills(playerObj, args.normal or 0, args.sprinter or 0)
 end
 
-Commands[Core.commands.getPlayerList] = function(player, args)
-    if not Core.utils.isAdmin(player) then
-        return
+--- Every player's balances, keyed the way the wallet table is keyed.
+---
+--- Balances only. A wallet record also carries `purchases`, which is an
+--- unbounded per-player history, and shipping all of them to draw a table of
+--- numbers would put the biggest payload in the mod behind a button nobody
+--- thinks of as expensive.
+local function allWallets()
+    local wallets = {}
+    for name, w in pairs(Core.wallet.data or {}) do
+        wallets[tostring(name)] = {
+            current = w.current or {},
+            bound = w.bound or {}
+        }
     end
-    local players = {}
-    for k, v in pairs(Core.wallet.data) do
-        table.insert(players, tostring(k))
-    end
-    sendServerCommand(player, Core.name, Core.commands.getPlayerList, {
-        players = players
-    })
+    return wallets
 end
 
-Commands[Core.commands.getPlayersWallet] = function(player, args)
+-- getPlayerList and getPlayersWallet used to serve the wallet editor, which
+-- asked for the names and then for one wallet at a time. The editor is a grid
+-- now and takes the lot in one reply, so both are gone rather than left
+-- answering nobody.
+Commands[Core.commands.getAllWallets] = function(player, args)
     if not Core.utils.isAdmin(player) then
         return
     end
-    sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
-        wallet = Core.wallet:get(args.playername)
+    sendServerCommand(player, Core.name, Core.commands.getAllWallets, {
+        wallets = allWallets()
     })
 end
 
@@ -816,9 +824,11 @@ Commands[Core.commands.adjustPlayerWallet] = function(player, args)
     end
     Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
     local wallet = Core.wallet:get(args.playername)
-    -- Update the admin editor
-    sendServerCommand(player, Core.name, Core.commands.getPlayersWallet, {
-        wallet = wallet
+    -- Update the admin editor. The whole set rather than the one wallet, so the
+    -- grid takes the reply through the same path as a plain refresh and there
+    -- is no second shape for it to handle.
+    sendServerCommand(player, Core.name, Core.commands.getAllWallets, {
+        wallets = allWallets()
     })
     -- Notify the target player so their character tab refreshes.
     -- In SP the shared wallet data is already updated in-place.

@@ -525,6 +525,23 @@ function ListPanel:onReferenceClick()
     end
 end
 
+--- Which column an x offset inside the list falls in. Column entries hold their
+--- left edge in `size`, so the answer is the last one that starts at or before
+--- x. Lets a row act on the cell that was clicked rather than the whole row,
+--- which is the difference between clicking a balance to edit it and being
+--- asked afterwards which balance you meant.
+function ListPanel:columnAt(x)
+    local found = 1
+    for i, col in ipairs(self.list.columns or {}) do
+        if x >= col.size then
+            found = i
+        else
+            break
+        end
+    end
+    return found
+end
+
 --- Where the key lives in a row's data. Every definition panel stores it as
 --- `key`; override if one ever doesn't.
 function ListPanel:getRowKey(itemData)
@@ -635,7 +652,11 @@ function ListPanel.defaultDrawRow(listSelf, y, item, alt)
 
             local tx
             if col.align == "right" then
-                tx = rightEdge - getTextManager():MeasureStringX(listSelf.font, text) - 10
+                -- Against this column's own right edge, not the list's. For a
+                -- trailing column the two are the same, which is every column
+                -- that used this before the wallet grid put three numeric
+                -- columns in a row.
+                tx = nextX - getTextManager():MeasureStringX(listSelf.font, text) - 10
             elseif i == 1 then
                 tx = 10
             else

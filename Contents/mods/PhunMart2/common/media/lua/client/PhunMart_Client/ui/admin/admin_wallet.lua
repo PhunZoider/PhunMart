@@ -2,32 +2,33 @@ if isServer() then
     return
 end
 
-require "ISUI/ISPanel"
+-- What every player is holding, as a grid.
+--
+-- This was a standalone window with a dropdown at the top: pick a player, wait
+-- for their wallet to come back, read two rows, pick the next player. Comparing
+-- two people meant switching back and forth and remembering the numbers, and
+-- there was no way to see at a glance who had nothing and who had thousands.
+--
+-- The data is small enough to fetch whole, so it is now a row per player and a
+-- column per currency pool, which is the shape the question was always in.
 
 local Core = PhunMart
-local tools = require "PhunMart_Client/ui/ui_utils"
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
-local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
-local FONT_SCALE = FONT_HGT_SMALL / 14
+require "PhunMart/wallet"
+local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 
-local PAD = math.max(10, math.floor(10 * FONT_SCALE))
+local FONT_HGT_SMALL = ListPanel.FONT_HGT_SMALL
+local FONT_HGT_MEDIUM = ListPanel.FONT_HGT_MEDIUM
+local FONT_SCALE = ListPanel.FONT_SCALE
+local PAD = ListPanel.PAD
 local ROW_H = FONT_HGT_SMALL + math.floor(6 * FONT_SCALE)
 
-local windowName = "PhunWalletAdminUI"
+Core.ui.admin_wallet = ListPanel:derive("PhunMartAdminWallet")
+Core.ui.admin_wallet.instances = {}
+local UI = Core.ui.admin_wallet
 
-Core.ui.admin = ISPanel:derive(windowName);
-Core.ui.admin.instances = {}
-local UI = Core.ui.admin
-
-local function refreshPlayers()
-    sendClientCommand(Core.name, Core.commands.getPlayerList, {})
-end
-
-local function refreshPlayerWallet(playername)
-    sendClientCommand(Core.name, Core.commands.getPlayersWallet, {
-        playername = playername
-    })
-end
+---------------------------------------------------------------------------
+-- Formatting
+---------------------------------------------------------------------------
 
 -- Format a pool balance for display based on its format type.
 local function formatBalance(amount, format)
@@ -37,9 +38,11 @@ local function formatBalance(amount, format)
         local cents = amount % 100
         return string.format("$%d.%02d", dollars, cents)
     else
-        -- Integer count with thousand separators
+        -- Integer count with thousand separators. Parenthesised because gsub
+        -- returns the replacement count alongside the string, and a bare
+        -- `return s:gsub(...)` hands both back to the caller.
         local s = tostring(math.floor(amount + 0.5)):reverse():gsub("(%d%d%d)", "%1,")
-        return s:reverse():gsub("^,", "")
+        return (s:reverse():gsub("^,", ""))
     end
 end
 
@@ -55,6 +58,57 @@ local function parseAmount(text, format)
     return math.floor(num + 0.5)
 end
 
+--- One entry per balance a player can hold: every pool, plus a second entry
+--- for each pool that also keeps a bound total. Derived from the pool table
+--- rather than hardcoded to change and tokens, so a third pool appears as a
+--- column without touching this file.
+local function balanceColumns()
+    local pools = Core.wallet.pools or {}
+    local keys = {}
+    for pool in pairs(pools) do
+        table.insert(keys, pool)
+    end
+    -- pairs() order is undefined and these are columns; without sorting they
+    -- would swap places between sessions.
+    table.sort(keys)
+
+    local cols = {}
+    for _, pool in ipairs(keys) do
+        local def = pools[pool]
+        local label = getTextOrNull(def.label or pool) or def.label or pool
+        table.insert(cols, {
+            pool = pool,
+            label = label,
+            format = def.format,
+            walletType = "current"
+        })
+        if def.bound then
+            table.insert(cols, {
+                pool = pool,
+                label = getText("IGUI_PhunMart_Col_BoundOf", label),
+                format = def.format,
+                walletType = "bound"
+            })
+        end
+    end
+    return cols
+end
+
+--- What to show in the player column. Singleplayer files every wallet under
+--- the key 0 (see Core.wallet:get), so the grid would otherwise have a single
+--- row labelled "0".
+local function displayName(key)
+    if Core.isLocal and tostring(key) == "0" then
+        local player = getSpecificPlayer(0)
+        local name = player and player:getUsername()
+        if name and name ~= "" then
+            return name
+        end
+        return getText("IGUI_PhunMart_Lbl_ThisPlayer")
+    end
+    return tostring(key)
+end
+
 ---------------------------------------------------------------------------
 -- Edit Modal
 ---------------------------------------------------------------------------
@@ -68,15 +122,15 @@ function EditModal:createChildren()
     local w = self.width - PAD * 2
 
     -- Title
-    local titleText = self.poolLabel .. ": " .. self.playerName
+    local titleText = self.poolLabel .. ": " .. self.displayName
     self.titleLabel = ISLabel:new(x, y, FONT_HGT_MEDIUM, titleText, 1, 1, 1, 1, UIFont.Medium, true)
     self.titleLabel:initialise()
     self:addChild(self.titleLabel)
     y = y + FONT_HGT_MEDIUM + PAD
 
     -- Current balance
-    self.currentLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Current", self.currentFormatted), 0.8, 0.8, 0.8, 1, UIFont.Small,
-        true)
+    self.currentLabel = ISLabel:new(x, y, ROW_H, getText("IGUI_PhunMart_Lbl_Current", self.currentFormatted), 0.8, 0.8,
+        0.8, 1, UIFont.Small, true)
     self.currentLabel:initialise()
     self:addChild(self.currentLabel)
     y = y + ROW_H + PAD
@@ -110,7 +164,8 @@ function EditModal:createChildren()
     y = y + ROW_H + 2
 
     -- Format hint
-    local hint = self.format == "cents" and getText("IGUI_PhunMart_Hint_EnterDollars") or getText("IGUI_PhunMart_Hint_EnterWholeNumber")
+    local hint = self.format == "cents" and getText("IGUI_PhunMart_Hint_EnterDollars") or
+                     getText("IGUI_PhunMart_Hint_EnterWholeNumber")
     self.hintLabel = ISLabel:new(x + labelW, y, FONT_HGT_SMALL, hint, 0.5, 0.5, 0.5, 1, UIFont.Small, true)
     self.hintLabel:initialise()
     self:addChild(self.hintLabel)
@@ -126,7 +181,8 @@ function EditModal:createChildren()
     self.applyBtn:initialise()
     self:addChild(self.applyBtn)
 
-    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self, EditModal.onCancel)
+    self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
+        EditModal.onCancel)
     self.cancelBtn:initialise()
     self:addChild(self.cancelBtn)
 end
@@ -151,7 +207,7 @@ function EditModal:onApply()
     end
 
     sendClientCommand(Core.name, Core.commands.adjustPlayerWallet, {
-        playername = self.playerName,
+        playername = self.playerKey,
         walletType = self.walletType,
         pool = self.pool,
         value = tostring(value)
@@ -169,7 +225,10 @@ function EditModal:close()
     self:removeFromUIManager()
 end
 
-function EditModal:new(playerName, walletType, pool, poolLabel, rawAmount, format)
+--- @param playerKey the wallet's key, which is what the server indexes by
+--- @param name      what to call them on screen, which in singleplayer is not
+---                  the same string
+function EditModal:new(playerKey, name, walletType, pool, poolLabel, rawAmount, format)
     local modalW = math.floor(300 * FONT_SCALE)
     local modalH = PAD * 7 + FONT_HGT_MEDIUM + ROW_H * 3 + FONT_HGT_SMALL + PAD + 25
     local core = getCore()
@@ -179,7 +238,8 @@ function EditModal:new(playerName, walletType, pool, poolLabel, rawAmount, forma
     local o = ISPanel:new(sx, sy, modalW, modalH)
     setmetatable(o, self)
     self.__index = self
-    o.playerName = playerName
+    o.playerKey = playerKey
+    o.displayName = name
     o.walletType = walletType
     o.pool = pool
     o.poolLabel = poolLabel
@@ -203,256 +263,222 @@ function EditModal:new(playerName, walletType, pool, poolLabel, rawAmount, forma
 end
 
 ---------------------------------------------------------------------------
--- Main Admin Panel
+-- Tab
 ---------------------------------------------------------------------------
 
-function UI.OnOpenPanel(player)
+function UI.createTab(player)
     local playerIndex = player:getPlayerNum()
     local instance = UI.instances[playerIndex]
     if not instance then
-        local core = getCore()
-        local width = math.floor(350 * FONT_SCALE)
-        local height = math.floor(400 * FONT_SCALE)
-        local x = (core:getScreenWidth() - width) / 2
-        local y = (core:getScreenHeight() - height) / 2
-        instance = UI:new(x, y, width, height, player)
+        instance = UI:new(0, 0, 100, 100, player)
+        instance.description = getText("IGUI_PhunMart_Desc_Wallets")
         instance:initialise()
         UI.instances[playerIndex] = instance
     end
-    instance:addToUIManager()
-    instance:setVisible(true)
-    refreshPlayers()
     return instance
 end
 
-function UI:setPlayers(players)
-    self.box:clear()
-    table.sort(players, function(a, b)
-        return a < b
-    end)
-    for _, player in ipairs(players) do
-        self.box:addOption(player)
+function UI:createChildren()
+    ListPanel.createChildren(self)
+
+    self._cols = balanceColumns()
+
+    self.list.doDrawItem = ListPanel.defaultDrawRow
+
+    -- Double-click acts on the cell rather than the row. The base list only
+    -- hands the callback the row's data, so the x offset is caught on the way
+    -- through the widget's own handler and read back in the callback.
+    local baseDoubleClick = ISScrollingListBox.onMouseDoubleClick
+    self.list.onMouseDoubleClick = function(listSelf, x, y)
+        self._lastClickX = x
+        baseDoubleClick(listSelf, x, y)
     end
-    refreshPlayerWallet(self.box:getSelectedText())
-end
+    self.list:setOnMouseDoubleClick(self, self.onCellDoubleClick)
 
--- Populate the list with one row per pool (plus a bound row for bound pools).
-function UI:setWallet(wallet)
-    self.datas:clear()
-    self.datas:setVisible(false)
-
-    -- Sort by key: pairs() order is undefined, so without this the balance rows
-    -- reorder themselves between refreshes.
-    local pools = Core.wallet.pools or {}
-    local poolKeys = {}
-    for pool in pairs(pools) do
-        table.insert(poolKeys, pool)
-    end
-    table.sort(poolKeys)
-
-    for _, pool in ipairs(poolKeys) do
-        local def = pools[pool]
-        local current = (wallet.current or {})[pool] or 0
-        self.datas:addItem(pool, {
-            label = def.label or pool,
-            value = formatBalance(current, def.format),
-            rawAmount = current,
-            pool = pool,
-            format = def.format
-        })
-        if def.bound then
-            local boundAmt = (wallet.bound or {})[pool] or 0
-            self.datas:addItem("BOA:" .. pool, {
-                label = def.label or pool,
-                value = formatBalance(boundAmt, def.format),
-                rawAmount = boundAmt,
-                pool = pool,
-                format = def.format,
-                isBound = true
-            })
+    self.list.onRightMouseUp = function(target, x, y)
+        local row = target:rowAt(x, y)
+        if row == -1 then
+            return
         end
+        target.selected = row
+        target:ensureVisible(row)
+        self:openPoolMenu(target.items[row].item, getMouseX(), getMouseY())
     end
-    self.datas:setVisible(true)
+
+    self:addListColumn(getText("IGUI_PhunMart_Col_Player"), 0, {
+        field = "name"
+    })
+
+    -- The player column takes a fixed share and the balances split what is
+    -- left, so two pools or four both lay out without a table of magic numbers.
+    local first = 0.4
+    local step = (1 - first) / math.max(1, #self._cols)
+    for i, col in ipairs(self._cols) do
+        self:addListColumn(col.label, first + step * (i - 1), {
+            text = function(d)
+                return formatBalance(d.balances[i], col.format)
+            end,
+            color = function(d)
+                -- A zero is worth reading past rather than reading, and dimming
+                -- it makes the players who actually hold something stand out in
+                -- a long list.
+                if (d.balances[i] or 0) == 0 then
+                    return 0.45, 0.45, 0.45
+                end
+                return 1, 1, 1
+            end,
+            align = "right"
+        })
+    end
+
+    self._editBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+    self._refreshBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Refresh"), self.refresh)
+
+    self:refresh()
 end
 
-function UI:openEditModal(item)
-    local player = self.box:getSelectedText()
-    if not player then
+---------------------------------------------------------------------------
+-- Data
+---------------------------------------------------------------------------
+
+--- Ask for every wallet. The reply lands in setWallets, so the rows already on
+--- screen stay put until it does rather than blanking on every tab switch.
+function UI:refresh()
+    sendClientCommand(Core.name, Core.commands.getAllWallets, {})
+end
+
+function UI:setWallets(wallets)
+    -- A reply can only be in flight for a tab that has been built, but the
+    -- columns are what every row is flattened against, so refuse rather than
+    -- fill the list with nil.
+    if not self._cols then
         return
     end
-    local walletType = item.isBound and "bound" or "current"
-    local label = item.label
-    if item.isBound then
-        label = label .. " " .. getText("IGUI_PhunMart_Bound")
+    self:clearList()
+
+    local keys = {}
+    for key in pairs(wallets or {}) do
+        table.insert(keys, key)
     end
-    local modal = EditModal:new(player, walletType, item.pool, label, item.rawAmount, item.format)
+    table.sort(keys, function(a, b)
+        return displayName(a):lower() < displayName(b):lower()
+    end)
+
+    for _, key in ipairs(keys) do
+        local w = wallets[key]
+        -- Flattened against the column list at build time, so drawing a row is
+        -- an array lookup rather than two table walks per cell per frame.
+        local balances = {}
+        for i, col in ipairs(self._cols) do
+            balances[i] = (w[col.walletType] or {})[col.pool] or 0
+        end
+        self:addListItem(displayName(key), {
+            key = tostring(key),
+            name = displayName(key),
+            balances = balances
+        })
+    end
+end
+
+--- Push a fresh set into every open tab. Called from the command handlers.
+function UI.updateAll(wallets)
+    for _, instance in pairs(UI.instances or {}) do
+        if instance.setWallets then
+            instance:setWallets(wallets)
+        end
+    end
+end
+
+function UI:getFilterText(itemData)
+    return itemData.name or itemData.key or ""
+end
+
+---------------------------------------------------------------------------
+-- Editing
+---------------------------------------------------------------------------
+
+function UI:openEditModal(row, colIndex)
+    local col = self._cols[colIndex]
+    if not row or not col then
+        return
+    end
+    local label = col.label
+    local modal = EditModal:new(row.key, row.name, col.walletType, col.pool, label, row.balances[colIndex] or 0,
+        col.format)
     modal:initialise()
     modal:addToUIManager()
     modal:bringToTop()
 end
 
+--- Which balance did you mean? Only asked when the click did not already say,
+--- which is when it landed on the player's name rather than on a number.
+function UI:openPoolMenu(row, screenX, screenY)
+    if not row then
+        return
+    end
+    local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
+    for i, col in ipairs(self._cols) do
+        -- The balance in the option text, so the menu answers the obvious
+        -- question without having to be dismissed first.
+        context:addOption(col.label .. ": " .. formatBalance(row.balances[i], col.format), self, function()
+            self:openEditModal(row, i)
+        end)
+    end
+end
+
+function UI:selectedRow()
+    local sel = self.list.selected
+    local entry = sel and sel > 0 and self.list.items[sel]
+    return entry and entry.item or nil
+end
+
+function UI:onCellDoubleClick()
+    local row = self:selectedRow()
+    if not row then
+        return
+    end
+    -- Column 1 is the player's name, so a double-click there has not picked a
+    -- balance. Columns 2 upwards line up with _cols one for one.
+    local colIndex = self:columnAt(self._lastClickX or 0) - 1
+    if colIndex >= 1 and colIndex <= #self._cols then
+        self:openEditModal(row, colIndex)
+    else
+        self:openPoolMenu(row, getMouseX(), getMouseY())
+    end
+end
+
 function UI:onEditClick()
-    if not self.datas.selected or self.datas.selected == 0 then
+    local row = self:selectedRow()
+    if not row then
         return
     end
-    local selectedItem = self.datas.items[self.datas.selected]
-    if not selectedItem then
-        return
-    end
-    self:openEditModal(selectedItem.item)
+    -- The button cannot know which cell was meant, so it always asks.
+    self:openPoolMenu(row, self._editBtn:getAbsoluteX(), self._editBtn:getAbsoluteY())
 end
 
-function UI:GridDoubleClick(item)
-    self:openEditModal(item)
-end
-
-function UI:createChildren()
-    ISPanel.createChildren(self)
-
-    local x = PAD
-    local y = PAD
-    local w = self.width - PAD * 2
-
-    -- Title
-    self.title = ISLabel:new(x, y, FONT_HGT_MEDIUM, getText("IGUI_PhunMart_Title_WalletAdmin"), 1, 1, 1, 1, UIFont.Medium, true)
-    self.title:initialise()
-    self.title:instantiate()
-    self:addChild(self.title)
-
-    local closeSz = math.floor(25 * FONT_SCALE)
-    self.closeButton = ISButton:new(self.width - closeSz - x, y, closeSz, closeSz, "X", self, function()
-        UI.OnOpenPanel(self.player):close()
-    end)
-    self.closeButton:initialise()
-    self:addChild(self.closeButton)
-
-    y = y + FONT_HGT_MEDIUM + PAD
-
-    -- Toolbar row: combo + refresh + edit
-    local btnW = math.floor(70 * FONT_SCALE)
-    local gap = math.floor(5 * FONT_SCALE)
-    local comboW = w - (btnW + gap) * 2
-
-    self.box = ISComboBox:new(x, y, comboW, ROW_H, self, function()
-        refreshPlayerWallet(self.box:getSelectedText())
-    end)
-    self.box:initialise()
-    self:addChild(self.box)
-
-    self.refreshPlayersButton = ISButton:new(x + comboW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Refresh"), self, function()
-        refreshPlayerWallet(self.box:getSelectedText())
-    end)
-    self.refreshPlayersButton:initialise()
-    self:addChild(self.refreshPlayersButton)
-
-    self.editButton = ISButton:new(x + comboW + gap + btnW + gap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, UI.onEditClick)
-    self.editButton:initialise()
-    self:addChild(self.editButton)
-
-    y = y + ROW_H + PAD + tools.HEADER_HGT
-
-    -- Data list
-    local listH = self.height - y - PAD
-    self.datas = ISScrollingListBox:new(x, y, w, listH)
-    self.datas:initialise()
-    self.datas:instantiate()
-    self.datas.itemheight = FONT_HGT_MEDIUM + math.floor(8 * FONT_SCALE)
-    self.datas.selected = 0
-    self.datas.joypadParent = self
-    self.datas.font = UIFont.NewSmall
-    self.datas.doDrawItem = self.drawDatas
-    self.datas.drawBorder = true
-    self.datas:setOnMouseDoubleClick(self, self.GridDoubleClick)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Pool"), 0)
-    self.datas:addColumn(getText("IGUI_PhunMart_Col_Balance"), math.floor(w * 0.6))
-    self.datas:setVisible(false)
-    self:addChild(self.datas)
-end
-
-function UI:drawDatas(y, item, alt)
-    if y + self:getYScroll() + self.itemheight < 0 or y + self:getYScroll() >= self.height then
-        return y + self.itemheight
-    end
-
-    local a = 0.9
-    local textY = y + (self.itemheight - FONT_HGT_SMALL) / 2
-
-    if self.selected == item.index then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.7, 0.35, 0.15)
-    end
-    if alt then
-        self:drawRect(0, y, self:getWidth(), self.itemheight, 0.3, 0.6, 0.5, 0.5)
-    end
-    self:drawRectBorder(0, y, self:getWidth(), self.itemheight, a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b)
-
-    local xoffset = 10
-    local label = item.item.label or item.text or ""
-    if item.item.isBound then
-        label = label .. " " .. getText("IGUI_PhunMart_Bound")
-    end
-
-    local clipX = self.columns[1].size
-    local clipX2 = self.columns[2].size
-    local clipY = math.max(0, y + self:getYScroll())
-    local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight)
-    self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
-    self:drawText(label, xoffset, textY, 1, 1, 1, a, self.font)
-    self:clearStencilRect()
-
-    local valueWidth = getTextManager():MeasureStringX(self.font, item.item.value)
-    self:drawText(item.item.value, self.width - valueWidth - 10, textY, 1, 1, 1, a, self.font)
-
-    self.itemsHeight = y + self.itemheight
-    return self.itemsHeight
-end
-
-function UI:close()
-    self:setVisible(false)
-    self:removeFromUIManager()
-    UI.instances[self.playerIndex] = nil
-end
-
-function UI:new(x, y, width, height, player)
-    local o = ISPanel:new(x, y, width, height, player)
-    setmetatable(o, self)
-    self.__index = self
-    o.player = player
-    o.playerIndex = player:getPlayerNum()
-    o.borderColor = {
-        r = 0.4,
-        g = 0.4,
-        b = 0.4,
-        a = 1
-    }
-    o.backgroundColor = {
-        r = 0,
-        g = 0,
-        b = 0,
-        a = 0.8
-    }
-    o.moveWithMouse = true
-    return o
-end
+---------------------------------------------------------------------------
+-- Commands
+---------------------------------------------------------------------------
 
 local Commands = {}
 
 if Core.isLocal then
 
-    Commands[Core.commands.getPlayerList] = function(player, args)
-        local players = {}
-        for k, v in pairs(Core.wallet.data or {}) do
-            table.insert(players, tostring(k))
+    -- Singleplayer reads the wallet table straight out of ModData rather than
+    -- round-tripping through the server handler, which shares this Lua state.
+    local function localWallets()
+        local out = {}
+        for key, w in pairs(Core.wallet.data or {}) do
+            out[tostring(key)] = {
+                current = w.current or {},
+                bound = w.bound or {}
+            }
         end
-        for _, instance in pairs(UI.instances or {}) do
-            instance:setPlayers(players)
-        end
+        return out
     end
 
-    Commands[Core.commands.getPlayersWallet] = function(player, args)
-        for _, instance in pairs(UI.instances or {}) do
-            instance:setWallet(Core.wallet:get(args.playername))
-        end
+    Commands[Core.commands.getAllWallets] = function(player, args)
+        UI.updateAll(localWallets())
     end
 
     -- This is the singleplayer path for the adjustment. The server-side handler
@@ -460,9 +486,7 @@ if Core.isLocal then
     -- twice. Don't restore it there without removing it here.
     Commands[Core.commands.adjustPlayerWallet] = function(player, args)
         Core.wallet:adjustByPool(args.playername, args.walletType, args.pool, tonumber(args.value or 0))
-        for _, instance in pairs(UI.instances or {}) do
-            instance:setWallet(Core.wallet:get(args.playername))
-        end
+        UI.updateAll(localWallets())
     end
 
     Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
@@ -473,16 +497,8 @@ if Core.isLocal then
 
 else
 
-    Commands[Core.commands.getPlayerList] = function(args)
-        for _, instance in pairs(UI.instances or {}) do
-            instance:setPlayers(args.players)
-        end
-    end
-
-    Commands[Core.commands.getPlayersWallet] = function(args)
-        for _, instance in pairs(UI.instances or {}) do
-            instance:setWallet(args.wallet)
-        end
+    Commands[Core.commands.getAllWallets] = function(args)
+        UI.updateAll(args.wallets)
     end
 
     Events.OnServerCommand.Add(function(module, command, arguments)
@@ -492,3 +508,5 @@ else
     end)
 
 end
+
+return UI

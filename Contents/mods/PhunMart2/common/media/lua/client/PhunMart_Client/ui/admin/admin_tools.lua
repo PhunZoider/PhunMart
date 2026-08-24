@@ -85,13 +85,8 @@ local TOOLS = {{
         CurrencyTool.open(panel.player)
     end
 }, {
-    key = "wallet",
-    label = "IGUI_PhunMart_Tool_Wallets",
-    desc = "IGUI_PhunMart_ToolDesc_Wallets",
-    run = function(panel)
-        Core.ui.admin.OnOpenPanel(panel.player)
-    end
-}, {
+    -- The wallet editor was a row here until it became a tab of its own. A row
+    -- whose only job is to send you to a tab is worse than no row at all.
     key = "pending",
     label = "IGUI_PhunMart_Tool_Pending",
     desc = "IGUI_PhunMart_ToolDesc_Pending",

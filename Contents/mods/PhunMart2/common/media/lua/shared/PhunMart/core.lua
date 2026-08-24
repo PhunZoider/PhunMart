@@ -43,7 +43,7 @@ PhunMart = {
         upsertSpecialDef = "PhunMartUpsertSpecialDef",
         upsertPoolDef = "PhunMartUpsertPoolDef",
         deleteDefinition = "PhunMartDeleteDefinition",
-    revertDefinition = "PhunMartRevertDefinition",
+        revertDefinition = "PhunMartRevertDefinition",
         getShopList = "PhunMartGetShopList",
         getInstanceList = "PhunMartGetInstanceList",
         getShopData = "PhunMartGetShopData",
@@ -87,9 +87,10 @@ PhunMart = {
         consumeCoin = "PhunMartConsumeCoin",
         consumeDroppedWallet = "PhunMartConsumeDroppedWallet",
         dropWallet = "PhunMartDropWallet",
-        -- Admin wallet
-        getPlayerList = "PhunMartGetPlayerList",
-        getPlayersWallet = "PhunMartGetPlayersWallet",
+        -- Admin wallet. One reply carries every player's balances; the editor
+        -- used to ask for the names and then for one wallet at a time, which is
+        -- why getPlayerList and getPlayersWallet are no longer here.
+        getAllWallets = "PhunMartGetAllWallets",
         adjustPlayerWallet = "PhunMartAdjustPlayerWallet",
         claimVehicle = "PhunMartClaimVehicle",
         claimAnimal = "PhunMartClaimAnimal",
