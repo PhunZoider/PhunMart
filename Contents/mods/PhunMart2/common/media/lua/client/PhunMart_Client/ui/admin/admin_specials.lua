@@ -556,7 +556,11 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         end
     })
 
-    -- Key
+    -- Identity above the tabs, name first, matching the other editors.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = specialKey or "",
         editable = isNew,
@@ -566,10 +570,6 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil
-    })
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     -- Template checkbox
@@ -786,7 +786,19 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         options = getPriceKeys(),
         selected = def.price or "",
         hint = getText("IGUI_PhunMart_Hint_PriceOverride"),
-        group = "instance"
+        group = "instance",
+        -- Same treatment as Inherits: a field naming another definition can go
+        -- and show you it. Reads the combo at click time so it follows a price
+        -- you have just picked.
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local key = f:getFieldValue("price")
+                if key and key ~= "" then
+                    Core.ui.admin_prices.OnEditPrice(getSpecificPlayer(0), key)
+                end
+            end
+        }
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",
@@ -1020,6 +1032,23 @@ end
 function UI:onDoubleClick(item)
     createEditModal(item.key, item.def, false, function(key, def)
         saveSpecialDef(self, key, def)
+    end)
+end
+
+--- Open the editor for one special, from outside this tab. The Open button
+--- beside the Grants dropdown on the item overrides form needs a way in, and
+--- createEditModal is file-local.
+function UI.OnEditSpecial(player, specialKey)
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local def = specials[specialKey]
+    if not def then
+        return
+    end
+    createEditModal(specialKey, def, false, function(key, editedDef)
+        local inst = UI.instances[player and player:getPlayerNum() or 0]
+        if inst then
+            saveSpecialDef(inst, key, editedDef)
+        end
     end)
 end
 

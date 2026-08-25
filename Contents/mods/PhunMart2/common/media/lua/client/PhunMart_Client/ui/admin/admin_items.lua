@@ -137,6 +137,11 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
         end,
     })
 
+    -- Identity above the tabs, name first, matching the other editors.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = itemKey or "", editable = isNew,
         required = true,
@@ -146,31 +151,52 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
             end
         end or nil,
     })
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = priceKeys, selected = def.price or priceKeys[1],
         hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+        section = "i_basics",
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local key = f:getFieldValue("price")
+                if key and key ~= "" then
+                    Core.ui.admin_prices.OnEditPrice(getSpecificPlayer(0), key)
+                end
+            end
+        },
     })
     form:addComboField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
         options = specialKeys, selected = def.reward or specialKeys[1],
         hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
-    })
-    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
-        default = weightDefault,
-        hint = getText("IGUI_PhunMart_Hint_Weight"),
-        numeric = true, min = 0,
+        section = "i_basics",
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local key = f:getFieldValue("special")
+                if key and key ~= "" then
+                    Core.ui.admin_specials.OnEditSpecial(getSpecificPlayer(0), key)
+                end
+            end
+        },
     })
     form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
         minDefault = stockMinDefault, maxDefault = stockMaxDefault,
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
         integer = true, min = 0, requireBoth = true,
+        section = "i_basics",
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
         checked = def.enabled ~= false,
         text = getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"),
+        section = "i_basics",
+    })
+
+    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+        default = weightDefault,
+        hint = getText("IGUI_PhunMart_Hint_Weight"),
+        numeric = true, min = 0,
+        section = "i_more",
     })
     -- Items could always be templates, the form just never let you see or set
     -- it, so the shipped ones were only editable by hand. Same field and
@@ -178,7 +204,16 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
     form:addCheckField("template", getText("IGUI_PhunMart_Lbl_IsTemplate"), {
         checked = def.template == true,
         text = getText("IGUI_PhunMart_Lbl_IsTemplate"),
+        section = "i_more",
     })
+
+    form:setSections({{
+        section = "i_basics",
+        label = getText("IGUI_PhunMart_Sec_Basics")
+    }, {
+        section = "i_more",
+        label = getText("IGUI_PhunMart_Sec_Advanced")
+    }})
 
     form:initialise()
     form:addToUIManager()

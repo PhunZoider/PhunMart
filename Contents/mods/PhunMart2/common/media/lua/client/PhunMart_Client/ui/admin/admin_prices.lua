@@ -134,8 +134,9 @@ local function onKindChanged(form, kind)
     local isItems = kind == "items"
 
     form:setFieldVisible("pool", isCurrency)
+    -- Amount is one range field now; its upper half is only meaningful for a
+    -- currency price, which the field validates rather than hides.
     form:setFieldVisible("amount", not isFree)
-    form:setFieldVisible("max", not isFree and not isItems)
     form:setFieldVisible("items", isItems)
 end
 
@@ -148,11 +149,9 @@ local PRICE_FIELD_SOURCE = {
     pool = function(d)
         return d.pool ~= nil
     end,
+    -- One key, matching the one range field that replaced the two boxes.
     amount = function(d)
         return d.amount ~= nil
-    end,
-    max = function(d)
-        return type(d.amount) == "table" and d.amount.max ~= nil
     end,
     factor = function(d)
         return d.factor ~= nil
@@ -239,10 +238,13 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             result.item = nil
             result.items = nil
 
+            -- One range field, so both bounds arrive together.
+            local amtLo, amtHi = f:getFieldRange("amount")
+
             if kind == "currency" then
                 result.pool = f:getFieldValue("pool")
-                local amt = f:getFieldNumber("amount")
-                local maxAmt = f:getFieldNumber("max")
+                local amt = amtLo
+                local maxAmt = amtHi
                 if result.pool == "change" then
                     amt = math.floor(amt * 100 + 0.5)
                     if maxAmt then maxAmt = math.floor(maxAmt * 100 + 0.5) end
@@ -256,12 +258,10 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                     result.amount = amt
                 end
             elseif kind == "self" then
-                local amt = f:getFieldNumber("amount")
-                result.amount = math.floor(amt + 0.5)
+                result.amount = math.floor(amtLo + 0.5)
             elseif kind == "items" then
                 local items = f:getFieldValue("items")
-                local amt = f:getFieldNumber("amount")
-                amt = amt and math.floor(amt + 0.5) or 1
+                local amt = amtLo and math.floor(amtLo + 0.5) or 1
                 if #items == 1 then
                     result.item = items[1]
                     result.amount = amt
@@ -322,25 +322,32 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         selected = def.pool or "change",
         group = "currency",
     })
-    form:addTextField("amount", getText("IGUI_PhunMart_Lbl_Amount"), {
-        default = amountDefault,
-        hint = getText("IGUI_PhunMart_Hint_AmountDollars"),
+    -- One range rather than an Amount box and a Max box. Leaving the upper half
+    -- blank is a fixed price; filling it makes the price roll between the two.
+    --
+    -- A range cannot hide half of itself, and the upper bound is only read for
+    -- currency prices: an items price carries one amount per item and a self
+    -- price is a flat number. Rather than showing a box that silently does
+    -- nothing, it says so when something is typed into it.
+    form:addRangeField("amount", getText("IGUI_PhunMart_Lbl_Amount"), {
+        minDefault = amountDefault,
+        maxDefault = maxDefault,
+        hint = getText("IGUI_PhunMart_Hint_AmountRange"),
         group = "amount",
         numeric = true, min = 0,
-        -- Required for currency and self, but optional for items, where a blank
-        -- amount means one of each.
         validate = function(value, f)
             local kind = f:getFieldValue("kind")
-            if value == "" and (kind == "currency" or kind == "self") then
+            local lo = value and value.min or ""
+            local hi = value and value.max or ""
+            -- Required for currency and self, but optional for items, where a
+            -- blank amount means one of each.
+            if lo == "" and (kind == "currency" or kind == "self") then
                 return getText("IGUI_PhunMart_Err_Required")
             end
+            if hi ~= "" and kind ~= "currency" then
+                return getText("IGUI_PhunMart_Err_MaxCurrencyOnly")
+            end
         end,
-    })
-    form:addTextField("max", getText("IGUI_PhunMart_Lbl_Max"), {
-        default = maxDefault,
-        hint = getText("IGUI_PhunMart_Hint_FixedAmount"),
-        group = "max",
-        numeric = true, min = 0,
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
         value = selectedItems,
@@ -554,6 +561,22 @@ end
 function UI:onDoubleClick(item)
     createEditModal(item.key, item.def, false, function(key, def)
         savePriceDef(self, key, def)
+    end)
+end
+
+--- Open the editor for one price, from outside this tab. The Open buttons beside
+--- a price dropdown elsewhere need a way in, and createEditModal is file-local.
+function UI.OnEditPrice(player, priceKey)
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local def = prices[priceKey]
+    if not def then
+        return
+    end
+    createEditModal(priceKey, def, false, function(key, editedDef)
+        local inst = UI.instances[player and player:getPlayerNum() or 0]
+        if inst then
+            savePriceDef(inst, key, editedDef)
+        end
     end)
 end
 
