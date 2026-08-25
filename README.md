@@ -1,7 +1,7 @@
 # PhunMart
 
 A Project Zomboid (B42) mod that converts vanilla vending machines into 16 themed automated
-shops, dispensing food, gear, weapons, vehicles, skill books, traits, XP boosts, and more.
+shops, dispensing food, gear, weapons, vehicles, livestock, skill books, traits, XP boosts, and more.
 Stock rotates on a timer. Coins come from scavenging. Tokens come from surviving.
 
 Shops source from the game's item catalogue by category, so **modded items show up
@@ -27,19 +27,21 @@ Admins can place machines manually and override every aspect of the system throu
 | **CSVPharmacy**       | Medical       | Common | Bandages and basics up front; antibiotics and rare pharmaceuticals at the back.                     |
 | **RadioHacks**        | Electronics   | Common | Walkie-talkies, batteries, circuitry. If it runs on volts, it's probably here.                     |
 | **Phish4U**           | Fishing       | Common | Rods, tackle, lures, and bait. Someone kept this thing restocked.                                   |
-| **HoesNMoes**         | Gardening     | Common | Seeds, fertiliser, farming tools. Plan for next season.                                             |
+| **HoesNMoes**         | Gardening     | Common | Seeds, fertiliser, farming tools, trapping gear, and live chickens, cows and sheep.                 |
 | **HardWear**          | Clothing      | Common | Civilian clothing at standard weight; military and protective gear at lower odds.                   |
 | **ShedsAndCommoners** | Literature    | Common | All 125 skill books across 25 B42 skills, sorted by volume tier.                                    |
 | **FinalAmendment**    | Weapons       | Rare   | Firearms, ammunition, and explosives. Rare, spread out, and worth hunting down.                     |
-| **WrentAWreck**       | Vehicles      | Rare   | Order a car. It spawns nearby. Budget, standard, and premium tiers. Restocks weekly.                |
-| **TraiterJoes**       | Traits        | Rare   | Spend tokens to gain positive traits or remove negative ones. The rarest machine in the world.      |
-| **BudgetXPerience**   | XP / Boosts   | Rare   | Direct skill XP grants and temporary XP multipliers, tiered by power.                               |
+| **WrentAWreck**       | Vehicles      | Rare   | Buy a claim key, summon the car when you want it. Budget to premium tiers. Restocks weekly.        |
+| **TraiterJoes**       | Traits        | Rare   | Spend tokens to gain positive traits or remove negative ones. One of the rarest machines going.    |
+| **BudgetXPerience**   | XP / Boosts   | Rare   | Direct skill XP grants and XP boost levels, tiered by power.                                        |
 | **Collectors**        | Trade-in      | Rare   | Bring your mementos and collectibles. Trade them in for bound tokens. The more obscure, the better. |
 | **PrawnStars**        | Pawn          | Rare   | Sell jewellery and valuables for change. Five payout tiers from budget ($1) to jackpot ($50).       |
 
-**Common** shops have a 15-in-15 base probability weight and no minimum spacing.
-**Rare** shops have lower probability weights (5–8) and a minimum tile distance (300–500 tiles)
-from other machines of the same type.
+When a vending machine converts, the shop it becomes is drawn at random from the eligible
+types, each weighted by its `probability`. **Common** shops carry a weight of 15 and no
+minimum spacing. **Rare** shops carry 5 to 8, so they come up roughly a third as often, and
+each declares a minimum tile distance (300 to 500) that keeps it away from other machines of
+the same type or category.
 
 ---
 
@@ -102,32 +104,83 @@ a legendary find. The selection rotates each restock.
 
 ### Sandbox Options
 
-Key settings available in `sandbox-options.txt` or the server sandbox editor:
+All settings live on the **PhunMart** page of the server sandbox editor, or under
+`PhunMart.*` in `sandbox-options.txt`.
 
-| Option                  | Default        | Description                                                                                      |
-| ----------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
-| `ChanceToConvert`       | 80%            | Global % chance to convert a vanilla vending machine                                             |
-| `DefaultDistance`       | 200 tiles      | Default minimum tile gap between any two machines                                                |
-| `ChangeCapCents`        | 9999 (=$99.99) | Maximum change balance per player                                                                |
-| `TokenCap`              | 60             | Maximum token balance per player                                                                 |
-| `DropOnDeath`           | true           | Whether the player drops a wallet item on death                                                  |
-| `OnlyPickupOwn`         | true           | Whether only the owner can pick up their dropped wallet                                          |
-| `ReturnRate`            | 100            | % of change returned in the dropped wallet (100 = full, 0 = nothing)                             |
-| `DefaultHoursToRestock` | 72             | Default in-game hours between shop restocks (3 days); per-shop `restockFrequency` overrides this |
+**Machine placement**
+
+| Option                  | Default   | Description                                                                                      |
+| ----------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| `ChanceToConvert`       | 80        | Percent chance to convert any given vanilla vending machine                                      |
+| `DefaultDistance`       | 200       | Default minimum tile gap between two machines of the same type or category                       |
+| `DefaultHoursToRestock` | 72        | In-game hours between shop restocks (3 days); a shop's own `restockFrequency` overrides this     |
+| `DefaultNumOfHoursToReRoll` | 0     | In-game hours before a machine becomes a different shop. 0 means machines never change.          |
+| `DefaultNumOfItemsWhenRestocking` | 5 | Items stocked by a shop that sets no roll count. The low end of a range, so 5 gives 5 to 8.     |
+| `MaxStickyItems`        | 10        | Size at which the compiler warns that an always-available pool has grown too big                 |
+
+**Wallets**
+
+| Option               | Default | Description                                                                    |
+| -------------------- | ------- | ------------------------------------------------------------------------------ |
+| `ChangeCapCents`     | 9999    | Maximum change balance per player, in cents (9999 = $99.99)                    |
+| `TokenCap`           | 60      | Maximum token balance per player                                               |
+| `EnableChangePool`   | true    | Whether the change wallet exists at all                                        |
+| `EnableTokenPool`    | true    | Whether the token wallet exists at all                                         |
+| `DropOnDeath`        | true    | Whether the player drops a wallet item on death                                |
+| `ReturnRate`         | 100     | Percent of change returned in the dropped wallet (100 = all, 0 = none)         |
+| `OnlyPickupOwn`      | true    | Whether only the owner can pick up their death wallet                          |
+| `AllowWalletDrop`    | true    | Whether players can drop currency by hand. Deliberate drops are always public. |
+
+**Coin loot**
+
+| Option               | Default | Description                                            |
+| -------------------- | ------- | ------------------------------------------------------ |
+| `ChanceToDropChange` | 30      | Percent chance a searched container yields loose coins |
+| `MinCoinsToDrop`     | 5       | Lowest coin value dropped, in cents                    |
+| `MaxCoinsToDrop`     | 75      | Highest coin value dropped, in cents                   |
+
+**Access and diagnostics**
+
+| Option       | Default | Description                                                                                                                             |
+| ------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `EditorRole` | (blank) | Restrict the config editor to admins holding this role name. Blank means every admin may edit. Singleplayer always has access.           |
+| `Debug`      | false   | Verbose logging                                                                                                                         |
+
+### Admin Tools
+
+Everything an admin can change lives in one window, **PhunMart Setup**. Open it from the
+`** PhunMart **` button on the Admin Panel, or from the Debug Menu. It is a row of tabs
+following the chain a shop resolves through:
+
+**Shops** and **Locations** (what shop types exist, and where machines actually stand in the
+world) then **Pools**, **Groups**, **Specials**, **Item overrides** and **Prices** (what a
+machine ends up selling and what it charges) then **Blacklist**, **Rewards** and **Wallets**.
+
+The last tab, **Tools**, holds the actions that are not edits:
+
+| Tool                    | What it does                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| Create a shop           | Wizard for a new machine: appearance, spawn rules, and stock                         |
+| Change the currency     | Price everything in a lootable item instead of change, with a live preview           |
+| Pending restocks        | Machines already placed whose stock predates your edits                              |
+| Reset player data       | Clear wallets, purchase history and reward tracking, chosen per tracker              |
+| Restock every machine   | Reroll the stock of every machine in the world at once                               |
+| Reload definitions      | Re-read the override files from disk, for when you have edited them by hand          |
+
+Machines can also be placed by hand from the in-game Items List.
 
 ### Admin Commands
 
-- `/dumppz all` dumps perks, traits, items, vehicles to a Lua file for reference
-- `/dumppz perks` / `traits` / `items` / `vehicles` for individual dumps
-
-Admins can also place machines manually via the in-game Items List.
+- `/dumppz all` dumps perks, traits, categories, items and vehicles to a Lua file for reference
+- `/dumppz perks` / `traits` / `categories` / `items` / `vehicles` for individual dumps
 
 ### Optional: PhunZones integration
 
 If [PhunZones](https://github.com/PhunZoider/PhunZones) is installed, shop pools can be
-filtered by zone difficulty (1–5). For example, the WrentAWreck budget pool appears only in
-difficulty 1–2 zones, and the premium pool only in 4–5. Shops in unzoned areas remain
-permissive and show all pools.
+gated by zone difficulty, so what a machine stocks depends on where it stands. WrentAWreck is
+the clearest example: its budget pool of small cars and vans is limited to difficulty 0 to 2,
+the standard tier to 2 and 3, and the luxury tier to difficulty 4 alone. Machines in unzoned
+areas stay permissive and draw on every pool.
 
 ---
 
@@ -140,7 +193,12 @@ rewards on top of the built-in defaults.
 Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** covers common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.
 
-**Adding modded vehicles to WrentAWreck:** [Docs/GUIDE_ADDING_MODDED_VEHICLE.md](Docs/GUIDE_ADDING_MODDED_VEHICLE.md) is a quick-start in two steps using the in-game admin UI.
+Two common jobs have guides of their own:
+
+- **[Adding modded vehicles to WrentAWreck](Docs/GUIDE_ADDING_MODDED_VEHICLE.md)**: four clicks
+  in the admin UI, with no Lua editing at all if the vehicle mod is loaded.
+- **[Using an item as currency](Docs/GUIDE_ITEM_CURRENCY.md)**: charge in `Base.Money` or
+  anything else lootable, and rescale every price to match.
 
 ---
 
@@ -157,4 +215,5 @@ source by category, so modded items appear automatically. No known conflicts; pl
 - [GitHub Repository](https://github.com/PhunZoider/PhunMart)
 - [Customisation Guide](Docs/CUSTOMISATION.md)
 - [Adding Modded Vehicles](Docs/GUIDE_ADDING_MODDED_VEHICLE.md)
+- [Using an Item as Currency](Docs/GUIDE_ITEM_CURRENCY.md)
 - [Issue Tracker](https://github.com/PhunZoider/PhunMart/issues)

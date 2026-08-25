@@ -1,84 +1,124 @@
 # Adding a Modded Vehicle to WrentAWreck
 
----
+Vehicles are not inventory items. Each one is a script id in the game's vehicle database, and
+PhunMart needs to know that a given id is something WrentAWreck may sell. That is all this
+guide is about.
 
-Vehicles are different to normal items. Each vehicle has a unique script id that we need to wrap into a PhunMart "special" so PhunMart knows how to sell it
+---
 
 ## Quick start
 
-Most vehicle mods list their script IDs on their Steam Workshop page. That's all you need.
+If the vehicle mod is loaded, its cars are already in PhunMart's vehicle picker. You do not
+need script names, and you do not need to create anything.
 
-This example uses the [91 Range Rover mod](https://steamcommunity.com/sharedfiles/filedetails/?id=2409333430),
-which lists script names `91range` and `91range2`.
+1. Open the Admin Panel and click `** PhunMart **`, then go to the **Groups** tab.
+2. Pick the group matching the tier you want the vehicle to sell at, for example
+   `vehicles_luxury` for high-end cars, and click **Edit**.
+3. Click **Pick...** next to **Vehicles**, find the vehicle by name, tick it, and confirm.
+4. **Apply**.
 
-### 1. Create a Special
+![Edit vehicles_luxury group](images/add_vehicle_to_group.png)
 
-Open the **Admin Tools > Specials** editor and add a new entry:
+That is the whole job. The vehicle appears in WrentAWreck as its own row at the next restock,
+priced and rewarded by the group's defaults. Use **Restock every machine** on the Tools tab if
+you do not want to wait.
 
-![Add Special dialog showing vehicle_k15_91range](images/add_vehicle.png)
+### Which group
 
-| Field       | Value                                                                           |
-| ----------- | ------------------------------------------------------------------------------- |
-| Key         | something unique, e.g. `vehicle_k15_91range`                                    |
-| Inherit     | `vehicle_base`                                                                  |
-| Label       | Display name shown on the claim key                                             |
-| Action      | `spawnVehicle`                                                                  |
-| Action Args | Comma-separated script names from the mod page, e.g. `91range, 91range2`        |
-| Price       | `vehicle_common`, `vehicle_uncommon`, or `vehicle_rare` (see price tiers below) |
+Each group carries the price tier and the spawn behaviour, so choosing the group is how you
+choose what the car costs.
 
-Leave Stock Min/Max blank for unlimited stock.
+| Group              | Label             | Price tier         | Cost          |
+| ------------------ | ----------------- | ------------------ | ------------- |
+| `vehicles_small`   | Small Cars        | `vehicle_common`   | $10.00-$20.00 |
+| `vehicles_vans`    | Vans & Pickups    | `vehicle_common`   | $10.00-$20.00 |
+| `vehicles_normal`  | Cars & Sedans     | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_trucks`  | Pickup Trucks     | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_4x4`     | Off-Road & SUVs   | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_luxury`  | Luxury & Sports   | `vehicle_rare`     | $40.00-$80.00 |
 
-### 2. Add the Special to a Group
+Prices are in **change**, the wallet currency, and each is a range rolled fresh per restock. If
+you have switched the mod to item-based currency, these scale with the rest of the tree.
 
-Open **Admin Tools > Groups**, find the group that fits the vehicle tier
-(e.g. `vehicles_luxury` for high-end vehicles), and add your special key to **Specials (By key)**:
-
-![Edit vehicles_luxury group showing vehicle_k15_91range in Specials field](images/add_vehicle_to_group.png)
-
-Apply and restart/reload. The vehicle will now appear in WrentAWreck.
-
----
-
-## What this approach gives you (and what it trades off)
-
-Putting all script names into one special's Action Args creates **one offer row** in the shop.
-When a player buys it, the game picks a random script from your list -- they cannot select a
-specific variant.
-
-This is fine for a set of near-identical variants (e.g. colour swaps). If you want players to
-be able to pick a specific vehicle (e.g. "I want the Rover, not the Defender"), use the
-[per-vehicle approach](#per-vehicle-rows) below.
+**The tier also decides where the car can be sold.** WrentAWreck has one pool per tier, and
+each is zone-gated when [PhunZones](https://github.com/PhunZoider/PhunZones) is installed:
+small and van groups appear in difficulty 0 to 2, the uncommon groups in 2 to 3, and luxury in
+4 only. Put a car in `vehicles_luxury` and it will only ever show up at machines standing in
+the roughest zones. Without PhunZones every pool is eligible everywhere.
 
 ---
 
-## Price tiers
+## Why this works
 
-| Price key          | Token range | Typical use                    |
-| ------------------ | ----------- | ------------------------------ |
-| `vehicle_common`   | 10–20 gold  | Small/economy cars, basic vans |
-| `vehicle_uncommon` | 20–40 gold  | Normal cars, trucks, SUVs      |
-| `vehicle_rare`     | 40–80 gold  | Luxury / sports / rare         |
+A group normally turns each entry in `items` into an offer that hands over that item. The
+vehicle groups set `defaults.reward` to a `spawnVehicle` special instead, so every entry
+becomes a car offer, and the entry the player bought is the car they get.
+
+```lua
+vehicles_luxury = {
+    label = "Luxury & Sports Cars",
+    defaults = {
+        price  = "vehicle_rare",
+        reward = "vehicle_luxury",       -- one special, shared by every entry
+        offer  = { weight = 1.0 }
+    },
+    items = { "CarLuxury", "SportsCar", "SportsCar_ez",
+              "RaceCar12", "RaceCar34", "RaceCar58" },   -- your entry joins this list
+},
+```
+
+So one special serves the whole tier, each car is its own selectable row, and adding a car is
+one name in a list. There is no reason to create a special of your own unless you want that
+particular car to behave differently from its tier.
+
+Equivalent by hand, in `PhunMart_Groups.txt`:
+
+```lua
+return {
+    vehicles_luxury = {
+        items = { "CarLuxury", "SportsCar", "SportsCar_ez",
+                  "RaceCar12", "RaceCar34", "RaceCar58",
+                  "91range", "91range2" },
+    },
+}
+```
+
+Note that `items` is an array, and arrays are replaced whole rather than merged, so the shipped
+entries have to be repeated alongside yours or they disappear. The admin UI handles that for
+you, which is the main reason to prefer it.
 
 ---
 
-## Per-vehicle rows
+## When you do need a special
 
-If you want a separate selectable row for each variant, the player picks the exact vehicle
-from the shop list and gets that specific one -- `offer.item` carries the script name through
-to the spawn logic.
+Create one when the vehicle should differ from its tier: a different price, limited stock, a
+custom label, or specific condition and fuel ranges.
 
-You have two routes:
+Open the **Specials** tab and add an entry:
 
-**Route A -- Admin UI (repeat the quick-start once per variant)**
+| Field           | Value                                                              |
+| --------------- | ------------------------------------------------------------------ |
+| Name            | What admins see in the list, for example `91 Range Rover`          |
+| Key             | Something unique, for example `vehicle_k15_91range`                |
+| Inherit         | `vehicle_base`                                                     |
+| Label           | The name shown on the claim key and in the shop                    |
+| Action          | `spawnVehicle`                                                     |
+| Vehicle Scripts | **Pick...**, then tick the variants this offer may spawn           |
 
-Follow steps 1 and 2 from the quick start, but create one special per script name, each
-with a single entry in Action Args. Then add all the resulting special keys to the group's
-**Specials (By key)** field. As many variants as you have, that many times through the flow.
+Price, weight and stock are on the **Advanced** tab. Leave stock blank for unlimited.
 
-**Route B -- Edit `PhunMart_Specials.txt` directly**
+![Add Special dialog](images/add_vehicle.png)
 
-Create the file `Zomboid/Lua/PhunMart_Specials.txt` (or add to it if it already exists) and
-define one entry per variant:
+Then add the key to a group's **Specials (by key)** field, the same way as above but in the
+other picker.
+
+**One special, many scripts, one row.** If you tick several variants in Vehicle Scripts, they
+become a single shop row and the game picks one at random when it is bought. That is right for
+colour swaps of the same car and wrong when players should be able to choose, in which case
+make one special per variant, or use the `items` route above, which gives separate rows for
+free.
+
+By hand, in `PhunMart_Specials.txt`:
 
 ```lua
 return {
@@ -91,87 +131,67 @@ return {
             condition = { min = 85, max = 100 }, fuel = { min = 0.3, max = 0.7 }
         }}}
     },
-    vehicle_91range_b = {
-        inherit = "vehicle_base",
-        price = "vehicle_rare",
-        offer = { weight = 1.0, stock = { min = 1, max = 1 } },
-        display = { text = "91 Range Rover (Green)" },
-        actions = {{ type = "spawnVehicle", scripts = {"91range2"}, args = {
-            condition = { min = 85, max = 100 }, fuel = { min = 0.3, max = 0.7 }
-        }}}
-    },
 }
 ```
 
-Then add both keys to the group via the admin Groups editor (**Specials (By key)**), or in
-`PhunMart_Groups.txt`:
-
-```lua
-return {
-    vehicles_luxury = {
-        specials = {"vehicle_91range_a", "vehicle_91range_b"},
-    },
-}
-```
-
-See [Specials](CUSTOMISATION.md#5-specials) and [Groups](CUSTOMISATION.md#8-groups) in the
-customisation guide for the full field reference.
+See [Specials](CUSTOMISATION.md#5-specials) and [Groups](CUSTOMISATION.md#8-groups) for the
+full field reference.
 
 ---
 
-## How to find script names
+## Finding script names by hand
 
-1. Subscribe to the mod on Steam Workshop.
-2. Check the mod's description page -- most vehicle mods list their script IDs.
-3. If not listed, find the mod folder under `Steam/steamapps/workshop/content/108600/<id>/`
-   and open any `.txt` file under `media/scripts/vehicles/`. Each vehicle block starts with:
+You should not need these, since the picker lists everything the game has loaded and shows
+proper names. If you are writing config on a machine without the mod installed:
+
+1. Most vehicle mods list their script ids on the Steam Workshop page.
+2. Otherwise, open any `.txt` under `media/scripts/vehicles/` in the mod folder
+   (`Steam/steamapps/workshop/content/108600/<id>/`). Each vehicle block starts:
    ```
    vehicle <ScriptName>
    {
    ```
-   The `<ScriptName>` is what you enter in Action Args.
+3. `/dumppz vehicles` writes every script the server currently knows about to a Lua file.
 
-Script names are **case-sensitive**.
+Script names are **case-sensitive**. A name that does not resolve is dropped at compile time
+with a warning in the server log, so a typo means the car silently never appears.
 
 ---
 
-## If the vehicle mod is removed (or a script name is wrong)
+## If the vehicle mod is removed
 
-The purchase will still complete -- currency is deducted and the player receives a
-`Vehicle Claim Key` item in their inventory. PhunMart stores the script name as a string;
-it has no way to validate that the mod is still active at purchase time.
+PhunMart checks script names twice, at compile time and again when the purchase resolves, so an
+offer for a car that no longer exists stops appearing once the mod is gone. Keys already in
+someone's inventory are the problem.
 
-When the player right-clicks the key and chooses **Claim**, the game tries to spawn a vehicle
-using that script name. If the mod is gone (or the name was wrong), the game returns nothing
-and the spawn silently fails:
+A **Vehicle Claim Key** stores its script name in ModData. When the player right-clicks and
+chooses Claim, the game tries to spawn that script. If it is gone:
 
 - No vehicle appears
 - No error is shown to the player
-- **The key is not consumed** -- it stays in inventory permanently
+- **The key is not consumed**, so it sits in their inventory forever
 
-The player is effectively left with a useless item and has already paid. There is no automatic
-refund.
+They have paid and received nothing, and there is no automatic refund.
 
-**To avoid this:**
+To avoid it:
 
-- Only add a vehicle mod's scripts while that mod is active on the server
-- If you remove a vehicle mod, remove the corresponding special and group entries at the same
-  time so the offer stops appearing at restock
-- Existing held keys become dead items if the mod is removed mid-session; affected players
-  would need manual compensation (return their currency via admin tools)
+- Only add a mod's scripts while that mod is active on the server
+- Remove the corresponding group entries at the same time you remove the mod, so the offer
+  stops appearing at the next restock
+- Compensate anyone holding a dead key by hand, using the **Wallets** tab
 
 ---
 
-## How the spawn works (for reference)
+## How the spawn works
 
-When a player buys a vehicle offer:
+1. The server picks the script: the exact one the player selected when the offer carried it,
+   otherwise a random valid one from the special's list.
+2. A `VehicleKeySpawner` item goes into the player's inventory, tagged with the script name and
+   the rolled condition, and named `Vehicle Claim Key: <label>`.
+3. Using the key outdoors spawns the vehicle.
 
-1. The server picks the vehicle script (either the exact one the player selected, or a random
-   one from the special's `scripts` list).
-2. A `VehicleKeySpawner` item is added to the player's inventory, tagged with the script name
-   in ModData, and named `"Vehicle Claim Key: <label>"`.
-3. The client receives a `spawnVehicle` command so the key knows which vehicle to summon when
-   used in the world.
+Livestock at HoesNMoes works the same way, with an `AnimalClaimToken` and a `spawnAnimal`
+action. See [special kinds](CUSTOMISATION.md#14-reference-special-kinds).
 
 ---
 
@@ -179,10 +199,13 @@ When a player buys a vehicle offer:
 
 | What                   | File                                                   |
 | ---------------------- | ------------------------------------------------------ |
-| Price tiers            | `defaults/prices.txt`                                  |
-| Special definitions    | `defaults/specials.txt` (VEHICLES section)             |
-| Group definitions      | `defaults/groups.txt` (WrentAWreck section)            |
-| Pool→group wiring      | `defaults/pools.txt`                                   |
-| Shop→pool wiring       | `defaults/shops.txt` (`WrentAWreck.poolSets`)          |
-| Spawn logic (server)   | `server/PhunMart_Server/main.txt` (`grantReward`)      |
-| Key use logic (client) | `client/PhunMart_Client/commands.txt` (`spawnVehicle`) |
+| Price tiers            | `defaults/prices.lua`                                  |
+| Special definitions    | `defaults/specials.lua` (VEHICLES section)             |
+| Group definitions      | `defaults/groups.lua` (WrentAWreck section)            |
+| Pool to group wiring   | `defaults/pools.lua`                                   |
+| Shop to pool wiring    | `defaults/shops.lua` (`WrentAWreck.poolSets`)          |
+| Spawn logic (server)   | `server/PhunMart_Server/main.lua` (`grantReward`)      |
+| Key use logic (client) | `client/PhunMart_Client/commands.lua` (`spawnVehicle`) |
+
+All are under `Contents/mods/PhunMart2/common/media/lua/shared/PhunMart/`, except the last two,
+which are under `.../media/lua/`.
