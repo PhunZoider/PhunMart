@@ -294,6 +294,14 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         end,
     })
 
+    -- Name first, then key, the same two rows in the same order as every other
+    -- editor. This was the last one still leading with the key.
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        -- Raw, not resolved: a name is this entry's own or it has none, and
+        -- showing the parent's would suggest it had been given one.
+        default = raw.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = priceKey or "", editable = isNew,
         required = true,
@@ -302,12 +310,6 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
-    })
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        -- Raw, not resolved: a name is this entry's own or it has none, and
-        -- showing the parent's would suggest it had been given one.
-        default = raw.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
     -- Prices and specials both store a `kind`, but they mean different things:
     -- here it selects how the player pays, there it is the sort of special.

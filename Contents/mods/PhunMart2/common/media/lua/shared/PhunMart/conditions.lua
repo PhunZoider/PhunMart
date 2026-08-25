@@ -10,7 +10,7 @@ local function addFail(out, key, textKey, args)
     out.ok = false
     out.failures[#out.failures + 1] = {
         condKey = key, -- e.g. "minHours"
-        textKey = textKey, -- e.g. "IGUI_PhunMart_Cond_WorldAgeBetween"
+        textKey = textKey, -- e.g. "IGUI_PhunMart_Cond_WorldAgeMin"
         args = args or {}
     }
 end

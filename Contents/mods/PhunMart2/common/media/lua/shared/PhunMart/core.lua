@@ -109,7 +109,14 @@ PhunMart = {
         OnPurchaseComplete = "OnPhunMartPurchaseComplete",
         OnApplyTraitReward = "OnPhunMartApplyTraitReward",
         OnRewardGranted = "OnPhunMartRewardGranted",
-        OnDefsUpdated = "OnPhunMartDefsUpdated"
+        OnDefsUpdated = "OnPhunMartDefsUpdated",
+        -- Both of these were being triggered without ever being declared, so
+        -- every item-def stream and every locations reply called triggerEvent
+        -- with a nil name. Declared rather than removed: the calls sit at the
+        -- end of two live round trips and are the natural place for anything
+        -- that wants to know the data has landed.
+        OnShopItemDefsReloaded = "OnPhunMartShopItemDefsReloaded",
+        OnShopLocationsReceived = "OnPhunMartShopLocationsReceived"
     },
     utils = require "PhunMart/utils",
     settings = {},

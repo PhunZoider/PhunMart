@@ -254,7 +254,12 @@ function UI:createChildren()
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
     self:addListColumn(getText("IGUI_PhunMart_Col_Category"), 0, {
-        field = "category",
+        -- Readable, rather than the raw config key. IGUI_PhunMart_Reward_* were
+        -- written for exactly this and never wired up, so the column has been
+        -- showing "sprinterKills" since it was built.
+        text = function(d)
+            return getTextOrNull("IGUI_PhunMart_Reward_" .. tostring(d.category)) or tostring(d.category or "")
+        end,
         color = function(d)
             if d.category == "playtime" then
                 return 0.5, 0.8, 1
