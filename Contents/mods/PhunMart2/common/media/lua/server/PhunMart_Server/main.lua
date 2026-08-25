@@ -296,7 +296,29 @@ end
 --- and CarAParts are both Vehicle, and putting them on the same street is the
 --- thing minDistance was meant to prevent but never could, because it only
 --- ever compared a shop against others of its own type.
-function Core:getInstanceDistancesFrom(x, y)
+---
+--- `ignore` is one instance table to leave out, for a machine asking what it
+--- could become: it stands exactly where the answer would go, so counted in it
+--- rules out its own type at distance zero and everything sharing its category
+--- along with it.
+---
+--- Matched by identity or by position, and it needs both. Usually the caller
+--- holds the very table that was registered, but relocateShop registers a fresh
+--- literal rather than the object's modData, so after a move the identity test
+--- alone would quietly stop matching. Position is the thing actually being
+--- asked about, and identity covers the case where two entries somehow share a
+--- tile.
+local function isIgnored(v, ignore)
+    if not ignore then
+        return false
+    end
+    if v == ignore then
+        return true
+    end
+    return v.x == ignore.x and v.y == ignore.y and (v.z or 0) == (ignore.z or 0)
+end
+
+function Core:getInstanceDistancesFrom(x, y, ignore)
     local byType, byCategory = {}, {}
     for k, v in pairs(self.shops) do
         if v.enabled ~= false then
@@ -308,20 +330,25 @@ function Core:getInstanceDistancesFrom(x, y)
     end
 
     for k, v in pairs(self.instances) do
-        local shopType = Core.isShopInstance(v) and v.type or nil
-        if shopType and byType[shopType] then
-            local dx = x - v.x
-            local dy = y - v.y
-            local distance = math.sqrt(dx * dx + dy * dy)
-            if distance < byType[shopType] then
-                byType[shopType] = distance
+        -- Skipped before the type check rather than folded into it, so the
+        -- deliberate omission does not reach the warning below and read as a
+        -- machine with a broken type.
+        if not isIgnored(v, ignore) then
+            local shopType = Core.isShopInstance(v) and v.type or nil
+            if shopType and byType[shopType] then
+                local dx = x - v.x
+                local dy = y - v.y
+                local distance = math.sqrt(dx * dx + dy * dy)
+                if distance < byType[shopType] then
+                    byType[shopType] = distance
+                end
+                local cat = self.shops[shopType] and self.shops[shopType].category
+                if cat and byCategory[cat] and distance < byCategory[cat] then
+                    byCategory[cat] = distance
+                end
+            else
+                Core.debugLn("No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
             end
-            local cat = self.shops[shopType] and self.shops[shopType].category
-            if cat and byCategory[cat] and distance < byCategory[cat] then
-                byCategory[cat] = distance
-            end
-        else
-            Core.debugLn("No shop with type " .. tostring(shopType) .. " (instance " .. k .. ")")
         end
     end
 

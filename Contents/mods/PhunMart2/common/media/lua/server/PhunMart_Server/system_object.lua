@@ -86,8 +86,30 @@ local function bakePrice(price, selfItem)
     return baked
 end
 
--- Default roll used when neither poolSet nor shop defines one.
-local DEFAULT_ROLL = { mode = "weighted", count = { min = 5, max = 8 } }
+-- Roll used when neither the pool set nor the shop names one. Among the shipped
+-- shops only PrawnStars relies on it; otherwise it is what an admin-built shop
+-- falls back to when they never set a count.
+--
+-- DefaultNumOfItemsWhenRestocking sets the low end rather than a fixed count.
+-- This was hardcoded to a 5 to 8 spread, and a shop stocking exactly N items
+-- every single restock reads as broken rather than as configured. At the shipped
+-- default of 5 the range comes out 5 to 8, which is what it has always been, so
+-- no existing world changes behaviour.
+local DEFAULT_ROLL_SPREAD = 3
+
+local function defaultRoll()
+    local min = tonumber(Core.getOption("DefaultNumOfItemsWhenRestocking", 5)) or 5
+    if min < 1 then
+        min = 1
+    end
+    return {
+        mode = "weighted",
+        count = {
+            min = min,
+            max = min + DEFAULT_ROLL_SPREAD
+        }
+    }
+end
 
 -- Weighted random pick without replacement. Returns array of {id, offer, scaledWeight} entries.
 -- candidates: array of {id, offer, scaledWeight}
@@ -141,6 +163,16 @@ local fields = {
     },
     lastRestock = {
         -- what hour this shop was last restocked
+        type = "numberToTens",
+        default = 0
+    },
+    lastReroll = {
+        -- what hour this machine last considered becoming a different shop.
+        -- Stamped even when it stayed as it was, so a machine with no other
+        -- option at its location does not re-run the search every tick.
+        -- Absent on machines placed before rerolling existed; treated as the
+        -- creation hour, which starts them on a full cycle rather than firing
+        -- the moment the setting is switched on.
         type = "numberToTens",
         default = 0
     },
@@ -238,7 +270,7 @@ function ServerObject:buildOffers()
 
     for _, poolSet in ipairs(shopDef.poolSets or {}) do
         -- Resolve roll: poolSet > shop > global default
-        local roll = poolSet.roll or shopDef.roll or DEFAULT_ROLL
+        local roll = poolSet.roll or shopDef.roll or defaultRoll()
         local mode = roll.mode or "weighted"
 
         -- Merge candidates from ALL eligible pools in this poolSet.
@@ -442,6 +474,47 @@ function ServerObject:getSpriteIndex()
     end
 end
 
+--- Whether this machine's square is currently lit.
+function ServerObject:hasElectricity()
+    return self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
+               GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
+end
+
+--- Put the machine's face in step with its type, whatever that type now is.
+---
+--- updateSprite cannot do this job, because neither of its branches is about
+--- the type changing. For a shop declaring powered = true it swaps sprites only
+--- when the power state moved; for every other shop, which is all sixteen of
+--- the shipped ones, it only rescues a machine stuck on an unpowered sprite, by
+--- testing the current sprite against the new type's unpowered list. After a
+--- reroll the sprite on the machine belongs to the type it just stopped being
+--- and appears in nobody's list, so that test finds nothing and the machine
+--- keeps the wrong face while selling the new shop's stock.
+function ServerObject:applyTypeSprite()
+    local isoObject = self:getIsoObject()
+    local def = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
+    if not isoObject or not def or not def.sprites then
+        return false
+    end
+
+    local idx = self:getSpriteIndex()
+    local sprite = def.sprites[idx]
+    if def.powered == true then
+        local hasPower = self:hasElectricity()
+        self.powered = hasPower
+        if not hasPower then
+            sprite = (def.unpoweredSprites or {})[idx] or sprite
+        end
+    end
+    if not sprite then
+        return false
+    end
+
+    isoObject:setSprite(sprite)
+    isoObject:transmitUpdatedSpriteToClients()
+    return true
+end
+
 function ServerObject:updateSprite(force)
     local isoObject = self:getIsoObject()
     if not isoObject then
@@ -453,8 +526,7 @@ function ServerObject:updateSprite(force)
     end
 
     if def.powered == true then
-        local hasPower = self:getSquare():haveElectricity() or SandboxVars.ElecShutModifier > -1 and
-                             GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
+        local hasPower = self:hasElectricity()
         -- skip if power state unchanged: avoids redundant setSprite + network transmit on every tick
         if not force and hasPower == self.powered then
             return
@@ -570,6 +642,106 @@ function ServerObject:restock()
 
     self:buildOffers()
     self:saveData() -- toModData + transmitModData → engine syncs offers to all clients
+end
+
+-- -----------------------------
+-- Rerolling: a machine becoming a different shop
+--
+-- Restocking changes what is on the shelves. Rerolling changes whose shelves
+-- they are: the machine picks a new shop type from the ones eligible where it
+-- stands, and swaps its sprite and stock to match. Off by default, because a
+-- world where the hardware store might be a pharmacy tomorrow is a choice
+-- rather than the obvious behaviour.
+-- -----------------------------
+
+--- Hours between rerolls, or nil when this machine should never reroll.
+--- A shop may set its own `rerollFrequency`, including 0 to opt out of a server
+--- default, so a machine meant to be a landmark can stay one.
+function ServerObject:rerollFrequency()
+    local shop = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
+    local hours = shop and shop.rerollFrequency
+    if hours == nil then
+        hours = Core.getOption("DefaultNumOfHoursToReRoll", 0)
+    end
+    hours = tonumber(hours) or 0
+    if hours > 0 then
+        return hours
+    end
+    return nil
+end
+
+--- When the current reroll cycle started. Machines predating this feature have
+--- no stamp, so they start from when they were created rather than from hour
+--- zero, which would reroll every one of them the moment an admin enables it.
+--- Spelled out rather than `self.lastReroll or self.created`: lastReroll is 0
+--- rather than nil on those machines, and 0 is truthy.
+function ServerObject:rerollClockStart()
+    local stamp = tonumber(self.lastReroll) or 0
+    if stamp > 0 then
+        return stamp
+    end
+    return tonumber(self.created) or 0
+end
+
+function ServerObject:requiresReroll()
+    local frequency = self:rerollFrequency()
+    if not frequency then
+        return false
+    end
+    local now = GameTime:getInstance():getWorldAgeHours()
+    return now >= self:rerollClockStart() + frequency
+end
+
+--- Become a different shop, if there is one this location will take.
+--- Returns true only when the type actually changed.
+function ServerObject:reroll()
+    -- Before the stamp, not after. These mean the attempt could not be made at
+    -- all rather than that it was made and came to nothing, so stamping here
+    -- would push the machine a whole cycle away for a transient failure.
+    local system = Core.ServerSystem and Core.ServerSystem.instance
+    local isoObject = self:getIsoObject()
+    if not system or not isoObject then
+        return false
+    end
+
+    local now = GameTime:getInstance():getWorldAgeHours()
+    -- Stamped whatever happens below. The commonest outcome by far is that no
+    -- other shop suits this spot, which will still be true a second from now,
+    -- and without a stamp that machine re-runs the whole search every tick for
+    -- the rest of the world's life.
+    self.lastReroll = now
+
+    -- Out of the running for the pick. This machine stands exactly where the
+    -- new shop would go, so counted in the spacing it rules out its own type at
+    -- distance zero and everything sharing its category with it. The tile is
+    -- being vacated, so it should not be spacing anything out.
+    local data = isoObject:getModData()
+    local previous = self.type
+    local picked = system:getRandomShop(self.x, self.y, data)
+
+    -- Nothing else suits this spot, or the lottery landed on what it already
+    -- is. Nothing changes, but the stamp still has to reach modData or it is
+    -- lost when the chunk unloads and the search runs again on next load.
+    if not picked or picked == previous then
+        self:saveData()
+        return false
+    end
+
+    self.type = picked
+    -- The old stock belonged to a shop that is no longer here, so it goes
+    -- before anyone can buy from it. The restock clock resets with it: the new
+    -- shop deserves a full cycle rather than inheriting a timer about to expire.
+    self.lastRestock = now
+    self:buildOffers()
+
+    -- applyTypeSprite rather than updateSprite: the thing that changed is the
+    -- type, and updateSprite only ever reacts to power. See its comment.
+    self:applyTypeSprite()
+    self:saveData()
+
+    Core.debugLn("reroll: " .. tostring(previous) .. " -> " .. tostring(picked) .. " at " .. tostring(self.x) .. "," ..
+                     tostring(self.y))
+    return true
 end
 
 function ServerObject:requiresPower()

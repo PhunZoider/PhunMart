@@ -353,9 +353,13 @@ end
 -- returns a random shop key based on x,y location based on its probability
 -- it will omit shops that are disabled, whose group/type would be too close to one another,
 -- or whose pools are all zone-filtered out at this location
-function ServerSystem:getRandomShop(x, y)
+--
+-- `ignore` is an instance table to leave out of the spacing measurement, used
+-- by a machine asking what it could turn into: it is standing on the spot being
+-- filled and should not be spacing itself out of the running.
+function ServerSystem:getRandomShop(x, y, ignore)
 
-    local options, byCategory = Core:getInstanceDistancesFrom(x, y)
+    local options, byCategory = Core:getInstanceDistancesFrom(x, y, ignore)
     local candidates = {}
 
     local shops = Core.shops
@@ -469,6 +473,10 @@ function ServerSystem:relocateShop(oldX, oldY, oldZ, newX, newY, newZ)
         facing = oldObj.facing,
         created = oldObj.created,
         lastRestock = oldObj.lastRestock,
+        -- Carried like the restock clock. Dropping it would hand the machine a
+        -- fresh cycle on every move, so a machine an admin nudges around never
+        -- reaches its next reroll.
+        lastReroll = oldObj.lastReroll,
         offers = oldObj.offers
     }
 
@@ -491,6 +499,7 @@ function ServerSystem:relocateShop(oldX, oldY, oldZ, newX, newY, newZ)
     newObj.facing = saved.facing
     newObj.created = saved.created
     newObj.lastRestock = saved.lastRestock
+    newObj.lastReroll = saved.lastReroll
     newObj.offers = saved.offers
     newObj.x = newX
     newObj.y = newY
@@ -502,6 +511,7 @@ function ServerSystem:relocateShop(oldX, oldY, oldZ, newX, newY, newZ)
         facing = saved.facing,
         created = saved.created,
         lastRestock = saved.lastRestock,
+        lastReroll = saved.lastReroll,
         x = newX,
         y = newY,
         z = newZ

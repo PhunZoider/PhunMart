@@ -75,9 +75,48 @@ Events.EveryTenMinutes.Add(function()
     Core.playtimeRewards:tick()
 end)
 
+-- How close a player has to be for a machine to hold off rerolling. Far enough
+-- that a machine never changes identity in view of the person about to use it,
+-- or worse, while they have its shop window open. It only defers: the reroll
+-- happens on the next tick after they leave.
+local REROLL_KEEP_AWAY = 30
+
+--- True when anyone is standing near enough to see this machine change.
+local function playerIsNear(obj)
+    local players = Core.utils.onlinePlayers()
+    if not players then
+        -- No way to tell, so assume someone is watching. Deferring a reroll
+        -- costs a minute; doing one in front of a player cannot be undone.
+        return true
+    end
+    local objZ = math.floor(tonumber(obj.z) or 0)
+    for i = 0, players:size() - 1 do
+        local p = players:get(i)
+        if p then
+            -- Floored, because a player's Z is a float mid-stair while the
+            -- machine's is the integer level it was stored on.
+            if math.floor(p:getZ()) == objZ then
+                local dx, dy = p:getX() - obj.x, p:getY() - obj.y
+                if (dx * dx + dy * dy) <= REROLL_KEEP_AWAY * REROLL_KEEP_AWAY then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 -- Check power state every minute so sprite swaps within ~1 minute of electricity changing.
 -- updateSprite() compares hasPower against self.powered and no-ops when unchanged,
 -- so this loop is near-zero cost during steady state.
+--
+-- Rerolling rides along here rather than on shop open, which is where restocking
+-- happens. Restocking on open is invisible; changing the whole shop on open
+-- means clicking a hardware store and being handed a pharmacy. Doing it on a
+-- tick instead lets a machine change while nobody is watching, which is the
+-- only way it reads as the world moving on rather than as a bug.
+-- requiresReroll() is a comparison against a stored hour and returns false
+-- immediately while the feature is off, so the added cost is nil by default.
 Events.EveryOneMinute.Add(function()
     local sys = Core.ServerSystem and Core.ServerSystem.instance
     if not sys then
@@ -86,6 +125,9 @@ Events.EveryOneMinute.Add(function()
     for i = 1, sys:getLuaObjectCount() do
         local obj = sys:getLuaObjectByIndex(i)
         if obj then
+            if obj.requiresReroll and obj:requiresReroll() and not playerIsNear(obj) then
+                obj:reroll()
+            end
             obj:updateSprite()
         end
     end

@@ -40,10 +40,10 @@
   "Sandbox_PhunMart_DefaultHoursToRestock_tooltip": "The default number of hours between restocking a shop. 0 would mean that (by default) the shops are only ever stocked once",
 
   "Sandbox_PhunMart_DefaultNumOfHoursToReRoll": "Default hours rerolling shop",
-  "Sandbox_PhunMart_DefaultNumOfHoursToReRoll_tooltip": "The default number of hours between changing the shop to a different one. 0 means shops will default to never changing",
+  "Sandbox_PhunMart_DefaultNumOfHoursToReRoll_tooltip": "How many hours before a machine becomes a different shop entirely, picked from the ones eligible where it stands. 0 means machines keep the shop they converted as. A machine waits until no player is nearby before changing.",
 
   "Sandbox_PhunMart_DefaultNumOfItemsWhenRestocking": "Default number of items to stock",
-  "Sandbox_PhunMart_DefaultNumOfItemsWhenRestocking_tooltip": "This the number of items a shop will stock by default",
+  "Sandbox_PhunMart_DefaultNumOfItemsWhenRestocking_tooltip": "How many items a shop stocks when it does not set a roll count of its own. This is the low end of a small range, so 5 stocks 5 to 8. Most shops set their own count and ignore this.",
 
   "Sandbox_PhunMart_ChanceToConvert": "Chance to convert vanilla",
   "Sandbox_PhunMart_ChanceToConvert_tooltip": "The chance that a vanilla vending machine will get converted to a random PhunMart machine. Set to 0 to disable",

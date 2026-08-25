@@ -1235,6 +1235,9 @@ function Compiler.compileAll(ctx)
                 poolSets = compiledPoolSets,
                 throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,
+                -- Explicit rather than absent when a shop opts out, because
+                -- nil here means "use the server default" and 0 means "never".
+                rerollFrequency = shopDef.rerollFrequency,
                 background = shopDef.background,
                 defaultView = shopDef.defaultView,
                 probability = shopDef.probability,

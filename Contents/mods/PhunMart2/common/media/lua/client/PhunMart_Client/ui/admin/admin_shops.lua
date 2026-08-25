@@ -324,6 +324,10 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             result.probability = f:getFieldNumber("probability")
             result.minDistance = f:getFieldNumber("minDistance")
             result.restockFrequency = f:getFieldNumber("restockFrequency")
+            -- getFieldNumber returns nil for an empty box, which is the third
+            -- state this field needs: nil follows the server setting, 0 opts
+            -- out of it, and a number sets this shop's own pace.
+            result.rerollFrequency = f:getFieldNumber("rerollFrequency")
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
@@ -383,6 +387,16 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
     form:addTextField("minDistance", getText("IGUI_PhunMart_Lbl_MinDistance"), {
         default = def.minDistance and tostring(def.minDistance) or "",
         hint = getText("IGUI_PhunMart_Hint_MinDistance"),
+        integer = true,
+        min = 0,
+        section = "s_basics"
+    })
+    -- Beside the other placement rules, because it is one: how long a machine
+    -- stays this shop before picking another. Blank defers to the server
+    -- setting, 0 opts this shop out of it.
+    form:addTextField("rerollFrequency", getText("IGUI_PhunMart_Lbl_RerollFrequency"), {
+        default = def.rerollFrequency and tostring(def.rerollFrequency) or "",
+        hint = getText("IGUI_PhunMart_Hint_RerollFrequency"),
         integer = true,
         min = 0,
         section = "s_basics"
