@@ -9,7 +9,6 @@ local tools = require "PhunMart_Client/ui/ui_utils"
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
-local CurrencyTool = require "PhunMart_Client/ui/admin/currency_tool"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -311,6 +310,49 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             end
         end or nil,
     })
+
+    -- Directly under the key, above everything it supplies a default for.
+    -- Twenty-five of the shipped prices inherit, and for those the fields below
+    -- are mostly showing the parent's values rather than their own. Reading the
+    -- parent last meant reading four inherited rows before finding out where
+    -- they came from.
+    --
+    -- A combo rather than a typed key, matching the specials editor. It cannot
+    -- name a price that does not exist and cannot name itself, which is what
+    -- the two validations underneath it used to be for.
+    local inheritOptions = {NONE}
+    local inheritKeys = {}
+    for k in pairs(prices) do
+        if k ~= priceKey then
+            table.insert(inheritKeys, k)
+        end
+    end
+    table.sort(inheritKeys)
+    for _, k in ipairs(inheritKeys) do
+        table.insert(inheritOptions, k)
+    end
+    -- An override naming a price that has since gone would otherwise drop off
+    -- the list and read as "(none)", quietly unparenting itself on the next save.
+    if raw.inherit and raw.inherit ~= "" and not prices[raw.inherit] then
+        table.insert(inheritOptions, raw.inherit)
+    end
+
+    form:addComboField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
+        options = inheritOptions,
+        selected = (raw.inherit and raw.inherit ~= "") and raw.inherit or NONE,
+        hint = getText("IGUI_PhunMart_Hint_InheritKey"),
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local parentKey = f:getFieldValue("inherit")
+                local parentRaw = parentKey and parentKey ~= NONE and prices[parentKey]
+                if parentRaw then
+                    createEditModal(parentKey, parentRaw, false, cb)
+                end
+            end
+        }
+    })
+
     -- Prices and specials both store a `kind`, but they mean different things:
     -- here it selects how the player pays, there it is the sort of special.
     -- Separate strings so neither label has to be vague enough to cover both.
@@ -324,7 +366,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         selected = def.pool or "change",
         group = "currency",
     })
-    -- One range rather than an Amount box and a Max box. Leaving the upper half
+    -- One range rather than an Amount box and a Max box. Leaving the second box
     -- blank is a fixed price; filling it makes the price roll between the two.
     --
     -- A range cannot hide half of itself, and the upper bound is only read for
@@ -362,41 +404,6 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
             end)
         end,
-    })
-    -- A combo rather than a typed key, matching the specials editor. It cannot
-    -- name a price that does not exist and cannot name itself, which is what
-    -- the two validations underneath it used to be for.
-    local inheritOptions = {NONE}
-    local inheritKeys = {}
-    for k in pairs(prices) do
-        if k ~= priceKey then
-            table.insert(inheritKeys, k)
-        end
-    end
-    table.sort(inheritKeys)
-    for _, k in ipairs(inheritKeys) do
-        table.insert(inheritOptions, k)
-    end
-    -- An override naming a price that has since gone would otherwise drop off
-    -- the list and read as "(none)", quietly unparenting itself on the next save.
-    if raw.inherit and raw.inherit ~= "" and not prices[raw.inherit] then
-        table.insert(inheritOptions, raw.inherit)
-    end
-
-    form:addComboField("inherit", getText("IGUI_PhunMart_Lbl_Inherit"), {
-        options = inheritOptions,
-        selected = (raw.inherit and raw.inherit ~= "") and raw.inherit or NONE,
-        hint = getText("IGUI_PhunMart_Hint_InheritKey"),
-        button = {
-            text = getText("IGUI_PhunMart_Btn_OpenParent"),
-            onClick = function(f)
-                local parentKey = f:getFieldValue("inherit")
-                local parentRaw = parentKey and parentKey ~= NONE and prices[parentKey]
-                if parentRaw then
-                    createEditModal(parentKey, parentRaw, false, cb)
-                end
-            end
-        }
     })
     form:addTextField("factor", getText("IGUI_PhunMart_Lbl_Factor"), {
         default = factorDefault,
@@ -464,20 +471,13 @@ function UI:createChildren()
         align = "right"
     })
 
-    -- On the Prices tab because that is what it edits, and first because it is
-    -- the one thing here a server owner is most likely to want and least
-    -- likely to find: it is a single edit to currency_base that reprices
-    -- everything inheriting from it.
-    self:addBottomButton(getText("IGUI_PhunMart_Cur_Btn"), self.onCurrencyClick)
+    -- The currency tool was a fourth button here, from before the Tools tab
+    -- existed. It is a one-off setup action rather than an edit to any row in
+    -- this list, and it now has a described row of its own over there. Two
+    -- doors to one dialog is one more than it needs.
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), self.onDeleteClick, true)
-end
-
-function UI:onCurrencyClick()
-    CurrencyTool.open(self.player, function()
-        self:refreshPrices()
-    end)
 end
 
 function UI:onDeleteClick()

@@ -934,6 +934,11 @@ function FormPanel:createChildren()
     self._applyBtn = ISButton:new(btnX, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self,
         FormPanel._onApplyClick)
     self._applyBtn:initialise()
+    -- Guarded the same way as enableCancelColor throughout: these are build 42
+    -- conveniences and an older or modded ISButton may not carry them.
+    if self._applyBtn.enableAcceptColor then
+        self._applyBtn:enableAcceptColor()
+    end
     self:addChild(self._applyBtn)
 
     self._cancelBtn = ISButton:new(btnX + btnW + btnGap, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
@@ -1513,25 +1518,12 @@ function FormPanel:reflowFields()
     -- Extra padding before buttons
     y = y + PAD
 
-    -- Position Apply/Cancel
+    -- Position the button row
     local btnW = math.floor(80 * FONT_SCALE)
     local btnGap = PAD
-    local totalBtnW = btnW * 2 + btnGap
-    local btnX = (self.width - totalBtnW) / 2
 
-    -- With a Back button the row is three wide, so the pair shifts left to keep
-    -- the whole group centred rather than Apply drifting off centre.
-    if self._backBtn and self._backBtn:isVisible() then
-        btnX = (self.width - (btnW * 3 + btnGap * 2)) / 2
-        self._backBtn:setX(btnX)
-        self._backBtn:setY(y)
-        btnX = btnX + btnW + btnGap
-    end
-
-    self._applyBtn:setX(btnX)
-    self._applyBtn:setY(y)
-    self._cancelBtn:setX(btnX + btnW + btnGap)
-    self._cancelBtn:setY(y)
+    -- Left group first, because where it ends decides how much room the right
+    -- group has.
     local leftX = PAD
     if self._deleteBtn then
         self._deleteBtn:setX(leftX)
@@ -1541,7 +1533,31 @@ function FormPanel:reflowFields()
     if self._extraBtn then
         self._extraBtn:setX(leftX)
         self._extraBtn:setY(y)
+        leftX = leftX + self._extraBtn.width + PAD
     end
+
+    -- Apply and Cancel sit at the right edge rather than centred on the window.
+    -- Centred, they were computed from the full width while Delete and the
+    -- extra button grew rightwards from the left edge, so a wide form put four
+    -- buttons in the left two thirds and left a dead third on the right, and a
+    -- narrow one marched the left group into Apply. Right-aligned, the row
+    -- balances at any width and the destructive button stays as far from Apply
+    -- as the form allows.
+    local rightCount = (self._backBtn and self._backBtn:isVisible()) and 3 or 2
+    local groupW = btnW * rightCount + btnGap * (rightCount - 1)
+    -- Never left of where the left group ended: on a form too narrow for both,
+    -- overlapping buttons are worse than an off-centre row.
+    local groupX = math.max(leftX, self.width - PAD - groupW)
+
+    if rightCount == 3 then
+        self._backBtn:setX(groupX)
+        self._backBtn:setY(y)
+        groupX = groupX + btnW + btnGap
+    end
+    self._applyBtn:setX(groupX)
+    self._applyBtn:setY(y)
+    self._cancelBtn:setX(groupX + btnW + btnGap)
+    self._cancelBtn:setY(y)
 
     -- The window was already sized at the top of this function, from the content
     -- rather than from wherever the last field happened to land.

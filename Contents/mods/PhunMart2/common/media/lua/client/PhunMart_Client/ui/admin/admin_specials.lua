@@ -25,6 +25,18 @@ Core.ui.admin_specials = ListPanel:derive(windowName)
 Core.ui.admin_specials.instances = {}
 local UI = Core.ui.admin_specials
 UI._defKind = "specials"
+-- Six templates stand behind 209 children. Folded away by default so the tab
+-- opens on the entries a shop can actually roll.
+UI._hasTemplates = true
+
+--- What to print under the price dropdown: what the chosen key costs.
+local function priceHintFor(key)
+    local text = tools.priceHint(key)
+    if text == "" then
+        return getText("IGUI_PhunMart_Hint_PriceOverride")
+    end
+    return text
+end
 
 -- Format the kind/inherit column for display.
 local function formatType(def)
@@ -785,7 +797,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
         selected = def.price or "",
-        hint = getText("IGUI_PhunMart_Hint_PriceOverride"),
+        -- What it costs, not what the field is for. Same treatment as the
+        -- group price dropdown, which is where most prices are actually set.
+        hint = priceHintFor(def.price),
+        onChange = function(f)
+            f:setHintText("price", priceHintFor(f:getFieldValue("price")))
+        end,
         group = "instance",
         -- Same treatment as Inherits: a field naming another definition can go
         -- and show you it. Reads the combo at click time so it follows a price
@@ -826,16 +843,17 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- applies to the chosen action type at all, `section` says which tab it sits
     -- on. Named by exception, since everything not listed belongs on Basics.
     --
-    -- What a special is and does stays on Basics. What it costs, how often it
-    -- shows up, how many exist, and the whole template apparatus go to Advanced:
-    -- real settings, none of them the reason anybody opened this.
+    -- What a special is, does, and costs stays on Basics. Price was on Advanced
+    -- with the rest, which was wrong: it is not an occasional setting but half
+    -- of what an offer is, and the first thing anyone checks after the action.
+    -- How often it shows up, how many exist, and the whole template apparatus
+    -- stay on Advanced.
     form:assignSections({
         template = "sp_more",
         kind = "sp_more",
         category = "sp_more",
         texture = "sp_more",
         overlay = "sp_more",
-        price = "sp_more",
         weight = "sp_more",
         stock = "sp_more"
     }, "sp_basics")
@@ -933,19 +951,6 @@ end
 
 function UI:rowInFilterTab(itemData, tabKey)
     return tabKey == "all" or itemData.domain == tabKey
-end
-
---- Is this row one of a family that differs only by which skill it names?
---- True when it copies from a template, which is what generation produces:
---- 35 children per base, identical but for a skill. Something an admin wrote
---- by hand has no inherit and is never hidden.
-function UI:isVariation(itemData)
-    if not itemData.inherit then
-        return false
-    end
-    local specials = Core.defs and Core.defs.specials or {}
-    local parent = specials[itemData.inherit]
-    return parent ~= nil and parent.template == true
 end
 
 function UI:getFilterText(itemData)

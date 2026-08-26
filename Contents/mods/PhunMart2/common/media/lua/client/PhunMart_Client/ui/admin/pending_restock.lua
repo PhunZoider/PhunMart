@@ -118,9 +118,16 @@ function Panel:createChildren()
     self.selectAllTick.changeOptionTarget = self
     self:addChild(self.selectAllTick)
 
+    -- Restocking is what this panel exists to do, and Skip beside it is already
+    -- the cancel-coloured one. Only the selected-rows button is coloured: the
+    -- All button next to it acts on every machine in the world, and green is
+    -- the wrong thing to say about that.
     self.restockBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_RestockSelected", "00")),
         BUTTON_HGT, "", self, Panel.onRestock)
     self.restockBtn:initialise()
+    if self.restockBtn.enableAcceptColor then
+        self.restockBtn:enableAcceptColor()
+    end
     self:addChild(self.restockBtn)
 
     self.restockAllBtn = ISButton:new(0, 0, self:btnWidth(getText("IGUI_PhunMart_Btn_RestockAll")), BUTTON_HGT,

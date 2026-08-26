@@ -179,11 +179,19 @@ function EditModal:createChildren()
 
     self.applyBtn = ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Apply"), self, EditModal.onApply)
     self.applyBtn:initialise()
+    if self.applyBtn.enableAcceptColor then
+        self.applyBtn:enableAcceptColor()
+    end
     self:addChild(self.applyBtn)
 
     self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
         EditModal.onCancel)
     self.cancelBtn:initialise()
+    -- This pair had neither colour, so the only thing telling Apply from Cancel
+    -- was the word on it. Matching the rest of the editors.
+    if self.cancelBtn.enableCancelColor then
+        self.cancelBtn:enableCancelColor()
+    end
     self:addChild(self.cancelBtn)
 end
 

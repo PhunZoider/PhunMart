@@ -8,6 +8,7 @@ local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -19,6 +20,18 @@ Core.ui.admin_pools = ListPanel:derive("PhunPoolsAdminUI")
 Core.ui.admin_pools.instances = {}
 local UI = Core.ui.admin_pools
 UI._defKind = "pools"
+
+--- What to print under a price dropdown. A key is a name somebody invented, so
+--- `currency_low` alone never answered the only question being asked, which is
+--- how much. Falls back to describing the field when nothing is chosen, since
+--- an empty hint under an empty dropdown says nothing at all.
+local function priceHintFor(key)
+    local text = tools.priceHint(key)
+    if text == "" then
+        return getText("IGUI_PhunMart_Hint_PoolDefaultPrice")
+    end
+    return text
+end
 
 -- Collect sorted keys from a table.
 local function getSortedKeys(tbl)
@@ -206,6 +219,10 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     local priceKeys = getPriceKeys()
     local currentPrice = def.defaults and def.defaults.price or ""
 
+    local defaultsStock = def.defaults and def.defaults.offer and def.defaults.offer.stock
+    local stockMinDefault = (defaultsStock and defaultsStock.min ~= nil) and tostring(defaultsStock.min) or ""
+    local stockMaxDefault = (defaultsStock and defaultsStock.max ~= nil) and tostring(defaultsStock.max) or ""
+
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPool") or getText("IGUI_PhunMart_Title_EditX", poolKey or "")
 
     local form = FormPanel:new({
@@ -259,6 +276,24 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 result.defaults.price = priceVal
             elseif result.defaults then
                 result.defaults.price = nil
+            end
+
+            -- Defaults stock (optional). The compiler merges the whole of
+            -- poolDef.defaults into every offer this pool builds, so stock has
+            -- always worked here; the form simply never offered it, leaving
+            -- pools the one layer in the chain that could set a price but not
+            -- an amount. Either bound alone is valid, same as the item and
+            -- special editors.
+            local stockMin, stockMax = f:getFieldRange("defaultsStock")
+            if stockMin or stockMax then
+                result.defaults = result.defaults or {}
+                result.defaults.offer = result.defaults.offer or {}
+                result.defaults.offer.stock = {
+                    min = stockMin and math.floor(stockMin) or nil,
+                    max = stockMax and math.floor(stockMax) or nil
+                }
+            elseif result.defaults and result.defaults.offer then
+                result.defaults.offer.stock = nil
             end
 
             -- Zones (optional)
@@ -340,30 +375,55 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 })
         end,
     })
-    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
-        checked = def.sticky == true,
-        text = getText("IGUI_PhunMart_Lbl_Sticky"),
-        hint = getText("IGUI_PhunMart_Hint_Sticky"),
-        section = "p_basics",
-    })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
         checked = def.enabled ~= false,
         hint = getText("IGUI_PhunMart_Hint_PoolEnabled"),
         section = "p_basics",
     })
 
-    -- A price only used where an item names none, and a difficulty gate that
-    -- needs PhunZones to mean anything: real settings, rarely the reason you
-    -- opened a pool.
+    -- A price only used where an item names none, a difficulty gate that needs
+    -- PhunZones to mean anything, and a shelf that never rolls: real settings,
+    -- none of them the reason you opened a pool. Two shipped pools are sticky
+    -- and no admin has ever needed to make a third.
     form:addComboField("defaultsPrice", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceKeys, selected = currentPrice,
-        hint = getText("IGUI_PhunMart_Hint_PoolDefaultPrice"),
+        hint = priceHintFor(currentPrice),
+        section = "p_more",
+        -- Reads the combo at click time so it follows a price just picked,
+        -- matching how Inherits and the specials price field behave.
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local key = f:getFieldValue("defaultsPrice")
+                if key and key ~= "" then
+                    Core.ui.admin_prices.OnEditPrice(getSpecificPlayer(0), key)
+                end
+            end
+        },
+        onChange = function(f)
+            f:setHintText("defaultsPrice", priceHintFor(f:getFieldValue("defaultsPrice")))
+        end,
+    })
+    -- Beside the fallback price, because it is the same idea: what this pool
+    -- hands an offer that names nothing of its own.
+    form:addRangeField("defaultsStock", getText("IGUI_PhunMart_Lbl_Stock"), {
+        minDefault = stockMinDefault,
+        maxDefault = stockMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+        integer = true,
+        min = 0,
         section = "p_more",
     })
     form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
         default = zonesDefault,
         hint = getText("IGUI_PhunMart_Hint_Zones"),
         validate = validateZones,
+        section = "p_more",
+    })
+    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
+        checked = def.sticky == true,
+        text = getText("IGUI_PhunMart_Lbl_Sticky"),
+        hint = getText("IGUI_PhunMart_Hint_Sticky"),
         section = "p_more",
     })
     -- Last resorts, below the group's own. No shipped pool sets either, and a

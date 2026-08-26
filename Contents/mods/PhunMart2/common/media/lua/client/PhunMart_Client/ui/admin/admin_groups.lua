@@ -11,6 +11,7 @@ local VehiclePicker = require "PhunMart_Client/ui/base/vehicle_picker"
 local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -22,6 +23,16 @@ local SCROLLBAR_W = ListPanel.SCROLLBAR_W
 ---------------------------------------------------------------------------
 -- Helpers
 ---------------------------------------------------------------------------
+
+--- What to print under the price dropdown: what the chosen key costs, since
+--- the key itself is a name somebody invented and never answered that.
+local function priceHintFor(key)
+    local text = tools.priceHint(key)
+    if text == "" then
+        return getText("IGUI_PhunMart_Hint_GroupPrice")
+    end
+    return text
+end
 
 local function getSortedKeys(tbl)
     local keys = {}
@@ -377,14 +388,27 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         end,
     })
     -- These two are the group's defaults, applied to every item it contains.
-    -- Their hints both used to read "(optional) Leave blank for default",
-    -- which is circular on a field called Default Price and says nothing at all
-    -- about the far more surprising one below it: that this is what buying
-    -- anything in the group actually hands the player.
-    form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
+    -- "Default Price" with a hint about overrides, which described the one case
+    -- in a thousand and made the ordinary one sound conditional. This is where
+    -- essentially all pricing in the mod is set; pool and shop prices exist to
+    -- catch what falls through. So: called Price, and the hint spends itself on
+    -- the only question anyone has, which is how much `currency_low` is.
+    form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = priceOpts, selected = defaults.price or "",
-        hint = getText("IGUI_PhunMart_Hint_GroupPrice"),
+        hint = priceHintFor(defaults.price),
         section = "g_basics",
+        button = {
+            text = getText("IGUI_PhunMart_Btn_OpenParent"),
+            onClick = function(f)
+                local key = f:getFieldValue("price")
+                if key and key ~= "" then
+                    Core.ui.admin_prices.OnEditPrice(getSpecificPlayer(0), key)
+                end
+            end
+        },
+        onChange = function(f)
+            f:setHintText("price", priceHintFor(f:getFieldValue("price")))
+        end,
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
         checked = def.enabled ~= false,

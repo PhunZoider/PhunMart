@@ -680,6 +680,7 @@ return {
 | `zones.difficulty` | Optional zone difficulty filter (0 to 5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). Checked at placement and restock. Omit for always-eligible. |
 | `sticky`           | Every offer in this pool appears on every restock, bypassing the roll. See below.                                                                                 |
 | `defaults.price`   | Price used by offers in this pool that name none of their own                                                                                                     |
+| `defaults.offer.stock` | `{ min, max }` stock for offers in this pool that set none. Omit `max` for a fixed amount.                                                                     |
 | `blacklist`        | Item keys this pool will not draw, on top of the global blacklist                                                                                                 |
 | `fallbackTexture`  | Icon of last resort, used only when the group supplies none                                                                                                       |
 | `fallbackCategory` | Category label of last resort, same rule                                                                                                                          |

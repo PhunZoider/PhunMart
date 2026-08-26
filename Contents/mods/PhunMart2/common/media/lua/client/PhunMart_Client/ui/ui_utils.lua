@@ -205,6 +205,104 @@ function tools.formatCents(n)
     end
 end
 
+--- What a price key actually costs, in words, resolved through its inherit
+--- chain: "$2.50 - $6.00", "3 tokens", "10x Base.Nails", "free".
+---
+--- Every editor with a price dropdown shows only the key, and a key is a name
+--- somebody invented. `currency_low` says nothing about whether that is pennies
+--- or a fortune, so choosing between two of them meant leaving the form and
+--- opening the price list. Now the hint under the dropdown answers it.
+---
+--- Reports the amount as stored, without applying `factor`, so a scaled child
+--- reads as its own base figure rather than a number that appears nowhere in
+--- its definition.
+function tools.formatPriceAmount(priceDef)
+    if not priceDef then
+        return ""
+    end
+    local kind = tools.resolvePriceField(priceDef, "kind")
+    if kind == "free" then
+        return getText("IGUI_PhunMart_Free")
+    end
+
+    local function amountText(amt, suffix)
+        if type(amt) == "table" then
+            return tostring(amt.min) .. " - " .. tostring(amt.max) .. (suffix or "")
+        end
+        return tostring(amt) .. (suffix or "")
+    end
+
+    if kind == "items" then
+        local items = tools.resolvePriceField(priceDef, "items")
+        local item = tools.resolvePriceField(priceDef, "item")
+        if not item and items and items[1] then
+            item = items[1].item
+        end
+        -- The entry's own amount wins over the line's: a child that overrides
+        -- only `amount` is the common shape, and reading the line would report
+        -- the parent's figure.
+        local amt = priceDef.amount or (items and items[1] and items[1].amount) or 1
+        local name = item or "?"
+        local si = item and getScriptManager():getItem(item)
+        if si then
+            name = si:getDisplayName()
+        end
+        return amountText(amt, "x ") .. name
+    end
+
+    if kind == "self" then
+        -- No item to name: the thing being sold is the thing being paid.
+        return getText("IGUI_PhunMart_Price_Self",
+            amountText(tools.resolvePriceField(priceDef, "amount") or 1))
+    end
+
+    local amount = tools.resolvePriceField(priceDef, "amount")
+    if amount == nil then
+        return ""
+    end
+    local pool = tools.resolvePriceField(priceDef, "pool")
+
+    if pool == "change" then
+        if type(amount) ~= "table" then
+            return tools.formatCents(amount)
+        end
+        -- Both ends in the same shape. formatCents drops the pence on a whole
+        -- number of dollars, which reads fine alone and mismatched in a range:
+        -- currency_low came out "$2.50 - $6". If either end wants pence, both
+        -- get them.
+        local lo, hi = tonumber(amount.min) or 0, tonumber(amount.max) or 0
+        if lo % 100 == 0 and hi % 100 == 0 then
+            return tools.formatCents(lo) .. " - " .. tools.formatCents(hi)
+        end
+        return string.format("$%.2f - $%.2f", lo / 100, hi / 100)
+    end
+
+    if pool == "tokens" then
+        -- Spelled out rather than the "t" suffix the shop grid uses: that is
+        -- compressed for a tile with no room, and there is room here.
+        if type(amount) ~= "table" and tonumber(amount) == 1 then
+            return getText("IGUI_PhunMart_Price_Token", tostring(amount))
+        end
+        return getText("IGUI_PhunMart_Price_Tokens", amountText(amount))
+    end
+
+    return amountText(amount, " " .. tostring(pool or "currency"))
+end
+
+--- The same thing, from a price key rather than a definition. Returns "" for a
+--- key that names nothing, so a caller can print it without checking.
+function tools.priceHint(key)
+    if not key or key == "" then
+        return ""
+    end
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local def = prices[key]
+    if not def then
+        return ""
+    end
+    return tools.formatPriceAmount(def)
+end
+
 --- The order the four machine tiles are read in. ServerObject:getSpriteIndex
 --- maps E to 1, S to 2, W to 3 and anything else to 4, so the list is not the
 --- compass order anyone would guess and a preview has to say which is which.

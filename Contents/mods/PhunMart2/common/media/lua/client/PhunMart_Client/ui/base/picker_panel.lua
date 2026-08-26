@@ -154,6 +154,9 @@ function PickerPanel:createChildren()
     self._okBtn = ISButton:new(0, PAD, btnW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_Apply"), self, self.onOK)
     self._okBtn:initialise()
     self._okBtn:instantiate()
+    if self._okBtn.enableAcceptColor then
+        self._okBtn:enableAcceptColor()
+    end
     self._buttonBar:addChild(self._okBtn)
 
     -- Cancel button

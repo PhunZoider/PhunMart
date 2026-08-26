@@ -182,25 +182,30 @@ function ListPanel:createChildren()
                                  BUTTON_HGT + PAD
     end
 
-    -- A second tickbox for lists whose rows are mostly generated variants of
-    -- one another. Declared by the subclass overriding isVariation, and ticked
-    -- by default: a list where nine rows in ten differ only by a skill name
-    -- opens more usefully with them folded away.
-    if self.isVariation ~= ListPanel.isVariation then
-        local vtick = ISTickBox:new(0, PAD, BUTTON_HGT, BUTTON_HGT, "")
-        vtick:initialise()
-        vtick:instantiate()
-        vtick:addOption(getText("IGUI_PhunMart_Lbl_HideVariations"), nil)
-        vtick:setSelected(1, true)
-        vtick.tooltip = getText("IGUI_PhunMart_Tip_HideVariations")
-        vtick.changeOptionMethod = function()
+    -- A second tickbox for lists holding templates, ticked by default.
+    --
+    -- This used to hide variations instead: the 209 XP and boost entries that
+    -- copy a template and differ only by which skill they name. That was the
+    -- wrong half to fold away. Those are the concrete entries someone came here
+    -- to edit, and hiding them left a list that was mostly templates, so the
+    -- tab opened showing seven rows of scaffolding and nothing you could use.
+    -- A template is the abstraction; it is what a first-time admin does not
+    -- recognise and almost never wants.
+    if self._hasTemplates then
+        local ttick = ISTickBox:new(0, PAD, BUTTON_HGT, BUTTON_HGT, "")
+        ttick:initialise()
+        ttick:instantiate()
+        ttick:addOption(getText("IGUI_PhunMart_Lbl_HideTemplates"), nil)
+        ttick:setSelected(1, true)
+        ttick.tooltip = getText("IGUI_PhunMart_Tip_HideTemplates")
+        ttick.changeOptionMethod = function()
             self:applyFilter()
         end
-        vtick.changeOptionTarget = self
-        self._buttonBar:addChild(vtick)
-        self._hideVariationsTick = vtick
-        self._hideVariationsW = getTextManager():MeasureStringX(UIFont.Small,
-            getText("IGUI_PhunMart_Lbl_HideVariations")) + BUTTON_HGT + PAD
+        ttick.changeOptionTarget = self
+        self._buttonBar:addChild(ttick)
+        self._hideTemplatesTick = ttick
+        self._hideTemplatesW = getTextManager():MeasureStringX(UIFont.Small,
+            getText("IGUI_PhunMart_Lbl_HideTemplates")) + BUTTON_HGT + PAD
     end
 
     -- The "used by" line, as a button rather than drawn text so it can be
@@ -331,8 +336,17 @@ end
 --- Once a definition has a name, the key is no longer what you are reading, so
 --- ordering by it makes an otherwise sorted list look shuffled. Ties fall back
 --- to the key so the order stays stable between sessions.
+---
+--- Templates come first as a block. They are hidden by default, so this only
+--- shows once someone has asked for them, and having asked, they should not
+--- then have to hunt for them among two hundred alphabetised children.
 function ListPanel:sortKeysByName(keys, defs)
     table.sort(keys, function(a, b)
+        local at = (defs[a] and defs[a].template == true) and 0 or 1
+        local bt = (defs[b] and defs[b].template == true) and 0 or 1
+        if at ~= bt then
+            return at < bt
+        end
         local an = (self:titleFor(defs[a]) or a):lower()
         local bn = (self:titleFor(defs[b]) or b):lower()
         if an == bn then
@@ -399,11 +413,11 @@ function ListPanel:rowInFilterTab(itemData, tabKey)
     return true
 end
 
---- Is this row one of many near-identical generated entries? A subclass that
---- overrides this gets a "hide variations" tickbox; the base answer of false
---- means no such box appears, which is right for a list of distinct things.
-function ListPanel:isVariation(itemData)
-    return false
+--- Is this row a template rather than something a shop can actually sell?
+--- Every list stores the flag the same way, so the base answer is usually
+--- right; the tickbox appears only on panels that set `_hasTemplates`.
+function ListPanel:isTemplateRow(itemData)
+    return itemData and itemData.template == true
 end
 
 --- Add a button to the bottom bar (left-aligned).
@@ -589,6 +603,14 @@ function ListPanel:applySort()
     end
     local desc = self._sortDesc
     table.sort(self._allItems, function(x, y)
+        -- Templates stay above everything, whichever column is sorted and
+        -- whichever direction. Sorting by Type or Price otherwise scatters them
+        -- back through the list they were just grouped out of.
+        local xt = self:isTemplateRow(x.data) and 0 or 1
+        local yt = self:isTemplateRow(y.data) and 0 or 1
+        if xt ~= yt then
+            return xt < yt
+        end
         local a = self:sortValue(col, x.data)
         local b = self:sortValue(col, y.data)
         if type(a) ~= type(b) then
@@ -887,7 +909,7 @@ function ListPanel:applyFilter()
     local filterText = typed:lower()
 
     local onlyChanged = self._onlyChangedTick and self._onlyChangedTick:isSelected(1)
-    local hideVariations = self._hideVariationsTick and self._hideVariationsTick:isSelected(1)
+    local hideTemplates = self._hideTemplatesTick and self._hideTemplatesTick:isSelected(1)
 
     -- Before filtering, so the visible rows come out in order. This runs on a
     -- rebuild or a sort change, not per frame.
@@ -908,9 +930,9 @@ function ListPanel:applyFilter()
         end
 
         -- Typing a filter means looking for something specific, and a hidden
-        -- variation is still a real entry, so a search reaches past this.
-        if include and hideVariations and filterText == "" then
-            include = not self:isVariation(entry.data)
+        -- template is still a real entry, so a search reaches past this.
+        if include and hideTemplates and filterText == "" then
+            include = not self:isTemplateRow(entry.data)
         end
 
         if include and filterText ~= "" then
@@ -972,7 +994,7 @@ function ListPanel:prerender()
             actionsW = actionsW + btn.width + PAD
         end
     end
-    local narrowW = PAD + filterLblW + filterMinW + PAD + (self._onlyChangedW or 0) + (self._hideVariationsW or 0)
+    local narrowW = PAD + filterLblW + filterMinW + PAD + (self._onlyChangedW or 0) + (self._hideTemplatesW or 0)
     local twoRows = (narrowW + actionsW + PAD) > w
 
     local topY = PAD
@@ -1012,10 +1034,10 @@ function ListPanel:prerender()
         self._onlyChangedTick:setY(topY)
         narrowRight = tickX - PAD
     end
-    if self._hideVariationsTick then
-        local tickX = narrowRight - self._hideVariationsW
-        self._hideVariationsTick:setX(tickX)
-        self._hideVariationsTick:setY(topY)
+    if self._hideTemplatesTick then
+        local tickX = narrowRight - self._hideTemplatesW
+        self._hideTemplatesTick:setX(tickX)
+        self._hideTemplatesTick:setY(topY)
         narrowRight = tickX - PAD
     end
     if hasFilter then

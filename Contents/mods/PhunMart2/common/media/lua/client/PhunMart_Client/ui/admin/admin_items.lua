@@ -7,6 +7,16 @@ local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
+local tools = require "PhunMart_Client/ui/ui_utils"
+
+--- What to print under the price dropdown: what the chosen key costs.
+local function priceHintFor(key)
+    local text = tools.priceHint(key)
+    if text == "" then
+        return getText("IGUI_PhunMart_Hint_OptionalDefault")
+    end
+    return text
+end
 
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
@@ -103,14 +113,20 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
 
             result.offer.weight = f:getFieldNumber("weight") or 1.0
 
+            -- Either bound alone is a valid shape, so this takes what it is
+            -- given rather than demanding the pair. The compiler reads a
+            -- missing max as "same as min", which is how you write a fixed
+            -- stock of three; requiring both discarded that entry silently and
+            -- turned it back into unlimited. The specials editor has always
+            -- accepted it this way.
             local stockMin, stockMax = f:getFieldRange("stock")
-            if stockMin and stockMax then
+            if stockMin or stockMax then
                 result.offer.stock = {
-                    min = math.floor(stockMin),
-                    max = math.floor(stockMax)
+                    min = stockMin and math.floor(stockMin) or nil,
+                    max = stockMax and math.floor(stockMax) or nil
                 }
             else
-                -- Blank stock means unlimited; clear any previous limit.
+                -- Both blank means unlimited; clear any previous limit.
                 result.offer.stock = nil
             end
 
@@ -154,7 +170,10 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
 
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = priceKeys, selected = def.price or priceKeys[1],
-        hint = getText("IGUI_PhunMart_Hint_OptionalDefault"),
+        hint = priceHintFor(def.price or priceKeys[1]),
+        onChange = function(f)
+            f:setHintText("price", priceHintFor(f:getFieldValue("price")))
+        end,
         section = "i_basics",
         button = {
             text = getText("IGUI_PhunMart_Btn_OpenParent"),
@@ -183,7 +202,7 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
     form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
         minDefault = stockMinDefault, maxDefault = stockMaxDefault,
         hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
-        integer = true, min = 0, requireBoth = true,
+        integer = true, min = 0,
         section = "i_basics",
     })
     form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled"), {
@@ -229,6 +248,7 @@ Core.ui.admin_items = ListPanel:derive("PhunItemsAdminUI")
 Core.ui.admin_items.instances = {}
 local UI = Core.ui.admin_items
 UI._defKind = "items"
+UI._hasTemplates = true
 
 --- Build this panel as a view for the tabbed shell. The shell owns the size
 --- and position, so both are placeholders until its first layout pass.

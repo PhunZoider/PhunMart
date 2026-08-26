@@ -928,6 +928,9 @@ function WeightEditor._Panel:createChildren()
         WeightEditor._Panel.onCancel)
     self.okBtn:initialise()
     self.okBtn:instantiate()
+    if self.okBtn.enableAcceptColor then
+        self.okBtn:enableAcceptColor()
+    end
     self:addChild(self.okBtn)
     self.cancelBtn:initialise()
     self.cancelBtn:instantiate()
@@ -1052,6 +1055,9 @@ function MoveToPoolModal._Panel:createChildren()
     self.okBtn =
         ISButton:new(btnX, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Move"), self, MoveToPoolModal._Panel.onOK)
     self.okBtn:initialise()
+    if self.okBtn.enableAcceptColor then
+        self.okBtn:enableAcceptColor()
+    end
     self:addChild(self.okBtn)
 
     self.cancelBtn = ISButton:new(btnX + btnW + btnGap, y, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Cancel"), self,
