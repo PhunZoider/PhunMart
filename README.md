@@ -9,7 +9,7 @@ automatically**, no config needed. Right-click a machine, browse the shop UI, an
 **change** (coins found as loot) or **tokens** (earned through milestones and trade-ins).
 Admins can place machines manually and override every aspect of the system through Lua files.
 
-> **Requires:** Project Zomboid Build 42.15+ (singleplayer or multiplayer)
+> **Requires:** Project Zomboid Build 42 (singleplayer or multiplayer)
 > **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) for zone-difficulty filtering on shop pools
 
 ![Shop in the apocolypse](Docs/images/shopping.png)
