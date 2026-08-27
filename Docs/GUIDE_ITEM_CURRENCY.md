@@ -39,8 +39,8 @@ reasonable item counts — `currency_50` with `amount = 50` and `factor = 0.04` 
 
 Most of the built-in prices inherit from `currency_base`. That key ships as:
 
-```lua
-currency_base = { kind = "currency", pool = "change", amount = 1, factor = 1 }
+```json
+"currency_base": { "kind": "currency", "pool": "change", "amount": 1, "factor": 1 }
 ```
 
 Child prices like `currency_25`, `currency_50`, `currency_150` etc. inherit the `kind`,
@@ -52,16 +52,16 @@ child price becomes an item-barter cost instead of a wallet deduction.
 
 ## Override file
 
-If you prefer to set this up outside the game, create or edit `PhunMart_Prices.txt` in your
+If you prefer to set this up outside the game, create or edit `PhunMart_Prices.json` in your
 server's `Zomboid/Lua/` folder:
 
-```lua
-return {
-    currency_base = {
-        kind   = "items",
-        items  = {{ item = "Base.Money", amount = 1 }},
-        factor = 0.04
-    },
+```json
+{
+  "currency_base": {
+    "kind": "items",
+    "items": [{ "item": "Base.Money", "amount": 1 }],
+    "factor": 0.04
+  }
 }
 ```
 
@@ -74,18 +74,19 @@ inherited factor to produce the final item count.
 You only need to override a child if you want it to deviate from the factor-scaled result.
 For example, if `currency_25` should cost exactly 3 instead of `ceil(25 * 0.04) = 1`:
 
-```lua
-return {
-    currency_base = {
-        kind   = "items",
-        items  = {{ item = "Base.Money", amount = 1 }},
-        factor = 0.04
-    },
+```json
+{
+  "currency_base": {
+    "kind": "items",
+    "items": [{ "item": "Base.Money", "amount": 1 }],
+    "factor": 0.04
+  },
 
-    -- Override just this one child
-    currency_25 = { inherit = "currency_base", amount = 3, factor = 1 },
+  "currency_25": { "inherit": "currency_base", "amount": 3, "factor": 1 }
 }
 ```
+
+The `currency_25` entry overrides just that one child.
 
 Setting `factor = 1` on the child prevents the parent's 0.04 from scaling the explicit
 amount of 3.

@@ -8,7 +8,7 @@ local Core = PhunMart
 Core.killRewards = {}
 local R = Core.killRewards
 
-local SAVE_FILE = "PhunMart_KillTracking.txt"
+local SAVE_FILE = "PhunMart_KillTracking.json"
 
 -- Persistent data loaded from / saved to SAVE_FILE.
 -- username → {

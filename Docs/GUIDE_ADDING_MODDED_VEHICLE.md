@@ -75,42 +75,53 @@ Follow steps 1 and 2 from the quick start, but create one special per script nam
 with a single entry in Action Args. Then add all the resulting special keys to the group's
 **Specials (By key)** field. As many variants as you have, that many times through the flow.
 
-**Route B -- Edit `PhunMart_Specials.txt` directly**
+**Route B -- Edit `PhunMart_Specials.json` directly**
 
-Create the file `Zomboid/Lua/PhunMart_Specials.txt` (or add to it if it already exists) and
+Create the file `Zomboid/Lua/PhunMart_Specials.json` (or add to it if it already exists) and
 define one entry per variant:
 
-```lua
-return {
-    vehicle_91range_a = {
-        inherit = "vehicle_base",
-        price = "vehicle_rare",
-        offer = { weight = 1.0, stock = { min = 1, max = 1 } },
-        display = { text = "91 Range Rover (Sand)" },
-        actions = {{ type = "spawnVehicle", scripts = {"91range"}, args = {
-            condition = { min = 85, max = 100 }, fuel = { min = 0.3, max = 0.7 }
-        }}}
-    },
-    vehicle_91range_b = {
-        inherit = "vehicle_base",
-        price = "vehicle_rare",
-        offer = { weight = 1.0, stock = { min = 1, max = 1 } },
-        display = { text = "91 Range Rover (Green)" },
-        actions = {{ type = "spawnVehicle", scripts = {"91range2"}, args = {
-            condition = { min = 85, max = 100 }, fuel = { min = 0.3, max = 0.7 }
-        }}}
-    },
+```json
+{
+  "vehicle_91range_a": {
+    "inherit": "vehicle_base",
+    "price": "vehicle_rare",
+    "offer": { "weight": 1.0, "stock": { "min": 1, "max": 1 } },
+    "display": { "text": "91 Range Rover (Sand)" },
+    "actions": [{
+      "type": "spawnVehicle",
+      "scripts": ["91range"],
+      "args": {
+        "condition": { "min": 85, "max": 100 },
+        "fuel": { "min": 0.3, "max": 0.7 }
+      }
+    }]
+  },
+
+  "vehicle_91range_b": {
+    "inherit": "vehicle_base",
+    "price": "vehicle_rare",
+    "offer": { "weight": 1.0, "stock": { "min": 1, "max": 1 } },
+    "display": { "text": "91 Range Rover (Green)" },
+    "actions": [{
+      "type": "spawnVehicle",
+      "scripts": ["91range2"],
+      "args": {
+        "condition": { "min": 85, "max": 100 },
+        "fuel": { "min": 0.3, "max": 0.7 }
+      }
+    }]
+  }
 }
 ```
 
 Then add both keys to the group via the admin Groups editor (**Specials (By key)**), or in
-`PhunMart_Groups.txt`:
+`PhunMart_Groups.json`:
 
-```lua
-return {
-    vehicles_luxury = {
-        specials = {"vehicle_91range_a", "vehicle_91range_b"},
-    },
+```json
+{
+  "vehicles_luxury": {
+    "specials": ["vehicle_91range_a", "vehicle_91range_b"]
+  }
 }
 ```
 

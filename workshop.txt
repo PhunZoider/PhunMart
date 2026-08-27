@@ -53,6 +53,17 @@ description=Both pools have configurable caps, earn rates, and death-recovery se
 description=
 description=[b]Want to use a different currency?[/b] PhunMart supports [b]any physical item as payment[/b] — cash items, gold bars, tokens from other mods, custom items. If it exists in the game, it can be a currency. See the guide below for setup.
 description=
+description=[h2]Upgrading from before B42.20.4[/h2]
+description=B42.20.4 removed loadstring, which is what the game used to read the old .txt config files. Config files are now JSON, and an old .txt cannot be read at all.
+description=
+description=Your old files are left exactly where they are, and the server log names any it cannot read at startup. To bring your customisations across, run each PhunMart_*.txt through the converter and save the result beside it with a .json extension. The converter runs entirely in your browser and uploads nothing.
+description=
+description=[url=https://phunzoider.github.io/PhunZones/converter/]Phun configuration converter[/url]
+description=
+description=This covers the player data files too: PhunMart_Wallet.txt, PhunMart_Purchases.txt, PhunMart_KillTracking.txt and PhunMart_PlaytimeTracking.txt. Wallet balances also live in the save, so those survive either way, but purchase history and reward progress come back only once their files are converted. Convert before players return and nothing is lost.
+description=
+description=If you have never hand-edited these files, everything the mod wrote converts cleanly. Only a file with real Lua logic in it has to be rewritten by hand.
+description=
 description=[h2]Customisation[/h2]
 description=PhunMart is deeply configurable, but to keep this page readable the full guides live here:
 description=
@@ -75,7 +86,7 @@ description=[list]
 description=[*][b]Does it work with ExtraMoney / other currency mods?[/b] PhunMart can use any physical item as currency. If your currency mod adds an in-game item (like cash or coins), you can set that item as the payment method. See the currency guide above.
 description=[*][b]Can players sell items?[/b] Yes. The built-in PrawnStars pawn shop lets players sell valuables back for change.
 description=[*][b]Can I create my own shops from scratch?[/b] Yes. Define custom pools, groups, pricing, conditions, and sprites. The admin tools let you do most of this in-game.
-description=[*][b]What happens to my customisations when updating?[/b] All customisations are saved to your file system. They survive restarts, wipes, and version updates.
+description=[*][b]What happens to my customisations when updating?[/b] All customisations are saved to your file system. They survive restarts, wipes, and version updates. The one exception is the move to JSON described above: your files are still there and still yours, but they need converting once before the game can read them again.
 description=[*][b]Does it work in Single Player?[/b] Yes. Designed for multiplayer servers but fully functional in SP.
 description=[*][b]Can I add into existing game?[/b] Yes
 description=[*][b]Where can I see it in action?[/b] SP, your own server, or [url=https://discord.gg/v2USyAtP6q]come play on ours[/url].

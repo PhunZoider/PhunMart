@@ -85,35 +85,35 @@ Commands[Core.commands.upsertGroupDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.txt", "groups", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.json", "groups", args.key, args.def)
 end
 
 Commands[Core.commands.upsertItemDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Items.txt", "items", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Items.json", "items", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPriceDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.txt", "prices", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.json", "prices", args.key, args.def)
 end
 
 Commands[Core.commands.upsertSpecialDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Specials.txt", "specials", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Specials.json", "specials", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.txt", "pools", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.json", "pools", args.key, args.def)
 end
 
 Commands[Core.commands.getTokenRewards] = function(playerObj, args)
@@ -130,7 +130,7 @@ Commands[Core.commands.saveTokenRewards] = function(playerObj, args)
         return
     end
     Core.tokenRewardsCfg = args.cfg or {}
-    Core.fileUtils.saveTable("PhunMart_TokenRewards.txt", Core.tokenRewardsCfg)
+    Core.fileUtils.saveTable("PhunMart_TokenRewards.json", Core.tokenRewardsCfg)
     -- Reload the reward modules so they pick up the new config.
     if Core.playtimeRewards then
         Core.playtimeRewards:load()
@@ -811,7 +811,7 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     if not (poolKey and itemKey) then
         return
     end
-    local override = Core.fileUtils.loadTable("PhunMart_Pools.txt") or {}
+    local override = Core.fileUtils.loadTable("PhunMart_Pools.json") or {}
     override[poolKey] = override[poolKey] or {}
     override[poolKey].blacklist = override[poolKey].blacklist or {}
     -- avoid duplicates
@@ -821,7 +821,7 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
         end
     end
     table.insert(override[poolKey].blacklist, itemKey)
-    Core.fileUtils.saveTable("PhunMart_Pools.txt", override)
+    Core.fileUtils.saveTable("PhunMart_Pools.json", override)
     Core.ServerSystem.instance:recompileShops()
 end
 

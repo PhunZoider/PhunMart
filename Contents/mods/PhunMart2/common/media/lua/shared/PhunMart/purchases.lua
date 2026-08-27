@@ -1,6 +1,11 @@
 require("PhunMart/core")
 local Core = PhunMart
 
+-- Named once rather than repeated in load and save. A pair of literals that
+-- disagreed would read from one file and write to another, which loses the
+-- history without anything looking wrong.
+local SAVE_FILE = "PhunMart_Purchases.json"
+
 Core.purchases = {}
 
 local function getCharname(player)
@@ -72,9 +77,9 @@ function Core.purchases:getCount(scope, username, charId, key, windowSeconds)
 end
 
 function Core.purchases:load()
-    self.histories = Core.fileUtils.loadTable("PhunMart_Purchases.txt")
+    self.histories = Core.fileUtils.loadTable(SAVE_FILE)
 end
 
 function Core.purchases:save()
-    Core.fileUtils.saveTable("PhunMart_Purchases.txt", self.histories or {})
+    Core.fileUtils.saveTable(SAVE_FILE, self.histories or {})
 end

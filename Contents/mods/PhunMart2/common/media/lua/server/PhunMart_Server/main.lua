@@ -27,13 +27,13 @@ function Core.compile()
     -- These are sent to clients via requestShopDefs so they can recompile locally
     -- using their own shared defaults + these overrides (no FS access on clients).
     local overrides = {
-        prices = overridePatch({"PhunMart_Prices.txt"}),
-        specials = overridePatch({"PhunMart_Specials.txt", "PhunMart_XP_Rewards.txt"}),
-        conditionsDefs = overridePatch({"PhunMart_Conditions.txt", "PhunMart_XP_Conditions.txt"}),
-        items = overridePatch({"PhunMart_Items.txt", "PhunMart_XP_Items.txt"}),
-        groups = overridePatch({"PhunMart_Groups.txt"}),
-        pools = overridePatch({"PhunMart_Pools.txt"}),
-        shops = overridePatch({"PhunMart_Shops.txt"})
+        prices = overridePatch({"PhunMart_Prices.json"}),
+        specials = overridePatch({"PhunMart_Specials.json", "PhunMart_XP_Rewards.json"}),
+        conditionsDefs = overridePatch({"PhunMart_Conditions.json", "PhunMart_XP_Conditions.json"}),
+        items = overridePatch({"PhunMart_Items.json", "PhunMart_XP_Items.json"}),
+        groups = overridePatch({"PhunMart_Groups.json"}),
+        pools = overridePatch({"PhunMart_Pools.json"}),
+        shops = overridePatch({"PhunMart_Shops.json"})
     }
     Core._lastOverrides = overrides
     return Core.compileWith(overrides)
@@ -323,7 +323,7 @@ function Core:ini()
 
     -- Load token rewards config: try server override file first, then built-in defaults.
     local ok, tokenDefaults = pcall(require, "PhunMart/defaults/token_rewards")
-    Core.tokenRewardsCfg = Core.fileUtils.loadTable("PhunMart_TokenRewards.txt") or (ok and tokenDefaults) or {}
+    Core.tokenRewardsCfg = Core.fileUtils.loadTable("PhunMart_TokenRewards.json") or (ok and tokenDefaults) or {}
 
     -- Wire playtime and kill-tracking modules.
     require "PhunMart_Server/rewards_playtime"

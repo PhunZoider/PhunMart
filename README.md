@@ -7,7 +7,7 @@ Stock rotates on a timer. Coins come from scavenging. Tokens come from surviving
 Shops source from the game's item catalogue by category, so **modded items show up
 automatically** — no config needed. Right-click a machine, browse the shop UI, and buy with
 **change** (coins found as loot) or **tokens** (earned through milestones and trade-ins).
-Admins can place machines manually and override every aspect of the system through Lua files.
+Admins can place machines manually and override every aspect of the system through JSON files.
 
 > **Requires:** Project Zomboid Build 42.15+ (singleplayer or multiplayer)
 > **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) — zone-difficulty filtering on shop pools
@@ -133,9 +133,17 @@ permissive and show all pools.
 
 ## Customisation
 
-Everything is data-driven and overridable without touching the mod. Drop override files into
-your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
+Everything is data-driven and overridable without touching the mod. Drop JSON override files
+into your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
 rewards on top of the built-in defaults.
+
+> **Upgrading from before B42.20.4?** The config files used to be Lua tables in `.txt` files.
+> That build removed `loadstring`, so the game can no longer read them, and the files are now
+> `.json`. Your old files are left untouched and the server log names any it cannot read.
+> Convert them with the
+> [Phun configuration converter](https://phunzoider.github.io/PhunZones/converter/), which runs
+> in your browser and uploads nothing. See
+> [Converting your old config files](Docs/CUSTOMISATION.md#converting-your-old-config-files).
 
 Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** — common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.

@@ -8,7 +8,7 @@ local Core = PhunMart
 Core.playtimeRewards = {}
 local R = Core.playtimeRewards
 
-local SAVE_FILE = "PhunMart_PlaytimeTracking.txt"
+local SAVE_FILE = "PhunMart_PlaytimeTracking.json"
 
 -- Persistent data loaded from / saved to SAVE_FILE.
 -- username → { totalMinutes = N, playtimeRewards = { ["60"] = lastMultiple, ... } }

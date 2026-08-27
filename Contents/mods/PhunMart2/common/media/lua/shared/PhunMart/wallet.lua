@@ -1,6 +1,11 @@
 require "PhunMart/core"
 local Core = PhunMart
 
+-- Named once rather than repeated in load and save. A pair of literals that
+-- disagreed would read from one file and write to another, which is a silent
+-- way to lose everybody's balances.
+local SAVE_FILE = "PhunMart_Wallet.json"
+
 -- Currency items map to pools. Each coin adds its value (in cents or count) to the pool.
 -- Pools are what get stored and checked against prices.
 Core.wallet = {
@@ -263,7 +268,7 @@ end
 -- Survives server crashes between game saves.
 function Core.wallet:save()
     if Core.fileUtils then
-        Core.fileUtils.saveTable("PhunMart_Wallet.txt", self.data or {})
+        Core.fileUtils.saveTable(SAVE_FILE, self.data or {})
     end
 end
 
@@ -271,7 +276,7 @@ function Core.wallet:load()
     if not Core.fileUtils then
         return
     end
-    local saved = Core.fileUtils.loadTable("PhunMart_Wallet.txt")
+    local saved = Core.fileUtils.loadTable(SAVE_FILE)
     if not saved then
         return
     end

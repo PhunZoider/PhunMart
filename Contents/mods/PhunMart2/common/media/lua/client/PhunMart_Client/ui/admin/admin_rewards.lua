@@ -447,7 +447,7 @@ if Core.isLocal then
         Core.tokenRewardsCfg = args.cfg or {}
         -- In SP, also persist via fileUtils if available on the server side.
         if Core.fileUtils and Core.fileUtils.saveTable then
-            Core.fileUtils.saveTable("PhunMart_TokenRewards.txt", Core.tokenRewardsCfg)
+            Core.fileUtils.saveTable("PhunMart_TokenRewards.json", Core.tokenRewardsCfg)
         end
         if Core.playtimeRewards then
             Core.playtimeRewards:load()

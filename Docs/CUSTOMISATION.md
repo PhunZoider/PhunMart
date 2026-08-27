@@ -1,8 +1,12 @@
 # PhunMart -- Customisation Guide
 
 PhunMart is fully data-driven. Everything about what shops sell, what things cost, what
-conditions gate a purchase, and how tokens are earned is defined in plain Lua config files
+conditions gate a purchase, and how tokens are earned is defined in plain JSON config files
 that you can override without touching the mod itself.
+
+> **Upgrading from before B42.20.4?** These files used to be Lua tables in `.txt` files. That
+> build removed `loadstring`, so the game can no longer read them, and the config files are
+> now `.json`. See [Converting your old config files](#converting-your-old-config-files).
 
 ---
 
@@ -32,37 +36,37 @@ Each concept is a named, reusable definition stored in its own override file. Re
 top-down shows how to design a shop; bottom-up shows how data flows at compile time.
 
 ```
-SHOP  (PhunMart_Shops.txt)
+SHOP  (PhunMart_Shops.json)
   Machine sprite, pool sets, default pricing & roll count
   │
   └─► POOL SET  (defined inline on the shop)
         Roll count, default price for this shelf
         │
-        └─► POOL  (PhunMart_Pools.txt)
+        └─► POOL  (PhunMart_Pools.json)
               Which groups to draw from; zone gating
               │
-              └─► GROUP  (PhunMart_Groups.txt)
+              └─► GROUP  (PhunMart_Groups.json)
                     Which game items or specials to include; default price & weight
                     │
                     ├─► game item catalogue  (via `categories` or explicit `items`)
                     ├─► SPECIAL  (via `specialCategories` or explicit `specials`)
                     │
-                    └─► ITEM / OFFER  (PhunMart_Items.txt)
+                    └─► ITEM / OFFER  (PhunMart_Items.json)
                           Per-offer overrides: price, weight, stock, conditions
                           │
-                          ├─► PRICE  (PhunMart_Prices.txt)
-                          └─► CONDITIONS  (PhunMart_Conditions.txt)
+                          ├─► PRICE  (PhunMart_Prices.json)
+                          └─► CONDITIONS  (PhunMart_Conditions.json)
 ```
 
 | Layer          | Override file             | Controls                                            |
 | -------------- | ------------------------- | --------------------------------------------------- |
-| **Shop**       | `PhunMart_Shops.txt`      | Sprite, pool sets, pricing, roll count, spawn rules |
-| **Pool**       | `PhunMart_Pools.txt`      | Which groups to draw from; zone gating              |
-| **Group**      | `PhunMart_Groups.txt`     | Which items or specials are eligible; default price |
-| **Special**    | `PhunMart_Specials.txt`   | What the player receives (trait, XP, vehicle, etc.) |
-| **Item/Offer** | `PhunMart_Items.txt`      | Per-offer weight, stock, price, conditions          |
-| **Price**      | `PhunMart_Prices.txt`     | Cost in change, tokens, or inventory items          |
-| **Condition**  | `PhunMart_Conditions.txt` | Who can buy it and how many times                   |
+| **Shop**       | `PhunMart_Shops.json`      | Sprite, pool sets, pricing, roll count, spawn rules |
+| **Pool**       | `PhunMart_Pools.json`      | Which groups to draw from; zone gating              |
+| **Group**      | `PhunMart_Groups.json`     | Which items or specials are eligible; default price |
+| **Special**    | `PhunMart_Specials.json`   | What the player receives (trait, XP, vehicle, etc.) |
+| **Item/Offer** | `PhunMart_Items.json`      | Per-offer weight, stock, price, conditions          |
+| **Price**      | `PhunMart_Prices.json`     | Cost in change, tokens, or inventory items          |
+| **Condition**  | `PhunMart_Conditions.json` | Who can buy it and how many times                   |
 
 ---
 
@@ -77,25 +81,27 @@ below is a standalone override file you drop into `Zomboid/Lua/`. See
 Make all food shops cheaper. `currency_low` is the default price used by GoodPhoods --
 override just the `amount` field.
 
-`PhunMart_Prices.txt`
+`PhunMart_Prices.json`
 
-```lua
-return {
-    currency_low = { amount = 15 },   -- was 25 ($0.25) → now 15 ($0.15)
+```json
+{
+  "currency_low": { "amount": 15 }
 }
 ```
+
+The shipped value is 25, which is $0.25, so that drops it to $0.15.
 
 ### Blacklist items from all shops
 
 Prevent specific items from appearing in any shop. No recompile needed -- takes effect on
 next restock.
 
-`PhunMart_Items.txt`
+`PhunMart_Items.json`
 
-```lua
-return {
-    ["Base.Katana"]   = { blacklisted = true },
-    ["Base.Crowbar"]  = { blacklisted = true },
+```json
+{
+  "Base.Katana": { "blacklisted": true },
+  "Base.Crowbar": { "blacklisted": true }
 }
 ```
 
@@ -107,13 +113,13 @@ right-click an item → **Add to blacklist**.
 Add specific items to an existing group so they appear in that group's pools. This merges
 with the built-in list.
 
-`PhunMart_Groups.txt`
+`PhunMart_Groups.json`
 
-```lua
-return {
-    tools_general = {
-        items = { "Base.Sledgehammer", "Base.Crowbar" }
-    },
+```json
+{
+  "tools_general": {
+    "items": ["Base.Sledgehammer", "Base.Crowbar"]
+  }
 }
 ```
 
@@ -121,26 +127,28 @@ return {
 
 Require Carpentry 3+ to buy a specific item, and limit it to one purchase per player.
 
-`PhunMart_Conditions.txt`
+`PhunMart_Conditions.json`
 
-```lua
-return {
-    carpentryMid = {
-        test = "perkLevelBetween",
-        args = { perk = "Carpentry", min = 3 }
-    },
+```json
+{
+  "carpentryMid": {
+    "test": "perkLevelBetween",
+    "args": { "perk": "Carpentry", "min": 3 }
+  }
 }
 ```
 
-`PhunMart_Items.txt`
+`PhunMart_Items.json`
 
-```lua
-return {
-    ["Base.Sledgehammer"] = {
-        conditions = { "carpentryMid", "onceOnly" },   -- "onceOnly" is built-in
-    },
+```json
+{
+  "Base.Sledgehammer": {
+    "conditions": ["carpentryMid", "onceOnly"]
+  }
 }
 ```
+
+`onceOnly` is built in, so only `carpentryMid` needs defining.
 
 ### Add vehicles from another mod
 
@@ -151,13 +159,15 @@ covers it in two steps using the in-game admin UI -- no Lua editing required.
 
 Make WrentAWreck restock weekly instead of using the server default.
 
-`PhunMart_Shops.txt`
+`PhunMart_Shops.json`
 
-```lua
-return {
-    WrentAWreck = { restockFrequency = 168 },   -- 168 hours = 7 days
+```json
+{
+  "WrentAWreck": { "restockFrequency": 168 }
 }
 ```
+
+`restockFrequency` is in hours, so 168 is seven days.
 
 ### Switch all prices to a physical item
 
@@ -173,16 +183,16 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 
 | Override file                | Patches                 |
 | ---------------------------- | ----------------------- |
-| `PhunMart_Prices.txt`        | Prices                  |
-| `PhunMart_Specials.txt`      | Specials                |
-| `PhunMart_Conditions.txt`    | Conditions              |
-| `PhunMart_Items.txt`         | Offer items             |
-| `PhunMart_XP_Items.txt`      | XP offer items          |
-| `PhunMart_XP_Conditions.txt` | XP conditions           |
-| `PhunMart_Groups.txt`        | Item groups             |
-| `PhunMart_Pools.txt`         | Pools                   |
-| `PhunMart_Shops.txt`         | Shops                   |
-| `PhunMart_TokenRewards.txt`  | Token reward milestones |
+| `PhunMart_Prices.json`        | Prices                  |
+| `PhunMart_Specials.json`      | Specials                |
+| `PhunMart_Conditions.json`    | Conditions              |
+| `PhunMart_Items.json`         | Offer items             |
+| `PhunMart_XP_Items.json`      | XP offer items          |
+| `PhunMart_XP_Conditions.json` | XP conditions           |
+| `PhunMart_Groups.json`        | Item groups             |
+| `PhunMart_Pools.json`         | Pools                   |
+| `PhunMart_Shops.json`         | Shops                   |
+| `PhunMart_TokenRewards.json`  | Token reward milestones |
 
 **Deep merge rules:**
 
@@ -190,81 +200,131 @@ your server's `Zomboid/Lua/` folder patches on top of those defaults using a dee
 - Arrays are replaced entirely (not merged element-by-element).
 - Setting a key to a new value in your override replaces it.
 - You only need to include the keys you want to change -- everything else stays as-is.
-- `PhunMart_TokenRewards.txt` is loaded in full (not merged) -- copy the whole file before editing.
+- `PhunMart_TokenRewards.json` is loaded in full (not merged) -- copy the whole file before editing.
 
-Each override file must `return {}` with your changes as a Lua table.
+Each override file is a single JSON object holding your changes.
+
+### Converting your old config files
+
+Before B42.20.4 these files were Lua tables in `.txt` files, and the mod read them with
+`loadstring`. That build removed `loadstring`, `load` and `loadfile`, so there is no longer any
+way for the game to read Lua source at runtime. The config files are JSON instead, and an old
+`.txt` cannot be read at all.
+
+Your old files are left exactly where they are. Nothing deletes or rewrites them, and they stay
+readable as a backup for as long as you want to keep them. What the mod does is notice them: if
+`PhunMart_Pools.txt` is present and `PhunMart_Pools.json` is not, the server log says so at
+startup and points at the converter, and the settings in that file are not applied until you
+convert it.
+
+This applies to the player data files too, not just the overrides:
+`PhunMart_Wallet.txt`, `PhunMart_Purchases.txt`, `PhunMart_KillTracking.txt` and
+`PhunMart_PlaytimeTracking.txt`. Wallet balances also live in the save, so those survive
+regardless, but purchase history and reward progress come back only once their files are
+converted. Convert them before players return, and nothing is lost.
+
+To convert:
+
+1. Back up your existing `.txt` files.
+2. Open the [Phun configuration converter](https://phunzoider.github.io/PhunZones/converter/).
+   It runs entirely in your browser and does not upload anything.
+3. Drag each old `PhunMart_*.txt` file onto the page, or paste its contents.
+4. Download the `.json` file it produces.
+5. Put it in the same folder as the old file, with the same name and a `.json` extension:
+   `PhunMart_Pools.txt` becomes `PhunMart_Pools.json`.
+6. Restart the server and check the log for any file it is still complaining about.
+7. Keep the `.txt` files until you have confirmed everything came across.
+
+Where the files live:
+
+| Setup            | Folder                                            |
+| ---------------- | ------------------------------------------------- |
+| Single-player    | `%UserProfile%\Zomboid\Lua\`                      |
+| Dedicated server | `%UserProfile%\Zomboid\Server\<server-name>\Lua\` |
+
+On a multiplayer server these files exist only on the server. Clients have no copy and need no
+conversion.
+
+The converter accepts data tables only. It rejects functions, calls and expressions, so a
+config file with real Lua logic in it has to be rewritten by hand: there is no version of the
+new runtime that can execute it. If you never hand-edited these files, everything the mod
+itself wrote will convert cleanly.
 
 ---
 
 ## 4. Prices
 
-File: `PhunMart_Prices.txt`
+File: `PhunMart_Prices.json`
 
 Named price definitions. Referenced by pool sets (as `price`) on shops, by groups (as `defaults.price`), and by individual offers (as `price`).
 
-```lua
-return {
+```json
+{
+  "free": { "kind": "free" },
 
-    -- Free -- no cost
-    free = { kind = "free" },
+  "currency_25": {
+    "kind": "currency",
+    "pool": "change",
+    "amount": 25
+  },
 
-    -- Currency -- deducted from the player's wallet
-    -- pool = "change"  (loose coin balance, stored in cents: 25 = $0.25)
-    -- pool = "tokens"  (bound tokens, integer count)
-    currency_25 = {
-        kind   = "currency",
-        pool   = "change",
-        amount = 25          -- $0.25
-    },
+  "currency_low": {
+    "kind": "currency",
+    "pool": "change",
+    "amount": { "min": 250, "max": 600 }
+  },
 
-    -- Amount can be a fixed number or a random range rolled per restock
-    currency_low = {
-        kind   = "currency",
-        pool   = "change",
-        amount = { min = 250, max = 600 }   -- $2.50–$6.00
-    },
+  "token_1": {
+    "kind": "currency",
+    "pool": "tokens",
+    "amount": 1
+  },
 
-    token_1 = {
-        kind   = "currency",
-        pool   = "tokens",
-        amount = 1
-    },
+  "nails_10": {
+    "kind": "items",
+    "items": [{ "item": "Base.Nails", "amount": 10 }]
+  },
 
-    -- Physical items -- items consumed from the player's inventory (barter)
-    nails_10 = {
-        kind  = "items",
-        items = { { item = "Base.Nails", amount = 10 } }
-    },
+  "recipe_bundle": {
+    "kind": "items",
+    "items": [
+      { "item": "Base.Nails", "amount": 5 },
+      { "item": "Base.Plank", "amount": 3 }
+    ]
+  },
 
-    -- Multiple item costs
-    recipe_bundle = {
-        kind  = "items",
-        items = {
-            { item = "Base.Nails",  amount = 5 },
-            { item = "Base.Plank",  amount = 3 },
-        }
-    },
+  "denim_barter": {
+    "kind": "items",
+    "items": [{
+      "item": "Base.CraftedDenimShirt",
+      "substitutes": ["Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random"],
+      "amount": 3
+    }]
+  },
 
-    -- Substitutes -- colour/style variants that count as equivalent payment.
-    -- Primary item is consumed first; substitutes fill the remainder.
-    denim_barter = {
-        kind  = "items",
-        items = {{
-            item        = "Base.CraftedDenimShirt",
-            substitutes = { "Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random" },
-            amount      = 3
-        }}
-    },
-
-    -- Self-pay -- collector/pawn offers where the displayed item IS the cost.
-    -- Substitutes work here too (add at top level instead of per-item).
-    self_with_subs = {
-        kind        = "self",
-        amount      = 3,
-        substitutes = { "Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random" }
-    },
+  "self_with_subs": {
+    "kind": "self",
+    "amount": 3,
+    "substitutes": ["Base.CraftedDenimShirt_White", "Base.CraftedDenimShirt_Random"]
+  }
 }
 ```
+
+Taking those in turn:
+
+- `free` costs nothing.
+- `currency_25` and `currency_low` are deducted from the player's wallet. `pool` picks which
+  balance: `change` is the loose coin balance and is stored in cents, so `25` is $0.25 and the
+  `250` to `600` range is $2.50 to $6.00. `tokens`, as in `token_1`, is an integer count of
+  bound tokens.
+- `amount` is either a fixed number or a `min`/`max` range, which is rolled once per restock.
+- `nails_10` and `recipe_bundle` are barter: the items are consumed from the player's
+  inventory, and a price can name more than one.
+- `substitutes` on an item lists colour or style variants that count as equivalent payment.
+  The primary item is consumed first and the substitutes fill the remainder.
+- `self_with_subs` is a self-pay price, used by collector and pawn offers where the item on
+  display *is* the cost. Substitutes work here too, but sit at the top level rather than
+  inside `items`.
 
 ### Using a physical item as currency
 
@@ -277,7 +337,7 @@ property to scale the entire price tree in one step. See the dedicated guide:
 
 ## 5. Specials
 
-File: `PhunMart_Specials.txt`
+File: `PhunMart_Specials.json`
 
 Named special definitions -- non-item actions the player receives (traits, XP, boosts, vehicles).
 Supports inheritance via `inherit` to avoid repetition. Templates (`template = true`) are base
@@ -285,25 +345,25 @@ definitions not used as offers directly.
 
 ### Template and inheritance
 
-```lua
-return {
+```json
+{
+  "trait_add_base": {
+    "template": true,
+    "kind": "trait",
+    "category": "trait_add",
+    "display": { "texture": "media/textures/icons/trait_add.png" }
+  },
 
-    -- Base template: all trait-add specials share these defaults
-    trait_add_base = {
-        template = true,
-        kind     = "trait",
-        category = "trait_add",
-        display  = { texture = "media/textures/icons/trait_add.png" }
-    },
-
-    -- Concrete special inheriting the template
-    add_brave = {
-        inherit  = "trait_add_base",
-        display  = { text = "Gain: Brave" },
-        actions  = { { type = "addTrait", trait = "base:brave" } }
-    },
+  "add_brave": {
+    "inherit": "trait_add_base",
+    "display": { "text": "Gain: Brave" },
+    "actions": [{ "type": "addTrait", "trait": "base:brave" }]
+  }
 }
 ```
+
+`trait_add_base` is the template every trait-add special shares; `add_brave` is a concrete
+special inheriting from it.
 
 The `inherit` key copies all fields from the named entry, then the local fields override them.
 Only one level of inheritance is supported.
@@ -326,12 +386,15 @@ See [Reference: special kinds](#14-reference-special-kinds) for full action sche
 
 The `display` block controls what the shop UI shows for a special:
 
-```lua
-display = {
-    text    = "Gain: Brave",          -- label in shop grid and details panel
-    texture = "Item_Notebook",        -- icon (game texture name or mod-relative path)
+```json
+"display": {
+  "text": "Gain: Brave",
+  "texture": "Item_Notebook"
 }
 ```
+
+`text` is the label in the shop grid and the details panel. `texture` is the icon, given as
+either a game texture name or a path relative to the mod.
 
 If `display.texture` is omitted for an item special, the game icon for that item is used.
 
@@ -339,45 +402,43 @@ If `display.texture` is omitted for an item special, the game icon for that item
 
 ## 6. Conditions
 
-File: `PhunMart_Conditions.txt`
+File: `PhunMart_Conditions.json`
 
 Named condition definitions. Referenced in offer `conditions` arrays and pool `defaults.conditions`.
 A condition is a named test applied server-side at purchase time and client-side for UI feedback.
 
-```lua
-return {
+```json
+{
+  "minHours": {
+    "test": "worldAgeHoursBetween",
+    "args": { "min": 10 }
+  },
 
-    -- Only available after 10 in-game hours
-    minHours = {
-        test = "worldAgeHoursBetween",
-        args = { min = 10 }
-    },
+  "lowCarpentry": {
+    "test": "perkLevelBetween",
+    "args": { "perk": "Woodwork", "min": 1, "max": 3 }
+  },
 
-    -- Player must have Woodwork skill between levels 1 and 3
-    lowCarpentry = {
-        test = "perkLevelBetween",
-        args = { perk = "Woodwork", min = 1, max = 3 }
-    },
+  "onceOnly": {
+    "test": "purchaseCountMax",
+    "args": { "max": 1, "scope": "player_item_shop" }
+  },
 
-    -- Limit purchases to 1 per player per shop per item (across all sessions)
-    onceOnly = {
-        test  = "purchaseCountMax",
-        args  = { max = 1, scope = "player_item_shop" }
-    },
+  "onlyCarpenters": {
+    "test": "professionIn",
+    "args": { "professions": ["carpenter"] }
+  },
 
-    -- Player must have a profession from the list
-    onlyCarpenters = {
-        test = "professionIn",
-        args = { professions = { "carpenter" } }
-    },
-
-    -- Player must have these items in their inventory
-    requiresNails = {
-        test = "hasItems",
-        args = { items = { { item = "Base.Nails", amount = 10 } } }
-    },
+  "requiresNails": {
+    "test": "hasItems",
+    "args": { "items": [{ "item": "Base.Nails", "amount": 10 }] }
+  }
 }
 ```
+
+In order: available only after 10 in-game hours; Woodwork between levels 1 and 3; one purchase
+per player per shop per item across all sessions; a profession drawn from the list; and the
+named items present in the player's inventory.
 
 See [Reference: condition tests](#13-reference-condition-tests) for all available tests.
 
@@ -385,49 +446,49 @@ See [Reference: condition tests](#13-reference-condition-tests) for all availabl
 
 ## 7. Items (Offers)
 
-File: `PhunMart_Items.txt`
+File: `PhunMart_Items.json`
 
 Named offer definitions. These are the individual purchasable slots in a pool. Each offer
 links a `price`, a `reward` (special key), and optional `conditions` and `offer` behaviour.
 
-```lua
-return {
+```json
+{
+  "offer:my_pistol": {
+    "price": "currency_high",
+    "reward": "reward_pistol",
+    "offer": {
+      "weight": 1.0
+    }
+  },
 
-    -- Simple item offer
-    ["offer:my_pistol"] = {
-        price  = "currency_high",     -- key from Prices
-        reward = "reward_pistol",     -- key from Specials
-        offer  = {
-            weight = 1.0              -- relative probability during selection
-        }
-    },
+  "vehicle:SmallCar": {
+    "price": "vehicle_common",
+    "reward": "vehicle_smallcar",
+    "offer": {
+      "weight": 1.0,
+      "stock": {
+        "min": 0,
+        "max": 1,
+        "restockHours": 168
+      }
+    }
+  },
 
-    -- Offer with limited stock and restock timer
-    ["vehicle:SmallCar"] = {
-        price  = "vehicle_common",
-        reward = "vehicle_smallcar",
-        offer  = {
-            weight = 1.0,
-            stock  = {
-                min          = 0,
-                max          = 1,
-                restockHours = 168    -- 1 week in-game
-            }
-        }
-    },
-
-    -- Offer gated by conditions
-    ["offer:rare_sword"] = {
-        price      = "currency_high",
-        reward     = "reward_katana",
-        conditions = { "minHours", "onceOnly" },   -- all must pass
-        offer      = { weight = 0.3 }
-    },
+  "offer:rare_sword": {
+    "price": "currency_high",
+    "reward": "reward_katana",
+    "conditions": ["minHours", "onceOnly"],
+    "offer": { "weight": 0.3 }
+  }
 }
 ```
 
+`price` is a key from Prices and `reward` a key from Specials. `offer.weight` is the relative
+probability during selection. The `restockHours` of 168 above is one in-game week. Every key
+listed in `conditions` must pass.
+
 **Key naming convention:** Items that belong to a logical type use a namespace prefix
-(`offer:`, `vehicle:`, etc.) as a readability aid. The colon syntax requires bracket notation.
+(`offer:`, `vehicle:`, etc.) as a readability aid.
 
 ### Offer fields
 
@@ -447,11 +508,11 @@ Pool sets on shops supply a default `price` that applies to all offers rolled fr
 
 ## 8. Groups
 
-File: `PhunMart_Groups.txt`
+File: `PhunMart_Groups.json`
 
 Groups define which game items or specials are eligible for a pool. For item-type shops the
 preferred approach is to source by **category** rather than listing items individually. A
-single category line like `categories = { "Clothing" }` automatically covers every clothing
+single category line like `"categories": ["Clothing"]` automatically covers every clothing
 item in the game -- hundreds of items in one declaration. It's also mod-compatible: any mod
 that adds items in that category gets included for free, with no config changes required.
 
@@ -465,60 +526,59 @@ specials by their `category` field, or `specials` to include specific special ke
 For adding vehicles from another mod to WrentAWreck, see
 [Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md).
 
-```lua
-return {
-
-    -- Category-based: covers every tool in the game, including from mods
-    tools_general = {
-        defaults = {
-            price = "currency_mid",
-            offer = { weight = 1.0 }
-        },
-        categories = { "Tool", "ToolWeapon" }
+```json
+{
+  "tools_general": {
+    "defaults": {
+      "price": "currency_mid",
+      "offer": { "weight": 1.0 }
     },
+    "categories": ["Tool", "ToolWeapon"]
+  },
 
-    -- Include specific items only
-    crafts_sewing = {
-        defaults = {
-            price = "currency_low",
-            offer = { weight = 0.8 }
-        },
-        items = { "Base.Scissors", "Base.Thread" }
+  "crafts_sewing": {
+    "defaults": {
+      "price": "currency_low",
+      "offer": { "weight": 0.8 }
     },
+    "items": ["Base.Scissors", "Base.Thread"]
+  },
 
-    -- Broad category with unwanted items removed
-    food_fresh = {
-        defaults = {
-            price = "currency_xlow",
-            offer = { weight = 1.0 }
-        },
-        categories = { "Food" },
-        blacklist = {
-            "Base.Crisps", "Base.BeerBottle",   -- individual IDs to exclude
-        },
-        blacklistCategories = { "Alcohol" }      -- whole sub-categories to exclude
+  "food_fresh": {
+    "defaults": {
+      "price": "currency_xlow",
+      "offer": { "weight": 1.0 }
     },
+    "categories": ["Food"],
+    "blacklist": ["Base.Crisps", "Base.BeerBottle"],
+    "blacklistCategories": ["Alcohol"]
+  },
 
-    -- Override the icon and category label shown in the shop UI for this group
-    vehicles_small = {
-        label          = "Small Cars",
-        fallbackTexture = "Item_CarKey",
-        defaults = {
-            price = "vehicle_common",
-            offer = { weight = 1.0 }
-        },
-        items = { "SmallCar", "SmallCar02", "CarTaxi" }
+  "vehicles_small": {
+    "label": "Small Cars",
+    "fallbackTexture": "Item_CarKey",
+    "defaults": {
+      "price": "vehicle_common",
+      "offer": { "weight": 1.0 }
     },
+    "items": ["SmallCar", "SmallCar02", "CarTaxi"]
+  },
 
-    -- Special-category group: wraps specials by their category field
-    traits_add = {
-        label           = "Positive Traits",
-        fallbackTexture = "media/textures/icons/trait_add.png",
-        fallbackCategory = "Positive Traits",
-        specialCategories = { "trait_add" }
-    },
+  "traits_add": {
+    "label": "Positive Traits",
+    "fallbackTexture": "media/textures/icons/trait_add.png",
+    "fallbackCategory": "Positive Traits",
+    "specialCategories": ["trait_add"]
+  }
 }
 ```
+
+`tools_general` is category-based and so covers every tool in the game, mods included.
+`crafts_sewing` names its items explicitly. `food_fresh` takes a broad category and then
+removes what it does not want: `blacklist` excludes individual item IDs and
+`blacklistCategories` excludes whole sub-categories. `vehicles_small` overrides the icon and
+category label shown in the shop UI. `traits_add` is a special-category group, wrapping
+specials by their `category` field rather than listing game items.
 
 ### Group fields
 
@@ -540,28 +600,30 @@ return {
 
 ## 9. Pools
 
-File: `PhunMart_Pools.txt`
+File: `PhunMart_Pools.json`
 
 Pools control which groups contribute to a shop shelf. They don't set pricing or roll counts
 -- those live on the pool set or shop (see [Shops](#10-shops)).
 
-```lua
-return {
-    pool_goodphoods = {
-        sources = {
-            groups = { "food_fresh", "food_cooking_utensils" }
-        }
-    },
+```json
+{
+  "pool_goodphoods": {
+    "sources": {
+      "groups": ["food_fresh", "food_cooking_utensils"]
+    }
+  },
 
-    -- Zone-gated: only appears in difficulty 3+ zones (requires PhunZones)
-    pool_finalamendment_guns = {
-        zones = { difficulty = { 3, 4 } },
-        sources = {
-            groups = { "weapons_firearms", "weapons_parts" }
-        }
-    },
+  "pool_finalamendment_guns": {
+    "zones": { "difficulty": [3, 4] },
+    "sources": {
+      "groups": ["weapons_firearms", "weapons_parts"]
+    }
+  }
 }
 ```
+
+`pool_finalamendment_guns` is zone-gated, appearing only in difficulty 3 and 4 zones, which
+requires PhunZones.
 
 | Field              | Description                                                                                                                                                       |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -572,47 +634,50 @@ return {
 
 ## 10. Shops
 
-File: `PhunMart_Shops.txt`
+File: `PhunMart_Shops.json`
 
 Shops bind a machine sprite to one or more pools via **pool sets**. Each pool set merges its
 pools into one candidate list, then rolls a random subset.
 
-```lua
-return {
+```json
+{
+  "PittyTheTool": {
+    "category": "Tool",
+    "background": "machine-pity-the-tool.png",
+    "sprites": ["phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"],
+    "unpoweredSprites": ["phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"],
+    "roll": { "mode": "weighted", "count": { "min": 5, "max": 8 } },
+    "poolSets": [
+      {
+        "price": "currency_mid",
+        "keys": [{ "key": "pool_pittythetool", "weight": 1.0 }]
+      }
+    ]
+  },
 
-    -- Simple: one pool set, shop-level roll and price
-    PittyTheTool = {
-        category         = "Tool",
-        background       = "machine-pity-the-tool.png",
-        sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
-        unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
-        roll = { mode = "weighted", count = { min = 5, max = 8 } },
-        poolSets = {
-            { price = "currency_mid",
-              keys = {{ key = "pool_pittythetool", weight = 1.0 }} },
-        }
-    },
-
-    -- Blended: multiple pools in ONE set merge into a single menu.
-    -- The weight on each key scales that pool's offer weights.
-    BudgetXPerience = {
-        category    = "XP",
-        defaultView = "list",
-        background  = "machine-budget-xp.png",
-        sprites     = { "phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43" },
-        unpoweredSprites = { "phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47" },
-        roll = { mode = "weighted", count = { min = 4, max = 8 } },
-        poolSets = {{
-            keys = {
-                { key = "pool_xp_budget",    weight = 1.0 },
-                { key = "pool_boost_budget", weight = 0.5 },   -- boosts appear ~half as often
-                { key = "pool_xp_gifted",    weight = 1.0 },
-                { key = "pool_boost_gifted", weight = 0.5 },
-            }
-        }}
-    },
+  "BudgetXPerience": {
+    "category": "XP",
+    "defaultView": "list",
+    "background": "machine-budget-xp.png",
+    "sprites": ["phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"],
+    "unpoweredSprites": ["phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"],
+    "roll": { "mode": "weighted", "count": { "min": 4, "max": 8 } },
+    "poolSets": [{
+      "keys": [
+        { "key": "pool_xp_budget", "weight": 1.0 },
+        { "key": "pool_boost_budget", "weight": 0.5 },
+        { "key": "pool_xp_gifted", "weight": 1.0 },
+        { "key": "pool_boost_gifted", "weight": 0.5 }
+      ]
+    }]
+  }
 }
 ```
+
+`PittyTheTool` is the simple case: one pool set, with the roll and price set at shop level.
+`BudgetXPerience` is blended, putting several pools in *one* set so they merge into a single
+menu. The weight on each key scales that pool's offer weights, which is why the boost pools at
+`0.5` appear about half as often as the XP pools beside them.
 
 ### Shop fields
 
@@ -649,39 +714,42 @@ menu (e.g. BudgetXPerience merges XP and boost pools into one selection).
 
 ## 11. Token Rewards
 
-File: `PhunMart_TokenRewards.txt`
+File: `PhunMart_TokenRewards.json`
 
 Controls when players automatically receive currency. This file is loaded in full -- copy the
 entire example file and edit it. It is not merged with defaults; your file replaces them.
 
-```lua
-return {
+```json
+{
+  "playtime": [
+    { "atMinutes": 10, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "atMinutes": 60, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "atMinutes": 300, "rewards": [{ "item": "PhunMart.Token", "amount": 2 }] }
+  ],
 
-    -- Playtime milestones -- one-time each, atMinutes = cumulative real-world minutes online
-    playtime = {
-        { atMinutes = 10,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
-        { atMinutes = 60,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
-        { atMinutes = 300, rewards = { { item = "PhunMart.Token", amount = 2 } } },
-        -- Mix in other items at a milestone:
-        -- { atMinutes = 600, rewards = {
-        --     { item = "PhunMart.Token", amount = 5 },
-        --     { item = "Base.Katana",    amount = 1 },
-        -- }},
-    },
+  "zombieKills": [
+    { "kills": 100, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "kills": 500, "rewards": [{ "item": "PhunMart.Token", "amount": 2 }] },
+    { "kills": 1000, "rewards": [{ "item": "PhunMart.Token", "amount": 5 }] }
+  ],
 
-    -- Normal zombie kill milestones -- one-time each per wipe
-    zombieKills = {
-        { kills = 100,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
-        { kills = 500,  rewards = { { item = "PhunMart.Token", amount = 2 } } },
-        { kills = 1000, rewards = { { item = "PhunMart.Token", amount = 5 } } },
-    },
-
-    -- Sprinter kill milestones
-    sprinterKills = {
-        { kills = 50,  rewards = { { item = "PhunMart.Token", amount = 1 } } },
-        { kills = 200, rewards = { { item = "PhunMart.Token", amount = 3 } } },
-    },
+  "sprinterKills": [
+    { "kills": 50, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "kills": 200, "rewards": [{ "item": "PhunMart.Token", "amount": 3 }] }
+  ]
 }
+```
+
+Every milestone is one-time. `atMinutes` counts cumulative real-world minutes online, and the
+kill milestones reset per wipe.
+
+A milestone can hand over more than one thing, since `rewards` is an array:
+
+```json
+{ "atMinutes": 600, "rewards": [
+  { "item": "PhunMart.Token", "amount": 5 },
+  { "item": "Base.Katana", "amount": 1 }
+]}
 ```
 
 ### Reward items
@@ -743,46 +811,53 @@ Use `/dumppz perks` (admin command) to get the full list for your server.
 
 ### `kind = "item"` -- spawn an item
 
-```lua
-actions = { { type = "giveItem", item = "Base.BaseballBat", amount = 1 } }
+```json
+"actions": [{ "type": "giveItem", "item": "Base.BaseballBat", "amount": 1 }]
 ```
 
 ### `kind = "trait"` -- add or remove a trait
 
-```lua
--- Add a positive trait
-actions = { { type = "addTrait",    trait = "base:brave" } }
+Add a positive trait:
 
--- Remove a negative trait
-actions = { { type = "removeTrait", trait = "base:slowlearner" } }
+```json
+"actions": [{ "type": "addTrait", "trait": "base:brave" }]
+```
+
+Remove a negative one:
+
+```json
+"actions": [{ "type": "removeTrait", "trait": "base:slowlearner" }]
 ```
 
 Trait keys follow the `base:<name>` format. Use `/dumppz traits` to list all trait keys.
 
 ### `kind = "skill"` -- grant XP to a perk
 
-```lua
-actions = { { type = "giveXP", perk = "Cooking", amount = 150 } }
+```json
+"actions": [{ "type": "giveXP", "perk": "Cooking", "amount": 150 }]
 ```
 
 ### `kind = "boost"` -- apply a temporary XP multiplier
 
-```lua
-actions = { { type = "applyBoost", perk = "Cooking", multiplier = 2.0, durationHours = 4 } }
+```json
+"actions": [{ "type": "applyBoost", "perk": "Cooking", "multiplier": 2.0, "durationHours": 4 }]
 ```
 
 ### `kind = "vehicle"` -- spawn a vehicle
 
-```lua
-actions = { {
-    type    = "spawnVehicle",
-    scripts = { "SmallCar", "SmallCar02" },   -- one chosen at random
-    args    = {
-        condition = { min = 40, max = 80 },   -- vehicle condition %
-        fuel      = { min = 0.2, max = 0.6 }, -- fuel level 0–1
-    }
-} }
+```json
+"actions": [{
+  "type": "spawnVehicle",
+  "scripts": ["SmallCar", "SmallCar02"],
+  "args": {
+    "condition": { "min": 40, "max": 80 },
+    "fuel": { "min": 0.2, "max": 0.6 }
+  }
+}]
 ```
+
+One of the `scripts` is chosen at random. `condition` is a vehicle condition percentage and
+`fuel` is a fuel level from 0 to 1.
 
 Use `scripts` (array) to pick randomly from multiple variants, or `script` (string) for a single type.
 Vehicle script names come from the game's vehicle script database -- use `/dumppz vehicles` to list them.
@@ -792,8 +867,8 @@ For a step-by-step walkthrough of adding vehicles from another mod, see
 
 ### `kind = "collector"` -- grant bound tokens
 
-```lua
-actions = { { type = "grantBoundTokens", amount = 2 } }
+```json
+"actions": [{ "type": "grantBoundTokens", "amount": 2 }]
 ```
 
 Used by the Collectors machine. The displayed item IS the price (the player hands over
@@ -803,8 +878,8 @@ shop grid is the item the player must bring.
 
 ### `kind = "pawn"` -- credit change to the wallet
 
-```lua
-actions = { { type = "adjustBalance", pool = "change", amount = 500 } }
+```json
+"actions": [{ "type": "adjustBalance", "pool": "change", "amount": 500 }]
 ```
 
 Used by the PrawnStars machine. Same flow as collectors -- the player hands over items
@@ -822,109 +897,113 @@ seven override files.
 
 ### Step 1 -- Define prices
 
-`PhunMart_Prices.txt`
+`PhunMart_Prices.json`
 
-```lua
-return {
-    tools_cheap  = { kind = "currency", pool = "change", amount = 50  },  -- $0.50
-    tools_normal = { kind = "currency", pool = "change", amount = 150 },  -- $1.50
-    tools_pricey = { kind = "currency", pool = "change", amount = 500 },  -- $5.00
+```json
+{
+  "tools_cheap": { "kind": "currency", "pool": "change", "amount": 50 },
+  "tools_normal": { "kind": "currency", "pool": "change", "amount": 150 },
+  "tools_pricey": { "kind": "currency", "pool": "change", "amount": 500 }
 }
 ```
+
+Amounts are in cents, so those are $0.50, $1.50 and $5.00.
 
 ### Step 2 -- Define a special (optional)
 
 Only needed for non-item actions (trait grants, XP boosts, vehicle spawns). Regular items
 sourced from a group don't need a special entry.
 
-`PhunMart_Specials.txt`
+`PhunMart_Specials.json`
 
-```lua
-return {
-    reward_sledgehammer = {
-        kind    = "item",
-        actions = { { type = "giveItem", item = "Base.Sledgehammer", amount = 1 } },
-        display = { text = "Sledgehammer" }
-    },
+```json
+{
+  "reward_sledgehammer": {
+    "kind": "item",
+    "actions": [{ "type": "giveItem", "item": "Base.Sledgehammer", "amount": 1 }],
+    "display": { "text": "Sledgehammer" }
+  }
 }
 ```
 
 ### Step 3 -- Define conditions (optional)
 
-`PhunMart_Conditions.txt`
+`PhunMart_Conditions.json`
 
-```lua
-return {
-    carpentryMid = {
-        test = "perkLevelBetween",
-        args = { perk = "Carpentry", min = 3 }
-    },
+```json
+{
+  "carpentryMid": {
+    "test": "perkLevelBetween",
+    "args": { "perk": "Carpentry", "min": 3 }
+  }
 }
 ```
 
 ### Step 4 -- Register the special as an offer
 
-`PhunMart_Items.txt`
+`PhunMart_Items.json`
 
-```lua
-return {
-    ["offer:sledgehammer_special"] = {
-        price      = "tools_pricey",
-        reward     = "reward_sledgehammer",
-        conditions = { "carpentryMid", "onceOnly" },
-        offer      = { weight = 0.5 }
-    },
+```json
+{
+  "offer:sledgehammer_special": {
+    "price": "tools_pricey",
+    "reward": "reward_sledgehammer",
+    "conditions": ["carpentryMid", "onceOnly"],
+    "offer": { "weight": 0.5 }
+  }
 }
 ```
 
 ### Step 5 -- Define the item group
 
-`PhunMart_Groups.txt`
+`PhunMart_Groups.json`
 
-```lua
-return {
-    bobs_tools = {
-        defaults = {
-            price = "tools_normal",
-            offer = { weight = 1.0 }
-        },
-        categories = { "Tool", "ToolWeapon" },
-        blacklistCategories = { "WeaponCrafted", "JunkWeapon", "InstrumentWeapon" }
+```json
+{
+  "bobs_tools": {
+    "defaults": {
+      "price": "tools_normal",
+      "offer": { "weight": 1.0 }
     },
+    "categories": ["Tool", "ToolWeapon"],
+    "blacklistCategories": ["WeaponCrafted", "JunkWeapon", "InstrumentWeapon"]
+  }
 }
 ```
 
 ### Step 6 -- Define the pool
 
-`PhunMart_Pools.txt`
+`PhunMart_Pools.json`
 
-```lua
-return {
-    pool_bobshardware = {
-        sources = {
-            groups = { "bobs_tools" }
-        }
-    },
+```json
+{
+  "pool_bobshardware": {
+    "sources": {
+      "groups": ["bobs_tools"]
+    }
+  }
 }
 ```
 
 ### Step 7 -- Define the shop
 
-`PhunMart_Shops.txt`
+`PhunMart_Shops.json`
 
-```lua
-return {
-    BobsHardware = {
-        category         = "Tool",
-        background       = "machine-hard-wear.png",
-        sprites          = { "phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27" },
-        unpoweredSprites = { "phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31" },
-        roll = { mode = "weighted", count = { min = 5, max = 8 } },
-        poolSets = {
-            { price = "tools_normal",
-              keys = {{ key = "pool_bobshardware", weight = 1.0 }} },
-        }
-    },
+```json
+{
+  "BobsHardware": {
+    "category": "Tool",
+    "background": "machine-hard-wear.png",
+    "sprites": ["phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"],
+    "unpoweredSprites": ["phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"],
+    "roll": { "mode": "weighted", "count": { "min": 5, "max": 8 } },
+    "poolSets": [
+      {
+        "price": "tools_normal",
+        "keys": [{ "key": "pool_bobshardware", "weight": 1.0 }]
+      }
+    ]
+  }
 }
 ```
 

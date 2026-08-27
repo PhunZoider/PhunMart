@@ -363,7 +363,7 @@ function ServerSystem:getShopList()
 end
 
 function ServerSystem:upsertShopDefinition(data)
-    self:upsertDefinition("PhunMart_Shops.txt", "shops", data.type, data)
+    self:upsertDefinition("PhunMart_Shops.json", "shops", data.type, data)
 end
 
 --- Generic upsert: diff against defaults, merge into override file, save, recompile.
