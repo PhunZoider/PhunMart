@@ -336,6 +336,13 @@ function ServerSystem:closestShopKeysTo(x, y)
 end
 
 -- Returns true if at least one pool in the shop's poolSets passes the zone filter at (x, y).
+--
+-- Zones only, deliberately: a pool's months gate is not consulted here. A shop
+-- is placed once and then stands there through every month that follows, so
+-- refusing to place one in November because its seasonal pool is out of season
+-- would only make the shop rarer without making it any less empty in January.
+-- Seasonal pools are filtered where it can actually change with the calendar,
+-- which is buildOffers on each restock.
 local function shopHasEligiblePool(shopDef, x, y)
     local fn = Core.poolPassesZoneFilter
     for _, poolSet in ipairs(shopDef.poolSets or {}) do

@@ -179,6 +179,103 @@ function utils.diffTable(original, edited)
     return hasDiff and diff or nil
 end
 
+-- Parse a pool's `months` restriction into a lookup set keyed 1-12.
+--
+-- Accepts either the array form the pool editor writes ({11, 12}) or a CSV
+-- string ("11,12"), because the JSON overrides are hand-authored as often as
+-- they are generated and both spellings read as obviously correct.
+--
+-- Returns nil for anything empty, meaning no restriction: a blank months is
+-- "sells year round", never "sells in no month at all". Values outside 1-12
+-- are dropped and returned in a second list so the caller can say so; a typo
+-- like month 13 would otherwise silently narrow a pool's season.
+function utils.parseMonths(value)
+    if value == nil or value == "" then
+        return nil, nil
+    end
+
+    local raw = {}
+    if type(value) == "string" then
+        for s in value:gmatch("[^,]+") do
+            table.insert(raw, s:match("^%s*(.-)%s*$"))
+        end
+    elseif type(value) == "table" then
+        for _, v in ipairs(value) do
+            table.insert(raw, v)
+        end
+    else
+        return nil, {tostring(value)}
+    end
+
+    local set, count, invalid = {}, 0, nil
+    for _, entry in ipairs(raw) do
+        local n = tonumber(entry)
+        if n and n == math.floor(n) and n >= 1 and n <= 12 then
+            if not set[n] then
+                set[n] = true
+                count = count + 1
+            end
+        else
+            invalid = invalid or {}
+            table.insert(invalid, tostring(entry))
+        end
+    end
+
+    if count == 0 then
+        return nil, invalid
+    end
+    return set, invalid
+end
+
+-- Normalise a months set back to a sorted array, for storage and display.
+function utils.monthsToList(set)
+    if type(set) ~= "table" then
+        return nil
+    end
+    local list = {}
+    for m = 1, 12 do
+        if set[m] then
+            table.insert(list, m)
+        end
+    end
+    if #list == 0 then
+        return nil
+    end
+    return list
+end
+
+-- The in-game calendar month as 1-12.
+--
+-- GameTime numbers months from zero, which is why vanilla farming, foraging
+-- and Seasons all write getMonth() + 1 before comparing against a 1-12 value.
+-- Everything in this mod works in the 1-12 space, so the adjustment is made
+-- once, here, rather than at each call site.
+--
+-- Returns nil if there is no clock yet, which is reachable during load.
+function utils.currentGameMonth()
+    local gt = getGameTime and getGameTime()
+    if not gt then
+        return nil
+    end
+    return gt:getMonth() + 1
+end
+
+-- Whether a compiled pool is in season for the given 1-12 month.
+--
+-- Permissive in both directions: a pool with no months restriction sells all
+-- year, and an unknown month (no clock) sells rather than hides. A seasonal
+-- pool quietly vanishing is much harder to diagnose than one that lingers.
+function utils.poolInSeason(pool, month)
+    local months = pool and pool.months
+    if not months then
+        return true
+    end
+    if not month then
+        return true
+    end
+    return months[month] == true
+end
+
 function utils.formatWholeNumber(n)
     n = tonumber(n) or 0
     local rounded = math.floor(n + 0.5)

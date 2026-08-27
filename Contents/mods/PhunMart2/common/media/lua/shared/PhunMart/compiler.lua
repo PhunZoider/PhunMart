@@ -1056,11 +1056,20 @@ function Compiler.compileAll(ctx)
 
     for poolKey, poolDef in pairs(resolved.pools) do
         if not gatedOut(poolDef) and poolDef.template ~= true then
+            -- Seasonal gate, resolved once here rather than on every restock.
+            -- Stored as a set keyed 1-12 so the runtime check is a lookup.
+            local months, badMonths = Core.utils.parseMonths(poolDef.months)
+            if badMonths then
+                logger:warn("Pool '" .. poolKey .. "' has months values outside 1-12, ignoring: " ..
+                                table.concat(badMonths, ", "))
+            end
+
             local poolRuntime = {
                 key = poolKey,
                 sticky = poolDef.sticky == true,
                 gate = poolDef.gate,
                 zones = poolDef.zones,
+                months = months,
                 offers = {}
             }
 

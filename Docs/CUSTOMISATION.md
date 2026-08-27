@@ -50,7 +50,7 @@ SHOP  (PhunMart_Shops.json)
         One shelf: which pools feed it, its roll count and fallback price
         │
         └─► POOL  (PhunMart_Pools.json)
-              Which groups to draw from, zone gating, always-available flag
+              Which groups to draw from, zone and season gating, always-available flag
               │
               └─► GROUP  (PhunMart_Groups.json)
                     Which game items or specials are eligible, and their defaults
@@ -73,7 +73,7 @@ one candidate list, and the weight on each key scales that pool's offers within 
 | Layer          | Override file              | Controls                                             |
 | -------------- | -------------------------- | ---------------------------------------------------- |
 | **Shop**       | `PhunMart_Shops.json`      | Sprite, pool sets, pricing, roll count, spawn rules  |
-| **Pool**       | `PhunMart_Pools.json`      | Which groups to draw from, zone gating               |
+| **Pool**       | `PhunMart_Pools.json`      | Which groups to draw from, zone and season gating    |
 | **Group**      | `PhunMart_Groups.json`     | Which items or specials are eligible, and defaults   |
 | **Special**    | `PhunMart_Specials.json`   | What the player receives: trait, XP, vehicle, animal |
 | **Item/Offer** | `PhunMart_Items.json`      | Per-offer weight, stock, price, conditions           |
@@ -718,6 +718,11 @@ pool set rather than here (see [Shops](#10-shops)), though a pool can supply a f
     }
   },
 
+  "pool_seasonal_xmas": {
+    "months": [12],
+    "sources": { "groups": ["clothing_festive"] }
+  },
+
   "pool_prawnstars_core": {
     "sticky": true,
     "defaults": { "price": "self_1", "reward": "change_payout_budget" },
@@ -727,13 +732,15 @@ pool set rather than here (see [Shops](#10-shops)), though a pool can supply a f
 ```
 
 `pool_finalamendment_guns` is zone-gated, appearing only in difficulty 3 and 4 zones, which
-requires PhunZones. `pool_prawnstars_core` is sticky, so every offer in it appears on every
-restock with no roll.
+requires PhunZones. `pool_seasonal_xmas` is month-gated, so its festive clothing is only
+stocked during December. `pool_prawnstars_core` is sticky, so every offer in it appears on
+every restock with no roll.
 
 | Field              | Description                                                                                                                                                       |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sources.groups`   | Array of Group keys to pull items and specials from                                                                                                               |
 | `zones.difficulty` | Optional zone difficulty filter (0 to 5). Requires [PhunZones](https://github.com/PhunZoider/PhunZones). Checked at placement and restock. Omit for always-eligible. |
+| `months`           | Optional in-game month filter, `1` to `12`. The pool is only stocked during those months. Checked at restock only. Omit to stock all year. See below. |
 | `sticky`           | Every offer in this pool appears on every restock, bypassing the roll. See below.                                                                                 |
 | `defaults.price`   | Price used by offers in this pool that name none of their own                                                                                                     |
 | `defaults.offer.stock` | `{ min, max }` stock for offers in this pool that set none. Omit `max` for a fixed amount.                                                                     |
@@ -749,6 +756,28 @@ appear and the roll fills any remaining slots from the other pools in the set. T
 ties: an item in both a sticky and a non-sticky pool is taken from the sticky one. Keep them
 small, since every offer is permanent shelf space. The compiler warns past `MaxStickyItems`
 (10 by default).
+
+**Seasonal pools** use `months` to limit a shelf to certain times of year, which is how you
+get festive stock in December without it turning up in July. The months are the in-game
+calendar's, not the real world's, so a server running an accelerated year sees the season come
+round on the world's clock. Pair it with a weight on the pool set key to control how much of
+the shelf it takes over while it is in season:
+
+```json
+{
+  "pool_seasonal_xmas": {
+    "months": [12],
+    "sources": { "groups": ["clothing_festive"] }
+  }
+}
+```
+
+Two things are worth knowing. The gate is only consulted when a shop restocks, so December
+stock sits on the shelf until the first restock after the month turns rather than vanishing at
+midnight on the 31st. And a month-gated pool is ignored when deciding where shops may spawn:
+a shop is placed once and stands there all year, so an out-of-season pool never stops one
+being placed. Give a shop at least one year-round pool if you do not want it empty out of
+season.
 
 **Price precedence**, most specific first: the offer's own `price`, then the `price` on the
 special it rewards, then group `defaults.price`, then pool `defaults.price`, then the pool

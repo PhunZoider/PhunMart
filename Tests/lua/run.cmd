@@ -18,7 +18,7 @@ if "%LUA%"=="" (
 
 set FAILED=0
 
-for %%T in (test_json test_playerdata) do (
+for %%T in (test_json test_playerdata test_months) do (
     echo.
     echo ==================== %%T ====================
     "%LUA%" "%~dp0%%T.lua"

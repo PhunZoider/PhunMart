@@ -66,6 +66,34 @@ local function formatZones(def)
     return ""
 end
 
+local MONTH_ABBREV = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+
+-- Format months summary. Names rather than numbers: "12" in a narrow column is
+-- indistinguishable from a zone difficulty or a count, where "Dec" can only be
+-- one thing.
+--
+-- Capped at three, matching formatKeyList below, because this is the last
+-- column and a full twelve would clip mid-word against the panel edge. A
+-- seasonal pool is one to three months in practice; the "+N" is for the pool
+-- somebody has restricted to most of the year, where the exact list matters
+-- less than the fact that it is restricted at all.
+local function formatMonths(def)
+    local list = Core.utils.monthsToList(Core.utils.parseMonths(def.months))
+    if not list then
+        return ""
+    end
+    local show = math.min(#list, 3)
+    local names = {}
+    for i = 1, show do
+        table.insert(names, MONTH_ABBREV[list[i]])
+    end
+    local text = table.concat(names, ",")
+    if #list > show then
+        text = text .. " +" .. tostring(#list - show)
+    end
+    return text
+end
+
 -- Parse a comma-separated string of numbers into an integer array. Returns nil for empty input.
 local function parseCSVNumbers(text)
     if not text or text == "" then
@@ -188,9 +216,36 @@ local function validateZones(value)
     return nil
 end
 
+-- Reject anything in the months field that isn't a whole number from 1 to 12.
+-- Stricter than the zones field on purpose: a difficulty tier is open-ended and
+-- depends on whatever PhunZones is configured with, where the calendar is not,
+-- so "13" here is always a mistake and is worth catching before it is saved.
+local function validateMonths(value)
+    if not value or value == "" then
+        return nil
+    end
+    for s in value:gmatch("[^,]+") do
+        local n = tonumber(s:match("^%s*(.-)%s*$"))
+        if not n or n ~= math.floor(n) or n < 1 or n > 12 then
+            return getText("IGUI_PhunMart_Err_Months")
+        end
+    end
+    return nil
+end
+
 local function createEditModal(poolKey, poolDef, isNew, cb)
     local def = poolDef or {}
     local allPools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
+
+    local monthsDefault = ""
+    local monthsList = Core.utils.monthsToList(Core.utils.parseMonths(def.months))
+    if monthsList then
+        local nums = {}
+        for _, m in ipairs(monthsList) do
+            table.insert(nums, tostring(m))
+        end
+        monthsDefault = table.concat(nums, ", ")
+    end
 
     local zonesDefault = ""
     if def.zones and def.zones.difficulty then
@@ -299,6 +354,12 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             -- Zones (optional)
             local zones = parseCSVNumbers(f:getFieldValue("zones"))
             result.zones = zones and {difficulty = zones} or nil
+
+            -- Months (optional). Stored as a sorted array to match zones, and
+            -- because a set would round-trip through JSON as string keys.
+            -- Clearing it relies on the tombstone, same as zones: nil unsets
+            -- the key and the pool goes back to selling year round.
+            result.months = Core.utils.monthsToList(Core.utils.parseMonths(f:getFieldValue("months")))
 
             -- Fallback texture / category (optional)
             local fbTex = f:getFieldValue("fallbackTexture")
@@ -420,6 +481,14 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         validate = validateZones,
         section = "p_more",
     })
+    -- Under zones, because it is the other half of the same idea: one gate on
+    -- where a pool sells, one on when.
+    form:addTextField("months", getText("IGUI_PhunMart_Lbl_Months"), {
+        default = monthsDefault,
+        hint = getText("IGUI_PhunMart_Hint_Months"),
+        validate = validateMonths,
+        section = "p_more",
+    })
     form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
         checked = def.sticky == true,
         text = getText("IGUI_PhunMart_Lbl_Sticky"),
@@ -497,6 +566,7 @@ function UI:createChildren()
         color = {0.9, 0.5, 0.5}
     })
     self:addListColumn(getText("IGUI_PhunMart_Col_Zones"), 0.74, {field = "zones", color = {0.7, 0.9, 0.7}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Months"), 0.86, {field = "months", color = {0.7, 0.8, 0.95}})
 
     self.list.doDrawItem = ListPanel.defaultDrawRow
 
@@ -512,7 +582,10 @@ end
 
 function UI:getFilterText(itemData)
     -- Both, so a filter matches whichever of the two the admin thinks in.
-    local text = (itemData.key or "") .. " " .. (itemData.title or "") .. " " .. (itemData.sources or "")
+    -- Months are searchable by name, since the column shows "Dec" and typing
+    -- what you can see should find it.
+    local text = (itemData.key or "") .. " " .. (itemData.title or "") .. " " .. (itemData.sources or "") .. " " ..
+                     (itemData.months or "")
     if itemData.sticky then
         text = text .. " sticky"
     end
@@ -548,6 +621,7 @@ function UI:refreshPools()
             sources = formatSources(def),
             blacklist = def.blacklist and #def.blacklist > 0 and tostring(#def.blacklist) or "",
             zones = formatZones(def),
+            months = formatMonths(def),
             def = def
         })
     end

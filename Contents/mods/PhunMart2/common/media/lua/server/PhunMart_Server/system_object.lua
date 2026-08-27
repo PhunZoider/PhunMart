@@ -238,6 +238,20 @@ local function poolPassesZoneFilter(pool, x, y)
 end
 Core.poolPassesZoneFilter = poolPassesZoneFilter
 
+-- Returns false if the pool is gated to certain months and the in-game calendar
+-- is not in one of them, so a seasonal pool follows the world's clock rather
+-- than the machine's. The parts worth getting right (the 1-12 space, and
+-- GameTime counting months from zero) live in utils, where the tests can reach
+-- them; this is only the join.
+--
+-- Note this is consulted while building offers and nowhere else. A shop that
+-- restocks monthly will carry December's stock a little way into January, until
+-- its next restock clears it out. That granularity is the restock interval.
+local function poolPassesMonthFilter(pool)
+    return Core.utils.poolInSeason(pool, Core.utils.currentGameMonth())
+end
+Core.poolPassesMonthFilter = poolPassesMonthFilter
+
 -- Build self.offers from Core.runtime for this shop's type.
 -- Called on first load (if offers absent) and on every restock.
 -- Each restock bakes concrete price amounts and stock quantities from their configured ranges.
@@ -296,6 +310,8 @@ function ServerObject:buildOffers()
                     -- wrong pass; skip
                 elseif not poolPassesZoneFilter(pool, self.x, self.y) then
                     -- pool excluded by zone difficulty at this location; skip silently
+                elseif not poolPassesMonthFilter(pool) then
+                    -- pool out of season this month; skip silently
                 else
                     for offerId, offer in pairs(pool.offers or {}) do
                         if not excluded[offer.item] then
