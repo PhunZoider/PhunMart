@@ -65,7 +65,16 @@ local function encodeValue(value, stack)
 
     for key, item in pairs(value) do
         if type(key) ~= 'string' then
-            error('object keys must be strings')
+            -- The offending key is named because the alternative is being told
+            -- that something somewhere in a nested table is wrong and having to
+            -- go looking for it.
+            --
+            -- Deliberately an error rather than a tostring() coercion. A number
+            -- key written out as a string comes back as a string, so the next
+            -- lookup by number misses it and quietly creates a second record
+            -- beside the first. Losing the data slowly is worse than refusing
+            -- to write it.
+            error('object keys must be strings, got ' .. type(key) .. ' (' .. tostring(key) .. ')')
         end
         result[#result + 1] = escapeString(key) .. ':' .. encodeValue(item, stack)
     end

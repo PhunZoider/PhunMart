@@ -6,6 +6,62 @@ local Core = PhunMart
 -- way to lose everybody's balances.
 local SAVE_FILE = "PhunMart_Wallet.json"
 
+-- The key single-player stores its wallet under. In multiplayer the key is the
+-- username; single-player has no stable one, because getUsername() returns the
+-- character name and that changes per playthrough.
+--
+-- Deliberately the string "0" and not the number 0, which is what it used to
+-- be. JSON object keys are strings, so a table keyed by a number cannot be
+-- encoded at all: every save of the wallet file failed outright in SP.
+--
+-- "0" rather than something readable like "singleplayer" because that is what
+-- the number turns into when an old PhunMart_Wallet.txt goes through the
+-- converter. Keeping the same spelling means converted data still lines up.
+local SP_KEY = "0"
+
+--- Move any record filed under a non-string key to its string equivalent.
+---
+--- One numeric key anywhere in this table stops the whole file saving, so it is
+--- not enough to write strings from here on: a save made before the change
+--- still holds the old number, and it has to come out. Handled on the way in
+--- rather than at save time, where the only options left are failing or
+--- dropping somebody's balance.
+local function normaliseKeys(data)
+    -- Keys collected first. Assigning a new key during pairs() is undefined.
+    local numeric = {}
+    for key in pairs(data) do
+        if type(key) ~= "string" then
+            table.insert(numeric, key)
+        end
+    end
+    for _, key in ipairs(numeric) do
+        local asString = tostring(key)
+        -- Only if nothing is there already. If both exist the string one was
+        -- written later, so it is the live record and the number is a leftover.
+        if data[asString] == nil then
+            data[asString] = data[key]
+        end
+        data[key] = nil
+    end
+    return #numeric
+end
+
+--- Bind self.data to ModData, tidying old keys the first time.
+local function bindData(self)
+    if self.data == nil then
+        self.data = ModData.getOrCreate(self.name)
+    end
+    if not self.keysNormalised then
+        self.keysNormalised = true
+        local moved = normaliseKeys(self.data)
+        if moved > 0 then
+            print("[PhunMart] wallet: moved " .. tostring(moved) ..
+                      " record(s) off a numeric key so the file can be written")
+        end
+    end
+    return self.data
+end
+
 -- Currency items map to pools. Each coin adds its value (in cents or count) to the pool.
 -- Pools are what get stored and checked against prices.
 Core.wallet = {
@@ -72,12 +128,10 @@ end
 -- Returns (or creates) the wallet record for a player.
 -- Balance stored as pool totals: { current={change=0,tokens=0}, bound={tokens=0}, purchases={} }
 function Core.wallet:get(player)
-    if self.data == nil then
-        self.data = ModData.getOrCreate(self.name)
-    end
+    bindData(self)
     local key
     if Core.isLocal then
-        key = 0
+        key = SP_KEY
     elseif type(player) == "string" then
         key = player
     else
@@ -282,9 +336,9 @@ function Core.wallet:load()
     end
     -- Merge file-backed data into ModData, preferring higher balances
     -- so a crash between file-save and game-save doesn't lose progress.
-    if self.data == nil then
-        self.data = ModData.getOrCreate(self.name)
-    end
+    -- bindData first, so a save still holding the old numeric key has been
+    -- moved across before the file's "0" is merged onto it.
+    bindData(self)
     for key, fileWallet in pairs(saved) do
         local mdWallet = self.data[key]
         if not mdWallet then

@@ -10,6 +10,14 @@ local R = Core.killRewards
 
 local SAVE_FILE = "PhunMart_KillTracking.json"
 
+-- The key single-player files its progress under. Deliberately the string "0"
+-- and not the number 0, which is what it used to be: JSON object keys are
+-- strings, so a table keyed by a number cannot be encoded and every save of
+-- this file failed in SP. "0" rather than a readable name because that is what
+-- the number becomes through the converter, so converted progress still lines
+-- up. See the same constant in wallet.lua and rewards_playtime.lua.
+local SP_KEY = "0"
+
 -- Persistent data loaded from / saved to SAVE_FILE.
 -- username → {
 --   zombieKills  = N,   -- total cumulative normal zombie kills
@@ -36,7 +44,7 @@ end
 -- so we key on a constant to preserve progress across characters.
 function R:getPlayerData(username)
     if Core.isLocal then
-        username = 0
+        username = SP_KEY
     end
     if not self.data[username] then
         self.data[username] = {
