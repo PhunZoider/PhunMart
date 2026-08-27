@@ -34,12 +34,12 @@ your override and restores the shipped currency exactly.
 
 Most built-in prices inherit from `currency_base`, which ships as:
 
-```lua
-currency_base = { kind = "currency", pool = "change", amount = 1, factor = 1 }
+```json
+"currency_base": { "kind": "currency", "pool": "change", "amount": 1, "factor": 1 }
 ```
 
 Children like `currency_25` and `currency_150` take their `kind`, `pool` and `factor` from it
-and override only `amount`. Changing `currency_base` to `kind = "items"` therefore flips the
+and override only `amount`. Changing `currency_base` to `"kind": "items"` therefore flips the
 entire tree in one step: every child becomes an item cost rather than a wallet deduction.
 
 ### The factor property
@@ -66,15 +66,15 @@ A child may set its own `factor`, which replaces the parent's rather than compou
 
 ## Doing it in a file instead
 
-Create or edit `PhunMart_Prices.txt` in your server's `Zomboid/Lua/` folder:
+Create or edit `PhunMart_Prices.json` in your server's `Zomboid/Lua/` folder:
 
-```lua
-return {
-    currency_base = {
-        kind   = "items",
-        items  = {{ item = "Base.Money", amount = 1 }},
-        factor = 0.04
-    },
+```json
+{
+  "currency_base": {
+    "kind": "items",
+    "items": [{ "item": "Base.Money", "amount": 1 }],
+    "factor": 0.04
+  }
 }
 ```
 
@@ -85,18 +85,19 @@ Every child that inherits from it picks up the new `kind` and `factor` automatic
 Only needed when a child should deviate from the factor-scaled result. To make `currency_25`
 cost exactly 3 rather than `ceil(25 * 0.04) = 1`:
 
-```lua
-return {
-    currency_base = {
-        kind   = "items",
-        items  = {{ item = "Base.Money", amount = 1 }},
-        factor = 0.04
-    },
+```json
+{
+  "currency_base": {
+    "kind": "items",
+    "items": [{ "item": "Base.Money", "amount": 1 }],
+    "factor": 0.04
+  },
 
-    -- Override just this one child
-    currency_25 = { inherit = "currency_base", amount = 3, factor = 1 },
+  "currency_25": { "inherit": "currency_base", "amount": 3, "factor": 1 }
 }
 ```
+
+The `currency_25` entry overrides just that one child.
 
 `factor = 1` on the child stops the parent's 0.04 scaling the explicit 3 down to 1.
 

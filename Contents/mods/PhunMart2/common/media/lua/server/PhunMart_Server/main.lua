@@ -401,7 +401,7 @@ function Core:ini()
 
     -- Load token rewards config: try server override file first, then built-in defaults.
     local ok, tokenDefaults = pcall(require, "PhunMart/defaults/token_rewards")
-    Core.tokenRewardsCfg = Core.fileUtils.loadTable("PhunMart_TokenRewards.txt") or (ok and tokenDefaults) or {}
+    Core.tokenRewardsCfg = Core.fileUtils.loadTable(Core.configFiles.tokenRewards) or (ok and tokenDefaults) or {}
 
     -- Wire playtime and kill-tracking modules.
     require "PhunMart_Server/rewards_playtime"

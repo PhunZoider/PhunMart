@@ -114,11 +114,19 @@ local function backup(files, fromVersion)
         any = true
     end
     if not any then
-        return
+        -- Nothing on disk to lose, so there is nothing to protect and no reason
+        -- to hold the migration up.
+        return true
     end
-    local name = "PhunMart_Backup_v" .. tostring(fromVersion) .. ".txt"
-    fileUtils.saveTable(name, snapshot)
+    local name = Core.backupFileFor(fromVersion)
+    if not fileUtils.saveTable(name, snapshot) then
+        -- The backup is the only way back out of a bad migration, so not having
+        -- one is a reason to stop rather than a reason to be careful.
+        log("could not write " .. name .. "; leaving the overrides alone")
+        return false
+    end
     log("backed up overrides to " .. name)
+    return true
 end
 
 --- Run any migrations the override files have not seen. Safe to call more than
@@ -172,7 +180,11 @@ function Migrations.run()
     end
 
     log("upgrading overrides from version " .. tostring(from) .. " to " .. tostring(Migrations.CURRENT))
-    backup(files, from)
+    if not backup(files, from) then
+        -- Left unstamped on purpose, so the upgrade is retried next start once
+        -- whatever stopped the backup has been dealt with.
+        return
+    end
 
     local touched = {}
     local touch = function(name)

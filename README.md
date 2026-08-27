@@ -186,9 +186,17 @@ areas stay permissive and draw on every pool.
 
 ## Customisation
 
-Everything is data-driven and overridable without touching the mod. Drop override files into
-your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
+Everything is data-driven and overridable without touching the mod. Drop JSON override files
+into your server's `Zomboid/Lua/` folder to patch prices, pools, shops, conditions, and token
 rewards on top of the built-in defaults.
+
+> **Upgrading from before B42.20.4?** The override files used to be Lua tables in `.txt`
+> files. That build removed `loadstring`, so the game can no longer read them, and the files
+> are now `.json`. Your old files are left untouched and the server log names any it cannot
+> read. Convert them with the
+> [Phun configuration converter](https://phunzoider.github.io/PhunZones/converter/), which runs
+> in your browser and uploads nothing. See
+> [Converting your old config files](Docs/CUSTOMISATION.md#converting-your-old-config-files).
 
 Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** covers common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.

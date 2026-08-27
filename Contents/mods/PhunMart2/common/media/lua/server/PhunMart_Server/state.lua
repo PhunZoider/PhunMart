@@ -5,7 +5,7 @@ end
 -- Small persistent key/value store for the mod itself, as opposed to the
 -- definition overrides.
 --
--- It lives in PhunMart.txt beside the override files, so it shares their
+-- It lives in PhunMart.json beside the override files, so it shares their
 -- lifetime: one per install rather than one per save. That is the right scope
 -- for anything describing the state of the *configuration* (which migrations
 -- have run) and for anything that needs to notice a save being replaced
@@ -20,7 +20,7 @@ local fileUtils = require "PhunMart_Server/utils_file"
 
 local State = {}
 
-local FILE = "PhunMart.txt"
+local FILE = Core.configFiles.state
 local cache = nil
 
 --- The whole table. Loaded once, then held: every write goes through this copy,

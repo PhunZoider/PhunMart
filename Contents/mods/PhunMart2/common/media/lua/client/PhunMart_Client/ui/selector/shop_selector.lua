@@ -30,7 +30,7 @@ function UI:refreshAll()
     -- Definitions, not the compiled runtime. The compiler drops anything with
     -- enabled=false, so a shop disabled here vanished from the only list that
     -- could reach its editor: there was no way back to the tickbox that
-    -- disabled it short of hand-editing PhunMart_Shops.txt.
+    -- disabled it short of hand-editing PhunMart_Shops.json.
     --
     -- Disabled rows draw grey, which the column colour below has always been
     -- written to do and never had the chance to.

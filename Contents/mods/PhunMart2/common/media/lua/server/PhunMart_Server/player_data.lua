@@ -68,6 +68,11 @@ end
 -- kept in, read once on upgrade and then left alone for good.
 ---------------------------------------------------------------------------
 
+--- `legacy` names the JSON file, not the file the old design actually wrote.
+--- Those were Lua tables, and B42.20.4 removed every way of reading one, so an
+--- admin who still has them has to put them through the converter first. Naming
+--- the converted file here is what makes that work: fileUtils reads the .json
+--- if it is there and reports the stranded .txt if it is not.
 PlayerData.trackers = {{
     key = "wallets",
     -- No `legacy`: the old PhunMart_Wallet.txt was a mirror of ModData rather
@@ -78,19 +83,19 @@ PlayerData.trackers = {{
     end
 }, {
     key = "purchases",
-    legacy = "PhunMart_Purchases.txt",
+    legacy = "PhunMart_Purchases.json",
     live = function()
         return Core.purchases and Core.purchases.histories
     end
 }, {
     key = "playtime",
-    legacy = "PhunMart_PlaytimeTracking.txt",
+    legacy = "PhunMart_PlaytimeTracking.json",
     live = function()
         return Core.playtimeRewards and Core.playtimeRewards.data
     end
 }, {
     key = "kills",
-    legacy = "PhunMart_KillTracking.txt",
+    legacy = "PhunMart_KillTracking.json",
     live = function()
         return Core.killRewards and Core.killRewards.data
     end
@@ -129,6 +134,7 @@ function PlayerData.importLegacy()
     end
 
     local imported = {}
+    local pending = {}
     for _, t in ipairs(PlayerData.trackers) do
         if t.legacy then
             local target = t.live()
@@ -143,16 +149,32 @@ function PlayerData.importLegacy()
                 end
                 if n > 0 then
                     table.insert(imported, t.key .. "=" .. tostring(n))
+                elseif fileUtils.needsConversion(t.legacy) then
+                    -- An old Lua-format file is sitting there with data in it
+                    -- and nothing can read it yet.
+                    table.insert(pending, fileUtils.legacyNameFor(t.legacy))
                 end
             end
         end
     end
 
-    State.set(IMPORTED_KEY, true)
     if #imported > 0 then
         log("imported from the old tracker files: " .. table.concat(imported, " "))
         log("the files themselves are untouched and no longer read")
     end
+
+    if #pending > 0 then
+        -- Deliberately not stamped. fileUtils has already said which files need
+        -- converting and where; leaving the flag off is what lets the import
+        -- actually happen on the next start once they have been. The guard
+        -- above means this only persists while the trackers are still empty, so
+        -- a server that simply carries on will stop asking as soon as anyone
+        -- earns anything.
+        log("still to convert: " .. table.concat(pending, " "))
+        return
+    end
+
+    State.set(IMPORTED_KEY, true)
 end
 
 ---------------------------------------------------------------------------

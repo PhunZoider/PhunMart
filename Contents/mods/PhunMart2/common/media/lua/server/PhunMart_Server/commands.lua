@@ -85,47 +85,58 @@ Commands[Core.commands.upsertGroupDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Groups.txt", "groups", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("groups"), "groups", args.key, args.def)
 end
 
 Commands[Core.commands.upsertItemDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Items.txt", "items", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("items"), "items", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPriceDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Prices.txt", "prices", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("prices"), "prices", args.key, args.def)
 end
 
 Commands[Core.commands.upsertSpecialDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Specials.txt", "specials", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("specials"), "specials", args.key, args.def)
 end
 
 Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:upsertDefinition("PhunMart_Pools.txt", "pools", args.key, args.def)
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("pools"), "pools", args.key, args.def)
 end
 
--- Override file backing each definition category the editors can delete from.
--- Shops are deliberately absent: a shop definition backs machines already placed
--- in the world, so it can be disabled but never removed.
-local DEF_OVERRIDE_FILES = {
-    pools = "PhunMart_Pools.txt",
-    groups = "PhunMart_Groups.txt",
-    items = "PhunMart_Items.txt",
-    prices = "PhunMart_Prices.txt",
-    specials = "PhunMart_Specials.txt"
+-- Which definition categories the editors may delete from. Shops are
+-- deliberately absent: a shop definition backs machines already placed in the
+-- world, so it can be disabled but never removed.
+--
+-- The file itself comes from Core.primaryOverride rather than being repeated
+-- here. This map used to carry its own copy of the filenames, which meant the
+-- move to JSON had two places to get right instead of one.
+local DELETABLE_KINDS = {
+    pools = true,
+    groups = true,
+    items = true,
+    prices = true,
+    specials = true
 }
+
+local function overrideFileFor(kind)
+    if not kind or not DELETABLE_KINDS[kind] then
+        return nil
+    end
+    return Core.primaryOverride(kind)
+end
 
 Commands[Core.commands.deleteDefinition] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
@@ -133,7 +144,7 @@ Commands[Core.commands.deleteDefinition] = function(playerObj, args)
     end
     local kind = args and args.kind
     local key = args and args.key
-    local filename = kind and DEF_OVERRIDE_FILES[kind]
+    local filename = overrideFileFor(kind)
     if not (filename and key) then
         return
     end
@@ -163,7 +174,7 @@ Commands[Core.commands.revertDefinition] = function(playerObj, args)
     end
     local kind = args and args.kind
     local key = args and args.key
-    local filename = kind and DEF_OVERRIDE_FILES[kind]
+    local filename = overrideFileFor(kind)
     if not (filename and key) then
         return
     end
@@ -188,7 +199,7 @@ Commands[Core.commands.saveTokenRewards] = function(playerObj, args)
         return
     end
     Core.tokenRewardsCfg = args.cfg or {}
-    Core.fileUtils.saveTable("PhunMart_TokenRewards.txt", Core.tokenRewardsCfg)
+    Core.fileUtils.saveTable(Core.configFiles.tokenRewards, Core.tokenRewardsCfg)
     -- Reload the reward modules so they pick up the new config.
     if Core.playtimeRewards then
         Core.playtimeRewards:load()
@@ -1010,7 +1021,7 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     if not (poolKey and itemKey) then
         return
     end
-    local override = Core.fileUtils.loadTable("PhunMart_Pools.txt") or {}
+    local override = Core.fileUtils.loadTable(Core.primaryOverride("pools")) or {}
     override[poolKey] = override[poolKey] or {}
     override[poolKey].blacklist = override[poolKey].blacklist or {}
     -- avoid duplicates
@@ -1020,7 +1031,7 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
         end
     end
     table.insert(override[poolKey].blacklist, itemKey)
-    Core.fileUtils.saveTable("PhunMart_Pools.txt", override)
+    Core.fileUtils.saveTable(Core.primaryOverride("pools"), override)
     Core.ServerSystem.instance:recompileShops()
 end
 

@@ -3,7 +3,7 @@ PhunMart = {
     inied = false,
     consts = {
         shops = "PhunMart_Shops",
-        shopsLuaFile = "PhunMart_Shops.txt",
+        shopsLuaFile = "PhunMart_Shops.json",
         players = "PhunMart_Players",
         history = "PhunMart_History",
         east = 0,
@@ -747,15 +747,47 @@ Core.defaultPaths = {
 --- in practice, but declared here beside defaultPaths because two things now
 --- need the same list: the compile that reads them, and the migrations that
 --- rewrite them. Having it in one place is what stops those two disagreeing.
+---
+--- These are JSON as of B42.20.4, which removed loadstring and with it any way
+--- to read the Lua-table format they used to be in. Old files are left alone
+--- and reported at startup rather than migrated in place: converting them needs
+--- a Lua parser, which is the thing the runtime no longer has.
 Core.overridePaths = {
-    prices = {"PhunMart_Prices.txt"},
-    specials = {"PhunMart_Specials.txt", "PhunMart_XP_Rewards.txt"},
-    conditionsDefs = {"PhunMart_Conditions.txt", "PhunMart_XP_Conditions.txt"},
-    items = {"PhunMart_Items.txt", "PhunMart_XP_Items.txt"},
-    groups = {"PhunMart_Groups.txt"},
-    pools = {"PhunMart_Pools.txt"},
-    shops = {"PhunMart_Shops.txt"}
+    prices = {"PhunMart_Prices.json"},
+    specials = {"PhunMart_Specials.json", "PhunMart_XP_Rewards.json"},
+    conditionsDefs = {"PhunMart_Conditions.json", "PhunMart_XP_Conditions.json"},
+    items = {"PhunMart_Items.json", "PhunMart_XP_Items.json"},
+    groups = {"PhunMart_Groups.json"},
+    pools = {"PhunMart_Pools.json"},
+    shops = {"PhunMart_Shops.json"}
 }
+
+--- The file an edit of `kind` is written back to.
+---
+--- A kind can be assembled from several override files, but only ever writes to
+--- the first: the extra ones exist so a hand-maintained split stays readable,
+--- and picking one to write to is what keeps an edit from landing in two files
+--- at once. The editors used to carry their own copy of this mapping, which is
+--- the kind of duplicate that survives a rename only by luck.
+function Core.primaryOverride(kind)
+    local names = Core.overridePaths[kind]
+    return names and names[1] or nil
+end
+
+--- The mutable files that are not per-kind overrides. Here rather than beside
+--- their readers so that every filename the mod writes is in one place, which
+--- is what makes a format change like the move to JSON checkable.
+Core.configFiles = {
+    -- Mod state: which migrations have run, whether the legacy import happened.
+    state = "PhunMart.json",
+    blacklist = "PhunMart_Blacklist.json",
+    tokenRewards = "PhunMart_TokenRewards.json"
+}
+
+--- Where the migrations put a copy of the overrides before touching them.
+function Core.backupFileFor(version)
+    return "PhunMart_Backup_v" .. tostring(version) .. ".json"
+end
 
 --- What to call a shop type on screen.
 ---

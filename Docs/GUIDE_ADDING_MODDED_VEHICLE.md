@@ -54,32 +54,35 @@ A group normally turns each entry in `items` into an offer that hands over that 
 vehicle groups set `defaults.reward` to a `spawnVehicle` special instead, so every entry
 becomes a car offer, and the entry the player bought is the car they get.
 
-```lua
-vehicles_luxury = {
-    label = "Luxury & Sports Cars",
-    defaults = {
-        price  = "vehicle_rare",
-        reward = "vehicle_luxury",       -- one special, shared by every entry
-        offer  = { weight = 1.0 }
-    },
-    items = { "CarLuxury", "SportsCar", "SportsCar_ez",
-              "RaceCar12", "RaceCar34", "RaceCar58" },   -- your entry joins this list
-},
+```json
+"vehicles_luxury": {
+  "label": "Luxury & Sports Cars",
+  "defaults": {
+    "price": "vehicle_rare",
+    "reward": "vehicle_luxury",
+    "offer": { "weight": 1.0 }
+  },
+  "items": ["CarLuxury", "SportsCar", "SportsCar_ez",
+            "RaceCar12", "RaceCar34", "RaceCar58"]
+}
 ```
+
+`defaults.reward` is the one special shared by every entry, and your car joins the `items`
+list alongside the shipped ones.
 
 So one special serves the whole tier, each car is its own selectable row, and adding a car is
 one name in a list. There is no reason to create a special of your own unless you want that
 particular car to behave differently from its tier.
 
-Equivalent by hand, in `PhunMart_Groups.txt`:
+Equivalent by hand, in `PhunMart_Groups.json`:
 
-```lua
-return {
-    vehicles_luxury = {
-        items = { "CarLuxury", "SportsCar", "SportsCar_ez",
-                  "RaceCar12", "RaceCar34", "RaceCar58",
-                  "91range", "91range2" },
-    },
+```json
+{
+  "vehicles_luxury": {
+    "items": ["CarLuxury", "SportsCar", "SportsCar_ez",
+              "RaceCar12", "RaceCar34", "RaceCar58",
+              "91range", "91range2"]
+  }
 }
 ```
 
@@ -118,19 +121,24 @@ colour swaps of the same car and wrong when players should be able to choose, in
 make one special per variant, or use the `items` route above, which gives separate rows for
 free.
 
-By hand, in `PhunMart_Specials.txt`:
+By hand, in `PhunMart_Specials.json`:
 
-```lua
-return {
-    vehicle_91range_a = {
-        inherit = "vehicle_base",
-        price = "vehicle_rare",
-        offer = { weight = 1.0, stock = { min = 1, max = 1 } },
-        display = { text = "91 Range Rover (Sand)" },
-        actions = {{ type = "spawnVehicle", scripts = {"91range"}, args = {
-            condition = { min = 85, max = 100 }, fuel = { min = 0.3, max = 0.7 }
-        }}}
-    },
+```json
+{
+  "vehicle_91range_a": {
+    "inherit": "vehicle_base",
+    "price": "vehicle_rare",
+    "offer": { "weight": 1.0, "stock": { "min": 1, "max": 1 } },
+    "display": { "text": "91 Range Rover (Sand)" },
+    "actions": [{
+      "type": "spawnVehicle",
+      "scripts": ["91range"],
+      "args": {
+        "condition": { "min": 85, "max": 100 },
+        "fuel": { "min": 0.3, "max": 0.7 }
+      }
+    }]
+  }
 }
 ```
 

@@ -36,7 +36,7 @@ end
 
 function Core.getBlacklist(refresh)
     if blacklistData == nil or refresh then
-        local override = Core.fileUtils.loadTable("PhunMart_Blacklist.txt") or {}
+        local override = Core.fileUtils.loadTable(Core.configFiles.blacklist) or {}
         blacklistData = mergeBlacklists(getDefaults(), override)
     end
     return blacklistData
@@ -44,6 +44,6 @@ end
 
 function Core.setBlacklist(data)
     blacklistData = data or {}
-    Core.fileUtils.saveTable("PhunMart_Blacklist.txt", blacklistData)
+    Core.fileUtils.saveTable(Core.configFiles.blacklist, blacklistData)
 end
 
