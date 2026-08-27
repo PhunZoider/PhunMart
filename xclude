@@ -8,3 +8,6 @@ xclude
 CLAUDE.md
 .claude
 .gitignore
+.html
+deploy.cmd
+converter
