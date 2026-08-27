@@ -75,18 +75,30 @@ function Core.wallet:nameOf(player)
     return player and player:getUsername() or nil
 end
 
+--- The key singleplayer files its one wallet under.
+---
+--- The string "0" and not the number 0, which is what it used to be. JSON
+--- object keys are strings, so a table holding a number key cannot be encoded
+--- at all. Nothing here writes JSON today, since wallets live in ModData, but
+--- the legacy import reads a converted PhunMart_Wallet.json whose keys are
+--- necessarily strings, and a number on this side would never match them.
+---
+--- "0" rather than something readable like "singleplayer" for that same
+--- reason: it is what the old number turns into through the converter.
+local SP_KEY = "0"
+
 --- The key a wallet record is filed under.
 ---
---- Singleplayer keeps one record under 0, because there is only ever one
+--- Singleplayer keeps one record under SP_KEY, because there is only ever one
 --- wallet and the name a call happens to pass in is not always the same string.
 --- Multiplayer files by username. Every read and write has to agree on this,
 --- which is the whole reason it is a function rather than four lines repeated
 --- at each call site: setPlayerData had its own copy that skipped the
---- singleplayer case, so it filed under the username while get read from 0 and
---- the same character ended up with two records.
+--- singleplayer case, so it filed under the username while get read from the
+--- singleplayer key and the same character ended up with two records.
 function Core.wallet:keyFor(player)
     if Core.isLocal then
-        return 0
+        return SP_KEY
     elseif type(player) == "string" then
         return player
     elseif player then
@@ -109,17 +121,20 @@ end
 ---
 --- Singleplayer only: multiplayer files by username at both ends and never had
 --- the problem. Idempotent, since it leaves no stray keys behind.
+---
+--- A record left under the old numeric 0 is a stray like any other now that
+--- SP_KEY is a string, so it folds in here without needing its own pass.
 function Core.wallet:repairKeys()
     if not Core.isLocal or not self.data then
         return
     end
-    -- Collected before anything is touched. Assigning self.data[0] inside the
-    -- traversal would be adding a key during pairs(), which Lua leaves
+    -- Collected before anything is touched. Assigning self.data[SP_KEY] inside
+    -- the traversal would be adding a key during pairs(), which Lua leaves
     -- undefined; clearing keys is allowed, but doing both is not worth the
     -- argument.
     local strays = {}
     for key, w in pairs(self.data) do
-        if key ~= 0 and type(w) == "table" then
+        if key ~= SP_KEY and type(w) == "table" then
             table.insert(strays, {
                 key = key,
                 wallet = w
@@ -130,13 +145,13 @@ function Core.wallet:repairKeys()
         return
     end
 
-    local keep = self.data[0]
+    local keep = self.data[SP_KEY]
     for _, stray in ipairs(strays) do
         local w = stray.wallet
         if not keep then
-            -- Nothing at 0 yet, so the first record simply moves there.
+            -- Nothing under SP_KEY yet, so the first record simply moves there.
             keep = w
-            self.data[0] = w
+            self.data[SP_KEY] = w
         elseif w ~= keep then
             for _, walletType in ipairs({"current", "bound"}) do
                 keep[walletType] = keep[walletType] or {}

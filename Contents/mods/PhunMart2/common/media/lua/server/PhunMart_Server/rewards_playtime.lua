@@ -16,6 +16,14 @@ local R = Core.playtimeRewards
 -- world on the machine shared one set of them.
 R.data = {}
 
+-- The key singleplayer files its progress under. The string "0" and not the
+-- number 0, which is what it used to be: the legacy import reads a converted
+-- PhunMart_PlaytimeTracking.json, and JSON object keys are necessarily
+-- strings, so a number on this side would never match the record coming in.
+-- "0" rather than a readable name because that is what the old number turns
+-- into through the converter. Same constant in wallet.lua and rewards_kill.lua.
+local SP_KEY = "0"
+
 function R:load()
     self.data = ModData.getOrCreate("PhunMart_PlaytimeTracking")
     self.loaded = true
@@ -28,7 +36,7 @@ function R:getPlayerData(usernameOrPlayer)
 
     local name
     if Core.isLocal then
-        name = 0
+        name = SP_KEY
     elseif type(usernameOrPlayer) == "string" then
         name = usernameOrPlayer
     else
