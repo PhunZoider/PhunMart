@@ -541,12 +541,78 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
 end
 
 -- -----------------------------
+-- Existence checks against the game database
+-- -----------------------------
+local function itemExists(itemType)
+    -- Server-side in PZ: getScriptManager():FindItem(itemType)
+    if getScriptManager then
+        local sm = getScriptManager()
+        if sm and sm:FindItem(itemType) then
+            return true
+        end
+    end
+    return false
+end
+
+--- Positive confirmation from the vehicle database: true only when the script
+--- is really in it. False when there is no database to ask, which is why the
+--- two callers below wrap it rather than share it.
+local function vehicleInDatabase(scriptName)
+    if type(scriptName) ~= "string" or not getScriptManager then
+        return false
+    end
+    local sm = getScriptManager()
+    if not sm or not sm.getVehicle then
+        return false
+    end
+    local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
+    return sm:getVehicle(fullType) ~= nil
+end
+
+--- Whether a spawnVehicle script an admin wrote should be kept. With no database
+--- to ask, everything is kept: dropping every vehicle offer where the question
+--- cannot be answered is worse than trusting what was written.
+local function vehicleExists(scriptName)
+    local sm = getScriptManager and getScriptManager()
+    if not sm or not sm.getVehicle then
+        return true
+    end
+    return vehicleInDatabase(scriptName)
+end
+
+--- Whether a key in a group's item list is a vehicle rather than an item. The
+--- opposite default to vehicleExists, for the opposite reason: this decides what
+--- a purchase hands over, so it answers no unless it is certain. An inventory
+--- item of the same name wins, because that is what the offer already gave.
+local function isVehicleScript(key)
+    return vehicleInDatabase(key) and not itemExists(key)
+end
+
+-- -----------------------------
 -- Special (actions) resolution
 -- -----------------------------
 local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemType, qty, logger)
     local r
     if specialRefOrInline == nil then
-        -- auto-special: give the item
+        -- auto-special: give the item.
+        --
+        -- Unless the key names a vehicle. A group's `items` list holds vehicle
+        -- script names alongside inventory item types, which is what the
+        -- Vehicles field in the group editor writes, and giveItem on a script
+        -- name hands over nothing: AddItem fails, the failure is a debug line,
+        -- and the player has already paid. Every shipped vehicle group escapes
+        -- that by naming a vehicle special in defaults.reward, so the hole was
+        -- open only for groups an admin wrote, which is the one place the
+        -- Vehicles field exists to serve.
+        if isVehicleScript(fallbackItemType) then
+            return {
+                kind = "vehicle",
+                actions = {{
+                    type = "spawnVehicle",
+                    script = fallbackItemType
+                }}
+            }
+        end
         return {
             display = {
                 item = fallbackItemType
@@ -584,28 +650,6 @@ end
 -- -----------------------------
 -- Group expansion (items/categories/specials/specialCategories)
 -- -----------------------------
-local function itemExists(itemType)
-    -- Server-side in PZ: getScriptManager():FindItem(itemType)
-    if getScriptManager then
-        local sm = getScriptManager()
-        if sm and sm:FindItem(itemType) then
-            return true
-        end
-    end
-    return false
-end
-
-local function vehicleExists(scriptName)
-    if not getScriptManager then
-        return true
-    end
-    local sm = getScriptManager()
-    if not sm or not sm.getVehicle then
-        return true
-    end
-    local fullType = scriptName:find("%.") and scriptName or ("Base." .. scriptName)
-    return sm:getVehicle(fullType) ~= nil
-end
 
 -- Builds a map of displayCategory -> set of fullItemName, cached for the compile run.
 -- Only called if any group uses categories.
@@ -1184,6 +1228,15 @@ function Compiler.compileAll(ctx)
                             poolRuntime.offers[offerId] = offer
                         elseif not offer.price then
                             logger:error("Offer '" .. offerId .. "' has no price (use price='free' if intended)")
+                            -- A preview keeps it, flagged, because "this item is
+                            -- missing a price" is the answer someone opened the
+                            -- preview to get. A real compile still drops it: an
+                            -- offer with no price cannot be sold.
+                            if ctx.keepPriceless and offer.reward then
+                                offer.meta.sourceType = meta.sourceType or "group"
+                                offer.meta.noPrice = true
+                                poolRuntime.offers[offerId] = offer
+                            end
                         else
                             logger:error("Failed to compile offer for " .. tostring(itemType) .. " in pool " ..
                                              tostring(poolKey))
@@ -1256,4 +1309,61 @@ function Compiler.compileAll(ctx)
     end
 
     return runtime, logger
+end
+
+-- -----------------------------
+-- Public: preview one group
+--
+-- What a group would put on a shelf, without needing a pool to put it in.
+--
+-- A group is not compiled on its own anywhere: items become offers only inside
+-- a pool, which is what supplies the fallback price and the roll. So the
+-- preview builds the smallest pool that could hold this group and compiles
+-- that, which means the result comes from the same code the real thing does
+-- rather than from a second implementation that could drift from it.
+--
+-- Two deliberate differences from a real compile, both so the preview can
+-- answer the question that prompted it:
+--   * the group is un-disabled and un-templated first, because "what is in
+--     this thing" is a fair question to ask about one that is switched off
+--   * offers with no price are kept and flagged rather than dropped
+--
+-- A `mods` gate is left alone: that one is not about the admin's intent, and a
+-- group needing an absent mod genuinely has nothing to show.
+-- -----------------------------
+Compiler.PREVIEW_POOL_KEY = "__preview"
+
+function Compiler.previewGroup(ctx, groupKey)
+    local groupDef = ctx.groups and ctx.groups[groupKey]
+    if type(groupDef) ~= "table" then
+        return nil
+    end
+
+    local preview = shallowCopy(groupDef)
+    preview.enabled = nil
+    preview.template = nil
+
+    local runtime, logger = Compiler.compileAll({
+        prices = ctx.prices,
+        specials = ctx.specials,
+        conditionsDefs = ctx.conditionsDefs,
+        items = ctx.items,
+        groups = {
+            [groupKey] = preview
+        },
+        pools = {
+            [Compiler.PREVIEW_POOL_KEY] = {
+                sources = {
+                    groups = {groupKey}
+                }
+            }
+        },
+        shops = {},
+        keepPriceless = true
+    })
+
+    -- The runtime comes back too: the preview compile generates its own
+    -- auto-conditions (the trait and boost gates), and the viewer needs that
+    -- table to put a name to the condition keys on each row.
+    return runtime.pools and runtime.pools[Compiler.PREVIEW_POOL_KEY], runtime, logger
 end

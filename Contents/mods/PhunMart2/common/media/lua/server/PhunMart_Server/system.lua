@@ -168,6 +168,33 @@ function ServerSystem.buildShopPayload(shopObj)
     }
 end
 
+--- Tell clients this machine's stock changed, so a shop window standing open in
+--- front of it redraws rather than showing the cycle before.
+---
+--- restock() saves and transmits modData, which is enough for the world and not
+--- enough for an open window: the window draws from the payload it was handed
+--- when it opened. Without this, a forced restock left the window showing offer
+--- IDs the shop no longer has, and buying one came back "Offer not found".
+---
+--- Broadcast rather than aimed at one player, because anyone can be standing at
+--- the machine, not only the admin who pressed the button. The client drops any
+--- key that is not the shop it has open, so a machine nobody is looking at costs
+--- one ignored message.
+function ServerSystem.notifyShopChanged(shopObj)
+    if not shopObj then
+        return
+    end
+    local payload = ServerSystem.buildShopPayload(shopObj)
+    if Core.isLocal then
+        triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
+    else
+        sendServerCommand(Core.name, Core.commands.onShopChange, {
+            key = payload.key,
+            data = payload
+        })
+    end
+end
+
 function ServerSystem:reroll(location, ignoreDistance)
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
     local square = shopObj:getIsoObject():getSquare()
@@ -208,6 +235,7 @@ function ServerSystem:restockAll()
         local obj = self:getLuaObjectByIndex(i)
         if obj then
             obj:restock()
+            ServerSystem.notifyShopChanged(obj)
             count = count + 1
         end
     end
@@ -246,6 +274,7 @@ function ServerSystem:restockTypes(types)
         local obj = self:getLuaObjectByIndex(i)
         if obj and wanted[obj.type] then
             obj:restock()
+            ServerSystem.notifyShopChanged(obj)
             count = count + 1
         end
     end

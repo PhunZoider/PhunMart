@@ -299,11 +299,15 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         -- nothing yet and the runtime has never heard of it.
         extraButton = (not isNew) and {
             text = getText("IGUI_PhunMart_Btn_ViewContents"),
+            -- Through the server, the same way the in-shop pool menu asks.
+            -- Reading the runtime here instead meant two faults: a disabled pool
+            -- is not in the runtime, so the button silently did nothing, and the
+            -- raw runtime pool carries no blacklist, so what did open drew every
+            -- blacklisted row as though it were live stock.
             onClick = function(f)
-                local poolData = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
-                if poolData then
-                    Core.ui.client.poolViewer.open(getSpecificPlayer(0), poolKey, poolData)
-                end
+                sendClientCommand(Core.name, Core.commands.requestPool, {
+                    poolKey = poolKey
+                })
             end
         } or nil,
         onApply = function(f)
@@ -391,21 +395,28 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         end,
     })
 
-    -- Identity above the tabs, name first. The name is what the lists show and
-    -- what you think in; the key is the machine-readable half and mostly fixed
-    -- once created, so leading with it put the least editable thing first.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- Identity above the tabs, key first.
+    --
+    -- This was the other way round, on the argument that the name is what the
+    -- lists show and what you think in, so leading with the key put the least
+    -- editable thing first. What that missed is that the key is the required
+    -- field and the name is an optional override of it, and a form that asks
+    -- for the optional half first reads as though the required half is
+    -- optional too. Filling in Name and being told Key is missing is the
+    -- specific confusion this order avoids.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = poolKey or "", editable = isNew,
         required = true,
+        hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if allPools[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     -- What the pool draws from, which is the whole of what a pool is for.
@@ -475,6 +486,17 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         min = 0,
         section = "p_more",
     })
+    -- Directly under stock, because it is a statement about stock: a sticky
+    -- pool's offers are all present every restock with no limit on them, which
+    -- is the setting the range above would otherwise be describing. It used to
+    -- sit below the zone and month gates, three fields away from the one it
+    -- qualifies.
+    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
+        checked = def.sticky == true,
+        text = getText("IGUI_PhunMart_Lbl_Sticky"),
+        hint = getText("IGUI_PhunMart_Hint_Sticky"),
+        section = "p_more",
+    })
     form:addTextField("zones", getText("IGUI_PhunMart_Lbl_Zones"), {
         default = zonesDefault,
         hint = getText("IGUI_PhunMart_Hint_Zones"),
@@ -487,12 +509,6 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
         default = monthsDefault,
         hint = getText("IGUI_PhunMart_Hint_Months"),
         validate = validateMonths,
-        section = "p_more",
-    })
-    form:addCheckField("sticky", getText("IGUI_PhunMart_Lbl_Sticky"), {
-        checked = def.sticky == true,
-        text = getText("IGUI_PhunMart_Lbl_Sticky"),
-        hint = getText("IGUI_PhunMart_Hint_Sticky"),
         section = "p_more",
     })
     -- Last resorts, below the group's own. No shipped pool sets either, and a
@@ -577,6 +593,7 @@ function UI:createChildren()
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), UI.onAddClick, false)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_View"), UI.onViewClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Duplicate"), UI.onDuplicateClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), UI.onDeleteClick, true)
 end
 
@@ -634,19 +651,36 @@ function UI:onAddClick()
     end)
 end
 
+--- Open a copy of the selected pool as a new entry. See the groups editor for
+--- what this is for; a pool carries zone and month gates that are tedious to
+--- retype and easy to get subtly wrong.
+function UI:onDuplicateClick()
+    local data = self:selectedRow()
+    if not data then
+        return
+    end
+    local pools = Core.defs and Core.defs.pools or require "PhunMart/defaults/pools"
+    local copy = Core.utils.deepCopy(data.def)
+    if copy.title and copy.title ~= "" then
+        copy.title = getText("IGUI_PhunMart_CopyOfX", copy.title)
+    end
+    createEditModal(self:copyKeyFor(data.key, pools), copy, true, function(key, def)
+        savePoolDef(key, def)
+        self:refreshPools()
+    end)
+end
+
 function UI:onViewClick()
-    if not self.list.selected or self.list.selected == 0 then
+    local data = self:selectedRow()
+    if not data then
         return
     end
-    local selectedItem = self.list.items[self.list.selected]
-    if not selectedItem then
-        return
-    end
-    local poolKey = selectedItem.item.key
-    local poolData = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
-    if poolData then
-        Core.ui.client.poolViewer.open(self.player, poolKey, poolData)
-    end
+    -- Through the server, like every other way into the viewer. This read the
+    -- runtime directly, which meant the button did nothing at all for a
+    -- disabled pool and drew blacklisted rows as live stock for the rest.
+    sendClientCommand(Core.name, Core.commands.requestPool, {
+        poolKey = data.key
+    })
 end
 
 function UI:onEditClick()
@@ -687,7 +721,11 @@ end
 
 -- Open the edit modal directly for a specific pool key (used by shop_main context menu).
 -- Pass nil poolKey to open in "Add" mode.
-function UI.OnEditPool(player, poolKey)
+--- @param onSaved optional function(key, isNew), for a caller that has somewhere
+---        to put the pool once it exists. Creating one from inside a shop is the
+---        case that needs it: the pool was made to be sold there, and leaving it
+---        unattached means the admin has to go and add it a second time.
+function UI.OnEditPool(player, poolKey, onSaved)
     local poolDef = nil
     local isNew = true
     if poolKey then
@@ -707,6 +745,9 @@ function UI.OnEditPool(player, poolKey)
             inst:refreshPools()
         end
         Core.debugLn("[PhunMart] Pool " .. (isNew and "added" or "updated") .. ": " .. key)
+        if onSaved then
+            onSaved(key, isNew)
+        end
     end)
 end
 

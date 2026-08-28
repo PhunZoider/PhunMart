@@ -568,20 +568,22 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         end
     })
 
-    -- Identity above the tabs, name first, matching the other editors.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- Identity above the tabs, key first, matching the other editors: the
+    -- required field before the optional one that overrides how it is shown.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = specialKey or "",
         editable = isNew,
         required = true,
+        hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if specials[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     -- Template checkbox
@@ -933,6 +935,7 @@ function UI:createChildren()
     -- Bottom buttons
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), UI.onAddClick, false)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), UI.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Duplicate"), UI.onDuplicateClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), UI.onDeleteClick, true)
 end
 
@@ -1016,6 +1019,28 @@ end
 
 function UI:onAddClick()
     createEditModal(nil, nil, true, function(key, def)
+        saveSpecialDef(self, key, def)
+    end)
+end
+
+--- Open a copy of the selected special as a new entry.
+---
+--- This is the tab the request came from. A template here stands behind
+--- hundreds of children, so wanting one slightly different version of it is
+--- common and editing the base to get there is the worst possible way: it
+--- changes every child at once. Copying a template yields a template, and
+--- copying a child keeps whatever it inherits, so both readings work.
+function UI:onDuplicateClick()
+    local data = self:selectedRow()
+    if not data then
+        return
+    end
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local copy = Core.utils.deepCopy(data.def)
+    if copy.title and copy.title ~= "" then
+        copy.title = getText("IGUI_PhunMart_CopyOfX", copy.title)
+    end
+    createEditModal(self:copyKeyFor(data.key, specials), copy, true, function(key, def)
         saveSpecialDef(self, key, def)
     end)
 end

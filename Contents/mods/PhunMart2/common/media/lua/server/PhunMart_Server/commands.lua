@@ -36,15 +36,7 @@ Commands[Core.commands.restock] = function(playerObj, args)
         return
     end
     obj:restock()
-    local payload = Core.ServerSystem.buildShopPayload(obj)
-    if Core.isLocal then
-        triggerEvent(Core.events.OnShopChange, payload.key, payload, false)
-    else
-        sendServerCommand(Core.name, Core.commands.onShopChange, {
-            key = payload.key,
-            data = payload
-        })
-    end
+    Core.ServerSystem.notifyShopChanged(obj)
 end
 
 Commands[Core.commands.changeTo] = function(playerObj, args)
@@ -923,6 +915,59 @@ Commands[Core.commands.adjustPlayerWallet] = function(player, args)
     end
 end
 
+--- Why a pool has no compiled contents, or nil when it does.
+--- Only ever consulted for a pool the runtime does not hold: those are the ones
+--- that would otherwise open as an unexplained empty list.
+local function poolUnavailableReason(poolDef)
+    if not poolDef then
+        return "missing"
+    end
+    if poolDef.template == true then
+        return "template"
+    end
+    if poolDef.enabled == false then
+        return "disabled"
+    end
+    -- Left over: a `mods` gate naming something that is not loaded.
+    return "gated"
+end
+
+--- What the pool viewer needs to draw one pool: its offers, the conditions they
+--- reference, and the global blacklist, which the viewer greys rows against and
+--- cannot work out for itself.
+local function buildPoolPayload(poolKey)
+    local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+    return {
+        poolKey = poolKey,
+        offers = pool and pool.offers or {},
+        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
+        blacklisted = (Core.getBlacklist().items or {}).exclude or {},
+        unavailable = (not pool) and
+            poolUnavailableReason(Core.defs and Core.defs.pools and Core.defs.pools[poolKey]) or nil
+    }
+end
+
+--- Send a pool back to one admin. `refresh` updates an open viewer in place
+--- rather than opening one, which is what an edit made from inside it wants:
+--- reopening would drop the scroll position and the filters.
+local function sendPool(playerObj, poolKey, refresh)
+    local data = buildPoolPayload(poolKey)
+    if Core.isLocal then
+        if refresh then
+            Core.ui.client.poolViewer.refreshData(poolKey, data)
+        else
+            Core.ui.client.poolViewer.open(playerObj, poolKey, data)
+        end
+    else
+        sendServerCommand(playerObj, Core.name, Core.commands.requestPool, {
+            username = playerObj:getUsername(),
+            poolKey = poolKey,
+            data = data,
+            refresh = refresh == true
+        })
+    end
+end
+
 Commands[Core.commands.requestPool] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
@@ -931,23 +976,63 @@ Commands[Core.commands.requestPool] = function(playerObj, args)
     if not poolKey then
         return
     end
-    local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
-    local excluded = (Core.getBlacklist().items or {}).exclude or {}
+    sendPool(playerObj, poolKey, false)
+end
+
+--- The same viewer, pointed at a group.
+---
+--- A group has no compiled contents of its own, so this compiles a preview of
+--- one (see Compiler.previewGroup) and sends it in the shape the pool viewer
+--- already reads. `isGroup` tells the viewer which of the two it is looking at,
+--- so it can label itself and send its edits back the same way.
+local function sendGroupPreview(playerObj, groupKey, refresh)
+    local pool, previewRuntime = Core.compiler.previewGroup(Core.defs or {}, groupKey)
+    local offers = pool and pool.offers or {}
+    local empty = true
+    for _ in pairs(offers) do
+        empty = false
+        break
+    end
+
     local data = {
-        poolKey = poolKey,
-        offers = pool and pool.offers or {},
-        conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
-        blacklisted = excluded
+        poolKey = groupKey,
+        isGroup = true,
+        offers = offers,
+        conditionsDefs = previewRuntime and previewRuntime.conditionsDefs,
+        blacklisted = (Core.getBlacklist().items or {}).exclude or {},
+        -- A group can come back empty for reasons worth naming: it lists
+        -- nothing, or a mods gate this server does not satisfy. Being switched
+        -- off is not one of them, because the preview looks inside a disabled
+        -- group on purpose.
+        unavailable = empty and
+            ((Core.defs and Core.defs.groups and Core.defs.groups[groupKey]) and "emptygroup" or "missing") or nil
     }
+
     if Core.isLocal then
-        Core.ui.client.poolViewer.open(playerObj, poolKey, data)
+        if refresh then
+            Core.ui.client.poolViewer.refreshData(groupKey, data)
+        else
+            Core.ui.client.poolViewer.open(playerObj, groupKey, data)
+        end
     else
         sendServerCommand(playerObj, Core.name, Core.commands.requestPool, {
             username = playerObj:getUsername(),
-            poolKey = poolKey,
-            data = data
+            poolKey = groupKey,
+            data = data,
+            refresh = refresh == true
         })
     end
+end
+
+Commands[Core.commands.requestGroup] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    local groupKey = args and args.groupKey
+    if not groupKey then
+        return
+    end
+    sendGroupPreview(playerObj, groupKey, false)
 end
 
 Commands[Core.commands.quickBlacklist] = function(playerObj, args)
@@ -1035,6 +1120,19 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     Core.ServerSystem.instance:recompileShops()
 end
 
+-- Weight used to be written straight onto the compiled runtime and nowhere
+-- else, so it survived exactly until the next compile: any definition save, any
+-- pool blacklist, any restart. That is also why the same pool read from the
+-- Pools tab disagreed with the one read from inside a shop, which looked like
+-- the shop holding a private copy and was really the edit having already
+-- evaporated.
+--
+-- It persists as an item override, because that is the only per-item slot in
+-- the merge chain (pool defaults -> group defaults -> special -> item override)
+-- and it is the last link, so it wins. The consequence worth knowing: an item
+-- override is global. Reweighting an item here reweights it in every pool that
+-- draws the same item, and there is nowhere finer to put it without inventing a
+-- per-pool item table the compiler does not have.
 Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
@@ -1045,46 +1143,146 @@ Commands[Core.commands.updateOfferWeight] = function(playerObj, args)
     if not (poolKey and offerId and weight and weight >= 0) then
         return
     end
-    local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
-    if not pool then
+
+    -- The client names the item outright. Resolving it by looking the offer up
+    -- in its pool worked only for a real pool, so the same edit made from a
+    -- group preview, whose offers belong to a pool built for the asking and
+    -- discarded, found nothing and silently did nothing. The pool is still
+    -- consulted as a fallback for a client that did not send the item.
+    local itemKey = args and args.itemKey
+    if not itemKey then
+        local pool = Core.runtime and Core.runtime.pools and Core.runtime.pools[poolKey]
+        local offer = pool and pool.offers and pool.offers[offerId]
+        itemKey = offer and offer.item
+    end
+    if not itemKey then
         return
     end
-    local offer = pool.offers and pool.offers[offerId]
-    if not offer then
-        return
+
+    local current = Core.defs and Core.defs.items and Core.defs.items[itemKey]
+    local def = Core.utils.deepCopy(current or {})
+    def.offer = def.offer or {}
+    def.offer.weight = weight
+    -- Same path as the Items tab: diffs against the shipped defaults, merges
+    -- into the override file, and recompiles.
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("items"), "items", itemKey, def)
+
+    -- After the recompile, so the viewer redraws from the pool that now exists
+    -- rather than the one that was replaced. A group preview is recompiled the
+    -- same way, since its offers went out of date for the same reason.
+    if args.isGroup then
+        sendGroupPreview(playerObj, poolKey, true)
+    else
+        sendPool(playerObj, poolKey, true)
     end
-    -- weight lives inside offer.offer sub-table
-    offer.offer = offer.offer or {}
-    offer.offer.weight = weight
 end
 
+-- Moving an offer between pools used to shuffle the compiled runtime and write
+-- nothing, so the move lasted until the next compile and no further.
+--
+-- There is no per-pool item list to move an entry into: an offer is in a pool
+-- because a group among that pool's sources yields the item. So a move is two
+-- edits to the definitions that produced it, which is what an admin would do by
+-- hand. Add the item to a group the destination pool draws from, and blacklist
+-- it in the source pool, the same pool-level blacklist the in-shop menu writes.
+--
+-- Worth knowing: a group can be a source of more than one pool, so adding an
+-- item to a group adds it to every pool drawing on that group, not only the one
+-- chosen here. The dialog names the group it is about to write to, which is as
+-- far as the UI goes towards saying so.
 Commands[Core.commands.moveOffers] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
     local fromPool = args and args.fromPool
     local toPool = args and args.toPool
+    local toGroup = args and args.toGroup
     local offerIds = args and args.offerIds
-    if not (fromPool and toPool and offerIds and fromPool ~= toPool) then
+    if not (fromPool and toPool and toGroup and offerIds and fromPool ~= toPool) then
         return
     end
-    local pools = Core.runtime and Core.runtime.pools
-    if not pools then
+
+    local src = Core.runtime and Core.runtime.pools and Core.runtime.pools[fromPool]
+    if not (src and src.offers) then
         return
     end
-    local src = pools[fromPool]
-    local dst = pools[toPool]
-    if not (src and src.offers and dst) then
-        return
-    end
-    dst.offers = dst.offers or {}
-    for _, offerId in ipairs(offerIds) do
-        local offer = src.offers[offerId]
-        if offer then
-            dst.offers[offerId] = offer
-            src.offers[offerId] = nil
+
+    -- The destination group has to be one the destination pool actually draws
+    -- from, or the items would land somewhere the pool never reads. The client
+    -- only offers valid ones; this is the server not taking its word for it.
+    local toPoolDef = Core.defs and Core.defs.pools and Core.defs.pools[toPool]
+    local sourceGroups = toPoolDef and toPoolDef.sources and toPoolDef.sources.groups or {}
+    local groupIsValid = false
+    for _, g in ipairs(sourceGroups) do
+        if g == toGroup then
+            groupIsValid = true
+            break
         end
     end
+    if not groupIsValid then
+        Core.debugLn("moveOffers: group '" .. tostring(toGroup) .. "' is not a source of pool '" .. tostring(toPool) ..
+                         "'")
+        return
+    end
+
+    local itemKeys = {}
+    for _, offerId in ipairs(offerIds) do
+        local offer = src.offers[offerId]
+        if offer and offer.item then
+            table.insert(itemKeys, offer.item)
+        end
+    end
+    if #itemKeys == 0 then
+        return
+    end
+
+    -- Destination: add to the group's item list.
+    -- Both lists below are built from Core.defs, which is defaults and override
+    -- already merged, because a sequence in an override replaces rather than
+    -- merges. Writing back only what the override happened to hold would drop
+    -- whatever the shipped default contributed.
+    local groupsFile = Core.primaryOverride("groups")
+    local groupsOverride = Core.fileUtils.loadTable(groupsFile) or {}
+    local groupDef = Core.defs and Core.defs.groups and Core.defs.groups[toGroup] or {}
+    local items, seen = {}, {}
+    for _, k in ipairs(groupDef.items or {}) do
+        items[#items + 1] = k
+        seen[k] = true
+    end
+    for _, k in ipairs(itemKeys) do
+        if not seen[k] then
+            items[#items + 1] = k
+            seen[k] = true
+        end
+    end
+    groupsOverride[toGroup] = groupsOverride[toGroup] or {}
+    groupsOverride[toGroup].items = items
+    Core.fileUtils.saveTable(groupsFile, groupsOverride)
+
+    -- Source: blacklist in the pool.
+    local poolsFile = Core.primaryOverride("pools")
+    local poolsOverride = Core.fileUtils.loadTable(poolsFile) or {}
+    local fromPoolDef = Core.defs and Core.defs.pools and Core.defs.pools[fromPool] or {}
+    local blacklist, blacklisted = {}, {}
+    for _, k in ipairs(fromPoolDef.blacklist or {}) do
+        blacklist[#blacklist + 1] = k
+        blacklisted[k] = true
+    end
+    for _, k in ipairs(itemKeys) do
+        if not blacklisted[k] then
+            blacklist[#blacklist + 1] = k
+            blacklisted[k] = true
+        end
+    end
+    poolsOverride[fromPool] = poolsOverride[fromPool] or {}
+    poolsOverride[fromPool].blacklist = blacklist
+    Core.fileUtils.saveTable(poolsFile, poolsOverride)
+
+    -- One recompile for both files, rather than one per file: compile re-reads
+    -- every override from disk, so the second would only repeat the first.
+    Core.ServerSystem.instance:recompileShops()
+
+    sendPool(playerObj, fromPool, true)
 end
 
 return Commands

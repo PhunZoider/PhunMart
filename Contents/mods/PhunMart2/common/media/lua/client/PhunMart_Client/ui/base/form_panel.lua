@@ -680,11 +680,22 @@ function FormPanel:setHintText(key, text)
         -- attempted Apply, _refreshMessages repaints this label from f.hint
         -- every frame and would otherwise undo the change.
         f.hint = text
-        if f._hint and not (self._showErrors and f._error) then
-            f._hint:setName(text)
-            if f._fieldX then
-                f._hint:setX(f._fieldX)
-            end
+        if f._hint then
+            -- Through _refreshMessages rather than straight to the label, so a
+            -- warning or an error on this field keeps the line it has earned.
+            self:_refreshMessages()
+        end
+    end
+end
+
+--- Put an amber note under a field, or clear it with nil. Unlike an error this
+--- shows immediately and does not block Apply. See _refreshMessages.
+function FormPanel:setFieldWarning(key, text)
+    local f = self._fieldsByKey[key]
+    if f then
+        f.warning = (text ~= "") and text or nil
+        if f._hint then
+            self:_refreshMessages()
         end
     end
 end
@@ -1826,6 +1837,14 @@ end
 --- prerender, in its own colour, so a field can say both what it is for and
 --- where its value came from. Replacing the hint cost the explanation on
 --- exactly the fields most likely to need one.
+--- Three things can occupy the line under a field, and they rank.
+---
+--- An error is red, appears once Apply has been attempted, and stops the save.
+--- A warning is amber, appears the moment it becomes true, and stops nothing:
+--- it is for a setting that is allowed and probably not what was meant, where
+--- refusing the save would be wrong because the missing half can legitimately
+--- arrive from somewhere this form cannot see.
+--- A hint is grey and says what the field is for.
 function FormPanel:_refreshMessages()
     for _, f in ipairs(self._fields) do
         if f._hint then
@@ -1833,6 +1852,9 @@ function FormPanel:_refreshMessages()
             if showError then
                 f._hint:setName(showError)
                 f._hint.r, f._hint.g, f._hint.b = 0.95, 0.45, 0.4
+            elseif f.warning then
+                f._hint:setName(f.warning)
+                f._hint.r, f._hint.g, f._hint.b = 0.95, 0.75, 0.35
             else
                 f._hint:setName(f.hint or "")
                 f._hint.r, f._hint.g, f._hint.b = 0.5, 0.5, 0.5

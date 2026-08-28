@@ -51,6 +51,7 @@ PhunMart = {
         requestLocations = "PhunMartRequestLocations",
         requestItemDefs = "PhunMartRequestItemDefs",
         requestPool = "PhunMartRequestPool",
+        requestGroup = "PhunMartRequestGroup",
         quickBlacklist = "PhunMartQuickBlacklist",
         blacklistInPool = "PhunMartBlacklistInPool",
         getGlobalBlacklist = "PhunMartGetGlobalBlacklist",

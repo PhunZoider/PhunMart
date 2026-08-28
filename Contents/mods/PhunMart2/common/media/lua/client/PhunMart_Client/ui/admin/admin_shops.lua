@@ -160,6 +160,27 @@ local function createSetEditForm(setData, isNew, cb)
         weightByKey[entry.key] = entry.weight or 1.0
     end
 
+    -- What the Weight field opens on, and what "unchanged" means for it.
+    --
+    -- The field used to default to 1.0 whatever the pools actually held, and on
+    -- save it was applied only to pools that had no weight yet. So it misreported
+    -- the current state, and editing it did nothing to any pool already in the
+    -- set: a control that looked live and was not.
+    --
+    -- Now it shows the weight when they all agree, and blank when they do not.
+    -- Blank means leave each pool as it is. Anything else is applied to every
+    -- pool in the set, which is what a single field labelled Weight should do.
+    local commonWeight, mixedWeights = nil, false
+    for _, entry in ipairs(set.keys or {}) do
+        local w = entry.weight or 1.0
+        if commonWeight == nil then
+            commonWeight = w
+        elseif commonWeight ~= w then
+            mixedWeights = true
+        end
+    end
+    local weightDefault = mixedWeights and "" or tostring(commonWeight or 1.0)
+
     local function formatPoolDisplay(keys)
         if not keys or #keys == 0 then
             return getText("IGUI_PhunMart_Lbl_None")
@@ -206,11 +227,13 @@ local function createSetEditForm(setData, isNew, cb)
                 result.price = price
             end
 
-            local defaultWeight = f:getFieldNumber("weight") or 1.0
+            -- A number applies to every pool here; blank keeps what each one
+            -- already had, and gives a pool just added the usual 1.0.
+            local weight = f:getFieldNumber("weight")
             for _, poolKey in ipairs(pools) do
                 table.insert(result.keys, {
                     key = poolKey,
-                    weight = weightByKey[poolKey] or defaultWeight
+                    weight = weight or weightByKey[poolKey] or 1.0
                 })
             end
 
@@ -236,8 +259,9 @@ local function createSetEditForm(setData, isNew, cb)
         end
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
-        default = "1.0",
-        hint = getText("IGUI_PhunMart_Hint_PoolWeight"),
+        default = weightDefault,
+        hint = mixedWeights and getText("IGUI_PhunMart_Hint_PoolWeightMixed") or
+            getText("IGUI_PhunMart_Hint_PoolWeight"),
         numeric = true,
         min = 0
     })
@@ -367,14 +391,14 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
     -- Identity, above the tabs. What you are editing should not be on a tab you
     -- might not be looking at. The form used to open on the Enabled tickbox,
     -- which is a state, not a name.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_ShopTitle")
-    })
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = shopKey or "",
         editable = false,
         hint = getText("IGUI_PhunMart_Hint_ShopKey")
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_ShopTitle")
     })
 
     form:addTextField("probability", getText("IGUI_PhunMart_Lbl_Probability"), {
@@ -514,15 +538,19 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
 
     -- Before initialise: only one section's fields are visible, and the window
     -- is sized from what is on screen.
+    -- Stock leads, and so is the tab the form opens on. It holds the pool sets,
+    -- which is what a shop actually sells and the reason most edits start; the
+    -- Basics tab is spawn chance, minimum distance and reroll frequency, which
+    -- are set once and revisited rarely.
     form:setSections({{
+        section = "s_stock",
+        label = getText("IGUI_PhunMart_Sec_Stock")
+    }, {
         section = "s_basics",
         label = getText("IGUI_PhunMart_Sec_Basics")
     }, {
         section = "s_look",
         label = getText("IGUI_PhunMart_Sec_Appearance")
-    }, {
-        section = "s_stock",
-        label = getText("IGUI_PhunMart_Sec_Stock")
     }})
 
     form:initialise()

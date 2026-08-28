@@ -420,6 +420,32 @@ function ListPanel:isTemplateRow(itemData)
     return itemData and itemData.template == true
 end
 
+--- The data behind the selected row, or nil when nothing is selected.
+--- Every editor was opening with the same six lines of guarding to reach it.
+function ListPanel:selectedRow()
+    if not self.list.selected or self.list.selected == 0 then
+        return nil
+    end
+    local selected = self.list.items[self.list.selected]
+    return selected and selected.item or nil
+end
+
+--- A free key for a copy of `key`: "vehicles_small" becomes
+--- "vehicles_small_copy", then _copy2 and so on if those are taken.
+--- Only a suggestion. The copy opens as a new entry with its key editable, so
+--- an admin who has a better name types it before saving.
+function ListPanel:copyKeyFor(key, defs)
+    local base = tostring(key or "new") .. "_copy"
+    if not defs[base] then
+        return base
+    end
+    local n = 2
+    while defs[base .. tostring(n)] do
+        n = n + 1
+    end
+    return base .. tostring(n)
+end
+
 --- Add a button to the bottom bar (left-aligned).
 -- @param text            Button label
 -- @param callback        Click handler

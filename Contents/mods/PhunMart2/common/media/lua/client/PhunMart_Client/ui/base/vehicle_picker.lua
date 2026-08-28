@@ -12,6 +12,7 @@ end
 
 local Core = PhunMart
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
+local PickerPanel = require "PhunMart_Client/ui/base/picker_panel"
 
 local VehiclePicker = ItemPicker:derive("PhunMartVehiclePicker")
 
@@ -94,8 +95,7 @@ function VehiclePicker.open(player, selectedKeys, callback)
     local core = getCore()
     local sw = core:getScreenWidth()
     local sh = core:getScreenHeight()
-    local w = math.min(600, sw - 40)
-    local h = math.min(600, sh - 40)
+    local w, h = PickerPanel.sizeFor(640, 600)
     local x = math.floor((sw - w) / 2)
     local y = math.floor((sh - h) / 2)
 

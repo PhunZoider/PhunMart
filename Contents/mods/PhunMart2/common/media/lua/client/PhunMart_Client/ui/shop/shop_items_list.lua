@@ -629,6 +629,23 @@ function UI:renderGrid()
                 local code = string.char(65 + globalRow) .. tostring(col + 1)
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
 
+                -- how many are left, top-right, and only when that is a finite
+                -- number. An unmarked cell is unlimited; the details panel says
+                -- as much in words, so nothing here has to be inferred from an
+                -- absence. Amber at two or fewer, which is the point at which
+                -- "am I about to buy this out" becomes a real question.
+                if stockQty and stockQty ~= -1 and stockQty > 0 then
+                    local stockText = getText("IGUI_PhunMart_StockBadge", tostring(stockQty))
+                    local stw = getTextManager():MeasureStringX(UIFont.Small, stockText)
+                    local sx = cx + cs - stw - 3
+                    self:drawRect(sx - 1, cy + 1, stw + 2, FONT_SM + 1, 0.75, 0, 0, 0)
+                    local sr, sg, sb = 0.72, 0.76, 0.80
+                    if stockQty <= 2 then
+                        sr, sg, sb = 0.95, 0.72, 0.30
+                    end
+                    self:drawText(stockText, sx, cy + 1, sr, sg, sb, 1, UIFont.Small)
+                end
+
                 -- price/OOS badge bottom-right
                 local badge, badgeTex
                 if isOOS then

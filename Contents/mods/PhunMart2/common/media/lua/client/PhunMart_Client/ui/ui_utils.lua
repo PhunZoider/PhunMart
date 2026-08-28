@@ -496,4 +496,23 @@ function tools.resolveParent(defs, def)
     return tools.resolveInherited(defs, def.inherit)
 end
 
+--- A yes/no modal that calls back on yes, with the text wrapped to the box.
+--- ISModalDialog reports which button through `internal`, which every caller
+--- was unpacking for itself.
+function tools.confirm(text, onYes, owner)
+    local lines = tools.wrapText(text, math.floor(340 * tools.FONT_SCALE), UIFont.Small)
+    local w = math.floor(380 * tools.FONT_SCALE)
+    local h = math.max(math.floor(130 * tools.FONT_SCALE),
+        #lines * tools.FONT_HGT_SMALL + math.floor(90 * tools.FONT_SCALE))
+    local modal = ISModalDialog:new((getCore():getScreenWidth() - w) / 2, (getCore():getScreenHeight() - h) / 2, w, h,
+        table.concat(lines, "\n"), true, owner, function(_, button)
+            if button.internal == "YES" and onYes then
+                onYes()
+            end
+        end)
+    modal:initialise()
+    modal:addToUIManager()
+    return modal
+end
+
 return tools

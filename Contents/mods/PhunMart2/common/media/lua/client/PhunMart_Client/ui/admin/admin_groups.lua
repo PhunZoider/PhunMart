@@ -34,6 +34,28 @@ local function priceHintFor(key)
     return text
 end
 
+--- The warning for a group with no price, or nil when there is nothing to warn
+--- about.
+---
+--- An offer that reaches the end of the merge chain without a price is dropped
+--- by the compiler, which logs and moves on, so the symptom is an item that
+--- simply never appears in a shop and nothing on screen saying why.
+---
+--- Not an error, because a price can still arrive from the pool this group ends
+--- up in, or from an item override, neither of which this form can see. And not
+--- shown at all for a group built only from specials: those carry their own
+--- prices, which is exactly the case that makes the rule look inconsistent from
+--- the outside.
+local function priceWarningFor(price, items, cats, vehicles)
+    if price and price ~= "" then
+        return nil
+    end
+    if #items == 0 and #cats == 0 and #vehicles == 0 then
+        return nil
+    end
+    return getText("IGUI_PhunMart_Warn_GroupNoPrice")
+end
+
 local function getSortedKeys(tbl)
     local keys = {}
     for k in pairs(tbl) do
@@ -228,6 +250,18 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 end
             end)
         end or nil,
+        -- The contents, from inside the group, so checking what a category
+        -- actually pulled in does not mean closing this and finding the row
+        -- again. Existing groups only: a new one has nothing to show until it
+        -- has been saved.
+        extraButton = (not isNew) and {
+            text = getText("IGUI_PhunMart_Btn_ViewContents"),
+            onClick = function(f)
+                sendClientCommand(Core.name, Core.commands.requestGroup, {
+                    groupKey = groupKey
+                })
+            end
+        } or nil,
         -- A group with nothing to draw from produces no offers. Every shipped
         -- group has exactly one source, so requiring one blocks nothing real.
         validate = function(f)
@@ -294,25 +328,56 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         end,
     })
 
-    -- Identity above the tabs, name first, the same two rows as everywhere else.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- Identity above the tabs, the same rows as everywhere else.
+    --
+    -- Key first because it is the required one and the only one that cannot be
+    -- changed later. It used to sit under Name, which reads as Name being the
+    -- field that matters and Key as the afterthought, when it is the other way
+    -- round: Name is an optional override for how the key is displayed.
+    --
+    -- Label joins them rather than living in Basics. All three are names for
+    -- this group, differing only in who reads them, and the way to see that
+    -- they are three of a kind is to have them in one place.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = groupKey or "", editable = isNew,
         required = true,
+        hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if groups[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
     })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
+    })
     -- The heading players see in the shop, which is not the same thing as the
     -- name this group goes by in these lists.
     form:addTextField("label", getText("IGUI_PhunMart_Lbl_Label"), {
         default = def.label or "",
         hint = getText("IGUI_PhunMart_Hint_Label"),
+    })
+    -- Whether the price warning applies depends on what the pickers hold, so
+    -- every one of them that changes the answer refreshes it.
+    local function refreshPriceWarning(f)
+        f:setFieldWarning("price",
+            priceWarningFor(f:getFieldValue("price"), selectedItems, selectedCats, selectedVehicles))
+    end
+
+    -- Seven pickers in a column, alternating between the two ways of naming
+    -- things: pick this exact item, or pick everything in a category. Ordered
+    -- and divided so the two are read as two, because which one you are looking
+    -- at changes what the field means and nothing on screen said so.
+    -- Above the first heading, because it belongs to the group rather than to
+    -- any one block below, and it has no business sitting under a heading that
+    -- says Price.
+    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
+        checked = def.enabled ~= false,
+        section = "g_basics",
+    })
+    form:addSeparator("sep_individual", {
+        text = getText("IGUI_PhunMart_Sec_Individual"),
         section = "g_basics",
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
@@ -322,6 +387,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             ItemPicker.open(getSpecificPlayer(0), selectedItems, function(keys)
                 selectedItems = keys or {}
                 f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
+                refreshPriceWarning(f)
             end)
         end,
     })
@@ -334,16 +400,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
                 selectedVehicles = keys or {}
                 f:setPickerValue("vehicles", selectedVehicles, formatVehicleList(selectedVehicles))
-            end)
-        end,
-    })
-    form:addPickerField("cats", getText("IGUI_PhunMart_Lbl_Categories"), {
-        value = selectedCats, display = formatCatList(selectedCats),
-        section = "g_basics",
-        onPick = function(f, field)
-            CategoryPicker.open(getSpecificPlayer(0), selectedCats, function(keys)
-                selectedCats = keys or {}
-                f:setPickerValue("cats", selectedCats, formatCatList(selectedCats))
+                refreshPriceWarning(f)
             end)
         end,
     })
@@ -357,16 +414,6 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickSpecials") })
         end,
     })
-    form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_SpecialCats"), {
-        value = selectedSpecialCats, display = formatCatList(selectedSpecialCats),
-        section = "g_basics",
-        onPick = function(f, field)
-            KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecialCats, function(keys)
-                selectedSpecialCats = keys or {}
-                f:setPickerValue("specialCats", selectedSpecialCats, formatCatList(selectedSpecialCats))
-            end, { title = getText("IGUI_PhunMart_Admin_PickSpecialCats") })
-        end,
-    })
     form:addPickerField("blItems", getText("IGUI_PhunMart_Lbl_BlacklistItems"), {
         value = selectedBlItems, display = formatItemList(selectedBlItems),
         section = "g_basics",
@@ -375,6 +422,32 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 selectedBlItems = keys or {}
                 f:setPickerValue("blItems", selectedBlItems, formatItemList(selectedBlItems))
             end)
+        end,
+    })
+
+    form:addSeparator("sep_categories", {
+        text = getText("IGUI_PhunMart_Sec_Categories"),
+        section = "g_basics",
+    })
+    form:addPickerField("cats", getText("IGUI_PhunMart_Lbl_Categories"), {
+        value = selectedCats, display = formatCatList(selectedCats),
+        section = "g_basics",
+        onPick = function(f, field)
+            CategoryPicker.open(getSpecificPlayer(0), selectedCats, function(keys)
+                selectedCats = keys or {}
+                f:setPickerValue("cats", selectedCats, formatCatList(selectedCats))
+                refreshPriceWarning(f)
+            end)
+        end,
+    })
+    form:addPickerField("specialCats", getText("IGUI_PhunMart_Lbl_SpecialCats"), {
+        value = selectedSpecialCats, display = formatCatList(selectedSpecialCats),
+        section = "g_basics",
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), specialCatOptions, selectedSpecialCats, function(keys)
+                selectedSpecialCats = keys or {}
+                f:setPickerValue("specialCats", selectedSpecialCats, formatCatList(selectedSpecialCats))
+            end, { title = getText("IGUI_PhunMart_Admin_PickSpecialCats") })
         end,
     })
     form:addPickerField("blCats", getText("IGUI_PhunMart_Lbl_BlacklistCats"), {
@@ -386,6 +459,11 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 f:setPickerValue("blCats", selectedBlCats, formatCatList(selectedBlCats))
             end)
         end,
+    })
+
+    form:addSeparator("sep_price", {
+        text = getText("IGUI_PhunMart_Sec_Price"),
+        section = "g_basics",
     })
     -- These two are the group's defaults, applied to every item it contains.
     -- "Default Price" with a hint about overrides, which described the one case
@@ -408,13 +486,9 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         },
         onChange = function(f)
             f:setHintText("price", priceHintFor(f:getFieldValue("price")))
+            refreshPriceWarning(f)
         end,
     })
-    form:addCheckField("enabled", getText("IGUI_PhunMart_Lbl_Enabled_Checkbox"), {
-        checked = def.enabled ~= false,
-        section = "g_basics",
-    })
-
     form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
         value = selectedSpecial, display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
         hint = getText("IGUI_PhunMart_Hint_GroupGrants"),
@@ -453,6 +527,10 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     }})
 
     form:initialise()
+    -- After initialise, which is where the message labels come from: a group
+    -- that already has this problem should say so on open rather than wait to
+    -- be edited into saying it.
+    refreshPriceWarning(form)
     form:addToUIManager()
     form:bringToTop()
     return form
@@ -518,7 +596,25 @@ function UI:createChildren()
 
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_View"), self.onViewClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Duplicate"), self.onDuplicateClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), self.onDeleteClick, true)
+end
+
+--- What this group actually yields, in the same viewer pools use.
+---
+--- The question a group cannot otherwise answer: one built from categories
+--- lists two category names and stands for four hundred items, and until now
+--- the only way to find out which four hundred was to put it in a pool and
+--- look at that instead.
+function UI:onViewClick()
+    local data = self:selectedRow()
+    if not data then
+        return
+    end
+    sendClientCommand(Core.name, Core.commands.requestGroup, {
+        groupKey = data.key
+    })
 end
 
 function UI:onDeleteClick()
@@ -579,6 +675,30 @@ end
 
 function UI:onAddClick()
     createEditModal(nil, nil, true, function(key, def)
+        saveGroupDef(self, key, def)
+    end)
+end
+
+--- Open a copy of the selected group as a new entry.
+---
+--- The nearest thing to a starting point this editor has: a shipped group is
+--- a worked example of eleven fields, and the only way to borrow one was to
+--- read it in one window and retype it in another. Editing the original
+--- instead is the mistake this exists to prevent.
+function UI:onDuplicateClick()
+    local data = self:selectedRow()
+    if not data then
+        return
+    end
+    local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
+    local copy = Core.utils.deepCopy(data.def)
+    -- The list shows the name where there is one, so two rows both reading
+    -- "Small Cars" with nothing to tell them apart is the first thing this
+    -- would otherwise produce.
+    if copy.title and copy.title ~= "" then
+        copy.title = getText("IGUI_PhunMart_CopyOfX", copy.title)
+    end
+    createEditModal(self:copyKeyFor(data.key, groups), copy, true, function(key, def)
         saveGroupDef(self, key, def)
     end)
 end

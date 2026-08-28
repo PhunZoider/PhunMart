@@ -35,6 +35,26 @@ PickerPanel.BUTTON_HGT = BUTTON_HGT
 PickerPanel.CHECK_SZ = CHECK_SZ
 
 ---------------------------------------------------------------------------
+-- Sizing
+---------------------------------------------------------------------------
+
+--- The size a picker should open at, given its base size at a default UI font.
+---
+--- Every picker used to carry a raw pixel constant, so at a large UI font the
+--- text grew and the window did not: the button bar ran out of room and Apply
+--- printed over the count label. Scaled by the font for that reason, and
+--- clamped to the screen so the scaling cannot push the window off the edge.
+---
+--- The bases are set for the current bar of four buttons. Adding a fifth means
+--- revisiting them, which prerender will survive but not flatter.
+function PickerPanel.sizeFor(baseW, baseH)
+    local core = getCore()
+    local w = math.min(math.floor(baseW * FONT_SCALE), core:getScreenWidth() - 40)
+    local h = math.min(math.floor(baseH * FONT_SCALE), core:getScreenHeight() - 40)
+    return w, h
+end
+
+---------------------------------------------------------------------------
 -- Construction
 ---------------------------------------------------------------------------
 
@@ -170,6 +190,28 @@ function PickerPanel:createChildren()
     end
     self._buttonBar:addChild(self._cancelBtn)
 
+    -- All / None, which act on the rows the filter is currently showing rather
+    -- than on everything. Filter to "saw", press All: that is the useful
+    -- gesture, and it is also the safe one. On the item picker the unfiltered
+    -- list is the entire game item database, and a button that selected all of
+    -- it would be a trap rather than a convenience.
+    if not self.singleSelect then
+        local allW = math.max(math.floor(52 * FONT_SCALE),
+            getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_All")) + PAD)
+        self._allBtn = ISButton:new(0, PAD, allW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_All"), self, self.onSelectAll)
+        self._allBtn:initialise()
+        self._allBtn:instantiate()
+        self._buttonBar:addChild(self._allBtn)
+
+        local noneW = math.max(math.floor(52 * FONT_SCALE),
+            getTextManager():MeasureStringX(UIFont.Small, getText("IGUI_PhunMart_Btn_None")) + PAD)
+        self._noneBtn = ISButton:new(0, PAD, noneW, BUTTON_HGT, getText("IGUI_PhunMart_Btn_None"), self,
+            self.onSelectNone)
+        self._noneBtn:initialise()
+        self._noneBtn:instantiate()
+        self._buttonBar:addChild(self._noneBtn)
+    end
+
     -- Populate
     self:populateItems()
     self:applyFilter()
@@ -215,6 +257,29 @@ function PickerPanel:applyFilter()
             if searchable:find(filterText, 1, true) then
                 self._list:addItem(entry.display, entry)
             end
+        end
+    end
+end
+
+--- Tick every row the filter is showing. Rows the filter is hiding keep
+--- whatever they had: this adds to the selection rather than replacing it, so
+--- narrowing the filter twice and pressing All twice collects both sets.
+function PickerPanel:onSelectAll()
+    for i = 1, #self._list.items do
+        local entry = self._list.items[i].item
+        if entry and entry.key then
+            self._selectedSet[entry.key] = true
+        end
+    end
+end
+
+--- Untick the rows the filter is showing, on the same principle. With no
+--- filter that is everything, which is the clear-it-all case.
+function PickerPanel:onSelectNone()
+    for i = 1, #self._list.items do
+        local entry = self._list.items[i].item
+        if entry and entry.key then
+            self._selectedSet[entry.key] = nil
         end
     end
 end
@@ -297,12 +362,37 @@ function PickerPanel:prerender()
     rightX = rightX - self._cancelBtn.width - PAD
     self._okBtn:setX(rightX - self._okBtn.width)
 
-    -- Count label
+    -- All / None sit left of Apply, in the order they read.
+    if self._allBtn then
+        rightX = rightX - self._okBtn.width - PAD
+        self._noneBtn:setX(rightX - self._noneBtn.width)
+        rightX = rightX - self._noneBtn.width - PAD
+        self._allBtn:setX(rightX - self._allBtn.width)
+        rightX = rightX - self._allBtn.width
+    else
+        rightX = rightX - self._okBtn.width
+    end
+
+    -- Count label, in whatever room the buttons left.
+    --
+    -- The buttons are placed first and this yields, rather than the two being
+    -- laid out independently and trusted not to meet. A window narrow enough
+    -- for them to collide is always reachable: the width is clamped to the
+    -- screen, so a wide enough font eventually wins.
     local count = 0
     for _ in pairs(self._selectedSet) do
         count = count + 1
     end
-    self._countLabel:setName(tostring(count) .. " selected")
+    local countText = getText("IGUI_PhunMart_Admin_NSelected", tostring(count))
+    local room = rightX - PAD * 2
+    if getTextManager():MeasureStringX(UIFont.Small, countText) <= room then
+        self._countLabel:setName(countText)
+    else
+        -- Just the number, then nothing. Losing the word is better than
+        -- printing it underneath a button.
+        local bare = tostring(count)
+        self._countLabel:setName(getTextManager():MeasureStringX(UIFont.Small, bare) <= room and bare or "")
+    end
 
     -- List
     local listY = PAD + BUTTON_HGT + PAD

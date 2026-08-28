@@ -199,7 +199,13 @@ end)
 Commands[Core.commands.requestPool] = function(args)
     local player = Core.utils.getPlayerByUsername(args.username)
     if player then
-        Core.ui.client.poolViewer.open(player, args.poolKey, args.data)
+        -- A refresh follows an edit made inside the viewer, so it updates the
+        -- open window rather than replacing it and losing the scroll position.
+        if args.refresh then
+            Core.ui.client.poolViewer.refreshData(args.poolKey, args.data)
+        else
+            Core.ui.client.poolViewer.open(player, args.poolKey, args.data)
+        end
     end
 end
 

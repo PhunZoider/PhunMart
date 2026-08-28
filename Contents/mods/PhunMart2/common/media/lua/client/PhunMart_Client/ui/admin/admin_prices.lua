@@ -293,22 +293,24 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         end,
     })
 
-    -- Name first, then key, the same two rows in the same order as every other
-    -- editor. This was the last one still leading with the key.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        -- Raw, not resolved: a name is this entry's own or it has none, and
-        -- showing the parent's would suggest it had been given one.
-        default = raw.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- Key first, then name, the same two rows in the same order as every other
+    -- editor: the required field before the optional one that overrides how it
+    -- is shown.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = priceKey or "", editable = isNew,
         required = true,
+        hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if prices[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        -- Raw, not resolved: a name is this entry's own or it has none, and
+        -- showing the parent's would suggest it had been given one.
+        default = raw.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     -- Directly under the key, above everything it supplies a default for.
@@ -477,6 +479,7 @@ function UI:createChildren()
     -- doors to one dialog is one more than it needs.
     self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onAddClick)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEditClick, true)
+    self:addBottomButton(getText("IGUI_PhunMart_Btn_Duplicate"), self.onDuplicateClick, true)
     self:addBottomButton(getText("IGUI_PhunMart_Btn_Delete"), self.onDeleteClick, true)
 end
 
@@ -542,6 +545,23 @@ end
 
 function UI:onAddClick()
     createEditModal(nil, nil, true, function(key, def)
+        savePriceDef(self, key, def)
+    end)
+end
+
+--- Open a copy of the selected price as a new entry. Prices come in families
+--- that differ by one number, which is exactly the shape this saves retyping.
+function UI:onDuplicateClick()
+    local data = self:selectedRow()
+    if not data then
+        return
+    end
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local copy = Core.utils.deepCopy(data.def)
+    if copy.title and copy.title ~= "" then
+        copy.title = getText("IGUI_PhunMart_CopyOfX", copy.title)
+    end
+    createEditModal(self:copyKeyFor(data.key, prices), copy, true, function(key, def)
         savePriceDef(self, key, def)
     end)
 end

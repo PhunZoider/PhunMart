@@ -733,8 +733,12 @@ function UI:onAdminMenu(btn)
                 local poolOpt = poolsMenu:addOption("* " .. key)
                 poolsMenu:addSubMenu(poolOpt, poolSub)
             end
+            -- Inside the set rather than once at the bottom, so which set the
+            -- new pool joins is answered by which Add was clicked and no dialog
+            -- has to ask. Adding a pool from in here used to create it and leave
+            -- it unattached, which reads as the machine ignoring the request.
+            poolsMenu:addOption(getText("IGUI_PhunMart_Admin_AddPool"), self, UI.onNewPool, si)
         end
-        poolsMenu:addOption(getText("IGUI_PhunMart_Admin_AddPool"), self, UI.onNewPool)
         local poolsOpt = context:addOption(getText("IGUI_PhunMart_Admin_Pools"))
         context:addSubMenu(poolsOpt, poolsMenu)
     end
@@ -787,28 +791,79 @@ function UI:onEditPool(poolKey)
     Core.ui.admin_pools.OnEditPool(self.player, poolKey)
 end
 
-function UI:onNewPool()
-    Core.ui.admin_pools.OnEditPool(self.player, nil)
+--- Create a pool and put it in this machine's pool set.
+---
+--- The shop definition is read from Core.defs rather than from self.data:
+--- the payload carries the compiled pool sets, where a price is already an
+--- expanded table, and writing those back would freeze the resolved price into
+--- the shop as if someone had typed it there.
+function UI:onNewPool(setIndex)
+    Core.ui.admin_pools.OnEditPool(self.player, nil, function(poolKey)
+        local shopType = self.data and self.data.shopType
+        local shopDef = shopType and Core.defs and Core.defs.shops and Core.defs.shops[shopType]
+        if not shopDef then
+            self:showFeedback(getText("IGUI_PhunMart_Msg_PoolNotAdded", poolKey), 0.9, 0.5, 0.2)
+            return
+        end
+
+        local def = Core.utils.deepCopy(shopDef)
+        def.poolSets = def.poolSets or {}
+        local set = def.poolSets[setIndex or 1]
+        if not set then
+            set = {
+                keys = {}
+            }
+            def.poolSets[setIndex or 1] = set
+        end
+        set.keys = set.keys or {}
+        for _, ref in ipairs(set.keys) do
+            local existing = type(ref) == "table" and ref.key or ref
+            if existing == poolKey then
+                return
+            end
+        end
+        table.insert(set.keys, {
+            key = poolKey,
+            weight = 1.0
+        })
+
+        def.type = shopType
+        sendClientCommand(Core.name, Core.commands.upsertShopDefinition, def)
+        if Core.ui.pending_restock then
+            Core.ui.pending_restock.note("shops", shopType)
+        end
+        if not Core.isLocal and Core.defs and Core.defs.shops then
+            Core.defs.shops[shopType] = def
+        end
+        self:showFeedback(getText("IGUI_PhunMart_Msg_PoolAdded", poolKey), 0.4, 0.9, 0.4)
+    end)
 end
 
 function UI:onBlacklistSelected()
     self:onBlacklistOffer(self.selectedId, self.selectedOffer)
 end
 
+-- Asks first, the same as the pool viewer's copy and for the same reason: this
+-- is one click away from an ordinary right-click on an item, and it takes the
+-- item out of every shop on the server.
 function UI:onBlacklistOffer(id, offer)
     local itemKey = offer and offer.item
     if not itemKey then
         return
     end
-    sendClientCommand(Core.name, Core.commands.quickBlacklist, {
-        itemKey = itemKey
-    })
-    -- This machine can be restocked from the gear menu, but every other machine
-    -- keeps the item until it rolls again, so track it like any other edit.
-    if Core.ui.pending_restock then
-        Core.ui.pending_restock.noteAllShops()
-    end
-    self:showFeedback(getText("IGUI_PhunMart_Msg_GlobalBlacklisted", tostring(itemKey)), 0.9, 0.5, 0.2)
+    local name = tools.resolveOfferDisplayName(offer) or itemKey
+    tools.confirm(getText("IGUI_PhunMart_Confirm_Blacklist", name), function()
+        sendClientCommand(Core.name, Core.commands.quickBlacklist, {
+            itemKey = itemKey
+        })
+        -- This machine can be restocked from the gear menu, but every other
+        -- machine keeps the item until it rolls again, so track it like any
+        -- other edit.
+        if Core.ui.pending_restock then
+            Core.ui.pending_restock.noteAllShops()
+        end
+        self:showFeedback(getText("IGUI_PhunMart_Msg_GlobalBlacklisted", tostring(itemKey)), 0.9, 0.5, 0.2)
+    end, self)
 end
 
 function UI:onBlacklistInPool(id, offer)
@@ -1262,6 +1317,28 @@ function UI:renderDetails(z)
             y = y + lh + 4
         end
     end
+
+    -- Stock, always, including when there is no limit.
+    --
+    -- Only the sold-out state was visible before, so a machine with two left
+    -- looked exactly like one with two hundred, and the first sign of a limit
+    -- was the offer greying out after the purchase that emptied it. Said in
+    -- words here rather than only as the count on the tile, because "unlimited"
+    -- is a real answer and an absent badge is not.
+    local stockQty = offer.offer and offer.offer.stockQty
+    local stockText, sr, sg, sb
+    if stockQty == nil or stockQty == -1 then
+        stockText, sr, sg, sb = getText("IGUI_PhunMart_StockUnlimited"), 0.60, 0.64, 0.68
+    elseif stockQty <= 0 then
+        stockText, sr, sg, sb = getText("IGUI_PhunMart_StockOut"), 0.90, 0.30, 0.30
+    else
+        stockText, sr, sg, sb = getText("IGUI_PhunMart_StockLeft", tostring(stockQty)), 0.72, 0.76, 0.80
+        if stockQty <= 2 then
+            sr, sg, sb = 0.95, 0.72, 0.30
+        end
+    end
+    self:drawText(truncate(stockText, maxW, UIFont.Small), x, y, sr, sg, sb, 1, UIFont.Small)
+    y = y + lh + 4
 
     -- conditions
     if not offer.conditions then

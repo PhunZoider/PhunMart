@@ -153,19 +153,21 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
         end,
     })
 
-    -- Identity above the tabs, name first, matching the other editors.
-    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
-        default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
-    })
+    -- Identity above the tabs, key first, matching the other editors: the
+    -- required field before the optional one that overrides how it is shown.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
         default = itemKey or "", editable = isNew,
         required = true,
+        hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if items[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
         end or nil,
+    })
+    form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
+        default = def.title or "",
+        hint = getText("IGUI_PhunMart_Hint_Title"),
     })
 
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {

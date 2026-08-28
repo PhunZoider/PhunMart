@@ -212,8 +212,9 @@ function ItemPicker.open(player, selectedKeys, callback)
     local core = getCore()
     local sw = core:getScreenWidth()
     local sh = core:getScreenHeight()
-    local w = math.min(600, sw - 40)
-    local h = math.min(600, sh - 40)
+    -- Wider than the rest: this one also carries a category dropdown on the
+    -- filter row.
+    local w, h = PickerPanel.sizeFor(680, 600)
     local x = math.floor((sw - w) / 2)
     local y = math.floor((sh - h) / 2)
 

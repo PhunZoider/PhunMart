@@ -198,7 +198,13 @@ function UI:new(x, y, w, h, player, poolKey, data)
         a = 0.8
     }
     o:setWantKeyEvents(true)
-    o:setTitle(getText("IGUI_PhunMart_Admin_PoolTitle", poolKey or "?"))
+    -- The same window serves pools and groups. A group has no compiled contents
+    -- of its own, so what it shows is a preview compiled against a pool that
+    -- exists only for the asking; the title says which of the two you are
+    -- looking at, and isGroup decides which actions make sense below.
+    o.isGroup = (data and data.isGroup) == true
+    o:setTitle(getText(o.isGroup and "IGUI_PhunMart_Admin_GroupTitle" or "IGUI_PhunMart_Admin_PoolTitle",
+        poolKey or "?"))
     return o
 end
 
@@ -253,10 +259,11 @@ function UI:createChildren()
     -- than plain admin because it opens a definition editor: the viewer itself
     -- is read-only and stays available to any admin.
     if Core.canEditConfig(self.player) then
-        local editBtnW = math.max(math.floor(70 * FONT_SCALE), getTextManager():MeasureStringX(UIFont.Small, getText(
-            "IGUI_PhunMart_Admin_EditPool")) + PAD * 2)
-        self.editPoolBtn = ISButton:new(0, PAD, editBtnW, BUTTON_HGT, getText("IGUI_PhunMart_Admin_EditPool"), self,
-            UI.onEditPool)
+        local editLabel = getText(self.isGroup and "IGUI_PhunMart_Admin_EditGroupBtn" or
+                                      "IGUI_PhunMart_Admin_EditPool")
+        local editBtnW = math.max(math.floor(70 * FONT_SCALE),
+            getTextManager():MeasureStringX(UIFont.Small, editLabel) + PAD * 2)
+        self.editPoolBtn = ISButton:new(0, PAD, editBtnW, BUTTON_HGT, editLabel, self, UI.onEditPool)
         self.editPoolBtn:initialise()
         self.editPoolBtn:instantiate()
         self._buttonBar:addChild(self.editPoolBtn)
@@ -474,7 +481,12 @@ function UI:buildRows()
             offer = offer,
             displayName = displayName or offer.item or "?",
             texture = texture,
-            priceText = formatPrice(offer.price),
+            -- A group preview keeps the offers a real compile would drop for
+            -- having no price, so the row can say that rather than the item
+            -- just being absent with no explanation.
+            _noPrice = (offer.meta and offer.meta.noPrice) == true,
+            priceText = (offer.meta and offer.meta.noPrice) and getText("IGUI_PhunMart_Admin_NoPrice") or
+                formatPrice(offer.price),
             weight = weight,
             sourceType = sourceType,
             sourceKey = meta.sourceGroup,
@@ -592,7 +604,13 @@ function UI.doDrawListItem(self, y, item, alt)
     self:drawText(tools.truncate(row.displayName, COL_NAME - 4, font), rx, ty, nr, ng, nb, dimA, font)
     rx = rx + COL_NAME
 
-    self:drawText(row.priceText, rx, ty, 0.6, 1.0, 0.6, dimA, font)
+    -- Amber for a missing price, the same colour the group editor warns in:
+    -- this row is the consequence that warning was about.
+    if row._noPrice then
+        self:drawText(row.priceText, rx, ty, 0.95, 0.75, 0.35, dimA, font)
+    else
+        self:drawText(row.priceText, rx, ty, 0.6, 1.0, 0.6, dimA, font)
+    end
     rx = rx + COL_PRICE
 
     local wr = row._edited and 1.0 or 0.75
@@ -622,6 +640,12 @@ end
 -- --- toolbar actions --------------------------------------------------------
 
 function UI:onEditPool()
+    if self.isGroup then
+        if Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
+            Core.ui.admin_groups.OnEditGroup(self.player, self.poolKey)
+        end
+        return
+    end
     if Core.ui.admin_pools and Core.ui.admin_pools.OnEditPool then
         Core.ui.admin_pools.OnEditPool(self.player, self.poolKey)
     end
@@ -653,9 +677,16 @@ function UI:showContextMenu(row, absX, absY)
     local count = #sel
 
     if count <= 1 then
-        if not row._blacklisted then
+        -- Both directions, because this menu could put an item on the global
+        -- blacklist and nothing here could take it off again: the only way back
+        -- was the Blacklists tab, if you knew that is where it went.
+        if row._blacklisted then
+            context:addOption(getText("IGUI_PhunMart_Admin_RemoveFromBlacklist"), self, UI.onUnblacklistRow, row)
+        else
             context:addOption(getText("IGUI_PhunMart_Admin_AddToBlacklist"), self, UI.onBlacklistRow, row)
         end
+        -- Weight is stored per item and applies wherever the item is drawn, so
+        -- it is editable from a group preview too.
         context:addOption(getText("IGUI_PhunMart_Admin_EditWeight"), self, UI.onEditWeightRow, row)
 
         -- Edit source: open the appropriate admin editor
@@ -669,9 +700,14 @@ function UI:showContextMenu(row, absX, absY)
     else
         context:addOption(getText("IGUI_PhunMart_Admin_BlacklistNItems", tostring(count)), self, UI.onBlacklistSelected)
     end
-    local moveLabel = count > 1 and getText("IGUI_PhunMart_Admin_MoveNToPool", tostring(count)) or
-                          getText("IGUI_PhunMart_Admin_MoveToPool")
-    context:addOption(moveLabel, self, UI.onMoveToPool)
+    -- Moving needs a real pool to move out of: it blacklists the item there,
+    -- and a group preview has no pool behind it to blacklist in. Left off
+    -- rather than offered and ignored.
+    if not self.isGroup then
+        local moveLabel = count > 1 and getText("IGUI_PhunMart_Admin_MoveNToPool", tostring(count)) or
+                              getText("IGUI_PhunMart_Admin_MoveToPool")
+        context:addOption(moveLabel, self, UI.onMoveToPool)
+    end
 end
 
 function UI:onEditSource(row)
@@ -687,35 +723,75 @@ function UI:onEditSource(row)
     end
 end
 
+-- Every machine keeps its current stock until it rolls again, so a change to
+-- the global list is outstanding work on all of them. Reached through Core.ui
+-- rather than required, the same way the shop panel does it, because the
+-- restock queue's own module pulls in enough of the admin UI to be a cycle.
+local function noteBlacklistChanged()
+    if Core.ui.pending_restock then
+        Core.ui.pending_restock.noteAllShops()
+    end
+end
+
+-- The global blacklist is server-wide and takes every shop with it, which is a
+-- lot to hang on one click of a context menu entry that sits next to Edit
+-- Weight. So both the single and the bulk form ask first, and the bulk one says
+-- how many. Removal does not ask: it undoes rather than does.
 function UI:onBlacklistRow(row)
     local itemKey = row.offer and row.offer.item
     if not itemKey then
         return
     end
-    sendClientCommand(Core.name, Core.commands.quickBlacklist, {
-        itemKey = itemKey
-    })
-    row._blacklisted = true
-    if not self.showBlacklisted then
-        self:applyFilters()
+    tools.confirm(getText("IGUI_PhunMart_Confirm_Blacklist", row.displayName or itemKey), function()
+        sendClientCommand(Core.name, Core.commands.quickBlacklist, {
+            itemKey = itemKey
+        })
+        row._blacklisted = true
+        noteBlacklistChanged()
+        if not self.showBlacklisted then
+            self:applyFilters()
+        end
+    end, self)
+end
+
+function UI:onUnblacklistRow(row)
+    local itemKey = row.offer and row.offer.item
+    if not itemKey then
+        return
     end
+    sendClientCommand(Core.name, Core.commands.setGlobalBlacklistEntry, {
+        itemKey = itemKey,
+        excluded = false
+    })
+    row._blacklisted = false
+    noteBlacklistChanged()
+    self:applyFilters()
 end
 
 function UI:onBlacklistSelected()
     local sel = self:getSelectedRows()
+    local pending = {}
     for _, row in ipairs(sel) do
-        local itemKey = row.offer and row.offer.item
-        if itemKey and not row._blacklisted then
+        if row.offer and row.offer.item and not row._blacklisted then
+            table.insert(pending, row)
+        end
+    end
+    if #pending == 0 then
+        return
+    end
+    tools.confirm(getText("IGUI_PhunMart_Confirm_BlacklistN", tostring(#pending)), function()
+        for _, row in ipairs(pending) do
             sendClientCommand(Core.name, Core.commands.quickBlacklist, {
-                itemKey = itemKey
+                itemKey = row.offer.item
             })
             row._blacklisted = true
         end
-    end
-    self.selected = {}
-    if not self.showBlacklisted then
-        self:applyFilters()
-    end
+        self.selected = {}
+        noteBlacklistChanged()
+        if not self.showBlacklisted then
+            self:applyFilters()
+        end
+    end, self)
 end
 
 function UI:onEditWeightRow(row)
@@ -850,8 +926,19 @@ function UI:render()
 
     -- empty state
     if #self.filteredRows == 0 then
-        local msg = #self.rows == 0 and getText("IGUI_PhunMart_Admin_NoOffers") or
-                        getText("IGUI_PhunMart_Admin_NoMatching")
+        -- A pool that is switched off, gated behind a mod, or a template is not
+        -- compiled at all, so it has no contents to show and no rows to explain
+        -- itself with. Saying which of those it is beats an empty box: the
+        -- button used to read the runtime directly, find nothing, and do
+        -- nothing at all.
+        local reason = #self.rows == 0 and self.poolData and self.poolData.unavailable
+        local msg
+        if reason then
+            msg = getText("IGUI_PhunMart_Admin_PoolUnavailable_" .. reason)
+        else
+            msg = #self.rows == 0 and getText("IGUI_PhunMart_Admin_NoOffers") or
+                      getText("IGUI_PhunMart_Admin_NoMatching")
+        end
         local msgW = getTextManager():MeasureStringX(UIFont.Small, msg)
         local listY = th + self.list:getY()
         local listH = self.list:getHeight()
@@ -946,9 +1033,15 @@ function WeightEditor._Panel:onOK()
         sendClientCommand(Core.name, Core.commands.updateOfferWeight, {
             poolKey = self.poolKey,
             offerId = self.row.id,
+            -- Named outright rather than left for the server to look up: from a
+            -- group preview there is no pool to look it up in.
+            itemKey = self.row.offer and self.row.offer.item,
+            isGroup = self.viewer and self.viewer.isGroup or false,
             weight = val
         })
-        -- optimistic local update
+        -- Optimistic, and still worth doing: the server replies with the
+        -- recompiled pool, but a dedicated server takes a moment about it and
+        -- the row should not sit on the old number until then.
         self.row.weight = val
         self.row._edited = true
     end
@@ -1071,8 +1164,27 @@ function MoveToPoolModal._Panel:createChildren()
     self:populatePoolList()
 end
 
+--- The groups a pool draws from, which is where a moved item has to land: a
+--- pool has no item list of its own.
+local function groupsOfPool(poolKey)
+    -- Same fallback the pool list itself uses: before the first defs sync a
+    -- client has only the shipped defaults, and answering "no groups" from that
+    -- state would empty the list rather than admit it does not know yet.
+    local defs = (Core.defs and Core.defs.pools) or require "PhunMart/defaults/pools"
+    local def = defs and defs[poolKey]
+    local groups = def and def.sources and def.sources.groups or {}
+    local out = {}
+    for _, g in ipairs(groups) do
+        table.insert(out, g)
+    end
+    table.sort(out)
+    return out
+end
+
 function MoveToPoolModal._Panel:populatePoolList()
     self.poolList:clear()
+    self.stage = "pool"
+    self:setTitle(getText("IGUI_PhunMart_Admin_MoveItemsToPool", tostring(#self.rows)))
 
     -- Get pool keys from runtime or defaults
     local poolKeys = {}
@@ -1095,10 +1207,30 @@ function MoveToPoolModal._Panel:populatePoolList()
     table.sort(poolKeys)
 
     for _, key in ipairs(poolKeys) do
+        -- A pool with no groups has nowhere to put the item, so it is not
+        -- somewhere anything can be moved to. Left out rather than offered and
+        -- then refused.
+        if #groupsOfPool(key) > 0 then
+            self.poolList:addItem(key, {
+                key = key
+            })
+        end
+    end
+end
+
+--- Second step, shown only when the chosen pool draws from more than one group
+--- and the move therefore has a question left in it.
+function MoveToPoolModal._Panel:populateGroupList(poolKey, groups)
+    self.poolList:clear()
+    self.stage = "group"
+    self.toPoolKey = poolKey
+    self:setTitle(getText("IGUI_PhunMart_Admin_MovePickGroup", poolKey))
+    for _, key in ipairs(groups) do
         self.poolList:addItem(key, {
             key = key
         })
     end
+    self.poolList.selected = 0
 end
 
 function MoveToPoolModal._Panel:drawPoolRow(y, item, alt)
@@ -1126,7 +1258,25 @@ function MoveToPoolModal._Panel:onOK()
     if not selectedItem then
         return
     end
-    local targetPool = selectedItem.item.key
+    local chosen = selectedItem.item.key
+
+    -- Step one picks the pool. If that pool draws from several groups, which
+    -- one receives the item is a real question and only the admin can answer
+    -- it, so the same list asks it rather than a guess being made here.
+    local targetPool, targetGroup
+    if self.stage == "group" then
+        targetPool, targetGroup = self.toPoolKey, chosen
+    else
+        local groups = groupsOfPool(chosen)
+        if #groups == 0 then
+            return
+        end
+        if #groups > 1 then
+            self:populateGroupList(chosen, groups)
+            return
+        end
+        targetPool, targetGroup = chosen, groups[1]
+    end
 
     -- Collect offer IDs to move
     local offerIds = {}
@@ -1137,6 +1287,7 @@ function MoveToPoolModal._Panel:onOK()
     sendClientCommand(Core.name, Core.commands.moveOffers, {
         fromPool = self.fromPoolKey,
         toPool = targetPool,
+        toGroup = targetGroup,
         offerIds = offerIds
     })
 
