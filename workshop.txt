@@ -56,13 +56,9 @@ description=
 description=[b]Want to use a different currency?[/b] PhunMart supports [b]any physical item as payment[/b]: cash items, gold bars, tokens from other mods, custom items. If it exists in the game, it can be a currency. See the guide below for setup.
 description=
 description=[h2]Upgrading from before B42.20.4[/h2]
-description=B42.20.4 removed loadstring, which is what the game used to read the old .txt config files. Override files are now JSON, and an old .txt cannot be read at all.
+description=That build removed loadstring, so the old .txt config files can no longer be read and PhunMart's override files are JSON now. Your old files are untouched and the server log names any it cannot read. This only affects you if you hand-edited them.
 description=
-description=Your old files are left exactly where they are, and the server log names any it cannot read at startup. To bring your customisations across, run each PhunMart_*.txt through the converter and save the result beside it with a .json extension. The converter runs entirely in your browser and uploads nothing.
-description=
-description=[url=https://phunzoider.github.io/PhunZones/converter/]Phun configuration converter[/url]
-description=
-description=If you have never hand-edited these files, everything the mod wrote converts cleanly. Only a file with real Lua logic in it has to be rewritten by hand.
+description=[url=https://steamcommunity.com/workshop/filedetails/discussion/3689006725/582806854239822290/]Converting your config files[/url]
 description=
 description=[h2]Customisation[/h2]
 description=PhunMart is deeply configurable, but to keep this page readable the full guides live here:
@@ -82,7 +78,7 @@ description=[list]
 description=[*][b]Does it work with ExtraMoney / other currency mods?[/b] PhunMart can use any physical item as currency. If your currency mod adds an in-game item (like cash or coins), you can set that item as the payment method. See the currency guide above.
 description=[*][b]Can players sell items?[/b] Yes. The built-in PrawnStars pawn shop lets players sell valuables back for change.
 description=[*][b]Can I create my own shops from scratch?[/b] Yes. Define custom pools, groups, pricing, conditions, and sprites. The admin tools let you do most of this in-game.
-description=[*][b]What happens to my customisations when updating?[/b] Your shop, price and pool edits are saved beside your server and are never overwritten by an update. They survive restarts, wipes, and new versions. The one exception is the move to JSON described above: your files are still there and still yours, but they need converting once before the game can read them again.
+description=[*][b]What happens to my customisations when updating?[/b] Your shop, price and pool edits are saved beside your server and are never overwritten by an update. They survive restarts, wipes, and new versions. The one exception is the B42.20.4 move to JSON: your files are still there and still yours, but they need converting once before the game can read them again. See the link above.
 description=[*][b]What happens to player wallets on a wipe?[/b] Wallets, purchase history and reward progress belong to the save, so a wipe clears them along with everything else. Your configuration is untouched.
 description=[*][b]Does it work in Single Player?[/b] Yes. Designed for multiplayer servers but fully functional in SP.
 description=[*][b]Can I add into existing game?[/b] Yes
@@ -93,7 +89,7 @@ description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
 description=
 description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252660][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url] 
-description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] 
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3792193021][img]https://i.ibb.co/vCBcKtp8/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] 
 description=
 description=Coded with love for the awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=
