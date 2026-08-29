@@ -46,6 +46,89 @@ function ServerSystem:removeInvalidInstanceData()
 
 end
 
+-- Ghost machines: a shop this save still has records for, standing on a square
+-- that no longer holds it.
+--
+-- Uninstalling the mod produces these. The IsoObject goes, because the engine
+-- drops an object whose sprite it cannot resolve, but nothing else does: the
+-- global objects belong to the map save and Core.instances is ModData, and
+-- neither notices the mod is missing. Reinstall and the records are back with
+-- nothing underneath them.
+--
+-- removeInvalidInstanceData cannot catch this. It tests instances against the
+-- global object list, and after an uninstall both sides of that comparison
+-- still agree with each other; it is the world they have both lost touch with.
+-- Only a loaded square can settle it, which is why this runs from
+-- loadGridsquare rather than at boot.
+--
+-- The mirror of checkObjectAdded, which recovers a sprite that outlived its
+-- global object. This drops a global object that outlived its sprite.
+local ghostsRemoved = 0
+
+function ServerSystem:removeGhostAt(square, objects)
+    -- Before ini the shop definitions have not compiled and the world is still
+    -- coming up, so an empty-looking square proves nothing yet.
+    if not Core.inied or not square then
+        return
+    end
+
+    local x, y, z = square:getX(), square:getY(), square:getZ()
+    local key = x .. "_" .. y .. "_" .. (z or 0)
+
+    -- This runs for every square of every chunk the game loads, so the cheap
+    -- question comes first and the rest of the function is reached by almost
+    -- nothing. A miss costs one hash lookup.
+    --
+    -- Which means a global object whose ModData record has already gone is left
+    -- alone. No path we have produces that pairing: addToWorld writes both,
+    -- removeLuaObject clears both, and removeInvalidInstanceData only ever
+    -- drops the record when the global object is the one already missing.
+    -- isShopInstance guards the lookup for the reason it does there too: other
+    -- things live in this table.
+    local instance = Core.instances and Core.instances[key]
+    if not Core.isShopInstance(instance) then
+        return
+    end
+
+    -- The caller found no sprite here carrying a CustomName this build knows,
+    -- which is a narrower thing than finding no machine. A shop whose type an
+    -- admin has since deleted no longer matches Core.shops, and a machine whose
+    -- sprite failed to resolve has no properties to read at all. Both are still
+    -- standing, and neither is a ghost. The object's name survives both, so it
+    -- settles what the sprite cannot.
+    --
+    -- Only reached on a square that has a record, so the per-object cost lands
+    -- on the handful of squares in the world that could possibly be ghosts.
+    for i = 0, objects:size() - 1 do
+        if self:isValidIsoObject(objects:get(i)) then
+            return
+        end
+    end
+
+    local luaObj = self:getLuaObjectAt(x, y, z)
+    if luaObj then
+        -- Takes the global object and the instance record together.
+        self:removeLuaObject(luaObj)
+    else
+        Core:removeInstance({
+            x = x,
+            y = y,
+            z = z
+        })
+    end
+
+    ghostsRemoved = ghostsRemoved + 1
+    if ghostsRemoved == 1 then
+        -- Once per session, whether or not debug is on. Records disappearing is
+        -- worth a line in anybody's log, and the count is not knowable up front
+        -- because they surface a chunk at a time.
+        print("[PhunMart] found shop data for a machine that is no longer in the world, and removed it.")
+        print("[PhunMart] this is expected after the mod has been uninstalled and reinstalled.")
+        print("[PhunMart] turn on the Debug sandbox option to log each one.")
+    end
+    Core.debugLn("removeGhostAt: dropped ghost shop data at " .. x .. "," .. y .. "," .. tostring(z))
+end
+
 function ServerSystem.addToWorld(square, shop, direction)
     local index = 4
     if direction == IsoDirections.E then
@@ -700,6 +783,10 @@ function ServerSystem:loadGridsquare(square)
                 }
             end
         end
+    end
+
+    if #existing == 0 then
+        self:removeGhostAt(square, objects)
     end
 
     for _, obj in ipairs(existing) do
