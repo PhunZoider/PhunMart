@@ -11,3 +11,6 @@ xclude
 deploy.cmd
 ServerFiles
 .xcf
+.cursor
+.html
+converter
