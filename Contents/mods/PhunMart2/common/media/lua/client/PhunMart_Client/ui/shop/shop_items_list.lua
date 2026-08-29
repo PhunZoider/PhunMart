@@ -6,7 +6,6 @@ require "ISUI/ISPanel"
 require "ISUI/ISToolTipInv"
 require "ISUI/ISToolTip"
 local Core = PhunMart
-local Traits = require "PhunMart/traits"
 local tools = require "PhunMart_Client/ui/ui_utils"
 
 local FONT_SM = getTextManager():getFontHeight(UIFont.Small)
@@ -30,45 +29,6 @@ local LIST_ICON_COMP = FONT_TINY + 2
 PhunMartUIShopItemsList = ISPanel:derive("PhunMartUIShopItemsList")
 local UI = PhunMartUIShopItemsList
 Core.ui.client.shopItemsList = UI
-
--- Maps skill perk names to the PZ script item whose texture is used as the base icon.
--- Skills not listed here fall back to the reward's display.texture or no icon.
-local SKILL_BOOK = {
-    -- Ranged / combat
-    Aiming = "Base.BookAiming1",
-    Reloading = "Base.BookReloading1",
-    Axe = "Base.BookAxe1",
-    Blunt = "Base.BookBlunt1",
-    SmallBlade = "Base.BookSmallBlade1",
-    LongBlade = "Base.BookLongBlade1",
-    SmallBlunt = "Base.BookSmallBlunt1",
-    Spear = "Base.BookSpear1",
-    -- Survival / nature
-    Foraging = "Base.BasicForaging1",
-    PlantScavenging = "Base.BasicForaging1",
-    Tracking = "Base.BasicForaging1",
-    Farming = "Base.BookFarming1",
-    Fishing = "Base.BookFishing1",
-    Trapping = "Base.BookTrapping1",
-    -- Crafting / trade
-    Cooking = "Base.BookCooking1",
-    Tailoring = "Base.BookTailoring1",
-    Woodwork = "Base.BookCarpentry1",
-    Electricity = "Base.BookElectricity1",
-    Mechanics = "Base.BookMechanics1",
-    Maintenance = "Base.BookMaintenance1",
-    MetalWelding = "Base.BookMetalWelding1",
-    Blacksmith = "Base.BookBlacksmith1",
-    Masonry = "Base.BookMasonry1",
-    Butchering = "Base.BookButchering1",
-    Husbandry = "Base.BookHusbandry1",
-    FlintKnapping = "Base.BookFlintKnapping1",
-    Pottery = "Base.BookPottery1",
-    Carving = "Base.BookCarving1",
-    Glassmaking = "Base.BookGlassmaking1",
-    -- Medical
-    Doctor = "Base.BookFirstAid1"
-}
 
 local formatPrice = tools.formatPriceShort
 local truncate = tools.truncate
@@ -212,45 +172,7 @@ function UI:setData(data)
     for id, offer in pairs(data.offers) do
         local scriptItem = getScriptManager():getItem(offer.item)
         local displayName = tools.resolveOfferDisplayName(offer)
-        local texture
-        -- Resolve texture from trait action if present
-        local traitKey = Traits.getOfferTraitKey(offer)
-        if traitKey then
-            texture = Traits.getTexture(traitKey)
-        end
-        if not texture then
-            texture = scriptItem and scriptItem:getNormalTexture()
-        end
-        -- For skill/boost rewards, try the corresponding PZ book item as the base icon
-        if not texture and offer.reward then
-            local kind = offer.reward.kind
-            if kind == "skill" or kind == "boost" then
-                local action = offer.reward.actions and offer.reward.actions[1]
-                if action and action.skill then
-                    local bookKey = SKILL_BOOK[action.skill]
-                    if bookKey then
-                        local bookItem = getScriptManager():getItem(bookKey)
-                        if bookItem then
-                            texture = bookItem:getNormalTexture()
-                        end
-                    end
-                end
-            end
-        end
-        if not texture and offer.reward and offer.reward.display and offer.reward.display.texture then
-            local dt = offer.reward.display.texture
-            texture = getTexture(dt)
-            if not texture then
-                -- allow display.texture to be a script item name (e.g. "Base.BookButchering1")
-                local si = getScriptManager():getItem(dt)
-                if si then
-                    texture = si:getNormalTexture()
-                end
-            end
-        end
-        if not texture and offer.meta and offer.meta.fallbackTexture then
-            texture = getTexture(offer.meta.fallbackTexture)
-        end
+        local texture = tools.resolveOfferTexture(offer)
         -- Overlay (e.g. plus-1/2/3 for xp tier, boost-1/2/3 for boost tier)
         local overlay = nil
         if offer.reward and offer.reward.display and offer.reward.display.overlay then

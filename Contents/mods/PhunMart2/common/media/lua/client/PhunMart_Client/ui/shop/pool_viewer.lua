@@ -10,7 +10,6 @@ require "ISUI/ISComboBox"
 
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
-local Traits = require "PhunMart/traits"
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
@@ -432,29 +431,12 @@ function UI:buildRows()
     local catMap = {}
 
     for offerId, offer in pairs(offers) do
-        local scriptItem = getScriptManager():getItem(offer.item)
-        local displayName, texture
-
-        local traitKey = Traits.getOfferTraitKey and Traits.getOfferTraitKey(offer)
-        if traitKey then
-            displayName = Traits.getLabel(traitKey)
-            texture = Traits.getTexture(traitKey)
-        end
-        if not displayName then
-            if scriptItem then
-                displayName = scriptItem:getDisplayName()
-            elseif offer.reward and offer.reward.display and offer.reward.display.text then
-                displayName = offer.reward.display.text
-            else
-                displayName = offer.item or offerId
-            end
-        end
-        if not texture then
-            texture = scriptItem and scriptItem:getNormalTexture()
-        end
-        if not texture and offer.meta and offer.meta.fallbackTexture then
-            texture = getTexture(offer.meta.fallbackTexture)
-        end
+        -- Named and iconed the way the shop names and icons it. The viewer used
+        -- to resolve both itself and had no case for vehicles or animals, so
+        -- every offer in a vehicle group read as the reward CLASS it belongs to
+        -- ("Van Key" a hundred times over) rather than the vehicle it hands out.
+        local displayName = tools.resolveOfferDisplayName(offer) or offer.item or offerId
+        local texture = tools.resolveOfferTexture(offer)
 
         local weight = (offer.offer and offer.offer.weight) or offer.weight or 1
         local category = resolveCategory(offer) or ""
@@ -480,6 +462,11 @@ function UI:buildRows()
             id = offerId,
             offer = offer,
             displayName = displayName or offer.item or "?",
+            -- The raw key the offer was built from: an item type, or a vehicle
+            -- script name. Not drawn, but the filter box searches it, which is
+            -- the only way to find "VanMail" once the row is labelled with the
+            -- van's in-game name.
+            itemKey = offer.item,
             texture = texture,
             -- A group preview keeps the offers a real compile would drop for
             -- having no price, so the row can say that rather than the item
@@ -537,9 +524,13 @@ function UI:applyFilters()
             show = false
         end
 
-        -- Text filter
+        -- Text filter (name or the raw item/vehicle key behind the row)
         if show and filterText ~= "" then
-            if not string.find(row.displayName:lower(), filterText, 1, true) then
+            local hit = string.find(row.displayName:lower(), filterText, 1, true)
+            if not hit and row.itemKey then
+                hit = string.find(row.itemKey:lower(), filterText, 1, true)
+            end
+            if not hit then
                 show = false
             end
         end

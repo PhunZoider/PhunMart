@@ -157,6 +157,106 @@ function tools.resolveOfferDisplayName(offer)
     return Traits.getLabel(offer.item) or offer.item
 end
 
+-- Maps skill perk names to the PZ script item whose texture is used as the base icon.
+-- Skills not listed here fall back to the reward's display.texture or no icon.
+local SKILL_BOOK = {
+    -- Ranged / combat
+    Aiming = "Base.BookAiming1",
+    Reloading = "Base.BookReloading1",
+    Axe = "Base.BookAxe1",
+    Blunt = "Base.BookBlunt1",
+    SmallBlade = "Base.BookSmallBlade1",
+    LongBlade = "Base.BookLongBlade1",
+    SmallBlunt = "Base.BookSmallBlunt1",
+    Spear = "Base.BookSpear1",
+    -- Survival / nature
+    Foraging = "Base.BasicForaging1",
+    PlantScavenging = "Base.BasicForaging1",
+    Tracking = "Base.BasicForaging1",
+    Farming = "Base.BookFarming1",
+    Fishing = "Base.BookFishing1",
+    Trapping = "Base.BookTrapping1",
+    -- Crafting / trade
+    Cooking = "Base.BookCooking1",
+    Tailoring = "Base.BookTailoring1",
+    Woodwork = "Base.BookCarpentry1",
+    Electricity = "Base.BookElectricity1",
+    Mechanics = "Base.BookMechanics1",
+    Maintenance = "Base.BookMaintenance1",
+    MetalWelding = "Base.BookMetalWelding1",
+    Blacksmith = "Base.BookBlacksmith1",
+    Masonry = "Base.BookMasonry1",
+    Butchering = "Base.BookButchering1",
+    Husbandry = "Base.BookHusbandry1",
+    FlintKnapping = "Base.BookFlintKnapping1",
+    Pottery = "Base.BookPottery1",
+    Carving = "Base.BookCarving1",
+    Glassmaking = "Base.BookGlassmaking1",
+    -- Medical
+    Doctor = "Base.BookFirstAid1"
+}
+
+-- Resolve the icon for an offer, in the order the shop grid resolves it:
+-- trait icon > script item icon > skill book cover > the reward's own texture
+-- > the group or pool fallback texture. Rewards with no inventory item behind
+-- them (vehicles, animals) reach the fallback, which is what it is for.
+function tools.resolveOfferTexture(offer)
+    if not offer then
+        return nil
+    end
+
+    local traitKey = Traits.getOfferTraitKey(offer)
+    if traitKey then
+        local tex = Traits.getTexture(traitKey)
+        if tex then
+            return tex
+        end
+    end
+
+    local scriptItem = getScriptManager():getItem(offer.item)
+    if scriptItem then
+        local tex = scriptItem:getNormalTexture()
+        if tex then
+            return tex
+        end
+    end
+
+    local reward = offer.reward
+    if reward then
+        -- For skill/boost rewards, the corresponding PZ book is the base icon
+        if reward.kind == "skill" or reward.kind == "boost" then
+            local action = reward.actions and reward.actions[1]
+            local bookKey = action and action.skill and SKILL_BOOK[action.skill]
+            local bookItem = bookKey and getScriptManager():getItem(bookKey)
+            if bookItem then
+                local tex = bookItem:getNormalTexture()
+                if tex then
+                    return tex
+                end
+            end
+        end
+
+        local dt = reward.display and reward.display.texture
+        if dt then
+            local tex = getTexture(dt)
+            if tex then
+                return tex
+            end
+            -- allow display.texture to be a script item name (e.g. "Base.BookButchering1")
+            local si = getScriptManager():getItem(dt)
+            if si then
+                return si:getNormalTexture()
+            end
+        end
+    end
+
+    if offer.meta and offer.meta.fallbackTexture then
+        return getTexture(offer.meta.fallbackTexture)
+    end
+
+    return nil
+end
+
 -- Format a price for compact display (grid badges, list rows).
 -- Returns (text, texture) where text is a short string like "FREE", "$1.50", "3t", "25";
 -- texture is the item icon for kind="items" (nil otherwise).
