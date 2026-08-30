@@ -9,6 +9,7 @@ Docs
 Tests
 xclude
 deploy.cmd
+run.cmd
 ServerFiles
 .xcf
 .cursor
