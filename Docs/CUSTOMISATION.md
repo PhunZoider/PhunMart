@@ -24,7 +24,7 @@ interchangeable and you can mix them freely.
 4. [Prices](#4-prices)
 5. [Specials](#5-specials)
 6. [Conditions](#6-conditions)
-7. [Items (Offers)](#7-items-offers)
+7. [Item Overrides](#7-item-overrides)
 8. [Groups](#8-groups)
 9. [Pools](#9-pools)
 10. [Shops](#10-shops)
@@ -58,7 +58,7 @@ SHOP  (PhunMart_Shops.json)
                     ├─► game item catalogue  (via `categories` or explicit `items`)
                     ├─► SPECIAL  (via `specialCategories`, `specials`, or `defaults.reward`)
                     │
-                    └─► ITEM / OFFER  (PhunMart_Items.json)
+                    └─► ITEM OVERRIDE  (PhunMart_Items.json)
                           Per-offer overrides: price, weight, stock, conditions
                           │
                           ├─► PRICE  (PhunMart_Prices.json)
@@ -76,7 +76,7 @@ one candidate list, and the weight on each key scales that pool's offers within 
 | **Pool**       | `PhunMart_Pools.json`      | Which groups to draw from, zone and season gating    |
 | **Group**      | `PhunMart_Groups.json`     | Which items or specials are eligible, and defaults   |
 | **Special**    | `PhunMart_Specials.json`   | What the player receives: trait, XP, vehicle, animal |
-| **Item/Offer** | `PhunMart_Items.json`      | Per-offer weight, stock, price, conditions           |
+| **Item override** | `PhunMart_Items.json`   | Per-item weight, stock, price, conditions            |
 | **Price**      | `PhunMart_Prices.json`     | Cost in change, tokens, or inventory items           |
 | **Condition**  | `PhunMart_Conditions.json` | Who can buy it, and how many times                   |
 | **Blacklist**  | `PhunMart_Blacklist.json`  | Items no shop may ever stock                         |
@@ -523,41 +523,29 @@ See [Reference: condition tests](#13-reference-condition-tests) for all availabl
 
 ---
 
-## 7. Items (Offers)
+## 7. Item Overrides
 
 File: `PhunMart_Items.json`
 
-Named offer definitions. These are the individual purchasable slots in a pool. Each offer
-links a `price`, a `reward` (special key), and optional `conditions` and `offer` behaviour.
+Per-item overrides. An entry here adjusts **one** item on top of whatever the pool and group
+it came from already said, keyed by the item's full name.
+
+It ships empty, and most setups never need it. Its real use is an item a group pulled in by
+**category**, where there is no other way to single one out.
 
 ```json
 {
-  "offer:my_pistol": {
+  "Base.Katana": {
     "price": "currency_high",
-    "reward": "reward_pistol",
-    "offer": {
-      "weight": 1.0
-    }
-  },
-
-  "vehicle:SmallCar": {
-    "price": "vehicle_common",
-    "reward": "vehicle_smallcar",
-    "offer": {
-      "weight": 1.0,
-      "stock": {
-        "min": 0,
-        "max": 1,
-        "restockHours": 168
-      }
-    }
-  },
-
-  "offer:rare_sword": {
-    "price": "currency_high",
-    "reward": "reward_katana",
     "conditions": ["minHours", "oneTimePurchase"],
     "offer": { "weight": 0.3 }
+  },
+
+  "Base.Saucepan": {
+    "offer": {
+      "weight": 0.2,
+      "stock": { "min": 0, "max": 1, "restockHours": 168 }
+    }
   }
 }
 ```
@@ -566,8 +554,12 @@ links a `price`, a `reward` (special key), and optional `conditions` and `offer`
 probability during selection. The `restockHours` of 168 above is one in-game week. Every key
 listed in `conditions` must pass.
 
-**Key naming convention:** Items that belong to a logical type use a namespace prefix
-(`offer:`, `vehicle:`, etc.) as a readability aid.
+**Prefer a group where you can.** If the item is one a group lists explicitly, moving it to a
+group whose `defaults` already say what you want is almost always better, because its siblings
+come with it. An override applies to exactly the one key you name, which is how the shipped
+vehicle overrides ended up promoting `PickUpVan` while the twenty `PickUpVan*` variants beside
+it stayed on the cheaper tier. Those overrides are gone; vehicle groups carry their own price
+tier now.
 
 ### Offer fields
 
@@ -638,7 +630,11 @@ For adding vehicles from another mod to WrentAWreck, see
     "fallbackTexture": "Item_CarKey",
     "defaults": {
       "price": "vehicle_common",
-      "offer": { "weight": 1.0 }
+      "offer": { "weight": 1.0, "stock": { "min": 1, "max": 1 } },
+      "spawn": {
+      "condition": { "min": 85, "max": 100 },
+      "fuel": { "min": 0.1, "max": 0.25 }
+    }
     },
     "items": ["SmallCar", "SmallCar02", "CarTaxi"]
   },
@@ -655,9 +651,10 @@ For adding vehicles from another mod to WrentAWreck, see
 `tools_general` is category-based and so covers every tool in the game, mods included.
 `crafts_sewing` names its items explicitly. `food_fresh` takes a broad category and then
 removes what it does not want: `blacklist` excludes individual item IDs and
-`blacklistCategories` excludes whole sub-categories. `vehicles_small` overrides the icon and
-category label shown in the shop UI. `traits_add` is a special-category group, wrapping
-specials by their `category` field rather than listing game items.
+`blacklistCategories` excludes whole sub-categories. `vehicles_small` lists vehicle script
+names rather than item IDs and overrides the icon and category label shown in the shop UI.
+`traits_add` is a special-category group, wrapping specials by their `category` field rather
+than listing game items.
 
 ### Group fields
 
@@ -666,6 +663,8 @@ specials by their `category` field rather than listing game items.
 | `defaults.price`        | Default price key applied to every item in this group                        |
 | `defaults.reward`       | Special key applied to every item in this group. See below                   |
 | `defaults.offer.weight` | Default weight for items from this group                                     |
+| `defaults.offer.stock`  | Default stock (`min`, `max`, `restockHours`) for items from this group       |
+| `defaults.spawn`        | For vehicle groups: `condition` and `fuel` ranges the car arrives in         |
 | `categories`            | Game display categories to include (item-type groups)                        |
 | `items`                 | Explicit item full names, or vehicle script names, to include                |
 | `specialCategories`     | Special `category` values to include (non-item groups: traits, XP, vehicles) |
@@ -678,6 +677,37 @@ specials by their `category` field rather than listing game items.
 | `title`                 | Name for this group in the admin lists. Cosmetic; falls back to the key      |
 | `enabled`               | Set `false` to drop the group from every pool that names it                  |
 
+### Vehicle groups
+
+A vehicle group is an ordinary group. The strings in `items` are vehicle **script names**
+rather than item IDs, the compiler recognises them as such, and each becomes its own row that
+hands over a claim key for that exact car.
+
+The group **is** the tier. Price, weight, stock and the condition the car arrives in all sit
+on its `defaults`, so adding a car is one name in a list and rebanding one is moving that name
+to another group.
+
+```json
+"vehicles_luxury": {
+  "label": "Luxury & Sports Cars",
+  "defaults": {
+    "price": "vehicle_rare",
+    "offer": { "weight": 0.5, "stock": { "min": 1, "max": 1 } },
+    "spawn": {
+      "condition": { "min": 85, "max": 100 },
+      "fuel": { "min": 0.1, "max": 0.25 }
+    }
+  },
+  "items": ["CarLuxury", "SportsCar", "SportsCar_ez",
+            "RaceCar12", "RaceCar34", "RaceCar58"]
+}
+```
+
+No `defaults.reward` is needed and none is set. These groups used to name a `vehicle_*` special
+that restated the price and weight, and `PhunMart_Items.json` restated them a third time per
+script. Those ten specials have been removed; a group or item override still naming one is
+migrated onto its own defaults on first server start.
+
 ### defaults.reward: one special, many rows
 
 An item listed in `items` normally becomes an offer that hands over that item. `defaults.reward`
@@ -685,14 +715,12 @@ replaces that with a named special, while each item still gets **its own row** i
 The row's item is passed to the special when the purchase resolves, so one special can serve
 a whole list.
 
-This is how the vehicle groups work. `vehicles_luxury` lists six car script names and sets
-`defaults.reward` to `vehicle_luxury`; the player sees six separate cars to choose between and
-buying any of them runs the same `spawnVehicle` action against the one they picked. Adding a
-seventh car is one entry in `items`, with no new special needed.
-
 Contrast `specials`, where each entry is a whole special and produces exactly one row. Use
 `items` plus `defaults.reward` when the entries differ only in which thing they hand over,
 and `specials` when they genuinely differ.
+
+Note that a special's `offer` fields outrank the group's, while the group's `price` outranks
+the special's. Set both in one place to avoid the surprise.
 
 ---
 
@@ -1069,28 +1097,38 @@ add one.
 
 ### `"kind": "vehicle"`: hand over a vehicle claim key
 
+Most vehicle selling needs no special at all: put the script names in a group and it carries
+the tier. See [Vehicle groups](#vehicle-groups). Write one only to collapse several variants
+into a single row, as below.
+
 ```json
 "actions": [{
   "type": "spawnVehicle",
   "scripts": ["SmallCar", "SmallCar02"],
   "args": {
     "condition": { "min": 40, "max": 80 },
-    "fuel": { "min": 0.2, "max": 0.6 }
+    "fuel": { "min": 0.1, "max": 0.25 }
   }
 }]
 ```
 
-One of the `scripts` is chosen at random. `condition` is a vehicle condition percentage and
-`fuel` is a fuel level from 0 to 1.
+One of the `scripts` is chosen at random. `condition` is a vehicle condition percentage, rolled
+separately for each part. `fuel` is a fraction of the tank.
 
 Use `scripts` (array) to pick randomly from several variants, or `script` (string) for a single
 type. Either way the purchase hands the player a **Vehicle Claim Key** rather than spawning
 anything immediately; they right-click the key outdoors to summon the car.
 
 If the offer's own item is a valid vehicle script, that is what spawns and the list is only a
-fallback. That is what lets a group of car names share one special and still let the player
-choose. Names are case-sensitive, and scripts that no longer resolve are dropped at compile
+fallback. Names are case-sensitive, and scripts that no longer resolve are dropped at compile
 time. Use `/dumppz vehicles` to list them, or the vehicle picker in the Specials editor.
+
+`args.fuel` is a fraction of the vehicle's own tank, so `0.25` is a quarter tank on a small car
+and a quarter tank on a step van. Omit it and the car keeps whatever fuel the game spawned it
+with.
+
+A group can set the same `condition` and `fuel` ranges for every car it holds through
+`defaults.spawn`, without a special.
 
 For a step-by-step walkthrough of adding vehicles from another mod, see
 [Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md).
@@ -1194,22 +1232,7 @@ sourced from a group don't need a special entry.
 }
 ```
 
-### Step 4: Register the special as an offer
-
-`PhunMart_Items.json`
-
-```json
-{
-  "offer:sledgehammer_special": {
-    "price": "tools_pricey",
-    "reward": "reward_sledgehammer",
-    "conditions": ["carpentryMid", "oneTimePurchase"],
-    "offer": { "weight": 0.5 }
-  }
-}
-```
-
-### Step 5: Define the item group
+### Step 4: Define the item group
 
 `PhunMart_Groups.json`
 
@@ -1221,7 +1244,29 @@ sourced from a group don't need a special entry.
       "offer": { "weight": 1.0 }
     },
     "categories": ["Tool", "ToolWeapon"],
-    "blacklistCategories": ["WeaponCrafted", "JunkWeapon", "InstrumentWeapon"]
+    "blacklistCategories": ["WeaponCrafted", "JunkWeapon", "InstrumentWeapon"],
+    "specials": ["reward_sledgehammer"]
+  }
+}
+```
+
+The `categories` line covers every tool in the game, mods included. `specials` adds the one
+from Step 2 as a row of its own alongside them; a special only becomes a purchasable offer
+once some group includes it.
+
+### Step 5: Price one item differently (optional)
+
+Everything from `categories` above arrives at `tools_normal`. To single one out, name it in
+Items. This is what that file is for.
+
+`PhunMart_Items.json`
+
+```json
+{
+  "Base.Sledgehammer": {
+    "price": "tools_pricey",
+    "conditions": ["carpentryMid", "oneTimePurchase"],
+    "offer": { "weight": 0.5 }
   }
 }
 ```

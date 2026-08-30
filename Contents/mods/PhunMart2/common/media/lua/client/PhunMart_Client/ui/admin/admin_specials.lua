@@ -140,12 +140,16 @@ local ALL_ACTION_GROUPS = {"act_trait", "act_xp", "act_boost", "act_vehicle", "a
 -- someone looking for a vehicle, so the list is grouped by what the thing
 -- actually does. Anything not named here falls into "other", which keeps the
 -- row reachable rather than hiding it because it is unusual.
+--
+-- No entry for spawnVehicle. Selling cars is a job for a vehicle group now, so
+-- the shipped set has none and the tab stood permanently empty. A vehicle
+-- special an admin writes for the one case a group cannot cover, several
+-- scripts on a single row, lands in Other, which is what Other is for.
 local ACTION_DOMAINS = {
     giveXP = "xp",
     applyBoost = "boost",
     addTrait = "trait",
     removeTrait = "trait",
-    spawnVehicle = "vehicle",
     spawnAnimal = "animal"
 }
 
@@ -162,9 +166,6 @@ local DOMAIN_TABS = {{
     key = "trait",
     label = "IGUI_PhunMart_Tab_Traits"
 }, {
-    key = "vehicle",
-    label = "IGUI_PhunMart_Tab_Vehicles"
-}, {
     key = "animal",
     label = "IGUI_PhunMart_Tab_Animals"
 }, {
@@ -180,7 +181,6 @@ local KIND_DOMAINS = {
     skill = "xp",
     boost = "boost",
     trait = "trait",
-    vehicle = "vehicle",
     animal = "animal"
 }
 

@@ -591,7 +591,7 @@ end
 -- -----------------------------
 -- Special (actions) resolution
 -- -----------------------------
-local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemType, qty, logger)
+local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemType, qty, logger, spawnArgs)
     local r
     if specialRefOrInline == nil then
         -- auto-special: give the item.
@@ -600,16 +600,20 @@ local function resolveSpecial(specialsTable, specialRefOrInline, fallbackItemTyp
         -- script names alongside inventory item types, which is what the
         -- Vehicles field in the group editor writes, and giveItem on a script
         -- name hands over nothing: AddItem fails, the failure is a debug line,
-        -- and the player has already paid. Every shipped vehicle group escapes
-        -- that by naming a vehicle special in defaults.reward, so the hole was
-        -- open only for groups an admin wrote, which is the one place the
-        -- Vehicles field exists to serve.
+        -- and the player has already paid.
+        --
+        -- This is the path every shipped vehicle group now takes. The group is the
+        -- class: it supplies the price band, the weight and the stock through its
+        -- defaults, and the condition range through defaults.spawn. The script name
+        -- comes from the offer itself, which is what the player picked and what
+        -- grantReward spawns.
         if isVehicleScript(fallbackItemType) then
             return {
                 kind = "vehicle",
                 actions = {{
                     type = "spawnVehicle",
-                    script = fallbackItemType
+                    script = fallbackItemType,
+                    args = spawnArgs
                 }}
             }
         end
@@ -810,16 +814,35 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     end
     merged = deepMerge(merged, (groupDef and groupDef.defaults) or {})
 
-    -- Inject special-level fields (price, offer) between group defaults and item override.
-    -- Full precedence: pool.defaults → group.defaults → special fields → itemDef override
-    -- Auto-link: when the item key IS a special key (e.g. xp/boost/trait entries pulled
-    -- via specials/specialCategories in a group), treat it as its own reward so the special's
-    -- price/offer/conditions are injected into the merge chain.
-    local rewardKey = merged.reward
+    -- Which special an offer resolves to has to be settled BEFORE that special's
+    -- fields are injected, because an item override is allowed to change it.
+    -- Reading the key off the pool/group layer alone took price and offer from the
+    -- class the override was moving the item OUT of. Nothing showed, because every
+    -- shipped override restated price and weight by hand; deleting one of those
+    -- apparently redundant lines would have silently rebanded the item.
+    --
+    -- Auto-link: when the item key IS a special key (e.g. xp/boost/trait entries
+    -- pulled via specials/specialCategories in a group), it is its own reward, so
+    -- the special's price/offer/conditions join the merge chain.
+    local rewardKey = (itemDef and itemDef.reward) or merged.reward
     if rewardKey == nil and ctx.specials[itemType] ~= nil then
         rewardKey = itemType
-        merged.reward = itemType
     end
+    merged.reward = rewardKey
+
+    -- Inject special-level fields (price, offer) between group defaults and item override.
+    -- Full precedence: pool.defaults → group.defaults → special fields → itemDef override
+    --
+    -- Except that price and offer do not agree on where the special sits. A
+    -- group's price beats the special's (the special only fills a gap), while a
+    -- special's offer fields beat the group's (deepMerge, special last). So a
+    -- group that sets both gets one honoured and one ignored. That is what made
+    -- vehicles_luxury.defaults.offer.weight = 1.0 dead data for years while the
+    -- price on the same table was live.
+    --
+    -- Left as it is on purpose: no shipped group sets defaults.price or
+    -- defaults.offer AND sources from specials, so nothing can currently observe
+    -- it, and picking a winner is a balance decision rather than a bug fix.
     local specialDef = type(rewardKey) == "string" and ctx.specials[rewardKey] or nil
     if specialDef then
         if specialDef.price and not merged.price then
@@ -846,7 +869,12 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     merged.offer = normalizeOffer(merged.offer)
 
     local priceResolved = resolvePrice(ctx.prices, merged.price, logger)
-    local rewardResolved = resolveSpecial(ctx.specials, merged.reward, itemType, merged.offer.qty, logger)
+    -- `spawn` carries what a vehicle is like when it arrives (condition range), as
+    -- opposed to `offer`, which is how it sits on the shelf. It merges down the same
+    -- chain as everything else, so a group sets the class and an item override can
+    -- still single one vehicle out.
+    local rewardResolved = resolveSpecial(ctx.specials, merged.reward, itemType, merged.offer.qty, logger,
+        type(merged.spawn) == "table" and merged.spawn or nil)
 
     local offerId = buildOfferId(poolKey, itemType)
     local offerConditions = normalizeConditions(merged.conditions)

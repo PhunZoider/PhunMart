@@ -28,7 +28,7 @@ local VERSION_KEY = "overrideVersion"
 
 --- Bump this when adding a migration. A file stamped lower than this runs
 --- everything above its stamp, in order.
-Migrations.CURRENT = 1
+Migrations.CURRENT = 2
 
 -- Printed once, unconditionally. debugLn prefixes "[PhunMart] " and prints too,
 -- so calling both put every line out twice with slightly different spacing.
@@ -81,6 +81,111 @@ Migrations.list = {{
                 end
             end
         end
+        return fixed
+    end
+}, {
+    version = 2,
+    describe = "Port groups off the removed vehicle_* specials onto their own defaults",
+    apply = function(files, touch)
+        -- The ten vehicle_* specials are gone. They were price bands wearing a
+        -- special's clothes, and every one of them is now expressed by the
+        -- group that holds the cars.
+        --
+        -- A group naming a removed key would lose its price and its reward at
+        -- once, and an offer that resolves neither is dropped. That is quiet
+        -- rather than dangerous, but an admin's car shop going empty with only
+        -- a line in the server log is not an upgrade. So port the band onto the
+        -- group instead of leaving it to fail.
+        --
+        -- The bands are spelled out here rather than read from the current
+        -- defaults on purpose: a migration describes what the data meant when
+        -- it was written, and has to keep working after those defaults move on.
+        local BANDS = {
+            vehicle_smallcar = {price = "vehicle_common", weight = 1.0},
+            vehicle_van = {price = "vehicle_common", weight = 1.0},
+            vehicle_stepvan = {price = "vehicle_common", weight = 1.0},
+            vehicle_normalcar = {price = "vehicle_uncommon", weight = 1.0},
+            vehicle_stationwagon = {price = "vehicle_uncommon", weight = 1.0},
+            vehicle_pickup = {price = "vehicle_uncommon", weight = 1.0},
+            vehicle_offroad = {price = "vehicle_uncommon", weight = 1.0},
+            vehicle_suv = {price = "vehicle_uncommon", weight = 1.0},
+            vehicle_luxury = {price = "vehicle_rare", weight = 0.5},
+            vehicle_sportscar = {price = "vehicle_rare", weight = 0.5}
+        }
+
+        --- Write the band onto `target`, without overwriting anything the admin
+        --- chose themselves. Their price beat the special's before this ran, so
+        --- it has to keep beating it afterwards.
+        local function port(target, band)
+            if target.price == nil then
+                target.price = band.price
+            end
+            target.offer = target.offer or {}
+            if target.offer.weight == nil then
+                target.offer.weight = band.weight
+            end
+            if target.offer.stock == nil then
+                target.offer.stock = {min = 1, max = 1}
+            end
+            if target.spawn == nil then
+                target.spawn = {condition = {min = 85, max = 100}}
+            end
+            target.reward = nil
+        end
+
+        local fixed = 0
+
+        for _, name in ipairs(Core.overridePaths.groups) do
+            local tbl = files[name]
+            if tbl then
+                for key, def in pairs(tbl) do
+                    local band = type(def) == "table" and type(def.defaults) == "table" and
+                                     BANDS[def.defaults.reward]
+                    if band then
+                        port(def.defaults, band)
+                        fixed = fixed + 1
+                        touch(name)
+                        log("  " .. name .. ": group '" .. tostring(key) .. "' now carries its own vehicle band")
+                    end
+                end
+            end
+        end
+
+        for _, name in ipairs(Core.overridePaths.items) do
+            local tbl = files[name]
+            if tbl then
+                for key, def in pairs(tbl) do
+                    local band = type(def) == "table" and BANDS[def.reward]
+                    if band then
+                        port(def, band)
+                        fixed = fixed + 1
+                        touch(name)
+                        log("  " .. name .. ": item '" .. tostring(key) .. "' now carries its own vehicle band")
+                    end
+                end
+            end
+        end
+
+        -- An override that only patched a shipped vehicle special is now a
+        -- fragment of a definition that no longer exists. Left alone it would
+        -- resolve to a special with no actions, and unlike a missing key that
+        -- passes the "has a reward" check: the offer would be sold and hand
+        -- over nothing. Drop those. One that carries its own actions stands on
+        -- its own, so it stays and simply moves to the Other tab.
+        for _, name in ipairs(Core.overridePaths.specials) do
+            local tbl = files[name]
+            if tbl then
+                for key, def in pairs(tbl) do
+                    if BANDS[key] and type(def) == "table" and def.actions == nil then
+                        tbl[key] = nil
+                        fixed = fixed + 1
+                        touch(name)
+                        log("  " .. name .. ": dropped '" .. tostring(key) .. "', the special it patched is gone")
+                    end
+                end
+            end
+        end
+
         return fixed
     end
 }}

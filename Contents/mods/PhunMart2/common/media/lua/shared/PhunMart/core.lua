@@ -790,6 +790,27 @@ function Core.backupFileFor(version)
     return "PhunMart_Backup_v" .. tostring(version) .. ".json"
 end
 
+--- Bump when a change to the SHIPPED definitions changes what a machine would
+--- put on its shelves, and existing machines should roll again rather than wait
+--- out their restock timer.
+---
+--- Separate from the migration version, which counts changes to an admin's
+--- override FILES. A server that never wrote an override runs no migrations and
+--- still needs this, because the defaults moved underneath it.
+---
+--- A machine bakes its offers at restock: prices, stock and a full copy of the
+--- reward. So until it rolls again it keeps selling what the old definitions
+--- said, which is stale rather than broken.
+Core.defsRevision = 1
+
+--- Which shop types that revision affects, or nil for all of them.
+---
+--- Named rather than assumed, because forcing every machine in the world to
+--- reroll takes stock out from under players standing at shops the change never
+--- touched. Revision 1 is the vehicle rework: groups carry their own price band
+--- and fuel now, and only WrentAWreck sells cars.
+Core.defsRevisionShops = {"WrentAWreck"}
+
 --- What to call a shop type on screen.
 ---
 --- Shipped shops are named by a translation key, which a shop an admin creates

@@ -520,34 +520,26 @@ return {
     -- WrentAWreck  (vehicles - clean only, no smashed/burnt/trailers)
     -- =========================================================
     --
-    -- Vehicles work differently from everything else here, and it is not
-    -- obvious from either end, so:
-    --
     -- The strings in `items` below are vehicle SCRIPT names, not inventory
     -- item types. Nothing validates them (compiler.lua only checks keys
     -- containing a dot, and these have none) and the item picker cannot show
     -- them, because getAllItems() has no vehicles in it. The Groups editor
     -- offers a separate Vehicles field for exactly this reason.
     --
-    -- `defaults.reward` names a CLASS of vehicle offer, not the vehicle. The
-    -- special it points at supplies the price, the display name, and the
-    -- condition and fuel ranges. It also carries a script list, which is
-    -- almost always ignored, because two places deliberately prefer the offer's
-    -- own key over it:
+    -- Past that, a vehicle group is an ordinary group. It IS the class: price
+    -- band, offer weight and stock, and the condition the vehicle arrives in.
+    -- To reband a vehicle, move its string to another group's list. There is
+    -- nothing else to keep in step.
     --
-    --   server/main.lua      grantReward() spawns context.offerItem when it is
-    --                        a real script, so buying VanMail gives a VanMail
-    --                        and not whatever vehicle_van lists.
-    --   client/ui_utils.lua  the offer label is getVehicleLabel(offer.item),
-    --                        so each row is named after its own vehicle.
-    --
-    -- So a script needs an entry in items.lua only to move it to a DIFFERENT
-    -- class, the way CarStationWagon leaves the small-car class. Adding a new
-    -- vehicle to an existing class is one string in the list below.
-    --
-    -- Replacing all of this with one special per vehicle inheriting a class
-    -- template was considered and parked. If it is ever revisited, the agreed
-    -- key format is vehicle_<ScriptName>.
+    -- It used to take three layers. `defaults.reward` named a vehicle_* special
+    -- that restated the price and weight, and items.lua restated them a third
+    -- time per script. Most of those entries were doing nothing, the ones that
+    -- weren't only applied to the bare script and not its variants (bare
+    -- PickUpVan was promoted, twenty PickUpVan* were not), and the special's
+    -- own script list and display name were never read: grantReward spawns
+    -- context.offerItem and ui_utils labels the row getVehicleLabel(offer.item),
+    -- so both already answered from the offer. The vehicle_* specials survive
+    -- deprecated for saved admin data. Nothing here points at them.
 
     -- Budget tier: small cars (gold 5-10)
     vehicles_small = {
@@ -555,23 +547,53 @@ return {
         fallbackTexture = "Item_ToyCar",
         defaults = {
             price = "vehicle_common",
-            reward = "vehicle_smallcar",
             offer = {
-                weight = 1.0
+                weight = 1.0,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
-        items = {"SmallCar", "SmallCar02", "CarNormal", "CarTaxi", "CarTaxi2", "CarStationWagon", "CarStationWagon2"}
+        items = {"SmallCar", "SmallCar02", "CarTaxi", "CarTaxi2"}
     },
 
     -- Budget tier: panel vans, step vans, pickup vans (gold 5-10)
     vehicles_vans = {
-        label = "Vans & Pickups",
+        label = "Vans & Step Vans",
         fallbackTexture = "Item_CarSeat",
         defaults = {
             price = "vehicle_common",
-            reward = "vehicle_van",
             offer = {
-                weight = 1.0
+                weight = 1.0,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
         items = { -- Generic vans
@@ -595,13 +617,11 @@ return {
         "StepVan_Zippee", "StepVan_Genuine_Beer", "StepVan_Heralds", "StepVan_SouthEasternPaint",
         "StepVan_MobileLibrary", "StepVan_Jorgensen", "StepVan_Plonkies", "StepVan_Florist", "StepVan_Butchers",
         "StepVan_Mechanic", "StepVan_Masonry", "StepVan_Cereal", "StepVan_RandisPlants", "StepVan_Scarlet",
-        "StepVan_USL", -- Pickup vans (light cargo)
-        "PickUpVan", "PickUpVanMccoy", "PickUpVanYingsWood", "PickUpVanMarchRidgeConstruction", "PickUpVanBuilder",
-        "PickUpVanWeldingbyCamille", "PickUpVanKimbleKonstruction", "PickUpVanMetalworker",
-        "PickUpVanHeltonMetalWorking", "PickUpVanBrickingIt", "PickUpVanCallowayLandscaping", "PickUpVan_Camo",
-        "PickUpVanLightsRanger", "PickUpVanLightsPolice", "PickUpVanLightsStatePolice", "PickUpVanLightsFire",
-        "PickUpVanLightsFossoil", "PickUpVanLightsCarpenter", "PickUpVanLightsLouisvilleCounty",
-        "PickUpVanLightsKentuckyLumber"}
+        "StepVan_USL"}
+        -- The PickUpVan* family used to live here at the common price, all
+        -- except bare PickUpVan, which an items.lua override promoted on its
+        -- own. They are all in vehicles_trucks now, at the uncommon price the
+        -- override was reaching for.
     },
 
     -- Standard tier: modern/mid-range cars (gold 10-20)
@@ -610,30 +630,74 @@ return {
         fallbackTexture = "Item_CarKey", -- the classic
         defaults = {
             price = "vehicle_uncommon",
-            reward = "vehicle_normalcar",
             offer = {
-                weight = 1.0
+                weight = 1.0,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
-        items = {"ModernCar", "ModernCar02", "ModernCar_Martin", "CarLightsKST", "CarLightsLouisvilleCounty",
-                 "CarLightsRanger", "CarLightsPolice", "CarLightsBulletinSheriff", "CarLightsMuldraughPolice",
-                 "ModernCarLightsCityLouisvillePD", "ModernCarLightsMeadeSheriff", "ModernCarLightsWestPoint"}
+        -- CarNormal and the two station wagons moved here from vehicles_small.
+        -- They were already priced vehicle_uncommon by an items.lua override, so
+        -- this group is the band they were being pulled into one at a time. Note
+        -- CarStationWagon2 never got that override and so shipped as a small car
+        -- wearing a station wagon's label.
+        items = {"ModernCar", "ModernCar02", "ModernCar_Martin", "CarNormal", "CarStationWagon", "CarStationWagon2",
+                 "CarLightsKST", "CarLightsLouisvilleCounty", "CarLightsRanger", "CarLightsPolice",
+                 "CarLightsBulletinSheriff", "CarLightsMuldraughPolice", "ModernCarLightsCityLouisvillePD",
+                 "ModernCarLightsMeadeSheriff", "ModernCarLightsWestPoint"}
     },
 
     -- Standard tier: pickup trucks (gold 10-20)
     vehicles_trucks = {
-        label = "Pickup Trucks",
+        label = "Pickup Trucks & Vans",
         fallbackTexture = "Item_CarTrunk",
         defaults = {
             price = "vehicle_uncommon",
-            reward = "vehicle_pickup",
             offer = {
-                weight = 1.0
+                weight = 1.0,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
         items = {"PickUpTruck", "PickUpTruck_Camo", "PickUpTruckMccoy", "PickUpTruckLightsFossoil",
                  "PickUpTruckLightsRanger", "PickUpTruckLightsAirportSecurity", "PickUpTruckLightsAirport",
-                 "PickUpTruckJPLandscaping", "PickUpTruckLightsFire"}
+                 "PickUpTruckJPLandscaping", "PickUpTruckLightsFire", -- Pickup vans (light cargo), moved
+        -- here from vehicles_vans so the whole family sits at one price. Bare
+        -- PickUpVan was already being promoted to this tier one script at a time.
+        "PickUpVan", "PickUpVanMccoy", "PickUpVanYingsWood", "PickUpVanMarchRidgeConstruction", "PickUpVanBuilder",
+                 "PickUpVanWeldingbyCamille", "PickUpVanKimbleKonstruction", "PickUpVanMetalworker",
+                 "PickUpVanHeltonMetalWorking", "PickUpVanBrickingIt", "PickUpVanCallowayLandscaping", "PickUpVan_Camo",
+                 "PickUpVanLightsRanger", "PickUpVanLightsPolice", "PickUpVanLightsStatePolice", "PickUpVanLightsFire",
+                 "PickUpVanLightsFossoil", "PickUpVanLightsCarpenter", "PickUpVanLightsLouisvilleCounty",
+                 "PickUpVanLightsKentuckyLumber"}
     },
 
     -- Standard tier: off-road / SUV (gold 10-20)
@@ -642,9 +706,24 @@ return {
         fallbackTexture = "Item_CarTire",
         defaults = {
             price = "vehicle_uncommon",
-            reward = "vehicle_offroad",
             offer = {
-                weight = 1.0
+                weight = 1.0,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
         items = {"OffRoad", "SUV"}
@@ -807,10 +886,28 @@ return {
         label = "Luxury & Sports Cars",
         fallbackTexture = "Item_CarWindshield",
         defaults = {
+            -- 0.5, not the 1.0 that used to sit here. The 1.0 never applied: a
+            -- special's offer fields outrank a group's, so vehicle_luxury's 0.5
+            -- won for every item in this group, race cars included.
             price = "vehicle_rare",
-            reward = "vehicle_luxury",
             offer = {
-                weight = 1.0
+                weight = 0.5,
+                stock = {
+                    min = 1,
+                    max = 1
+                }
+            },
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                -- A tenth to a quarter of the tank, whatever size that tank is.
+                -- Enough to get the car home, not enough to skip finding fuel.
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
             }
         },
         items = {"CarLuxury", "SportsCar", "SportsCar_ez", "RaceCar12", "RaceCar34", "RaceCar58"}

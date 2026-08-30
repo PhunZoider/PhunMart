@@ -484,7 +484,8 @@ Commands[Core.commands.claimVehicle] = function(playerObj, args)
             playerObj:getInventory():AddItem(carKey)
             sendAddItemToContainer(playerObj:getInventory(), carKey)
         end
-        -- Apply condition from key moddata if present
+        -- Apply condition from key moddata if present.
+        -- Rolled per part, so a claimed car is unevenly worn rather than uniform.
         local cond = keyItem:getModData().condition
         if cond then
             for i = 0, vehicle:getPartCount() - 1 do
@@ -493,6 +494,23 @@ Commands[Core.commands.claimVehicle] = function(playerObj, args)
                     vehicle:getPartByIndex(i):setCondition(v)
                 end)
             end
+        end
+
+        -- Fuel, as a fraction of this vehicle's own tank, so the same range
+        -- means the same range on a truck and on a small car.
+        --
+        -- Left alone when the group says nothing, which keeps whatever the
+        -- engine spawned the vehicle with. The tank is not an item container,
+        -- so the loot-clearing loop above never touched it either way.
+        local fraction = Core.utils.rollFraction(keyItem:getModData().fuel)
+        if fraction then
+            pcall(function()
+                local tank = vehicle:getPartById("GasTank")
+                local capacity = tank and tank:getContainerCapacity()
+                if capacity and capacity > 0 then
+                    tank:setContainerContentAmount(fraction * capacity)
+                end
+            end)
         end
         -- Consume the key (remove from whichever container holds it)
         local keyContainer = keyItem:getContainer()

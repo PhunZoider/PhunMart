@@ -28,14 +28,14 @@ you do not want to wait.
 Each group carries the price tier and the spawn behaviour, so choosing the group is how you
 choose what the car costs.
 
-| Group              | Label             | Price tier         | Cost          |
-| ------------------ | ----------------- | ------------------ | ------------- |
-| `vehicles_small`   | Small Cars        | `vehicle_common`   | $10.00-$20.00 |
-| `vehicles_vans`    | Vans & Pickups    | `vehicle_common`   | $10.00-$20.00 |
-| `vehicles_normal`  | Cars & Sedans     | `vehicle_uncommon` | $20.00-$40.00 |
-| `vehicles_trucks`  | Pickup Trucks     | `vehicle_uncommon` | $20.00-$40.00 |
-| `vehicles_4x4`     | Off-Road & SUVs   | `vehicle_uncommon` | $20.00-$40.00 |
-| `vehicles_luxury`  | Luxury & Sports   | `vehicle_rare`     | $40.00-$80.00 |
+| Group             | Label                | Price tier         | Cost          |
+| ----------------- | -------------------- | ------------------ | ------------- |
+| `vehicles_small`  | Small Cars           | `vehicle_common`   | $10.00-$20.00 |
+| `vehicles_vans`   | Vans & Step Vans     | `vehicle_common`   | $10.00-$20.00 |
+| `vehicles_normal` | Cars & Sedans        | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_trucks` | Pickup Trucks & Vans | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_4x4`    | Off-Road & SUVs      | `vehicle_uncommon` | $20.00-$40.00 |
+| `vehicles_luxury` | Luxury & Sports      | `vehicle_rare`     | $40.00-$80.00 |
 
 Prices are in **change**, the wallet currency, and each is a range rolled fresh per restock. If
 you have switched the mod to item-based currency, these scale with the rest of the tree.
@@ -51,37 +51,68 @@ the roughest zones. Without PhunZones every pool is eligible everywhere.
 ## Why this works
 
 A group normally turns each entry in `items` into an offer that hands over that item. The
-vehicle groups set `defaults.reward` to a `spawnVehicle` special instead, so every entry
-becomes a car offer, and the entry the player bought is the car they get.
+compiler recognises that a vehicle script name is not an item, so each entry becomes a car
+offer instead, and the car the player bought is the car they get.
 
 ```json
 "vehicles_luxury": {
   "label": "Luxury & Sports Cars",
   "defaults": {
     "price": "vehicle_rare",
-    "reward": "vehicle_luxury",
-    "offer": { "weight": 1.0 }
+    "offer": { "weight": 0.5, "stock": { "min": 1, "max": 1 } },
+    "spawn": {
+      "condition": { "min": 85, "max": 100 },
+      "fuel": { "min": 0.1, "max": 0.25 }
+    }
   },
   "items": ["CarLuxury", "SportsCar", "SportsCar_ez",
             "RaceCar12", "RaceCar34", "RaceCar58"]
 }
 ```
 
-`defaults.reward` is the one special shared by every entry, and your car joins the `items`
-list alongside the shipped ones.
+Everything that makes this the luxury tier is on the group: the price, how often it comes up,
+how many are in stock, and the condition and fuel the car arrives with. Your car joins the
+`items` list alongside the shipped ones and inherits all of it.
 
-So one special serves the whole tier, each car is its own selectable row, and adding a car is
-one name in a list. There is no reason to create a special of your own unless you want that
-particular car to behave differently from its tier.
+So each car is its own selectable row, adding a car is one name in a list, and moving a car
+between tiers is moving that name between groups. There is no special to create and none to
+keep in step.
+
+> **Changed in this version.** These groups used to point `defaults.reward` at a `vehicle_*`
+> special that restated the price and weight, and `PhunMart_Items.json` restated them a third
+> time for each script. The ten `vehicle_*` specials have been **removed**, and the Vehicles
+> tab in the Specials editor has gone with them.
+>
+> Nothing to do by hand. On first start the server migrates your override files: a group or
+> item naming a removed key gets that key's price, weight, stock and condition written onto
+> its own defaults, and the `reward` cleared. Anything you set yourself is left as it is. The
+> originals are backed up first and every change is listed in the server log.
+>
+> Existing machines are handled too. A machine bakes its stock when it restocks and keeps it
+> until it rolls again, so the new price tiers and fuel would otherwise take up to a restock
+> cycle to appear. The first start on this version marks every WrentAWreck to restock, and
+> each one does so as it is next loaded. Other shops are left alone rather than rerolled for
+> a change that never touched them.
+>
+> Fuel is the exception: it never worked before, so migrated groups are left on the game's
+> default rather than being quietly moved onto the shipped 10-25% range. Add `fuel` to their
+> `spawn` block if you want it.
 
 Equivalent by hand, in `PhunMart_Groups.json`:
 
 ```json
 {
   "vehicles_luxury": {
-    "items": ["CarLuxury", "SportsCar", "SportsCar_ez",
-              "RaceCar12", "RaceCar34", "RaceCar58",
-              "91range", "91range2"]
+    "items": [
+      "CarLuxury",
+      "SportsCar",
+      "SportsCar_ez",
+      "RaceCar12",
+      "RaceCar34",
+      "RaceCar58",
+      "91range",
+      "91range2"
+    ]
   }
 }
 ```
@@ -94,21 +125,33 @@ you, which is the main reason to prefer it.
 
 ## When you do need a special
 
-Create one when the vehicle should differ from its tier: a different price, limited stock, a
-custom label, or specific condition and fuel ranges.
+Almost never. Work through these first:
+
+| You want                                            | Do this                                                     |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| A different price, stock, weight, condition or fuel | Put the car in a group whose defaults say that, or make one |
+| A different name on the row                         | Nothing to do. Rows are named after the car itself          |
+| One car dearer than its group                       | An entry in **Items**, keyed by the script name             |
+
+The one thing a group cannot do is **put several cars on a single row**. That is what a
+special is still for: tick three colour variants and players get one offer that rolls between
+them, rather than three offers they choose from.
 
 Open the **Specials** tab and add an entry:
 
-| Field           | Value                                                              |
-| --------------- | ------------------------------------------------------------------ |
-| Name            | What admins see in the list, for example `91 Range Rover`          |
-| Key             | Something unique, for example `vehicle_k15_91range`                |
-| Inherit         | `vehicle_base`                                                     |
-| Label           | The name shown on the claim key and in the shop                    |
-| Action          | `spawnVehicle`                                                     |
-| Vehicle Scripts | **Pick...**, then tick the variants this offer may spawn           |
+| Field           | Value                                                     |
+| --------------- | --------------------------------------------------------- |
+| Name            | What admins see in the list, for example `91 Range Rover` |
+| Key             | Something unique, for example `vehicle_k15_91range`       |
+| Inherit         | `vehicle_base`                                            |
+| Label           | The name shown on the claim key and in the shop           |
+| Action          | `spawnVehicle`                                            |
+| Vehicle Scripts | **Pick...**, then tick the variants this offer may spawn  |
 
 Price, weight and stock are on the **Advanced** tab. Leave stock blank for unlimited.
+
+It will appear under the **Other** filter tab. There is no Vehicles tab any more: nothing
+ships in it now that groups carry the cars, so it stood permanently empty.
 
 ![Add Special dialog](images/add_vehicle.png)
 
@@ -130,14 +173,16 @@ By hand, in `PhunMart_Specials.json`:
     "price": "vehicle_rare",
     "offer": { "weight": 1.0, "stock": { "min": 1, "max": 1 } },
     "display": { "text": "91 Range Rover (Sand)" },
-    "actions": [{
-      "type": "spawnVehicle",
-      "scripts": ["91range"],
-      "args": {
-        "condition": { "min": 85, "max": 100 },
-        "fuel": { "min": 0.3, "max": 0.7 }
+    "actions": [
+      {
+        "type": "spawnVehicle",
+        "scripts": ["91range"],
+        "args": {
+          "condition": { "min": 85, "max": 100 },
+          "fuel": { "min": 0.1, "max": 0.25 }
+        }
       }
-    }]
+    ]
   }
 }
 ```
@@ -208,7 +253,6 @@ action. See [special kinds](CUSTOMISATION.md#14-reference-special-kinds).
 | What                   | File                                                   |
 | ---------------------- | ------------------------------------------------------ |
 | Price tiers            | `defaults/prices.lua`                                  |
-| Special definitions    | `defaults/specials.lua` (VEHICLES section)             |
 | Group definitions      | `defaults/groups.lua` (WrentAWreck section)            |
 | Pool to group wiring   | `defaults/pools.lua`                                   |
 | Shop to pool wiring    | `defaults/shops.lua` (`WrentAWreck.poolSets`)          |

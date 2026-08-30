@@ -542,4 +542,48 @@ function utils.getAllItems(refresh)
     return utils.itemsAll
 end
 
+--- Resolve a 0-to-1 fraction from either a plain number or a {min, max} range.
+---
+--- Used for the fuel a bought vehicle arrives with. ZombRand deals in integers,
+--- so the range is rolled in percentage points and divided back down; a range
+--- finer than a percent is not worth the rounding argument.
+---
+--- Tolerates a reversed range and clamps the result, because these numbers come
+--- from a config file an admin typed.
+---@param spec number|table A fraction, or {min = number, max = number}
+---@param rand function|nil Integer roller, [lo, hi). Defaults to ZombRand.
+---@return number|nil fraction 0 to 1, or nil when spec is nil
+function utils.rollFraction(spec, rand)
+    if spec == nil then
+        return nil
+    end
+
+    local value
+    if type(spec) == "table" then
+        local lo = math.floor((tonumber(spec.min) or 0) * 100 + 0.5)
+        local hi = math.floor((tonumber(spec.max) or 0) * 100 + 0.5)
+        if hi < lo then
+            lo, hi = hi, lo
+        end
+        if hi == lo then
+            value = lo / 100
+        else
+            local roll = rand or ZombRand
+            value = roll(lo, hi + 1) / 100
+        end
+    else
+        value = tonumber(spec)
+        if value == nil then
+            return nil
+        end
+    end
+
+    if value < 0 then
+        return 0
+    elseif value > 1 then
+        return 1
+    end
+    return value
+end
+
 return utils

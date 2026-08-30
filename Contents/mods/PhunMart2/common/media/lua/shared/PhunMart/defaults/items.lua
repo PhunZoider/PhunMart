@@ -1,191 +1,35 @@
 return {
 
     -- =========================================================
-    -- VEHICLE OFFER ITEMS
-    -- stock=1 with long restock keeps vehicles feeling rare
+    -- ITEM OVERRIDES
     -- =========================================================
     --
-    -- These exist to put one vehicle in a different CLASS from the rest of its
-    -- group: CarStationWagon leaves the small-car class, PickUpTruck leaves the
-    -- van class. See the comment above the vehicles_* groups in groups.lua for
-    -- what a class supplies and what it does not.
+    -- Ships empty, deliberately.
     --
-    -- The entries below that name the same reward their group already defaults
-    -- to, SmallCar and SmallCar02 among them, are doing nothing. They are left
-    -- alone only because removing a shipped default is a migration rather than
-    -- a deletion.
+    -- An entry here adjusts the price, offer weight, stock or conditions of ONE
+    -- item, on top of whatever the pool and group it came from already said.
+    -- Precedence, lowest first:
     --
-    -- Every entry in this file is a vehicle, which makes the tab look like a
-    -- vehicle mapping table. It is not. An item override adjusts the price,
-    -- weight or stock of any single item an offer is built from, most usefully
-    -- one a group pulled in by category, and nothing shipped demonstrates that.
-
-    SmallCar = {
-        price = "vehicle_common",
-        reward = "vehicle_smallcar",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    SmallCar02 = {
-        price = "vehicle_common",
-        reward = "vehicle_smallcar",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    CarNormal = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_normalcar",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    ModernCar = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_normalcar",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    ModernCar02 = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_normalcar",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    CarStationWagon = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_stationwagon",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    CarLuxury = {
-        price = "vehicle_rare",
-        reward = "vehicle_luxury",
-        offer = {
-            weight = 0.5,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    SportsCar = {
-        price = "vehicle_rare",
-        reward = "vehicle_sportscar",
-        offer = {
-            weight = 0.5,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    SUV = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_suv",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    OffRoad = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_offroad",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    PickUpTruck = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_pickup",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    PickUpVan = {
-        price = "vehicle_uncommon",
-        reward = "vehicle_pickup",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    Van = {
-        price = "vehicle_common",
-        reward = "vehicle_van",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    VanSeats = {
-        price = "vehicle_common",
-        reward = "vehicle_van",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    },
-    StepVan = {
-        price = "vehicle_common",
-        reward = "vehicle_stepvan",
-        offer = {
-            weight = 1.0,
-            stock = {
-                min = 1,
-                max = 1
-            }
-        }
-    }
-
+    --     pool.defaults -> group.defaults -> the special -> this file
+    --
+    -- It earns its keep on an item a group pulled in by CATEGORY, where there is
+    -- no other way to single one out. Naming an item a group already lists
+    -- explicitly is usually the wrong tool: move it to a group whose defaults
+    -- say what you want instead, and its siblings come with it.
+    --
+    -- This file used to hold sixteen vehicle entries and read like a vehicle
+    -- mapping table. Ten of them restated their group's defaults word for word.
+    -- The other six moved a single script into another price band while the
+    -- twenty-odd variants beside it stayed put. Vehicle groups now carry the
+    -- band themselves, so all sixteen are gone. See defaults/groups.lua.
+    --
+    -- Format, for when you do need one:
+    --
+    --     ["Base.Axe"] = {
+    --         price = "tools_expensive",
+    --         offer = { weight = 0.25, stock = { min = 1, max = 2 } }
+    --     }
+    --
     -- XP and boost offer items are defined in PhunMart_XP_Items.json (generated)
 
 }

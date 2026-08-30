@@ -123,25 +123,42 @@ end
 
 --- Compile one pool holding one group, and hand back the single offer in it.
 --- Everything else is the smallest world the compiler will accept.
-local function compileOffer(groupDef)
+---
+--- `itemDefs` is the items.lua layer, the per-item override that sits above the
+--- group. `extraSpecials` are merged over the two defined here, so a test can
+--- add a second band and check which one an offer actually lands in.
+local function compileOffer(groupDef, itemDefs, extraSpecials)
+    local specials = {
+        vehicle_smallcar = {
+            kind = "vehicle",
+            price = "cheap",
+            offer = {
+                weight = 1.0
+            },
+            actions = {{
+                type = "spawnVehicle",
+                scripts = {"SmallCar"}
+            }}
+        }
+    }
+    for k, v in pairs(extraSpecials or {}) do
+        specials[k] = v
+    end
+
     local runtime, logger = Compiler.compileAll({
         prices = {
             cheap = {
                 kind = "change",
                 amount = 10
+            },
+            dear = {
+                kind = "change",
+                amount = 500
             }
         },
-        specials = {
-            vehicle_smallcar = {
-                kind = "vehicle",
-                actions = {{
-                    type = "spawnVehicle",
-                    scripts = {"SmallCar"}
-                }}
-            }
-        },
+        specials = specials,
         conditionsDefs = {},
-        items = {},
+        items = itemDefs or {},
         groups = {
             g = groupDef
         },
@@ -222,6 +239,183 @@ do
     })
     ok("the named special still wins", action(offer).type == "spawnVehicle")
     ok("and keeps its own script list", action(offer).scripts ~= nil and action(offer).scripts[1] == "SmallCar")
+end
+
+print("-- a group that sets the condition its vehicles arrive in --")
+do
+    local offer = compileOffer({
+        defaults = {
+            price = "cheap",
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                }
+            }
+        },
+        items = {"SmallCar"}
+    })
+    -- The group is the class now, so the condition range has to reach the spawn
+    -- action from group defaults. It used to arrive only from a vehicle special.
+    local args = action(offer).args
+    ok("the condition range reaches the action", args ~= nil and args.condition ~= nil)
+    ok("with the numbers the group gave", args and args.condition and args.condition.min == 85 and
+        args.condition.max == 100)
+end
+
+print("-- an item override that moves an item into another band --")
+do
+    -- The bug this pins: the special supplying price and weight used to be
+    -- looked up from the group's reward, i.e. the band the override was moving
+    -- the item OUT of. It went unseen because every shipped override restated
+    -- price and weight by hand. This one deliberately does not.
+    -- No price on the group, so the price can only have come from a special,
+    -- which makes it visible which special was consulted.
+    local offer = compileOffer({
+        defaults = {
+            reward = "vehicle_smallcar"
+        },
+        items = {"SmallCar"}
+    }, {
+        SmallCar = {
+            reward = "vehicle_fancy"
+        }
+    }, {
+        vehicle_fancy = {
+            kind = "vehicle",
+            price = "dear",
+            offer = {
+                weight = 0.25
+            },
+            actions = {{
+                type = "spawnVehicle",
+                scripts = {"SmallCar"}
+            }}
+        }
+    })
+    ok("the offer takes the new band's price", offer and offer.price and offer.price.amount == 500,
+        "amount was " .. tostring(offer and offer.price and offer.price.amount))
+    ok("and the new band's weight", offer and offer.offer and offer.offer.weight == 0.25,
+        "weight was " .. tostring(offer and offer.offer and offer.offer.weight))
+end
+
+print("-- an item override still outranks the special it names --")
+do
+    local offer = compileOffer({
+        defaults = {
+            price = "cheap"
+        },
+        items = {"SmallCar"}
+    }, {
+        SmallCar = {
+            reward = "vehicle_smallcar",
+            price = "dear",
+            offer = {
+                weight = 0.1
+            }
+        }
+    })
+    ok("the override's price wins over the special's", offer and offer.price and offer.price.amount == 500,
+        "amount was " .. tostring(offer and offer.price and offer.price.amount))
+    ok("and the override's weight", offer and offer.offer and offer.offer.weight == 0.1,
+        "weight was " .. tostring(offer and offer.offer and offer.offer.weight))
+end
+
+print("-- a group that sets the fuel its vehicles arrive with --")
+do
+    local offer = compileOffer({
+        defaults = {
+            price = "cheap",
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                },
+                fuel = {
+                    min = 0.1,
+                    max = 0.25
+                }
+            }
+        },
+        items = {"SmallCar"}
+    })
+    local args = action(offer).args
+    ok("fuel reaches the action", args ~= nil and args.fuel ~= nil)
+    ok("as the range the group gave", args and args.fuel and args.fuel.min == 0.1 and args.fuel.max == 0.25)
+    ok("alongside condition, not instead of it", args and args.condition and args.condition.min == 85)
+end
+
+print("-- a group that sets condition but not fuel --")
+do
+    -- Fuel absent has to stay absent all the way to the action. A nil there is
+    -- what tells the claim to leave the tank as the engine spawned it.
+    local offer = compileOffer({
+        defaults = {
+            price = "cheap",
+            spawn = {
+                condition = {
+                    min = 85,
+                    max = 100
+                }
+            }
+        },
+        items = {"SmallCar"}
+    })
+    local args = action(offer).args
+    ok("condition still arrives", args and args.condition ~= nil)
+    ok("and fuel is absent rather than zero", args and args.fuel == nil,
+        "fuel was " .. tostring(args and args.fuel))
+end
+
+print("-- rolling a fuel fraction --")
+do
+    -- The compiler only carries the range. Turning it into a number happens at
+    -- claim time, and it is the one piece of arithmetic in the vehicle path.
+    local utils = require "PhunMart/utils"
+
+    --- Rollers that pin the ends of the range ZombRand would pick from, [lo, hi).
+    local function lowest(lo, _)
+        return lo
+    end
+    local function highest(_, hi)
+        return hi - 1
+    end
+
+    ok("nil stays nil, so the tank is left alone", utils.rollFraction(nil) == nil)
+    ok("a range's floor is its min", utils.rollFraction({min = 0.1, max = 0.25}, lowest) == 0.1,
+        tostring(utils.rollFraction({min = 0.1, max = 0.25}, lowest)))
+    ok("a range's ceiling is its max", utils.rollFraction({min = 0.1, max = 0.25}, highest) == 0.25,
+        tostring(utils.rollFraction({min = 0.1, max = 0.25}, highest)))
+    ok("a plain number passes through", utils.rollFraction(0.4) == 0.4)
+    ok("a fixed range needs no roll at all", utils.rollFraction({min = 0.2, max = 0.2}, function()
+        error("rolled when min == max")
+    end) == 0.2)
+
+    -- These come out of a config file someone typed by hand.
+    ok("a reversed range is read the right way up", utils.rollFraction({min = 0.9, max = 0.2}, lowest) == 0.2)
+    ok("more than a full tank clamps to full", utils.rollFraction(1.7) == 1)
+    ok("less than empty clamps to empty", utils.rollFraction(-0.5) == 0)
+    ok("text is nil rather than a crash", utils.rollFraction("half") == nil)
+end
+
+print("-- a group naming a special that no longer exists --")
+do
+    -- The vehicle_* specials were deleted rather than kept as shims, which is
+    -- only safe because an offer whose reward does not resolve is dropped.
+    -- If it were ever kept instead, a group left pointing at a removed key
+    -- would sell cars and hand over nothing.
+    local offer, count, logger = compileOffer({
+        defaults = {
+            price = "cheap",
+            reward = "vehicle_deleted"
+        },
+        items = {"SmallCar"}
+    })
+    ok("the offer is dropped, not sold empty", count == 0, "got " .. tostring(count) .. " offers")
+    ok("and the reason names the missing key",
+        #logger.errors > 0 and table.concat(logger.errors, " "):find("vehicle_deleted") ~= nil,
+        logger.errors[1] or "no error logged")
+    ok("nothing was handed over", offer == nil)
 end
 
 print("-- a vehicle offer with no price --")

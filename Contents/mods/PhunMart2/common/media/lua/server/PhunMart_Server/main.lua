@@ -115,11 +115,16 @@ function Core:grantReward(player, action, qty, context)
             local item = player:getInventory():AddItem("PhunMart.VehicleKeySpawner")
             if item then
                 sendAddItemToContainer(player:getInventory(), item)
+                -- Both ranges travel on the key as ranges, not as rolled numbers.
+                -- The roll happens when the key is used, so two keys bought
+                -- together are not identical cars.
                 local condition = action.args and action.args.condition or nil
+                local fuel = action.args and action.args.fuel or nil
                 local vehicleLabel = Core.getVehicleLabel(scriptName) or scriptName
                 item:setName("Vehicle Claim Key: " .. vehicleLabel)
                 item:getModData()["vehicleScript"] = scriptName
                 item:getModData()["condition"] = condition
+                item:getModData()["fuel"] = fuel
                 sendAddItemToContainer(player:getInventory(), item)
                 sendServerCommand(player, Core.name, Core.commands.spawnVehicle, {
                     itemId = tostring(item:getID()),
@@ -389,6 +394,45 @@ function Core.restockStamps()
     return restockStamps
 end
 
+--- Roll every affected machine once, when the shipped definitions have changed
+--- since this save last started.
+---
+--- The marker lives in the per-save restock ModData rather than in State, which
+--- is per install: one machine shared by two saves has to see this once for each
+--- of them, not once in total.
+---
+--- Nothing restocks here directly. Stamping is enough and is what an admin's
+--- Restock All does too: a loaded machine services the stamp the next time it is
+--- asked, and one in an unloaded chunk services it when that chunk loads.
+function Core.restockForChangedDefinitions()
+    local stamps = Core.restockStamps()
+    if stamps.defsRevision == Core.defsRevision then
+        return
+    end
+    stamps.defsRevision = Core.defsRevision
+
+    -- Same rounding as restockAll, so a machine that services this stamp cannot
+    -- come back with a rounded-down lastRestock that still looks older than it.
+    local now = tonumber(string.format("%.1f", GameTime:getInstance():getWorldAgeHours()))
+
+    local types = Core.defsRevisionShops
+    if types == nil then
+        stamps.forceRestockAt = now
+        Core.debugLn("definitions revision " .. tostring(Core.defsRevision) ..
+                         ": every shop will restock, stamped at " .. tostring(now))
+        return
+    end
+
+    stamps.forceRestockTypeAt = stamps.forceRestockTypeAt or {}
+    local named = {}
+    for _, t in ipairs(types) do
+        stamps.forceRestockTypeAt[t] = now
+        table.insert(named, t)
+    end
+    Core.debugLn("definitions revision " .. tostring(Core.defsRevision) .. ": " ..
+                     table.concat(named, ", ") .. " will restock, stamped at " .. tostring(now))
+end
+
 function Core:ini()
     self.inied = true
     self.instances = ModData.getOrCreate(self.name)
@@ -398,6 +442,10 @@ function Core:ini()
     self.lastStart = getTimestamp()
     Core.ServerSystem.instance:removeInvalidInstanceData()
     Core.compile()
+
+    -- After compile: the stamp is only worth setting once the definitions it
+    -- refers to have actually loaded.
+    Core.restockForChangedDefinitions()
 
     -- Load token rewards config: try server override file first, then built-in defaults.
     local ok, tokenDefaults = pcall(require, "PhunMart/defaults/token_rewards")
