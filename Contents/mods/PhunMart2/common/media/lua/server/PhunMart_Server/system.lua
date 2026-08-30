@@ -42,7 +42,19 @@ function ServerSystem:removeInvalidInstanceData()
         Core.instances[k] = nil
         removed = removed + 1
     end
-    Core.debugLn("Removed " .. tostring(removed) .. " invalid instances")
+    -- Both counts, and out loud when it actually took something. They were
+    -- already being gathered and neither was ever printed, which made the one
+    -- number that did print impossible to read: "removed 40" means one thing
+    -- against 40 objects and something much worse against none, and the second
+    -- reading is what a boot that runs before the global objects have loaded
+    -- would look like.
+    local msg = "removeInvalidInstanceData: " .. tostring(instanceCount) .. " instance records, " ..
+                    tostring(objectCount) .. " global objects, removed " .. tostring(removed)
+    if removed > 0 then
+        print("[" .. Core.name .. "] " .. msg)
+    else
+        Core.debugLn(msg)
+    end
 
 end
 
@@ -62,54 +74,108 @@ end
 -- loadGridsquare rather than at boot.
 --
 -- The mirror of checkObjectAdded, which recovers a sprite that outlived its
--- global object. This drops a global object that outlived its sprite.
+-- global object. This deals with a global object that outlived its sprite,
+-- which turns out to be two different situations wanting opposite answers.
+--
+-- If the object is gone, the records are the only thing left and they go too.
+-- If the object is still standing and only its sprite is unresolvable, then
+-- nothing has been lost at all: the type is right there on the global object,
+-- so the sprite can simply be put back and the machine reappears. Deleting
+-- that one would throw away a working shop over a rendering problem, which is
+-- what the first cut of this would have done had its guard not spared it for
+-- an unrelated reason.
+--
+-- Returns "removed", "repaired", or nil for a square that needed neither.
 local ghostsRemoved = 0
+local spritesRepaired = 0
 
-function ServerSystem:removeGhostAt(square, objects)
+function ServerSystem:reconcileMachineAt(square, objects)
     -- Before ini the shop definitions have not compiled and the world is still
     -- coming up, so an empty-looking square proves nothing yet.
-    if not Core.inied or not square then
-        return
+    if not Core.inied or not square or not objects then
+        return nil
     end
 
     local x, y, z = square:getX(), square:getY(), square:getZ()
     local key = x .. "_" .. y .. "_" .. (z or 0)
 
-    -- This runs for every square of every chunk the game loads, so the cheap
-    -- question comes first and the rest of the function is reached by almost
-    -- nothing. A miss costs one hash lookup.
+    -- Both halves are asked about, because either can outlive the other and
+    -- the first cut of this asked only about the ModData record. That is the
+    -- half that does not drive what a player sees: the context menu appears
+    -- when the CLIENT finds a global object on the square, and the client only
+    -- has one because the server sent it. So a record that has already gone,
+    -- which removeInvalidInstanceData will do at boot the moment the global
+    -- object list is not loaded yet, left the visible ghost untouched.
     --
-    -- Which means a global object whose ModData record has already gone is left
-    -- alone. No path we have produces that pairing: addToWorld writes both,
-    -- removeLuaObject clears both, and removeInvalidInstanceData only ever
-    -- drops the record when the global object is the one already missing.
-    -- isShopInstance guards the lookup for the reason it does there too: other
-    -- things live in this table.
+    -- isShopInstance guards the ModData side for the reason it does in
+    -- removeInvalidInstanceData: other things live in that table.
+    local luaObj = self:getLuaObjectAt(x, y, z)
     local instance = Core.instances and Core.instances[key]
-    if not Core.isShopInstance(instance) then
-        return
+    local hasRecord = Core.isShopInstance(instance)
+
+    if not luaObj and not hasRecord then
+        return nil
     end
 
-    -- The caller found no sprite here carrying a CustomName this build knows,
-    -- which is a narrower thing than finding no machine. A shop whose type an
-    -- admin has since deleted no longer matches Core.shops, and a machine whose
-    -- sprite failed to resolve has no properties to read at all. Both are still
-    -- standing, and neither is a ghost. The object's name survives both, so it
-    -- settles what the sprite cannot.
+    -- Both marks a machine can carry, so this decides for itself rather than
+    -- trusting what the caller worked out. loadGridsquare arrives here having
+    -- already ruled out one of them, openShop having ruled out neither, and a
+    -- function that deletes a player's shop on being called wrongly should not
+    -- depend on which.
     --
-    -- Only reached on a square that has a record, so the per-object cost lands
-    -- on the handful of squares in the world that could possibly be ghosts.
+    -- Two marks because either can go missing on its own. A shop whose type an
+    -- admin has since deleted no longer matches Core.shops, and a machine whose
+    -- sprite failed to resolve has no properties to read at all; the name
+    -- outlives both, and the client sets it on arrival for exactly this kind of
+    -- lookup. Any one of them means a machine is standing here.
+    --
+    -- Only reached on a square that has one half of a machine on it, so the
+    -- per-object cost lands nowhere near the whole map.
     for i = 0, objects:size() - 1 do
-        if self:isValidIsoObject(objects:get(i)) then
-            return
+        local obj = objects:get(i)
+        local isMachine = self:isValidIsoObject(obj)
+        if not isMachine then
+            local sprite = obj:getSprite()
+            if sprite and sprite.getProperties then
+                local customName = sprite:getProperties():get("CustomName")
+                isMachine = customName ~= nil and Core.shops[customName] ~= nil
+            end
+        end
+        if isMachine then
+            -- Standing, so not a ghost. The caller only gets here having failed
+            -- to find a sprite it recognises, so this object is a machine
+            -- wearing a sprite the game cannot resolve: invisible, but real,
+            -- and still answering when a player right-clicks the bare square it
+            -- appears to be. The type is on the global object, so put the
+            -- sprite back rather than taking the shop away.
+            if luaObj and luaObj.applyTypeSprite and luaObj:applyTypeSprite() then
+                spritesRepaired = spritesRepaired + 1
+                if spritesRepaired == 1 then
+                    print("[" .. Core.name ..
+                              "] a machine was standing here with a sprite this build could not resolve, so it was invisible.")
+                    print("[" .. Core.name ..
+                              "] its shop type was intact, so the sprite has been put back and the machine is visible again.")
+                    print("[" .. Core.name .. "] this is expected after the mod has been reinstalled.")
+                end
+                Core.debugLn("reconcileMachineAt: restored sprite for " .. tostring(luaObj.type) .. " at " .. x .. "," ..
+                                 y .. "," .. tostring(z))
+                return "repaired"
+            end
+            Core.debugLn("reconcileMachineAt: machine standing at " .. x .. "," .. y .. "," .. tostring(z) ..
+                             " but its sprite could not be restored")
+            return nil
         end
     end
 
-    local luaObj = self:getLuaObjectAt(x, y, z)
     if luaObj then
         -- Takes the global object and the instance record together.
         self:removeLuaObject(luaObj)
-    else
+    end
+    if hasRecord then
+        -- Unconditional rather than an else. removeLuaObject goes through
+        -- Core:removeInstance, but only for the position the global object
+        -- holds, and the whole reason this function looks at both halves is
+        -- that the two can disagree.
         Core:removeInstance({
             x = x,
             y = y,
@@ -122,11 +188,12 @@ function ServerSystem:removeGhostAt(square, objects)
         -- Once per session, whether or not debug is on. Records disappearing is
         -- worth a line in anybody's log, and the count is not knowable up front
         -- because they surface a chunk at a time.
-        print("[PhunMart] found shop data for a machine that is no longer in the world, and removed it.")
-        print("[PhunMart] this is expected after the mod has been uninstalled and reinstalled.")
-        print("[PhunMart] turn on the Debug sandbox option to log each one.")
+        print("[" .. Core.name .. "] found shop data for a machine that is no longer in the world, and removed it.")
+        print("[" .. Core.name .. "] this is expected after the mod has been uninstalled and reinstalled.")
+        print("[" .. Core.name .. "] turn on the Debug sandbox option to log each one.")
     end
-    Core.debugLn("removeGhostAt: dropped ghost shop data at " .. x .. "," .. y .. "," .. tostring(z))
+    Core.debugLn("reconcileMachineAt: dropped ghost shop data at " .. x .. "," .. y .. "," .. tostring(z))
+    return "removed"
 end
 
 function ServerSystem.addToWorld(square, shop, direction)
@@ -138,8 +205,21 @@ function ServerSystem.addToWorld(square, shop, direction)
     elseif direction == IsoDirections.W then
         index = 3
     end
-    local c = Core
-    local sprite = c.shops[shop].sprites[index]
+    -- Checked rather than assumed, because every caller reaches here having
+    -- already taken the old machine off the square. Indexing a missing
+    -- definition throws, and a throw at this point has destroyed a shop and put
+    -- nothing back: the machine is simply gone, which is what an admin sees.
+    -- Saying so and returning false lets the caller decide, and none of them
+    -- can decide anything useful after the fact, which is why they now ask
+    -- before they demolish.
+    local shopDef = shop and Core.shops[shop]
+    if not shopDef or not shopDef.sprites then
+        print("[" .. Core.name .. "] addToWorld: no shop definition for '" .. tostring(shop) .. "', nothing placed at " ..
+                  square:getX() .. "," .. square:getY() .. "," .. square:getZ())
+        return false
+    end
+
+    local sprite = shopDef.sprites[index]
     -- Plain IsoObject (not IsoThumpable): zombies ignore it and it can't be
     -- destroyed. Admin pickup/relocate goes through transmitRemoveItemFromSquare.
     local isoObject = IsoObject.new(square:getCell(), square, sprite)
@@ -147,6 +227,7 @@ function ServerSystem.addToWorld(square, shop, direction)
     square:AddSpecialObject(isoObject, -1)
     triggerEvent("OnObjectAdded", isoObject)
     isoObject:transmitCompleteItemToClients()
+    return true
 
 end
 
@@ -278,21 +359,70 @@ function ServerSystem.notifyShopChanged(shopObj)
     end
 end
 
+--- Turn the machine at `location` into a different shop, picked the way one is
+--- picked when a machine is first placed.
+---
+--- Everything is resolved before anything is destroyed. It used to remove the
+--- old machine and then work out what to put back, so a pick that came to
+--- nothing left bare ground and threw on the way out, and the shop an admin
+--- was standing in front of was gone for good.
+---
+--- The machine leaves itself out of the spacing measurement. It stands exactly
+--- where the answer would go, so counted in it rules out its own type at
+--- distance zero and everything sharing its category along with it, which on a
+--- server with one machine of each kind rules out the entire list. This is the
+--- same omission system_object's timed reroll already makes; this path never
+--- did, which is why the cog could empty a square that a timer never would.
+---
+--- ignoreDistance was accepted and then never read, so the tickbox offering to
+--- relax the spacing rule did nothing at all.
 function ServerSystem:reroll(location, ignoreDistance)
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
-    local square = shopObj:getIsoObject():getSquare()
+    local iso = shopObj and shopObj.getIsoObject and shopObj:getIsoObject()
+    local square = iso and iso:getSquare()
+    if not square then
+        Core.debugLn("reroll: no machine at " .. tostring(location.x) .. "," .. tostring(location.y) .. "," ..
+                         tostring(location.z))
+        return false
+    end
+
     local facing = resolveFacing(shopObj)
-    local shopname = self:getRandomShop(square:getX(), square:getY())
-    square:transmitRemoveItemFromSquare(shopObj:getIsoObject())
-    self.addToWorld(square, shopname, facing)
+    local shopname = self:getRandomShop(square:getX(), square:getY(), shopObj, ignoreDistance)
+    if not shopname then
+        -- Left standing on purpose. Nothing qualifies here, and an admin who
+        -- asked for a different shop is better served by the one they have than
+        -- by an empty square.
+        print("[" .. Core.name .. "] reroll: nothing eligible at " .. square:getX() .. "," .. square:getY() ..
+                  "; the machine has been left as it is")
+        return false
+    end
+
+    square:transmitRemoveItemFromSquare(iso)
+    return self.addToWorld(square, shopname, facing)
 end
 
+--- Turn the machine at `location` into `shopName` specifically. Same ordering
+--- rule as reroll: the definition is checked while the machine is still
+--- standing, because there is no putting it back afterwards.
 function ServerSystem:changeTo(shopName, location)
     local shopObj = self:getLuaObjectAt(location.x, location.y, location.z)
-    local square = shopObj:getIsoObject():getSquare()
+    local iso = shopObj and shopObj.getIsoObject and shopObj:getIsoObject()
+    local square = iso and iso:getSquare()
+    if not square then
+        Core.debugLn("changeTo: no machine at " .. tostring(location.x) .. "," .. tostring(location.y) .. "," ..
+                         tostring(location.z))
+        return false
+    end
+
+    if not shopName or not Core.shops[shopName] then
+        print("[" .. Core.name .. "] changeTo: no shop definition for '" .. tostring(shopName) ..
+                  "'; the machine has been left as it is")
+        return false
+    end
+
     local facing = resolveFacing(shopObj)
-    square:transmitRemoveItemFromSquare(shopObj:getIsoObject())
-    self.addToWorld(square, shopName, facing)
+    square:transmitRemoveItemFromSquare(iso)
+    return self.addToWorld(square, shopName, facing)
 end
 
 function ServerSystem:rerollAll()
@@ -370,6 +500,33 @@ function ServerSystem:openShop(player, args, forceRestock)
 
     if not shop then
         Core.debugLn("openShop: no shop at " .. args.x .. "," .. args.y .. "," .. args.z)
+        return
+    end
+
+    -- A ghost answers this command exactly as a machine would, which is how one
+    -- gets noticed: right-click bare ground and a working shop opens. Caught
+    -- here as well as on chunk load because this is the moment a player is
+    -- standing on the square, so it is certainly loaded, and because a shop
+    -- that is not there should not sell anything in the meantime.
+    local cell = getWorld() and getWorld():getCell()
+    local square = cell and cell:getGridSquare(args.x, args.y, args.z)
+    -- Only "removed" stops the open. A machine whose sprite was put back is a
+    -- real shop that is now visible as well, and the player asked to open it.
+    if square and self:reconcileMachineAt(square, square:getObjects()) == "removed" then
+        local key = shop.getKey and shop:getKey() or nil
+        if Core.isLocal then
+            Core.pendingShopData = Core.pendingShopData or {}
+            if key then
+                Core.pendingShopData[key] = {
+                    error = "machineGone"
+                }
+            end
+        else
+            sendServerCommand(player, Core.name, Core.commands.openError, {
+                key = key,
+                message = "machineGone"
+            })
+        end
         return
     end
 
@@ -476,7 +633,14 @@ end
 -- `ignore` is an instance table to leave out of the spacing measurement, used
 -- by a machine asking what it could turn into: it is standing on the spot being
 -- filled and should not be spacing itself out of the running.
-function ServerSystem:getRandomShop(x, y, ignore)
+--- Pick a shop that could stand at x,y.
+---
+--- `ignore` is one instance to leave out of the spacing measurement, for a
+--- machine asking what it could become. `ignoreDistance` drops the spacing test
+--- altogether, for an admin who has said they want this shop here regardless;
+--- the enabled, probability and eligible-pool tests still apply, since those
+--- are about whether the shop can work at all rather than where it sits.
+function ServerSystem:getRandomShop(x, y, ignore, ignoreDistance)
 
     local options, byCategory = Core:getInstanceDistancesFrom(x, y, ignore)
     local candidates = {}
@@ -497,7 +661,8 @@ function ServerSystem:getRandomShop(x, y, ignore)
             -- falls back to the type test alone, which is what every shop used
             -- to get.
             local catDist = shopDef.category and byCategory[shopDef.category] or 9999999
-            if minDist <= v and minDist <= catDist and shopHasEligiblePool(shopDef, x, y) then
+            local farEnough = ignoreDistance == true or (minDist <= v and minDist <= catDist)
+            if farEnough and shopHasEligiblePool(shopDef, x, y) then
                 table.insert(candidates, {
                     shop = k,
                     p = probability
@@ -785,8 +950,11 @@ function ServerSystem:loadGridsquare(square)
         end
     end
 
+    -- No sprite here that this build recognises, which is either a machine that
+    -- has gone or one that has lost its sprite. reconcileMachineAt tells them
+    -- apart and does the opposite thing in each case.
     if #existing == 0 then
-        self:removeGhostAt(square, objects)
+        self:reconcileMachineAt(square, objects)
     end
 
     for _, obj in ipairs(existing) do

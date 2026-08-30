@@ -32,6 +32,7 @@
   "IGUI_PhunMart_Shop_ShedsAndCommoners": "Sheds & Commoners",
   "IGUI_PhunMart_Shop_ShedsAndCommoners_tooltip": "Books, magazines and more to keep you entertained during the apocalypse",
   "IGUI_PhunMart_Open_X": "View %1",
+  "IGUI_PhunMart.Error.machineGone": "That machine is no longer there. Its leftover data has been cleared.",
   "IGUI_PhunMart_Open_X_nopower_tooltip": "The %1 vending machine requires power",
   "IGUI_PhunMart_Cond_Failed": "Condition failed: %1",
   "IGUI_PhunMart_Cond_UnknownKey": "Unknown requirement: %1",

@@ -431,7 +431,11 @@ Commands[Core.commands.requestShopGenerate] = function(playerObj, args)
     if not Core.utils.isAdmin(playerObj) then
         return
     end
-    Core.ServerSystem.instance:reroll(args.location, args.target, args.ignoreDistance == true)
+    -- args.target used to be passed between these two, landing in reroll's
+    -- ignoreDistance and pushing the real one off the end. Nothing sends this
+    -- command today and reroll has never taken a target, so the argument goes
+    -- rather than gaining a parameter to receive it.
+    Core.ServerSystem.instance:reroll(args.location, args.ignoreDistance == true)
 end
 
 -- Player uses a VehicleKeySpawner item to claim their vehicle.
