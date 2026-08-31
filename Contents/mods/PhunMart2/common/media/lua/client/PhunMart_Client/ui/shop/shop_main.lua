@@ -450,6 +450,14 @@ Core.registerShopMode({
     key = "buy",
     label = "IGUI_PhunMart_Buy",
     order = 10,
+    --- Every machine that stocks anything, which is every machine PhunMart
+    --- ships. A shop whose shelves are filled from somewhere else entirely has
+    --- no offers of its own, so this mode would draw an empty grid and sit
+    --- there being the only thing on the strip. Whatever fills that machine is
+    --- expected to register a mode that knows how to show it.
+    applies = function(data)
+        return not (data and data.stocksNothing)
+    end,
     getGridData = function(ui)
         return ui.data
     end,

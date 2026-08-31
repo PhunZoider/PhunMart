@@ -327,6 +327,10 @@ function ServerSystem.buildShopPayload(shopObj)
         background = shopDef and shopDef.background,
         defaultView = shopDef and shopDef.defaultView,
         poolSets = shopDef and shopDef.poolSets,
+        -- Travels so the window knows there is nothing of the shop's own to
+        -- show. Placement already reads it; the window needs it for the same
+        -- reason, one step later.
+        stocksNothing = shopDef and shopDef.stocksNothing,
         lastRestock = shopObj.lastRestock,
         restockFrequency = (shopCfg and shopCfg.restock) or 24
     }
