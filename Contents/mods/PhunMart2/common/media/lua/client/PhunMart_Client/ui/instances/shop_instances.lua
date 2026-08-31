@@ -204,53 +204,33 @@ end
 -- Teleport
 ---------------------------------------------------------------------------
 
+--- Put the player at a machine.
+---
+--- One engine call, which is what every teleport in the game itself is:
+--- teleportTo is what the debug menus, the admin panel, the spawn point editor
+--- and the PVP log tool all use, and it handles the cell not being streamed in
+--- yet. Nothing here has to wait for the destination to exist.
+---
+--- This used to set the position by hand and then force a world tick to make it
+--- take, reapplying it from OnPlayerUpdate until the square turned up. Two
+--- things were wrong with that. The forced tick was a second update inside a
+--- frame the engine had already updated, which B42 refuses outright: teleporting
+--- to a machine threw "Double-update call at frame N. ECSEntities must only be
+--- updated once per frame" and dropped the player out of the game. And the
+--- branch guarding it tested for setLx, which no longer exists on IsoPlayer --
+--- it appears nowhere in the game's own Lua -- so the forced tick was not a
+--- fallback that rarely ran, it was the only path.
+---
+--- The retry loop went with it, since the reason it existed is now the engine's
+--- job. It also called AdjacentFreeTileFinder and threw the square away, so it
+--- never did the one thing its name suggests: the player still lands on the
+--- machine's own tile rather than beside it. Worth fixing, separately.
 function UI:doPort(destinationX, destinationY, destinationZ)
     local player = self.player
     if not player then
         return
     end
-
-    local function place()
-        player:setX(destinationX)
-        player:setY(destinationY)
-        player:setZ(destinationZ)
-        if player.setLx then
-            player:setLx(destinationX)
-            player:setLy(destinationY)
-            player:setLz(destinationZ)
-        else
-            player:setLastX(destinationX)
-            player:setLastY(destinationY)
-            player:setLastZ(destinationZ)
-            getWorld():update()
-        end
-    end
-
-    place()
-
-    -- The destination square does not exist until the cell streams in, so the
-    -- position is reapplied once there is somewhere to stand. Bounded, because
-    -- a square that never loads would otherwise leave this running for the rest
-    -- of the session.
-    local retries = 100
-    local settle
-    settle = function()
-        local square = player:getCurrentSquare()
-        if square == nil then
-            return
-        end
-        retries = retries - 1
-        if retries <= 0 then
-            Events.OnPlayerUpdate.Remove(settle)
-            player:Say(getText("IGUI_PhunMart_Msg_PortFailed"))
-            return
-        end
-        if AdjacentFreeTileFinder.FindClosest(square, player) then
-            Events.OnPlayerUpdate.Remove(settle)
-            place()
-        end
-    end
-    Events.OnPlayerUpdate.Add(settle)
+    player:teleportTo(destinationX, destinationY, destinationZ)
 end
 
 ---------------------------------------------------------------------------
