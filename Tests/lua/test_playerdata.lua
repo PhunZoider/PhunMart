@@ -1,7 +1,11 @@
--- Wallets and the reward trackers on this branch live in ModData, so the
--- interesting part is not saving them but the key they are filed under, and
--- whether the one-off import of converted legacy files lands where the rest of
--- the mod looks.
+-- Wallets and the reward trackers live in ModData, so the interesting parts are
+-- the key they are filed under, whether the one-off import of converted legacy
+-- files lands where the rest of the mod looks, and whether progress written in
+-- one session is still there in the next.
+--
+-- That last group is ported from test_wallet.lua and test_trackers.lua, which
+-- covered the same ground back when these were files. The move to ModData
+-- retired their mechanism, not their questions.
 --
 -- Run: luajit test_playerdata.lua   (or run.cmd, which runs all of them)
 
@@ -120,6 +124,78 @@ Core.killRewards:getPlayerData("ignored in SP").zombieKills = 137
 check("kills file under \"0\"", Core.killRewards.data["0"] ~= nil)
 check("not under the number 0", Core.killRewards.data[0] == nil)
 check("and the table encodes", encodes(Core.killRewards.data))
+
+---------------------------------------------------------------------------
+print("\n-- a tracker record survives a reload --")
+
+-- Ported from the file-backed tests that the move to ModData retired. The
+-- mechanism they checked is gone (there is no save() writing a .json any more)
+-- but the question is not: progress written during one session has to still be
+-- there when load() binds the table again on the next one.
+
+Core.playtimeRewards:load()
+local playtime = Core.playtimeRewards:getPlayerData(fakePlayer)
+playtime.previousHours = 12
+playtime.claimed["playtime_60"] = true
+
+Core.playtimeRewards.data = {} -- drop the reference, as a restart would
+Core.playtimeRewards:load()
+local playtimeAgain = Core.playtimeRewards:getPlayerData(fakePlayer)
+check("previousHours survives a reload", playtimeAgain.previousHours == 12,
+    "got " .. tostring(playtimeAgain.previousHours))
+check("the claimed milestone survives", playtimeAgain.claimed["playtime_60"] == true)
+check("still one record, not two", (function()
+    local n = 0
+    for _ in pairs(Core.playtimeRewards.data) do n = n + 1 end
+    return n
+end)() == 1)
+
+Core.killRewards:load()
+local kills = Core.killRewards:getPlayerData("ignored in SP")
+kills.zombieKills = 137
+kills.claimed["zombie_100"] = true
+
+Core.killRewards.data = {}
+Core.killRewards:load()
+local killsAgain = Core.killRewards:getPlayerData("ignored in SP")
+check("the kill count survives a reload", killsAgain.zombieKills == 137,
+    "got " .. tostring(killsAgain.zombieKills))
+check("its claimed milestone survives too", killsAgain.claimed["zombie_100"] == true)
+
+---------------------------------------------------------------------------
+print("\n-- a record written before a field existed --")
+
+-- getPlayerData backfills rather than trusting the record it finds. A save
+-- made before sprinterKills was added hands back nil otherwise, and the
+-- milestone check adds to it.
+Core.killRewards.data = {
+    ["0"] = {zombieKills = 5}
+}
+local partial = Core.killRewards:getPlayerData("ignored in SP")
+check("the missing count reads as 0, not nil", partial.sprinterKills == 0,
+    "got " .. tostring(partial.sprinterKills))
+check("so it can be added to", partial.sprinterKills + 1 == 1)
+check("the missing claimed set is a table", type(partial.claimed) == "table")
+check("and the field that was there is untouched", partial.zombieKills == 5)
+
+---------------------------------------------------------------------------
+print("\n-- multiplayer keeps players apart --")
+
+Core.isLocal = false
+Core.killRewards.data = {}
+Core.killRewards:getPlayerData("PhunZoider").zombieKills = 5
+Core.killRewards:getPlayerData("Someone Else").zombieKills = 9
+
+check("each player gets their own record", (function()
+    local n = 0
+    for _ in pairs(Core.killRewards.data) do n = n + 1 end
+    return n
+end)() == 2)
+check("keyed by username rather than \"0\"", Core.killRewards.data["0"] == nil)
+check("the first player reads back", Core.killRewards:getPlayerData("PhunZoider").zombieKills == 5)
+check("the second is separate", Core.killRewards:getPlayerData("Someone Else").zombieKills == 9)
+check("and the table encodes", encodes(Core.killRewards.data))
+Core.isLocal = true
 
 ---------------------------------------------------------------------------
 print("\n-- importing a converted legacy file --")
