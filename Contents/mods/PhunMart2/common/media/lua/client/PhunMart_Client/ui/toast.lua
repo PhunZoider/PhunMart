@@ -2,6 +2,7 @@ if isServer() then return end
 
 require "PhunMart/core"
 local Core = PhunMart
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 -- ---------------------------------------------------------------------------
 -- Toast notification system
@@ -19,6 +20,8 @@ local W           = 300
 local H           = 64
 local MARGIN      = 20   -- gap from screen edges
 local HUD_OFFSET  = 80   -- pixels above bottom of screen (clears the HUD)
+local PAD         = 14   -- inner padding, and where text starts without an icon
+local MAX_LINES   = 2    -- the panel is 64 tall; a third line would not fit
 
 -- Animation timing (real-world seconds)
 local SLIDE_DURATION = 0.3
@@ -120,18 +123,46 @@ function Toast:_create(opts)
         self:drawRect(4, 0, W - 4, 1, alpha * 0.5, color.r, color.g, color.b)
 
         -- Optional icon
-        local textX = 14
+        local textX = PAD
         if iconTex then
             local iconSize = H - 16
             local iconY    = (H - iconSize) / 2
-            self:drawTextureScaled(iconTex, 14, iconY, iconSize, iconSize, alpha)
-            textX = 14 + iconSize + 8
+            self:drawTextureScaled(iconTex, PAD, iconY, iconSize, iconSize, alpha)
+            textX = PAD + iconSize + 8
         end
 
-        -- Message text (single line, vertically centred)
+        -- Message text, wrapped to the panel and centred as a block.
+        --
+        -- The panel is a fixed 300 wide and the text used to be drawn as one
+        -- line from textX, so anything longer than the room left simply ran off
+        -- the edge and over whatever was behind it. Callers cannot be expected
+        -- to count pixels, and an item name is as long as the item is called.
+        --
+        -- Wrapped rather than shrunk: two lines of the same size read better at
+        -- a glance than one line of smaller text, and a glance is all a toast
+        -- gets. A third line will not fit in 64, so the second is truncated.
         local fontH = getTextManager():getFontHeight(UIFont.Small)
-        local textY = math.floor((H - fontH) / 2)
-        self:drawText(text, textX, textY, color.r, color.g, color.b, alpha, UIFont.Small)
+        local avail = W - textX - PAD
+        local lines = tools.wrapText(text, avail, UIFont.Small)
+        if #lines > MAX_LINES then
+            lines[MAX_LINES] = lines[MAX_LINES] .. " " .. lines[MAX_LINES + 1]
+            for i = #lines, MAX_LINES + 1, -1 do
+                lines[i] = nil
+            end
+        end
+        -- Every line, not only the one that absorbed the overflow: wrapText
+        -- breaks on spaces and never inside a word, so a single long word --
+        -- which is what a modded item with no spaces in its name is -- comes
+        -- back as one line wider than the panel however many lines there are.
+        for i, line in ipairs(lines) do
+            lines[i] = tools.truncate(line, avail, UIFont.Small)
+        end
+
+        local blockH = #lines * fontH
+        local textY = math.floor((H - blockH) / 2)
+        for i, line in ipairs(lines) do
+            self:drawText(line, textX, textY + (i - 1) * fontH, color.r, color.g, color.b, alpha, UIFont.Small)
+        end
     end
 
     -- No additional drawing in render; prerender handles everything.
