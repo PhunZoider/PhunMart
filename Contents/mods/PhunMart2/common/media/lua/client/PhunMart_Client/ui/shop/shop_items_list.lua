@@ -13,6 +13,10 @@ local FONT_TINY = getTextManager():getFontHeight(UIFont.Tiny)
 local FONT_SCALE = FONT_SM / 14
 
 local COLS = 5
+
+-- How long after a click a second one on the same tile still counts as a
+-- double-click. Windows uses 500ms by default and people are used to it.
+local DOUBLE_CLICK_MS = 500
 local PAD_EDGE = 6
 local PAD_GAP = 3
 local HEADER_H = FONT_SM + 8
@@ -40,6 +44,7 @@ function UI:new(x, y, w, h, opts)
     o.player = (opts and opts.player) or getPlayer()
     o.onSelectFn = opts and opts.onSelect
     o.onRightClickFn = opts and opts.onRightClick
+    o.onActivateFn = opts and opts.onActivate
     o.groups = {}
     o.selected = nil
     o.hovered = nil
@@ -447,6 +452,23 @@ function UI:onMouseUp(x, y)
     if self.onSelectFn then
         self.onSelectFn(e.id, e.offer, e)
     end
+
+    -- A second click on the same tile, soon enough after the first, is a
+    -- double-click. Tracked here because nothing in the UI layer below reports
+    -- one, and the alternative -- select a thing, then reach for a button to
+    -- act on it -- is two motions for what people expect to be one.
+    --
+    -- Selection still happens first, every time, so whatever activation does,
+    -- it does to the tile now under the cursor.
+    local now = getTimestampMs()
+    if self.onActivateFn and self._lastClickId == e.id and (now - (self._lastClickAt or 0)) <= DOUBLE_CLICK_MS then
+        self._lastClickId = nil
+        self._lastClickAt = 0
+        self.onActivateFn(e.id, e.offer, e)
+        return
+    end
+    self._lastClickId = e.id
+    self._lastClickAt = now
     -- Re-assert tooltip after the callback: the UI state change from onSelectFn
     -- (enabling buy button, 3D preview, etc.) can trigger a stray mouse event that
     -- clears the tooltip even though the mouse hasn't moved.

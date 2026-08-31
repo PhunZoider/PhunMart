@@ -277,6 +277,9 @@ function UI:createChildren()
         end,
         onRightClick = function(id, offer, screenX, screenY)
             self:onItemRightClick(id, offer, screenX, screenY)
+        end,
+        onActivate = function(id, offer, entry)
+            self:onOfferActivated(id, offer, entry)
         end
     })
     self.controls.grid:initialise()
@@ -883,6 +886,19 @@ function UI:onOfferSelected(id, offer, entry)
             p3d.vehicleName = nil
             p3d:setVisible(false)
         end
+    end
+end
+
+--- A tile was double-clicked.
+---
+--- Offered to the active mode and nothing more. There is deliberately no
+--- default: making a double-click buy would turn a slip of the hand into a
+--- purchase, and every machine PhunMart ships is a machine where that would be
+--- somebody's money. A mode that has somewhere to go says so.
+function UI:onOfferActivated(id, offer, entry)
+    local mode = self:currentMode()
+    if mode and mode.onActivate then
+        mode.onActivate(self, id, offer, entry)
     end
 end
 
@@ -1697,6 +1713,30 @@ function UI:renderDetails(z)
     end
     self:drawText(truncate(stockText, maxW, UIFont.Small), x, y, sr, sg, sb, 1, UIFont.Small)
     y = y + lh + 4
+
+    -- Anything the active mode wants said about this offer.
+    --
+    -- Placed here, among the price and the stock, rather than appended at the
+    -- end: everything below this point is conditions, and every branch of it
+    -- returns early, so the end of this function is somewhere a line would
+    -- sometimes be drawn and sometimes not.
+    --
+    -- A mode needs this when the numbers above are true but incomplete -- a tile
+    -- standing for several listings has a lowest price rather than a price, and
+    -- saying so is the difference between a figure and a misleading one.
+    local mode = self:currentMode()
+    local extra = mode and mode.detailLines and mode.detailLines(self, offer)
+    if extra and #extra > 0 then
+        for _, line in ipairs(extra) do
+            if y > maxY then
+                break
+            end
+            self:drawText(truncate(tostring(line.text or ""), maxW, UIFont.Small), x, y, line.r or 0.72,
+                line.g or 0.76, line.b or 0.85, 1, UIFont.Small)
+            y = y + lh
+        end
+        y = y + 4
+    end
 
     -- conditions
     if not offer.conditions then
