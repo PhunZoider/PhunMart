@@ -208,6 +208,12 @@ Two common jobs have guides of their own:
 - **[Using an item as currency](Docs/GUIDE_ITEM_CURRENCY.md)**: charge in `Base.Money` or
   anything else lootable, and rescale every price to match.
 
+For mod authors rather than admins:
+
+- **[Extending PhunMart from another mod](Docs/GUIDE_EXTENDING.md)**: add a machine, a shop
+  window mode or an admin tab from a separate mod, with no fork and no edits to PhunMart.
+  This is how [Phlea Market](https://github.com/PhunZoider/PhleaMarket) is built.
+
 ---
 
 ## Compatibility

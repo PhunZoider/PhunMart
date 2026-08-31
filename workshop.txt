@@ -66,6 +66,7 @@ description=
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/CUSTOMISATION.md]PhunMart Customisation Guide[/url]
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ITEM_CURRENCY.md]Using a Physical Item as Currency[/url]
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ADDING_MODDED_VEHICLE.md]Adding Modded Vehicles to WrentAWreck[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_EXTENDING.md]Extending PhunMart From Another Mod[/url]
 description=
 description=[h2]Translations[/h2]
 description=[list]
