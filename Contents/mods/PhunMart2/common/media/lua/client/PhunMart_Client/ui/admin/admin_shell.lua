@@ -34,68 +34,82 @@ require "PhunMart_Client/ui/admin/admin_tools"
 local FONT_SCALE = ListPanel.FONT_SCALE
 local profileName = "PhunMartAdminShell"
 
--- Ordered along the chain a shop actually resolves through rather than
--- alphabetically, so the tab strip reads as the path from a machine down to
--- what it charges. `admin` is false on the tab everyone may see.
+-- The shipped tabs, ordered along the chain a shop actually resolves through
+-- rather than alphabetically, so the strip reads as the path from a machine
+-- down to what it charges.
 --
--- `module` is the key on Core.ui rather than the panel table itself, because
--- this list is built at load time and the panels register themselves as their
--- own files load.
-local TABS = {{
+-- Registered rather than held in a local list, so a mod that adds a machine of
+-- its own can add the screen that administers it. See Core.registerAdminTab.
+-- Orders are spaced ten apart to leave room between any two.
+for _, spec in ipairs({{
     key = "shops",
     module = "shop_selector",
     label = "IGUI_PhunMart_Title_Shops",
-    admin = false
+    admin = false,
+    order = 10
 }, {
     -- Beside Shops rather than in the chain below it: a machine standing in the
     -- world is an instance of a shop type, not a step in how one resolves.
     key = "locations",
     module = "shop_instances",
-    label = "IGUI_PhunMart_Title_Locations"
+    label = "IGUI_PhunMart_Title_Locations",
+    order = 20
 }, {
     key = "pools",
     module = "admin_pools",
-    label = "IGUI_PhunMart_Btn_Pools"
+    label = "IGUI_PhunMart_Btn_Pools",
+    order = 30
 }, {
     key = "groups",
     module = "admin_groups",
-    label = "IGUI_PhunMart_Btn_Groups"
+    label = "IGUI_PhunMart_Btn_Groups",
+    order = 40
 }, {
     -- Specials before item overrides: an override mostly exists to attach a
     -- special to an item type, so meeting the special first is the order the
     -- idea builds in.
     key = "specials",
     module = "admin_specials",
-    label = "IGUI_PhunMart_Btn_Specials"
+    label = "IGUI_PhunMart_Btn_Specials",
+    order = 50
 }, {
     key = "items",
     module = "admin_items",
-    label = "IGUI_PhunMart_Btn_Items"
+    label = "IGUI_PhunMart_Btn_Items",
+    order = 60
 }, {
     key = "prices",
     module = "admin_prices",
-    label = "IGUI_PhunMart_Btn_Prices"
+    label = "IGUI_PhunMart_Btn_Prices",
+    order = 70
 }, {
     key = "blacklist",
     module = "admin_blacklist",
-    label = "IGUI_PhunMart_Btn_Blacklist"
+    label = "IGUI_PhunMart_Btn_Blacklist",
+    order = 80
 }, {
     key = "rewards",
     module = "admin_rewards",
-    label = "IGUI_PhunMart_Btn_Rewards"
+    label = "IGUI_PhunMart_Btn_Rewards",
+    order = 90
 }, {
     -- Next to Rewards on purpose: that tab sets how tokens are earned, this one
     -- shows what everyone ended up holding.
     key = "wallets",
     module = "admin_wallet",
-    label = "IGUI_PhunMart_Btn_Wallets"
+    label = "IGUI_PhunMart_Btn_Wallets",
+    order = 100
 }, {
     -- Last, and deliberately outside the chain: nothing on this tab edits a
-    -- definition, so it does not belong anywhere among the ones that do.
+    -- definition, so it does not belong anywhere among the ones that do. Far
+    -- out at 1000 so it stays last however many tabs arrive after it.
     key = "tools",
     module = "admin_tools",
-    label = "IGUI_PhunMart_Btn_Tools"
-}}
+    label = "IGUI_PhunMart_Btn_Tools",
+    order = 1000
+}}) do
+    Core.registerAdminTab(spec)
+end
 
 Core.ui.admin_shell = ISCollapsableWindowJoypad:derive("PhunMartAdminShell")
 local Shell = Core.ui.admin_shell
@@ -151,7 +165,7 @@ function Shell:createChildren()
     local viewW = tabs.width
     local viewH = tabs.height - tabs.tabHeight
 
-    for _, spec in ipairs(TABS) do
+    for _, spec in ipairs(Core.adminTabsInOrder()) do
         if spec.admin == false or self._editable then
             local module = Core.ui[spec.module]
             if module and module.createTab then
@@ -337,7 +351,7 @@ function Shell.open(player, tabKey, selectKey)
         instance = nil
         -- Drop the views too, otherwise createTab hands the rebuilt shell the
         -- panels still parented to the old one.
-        for _, spec in ipairs(TABS) do
+        for _, spec in ipairs(Core.adminTabsInOrder()) do
             local module = Core.ui[spec.module]
             if module and module.instances then
                 module.instances[playerIndex] = nil

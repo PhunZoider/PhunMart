@@ -418,8 +418,9 @@ function Core.restockForChangedDefinitions()
     local types = Core.defsRevisionShops
     if types == nil then
         stamps.forceRestockAt = now
-        Core.debugLn("definitions revision " .. tostring(Core.defsRevision) ..
-                         ": every shop will restock, stamped at " .. tostring(now))
+        Core.debugLn(
+            "definitions revision " .. tostring(Core.defsRevision) .. ": every shop will restock, stamped at " ..
+                tostring(now))
         return
     end
 
@@ -429,8 +430,8 @@ function Core.restockForChangedDefinitions()
         stamps.forceRestockTypeAt[t] = now
         table.insert(named, t)
     end
-    Core.debugLn("definitions revision " .. tostring(Core.defsRevision) .. ": " ..
-                     table.concat(named, ", ") .. " will restock, stamped at " .. tostring(now))
+    Core.debugLn("definitions revision " .. tostring(Core.defsRevision) .. ": " .. table.concat(named, ", ") ..
+                     " will restock, stamped at " .. tostring(now))
 end
 
 function Core:ini()

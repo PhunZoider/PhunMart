@@ -1315,7 +1315,7 @@ function Compiler.compileAll(ctx)
                 end
             end
 
-            runtime.shops[shopKey] = {
+            local compiled = {
                 key = shopKey,
                 category = shopDef.category,
                 sprites = shopDef.sprites,
@@ -1331,8 +1331,22 @@ function Compiler.compileAll(ctx)
                 background = shopDef.background,
                 defaultView = shopDef.defaultView,
                 probability = shopDef.probability,
-                minDistance = shopDef.minDistance
+                minDistance = shopDef.minDistance,
+                -- A shop that fills its shelves from somewhere other than a
+                -- pool. Placement consults this; nothing else does.
+                stocksNothing = shopDef.stocksNothing
             }
+
+            -- Fields another mod asked to keep. Copied after the named ones and
+            -- never over them, so a passthrough entry naming something above
+            -- cannot quietly change what the compiler decided it should be.
+            for _, field in ipairs(Core.shopDefPassthrough or {}) do
+                if compiled[field] == nil then
+                    compiled[field] = shopDef[field]
+                end
+            end
+
+            runtime.shops[shopKey] = compiled
         end
     end
 

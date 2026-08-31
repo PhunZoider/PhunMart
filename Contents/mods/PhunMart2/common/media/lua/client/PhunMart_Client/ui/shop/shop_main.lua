@@ -89,7 +89,34 @@ local L = {
     -- Admin button: top-left corner of banner (mirrors close button top-right)
     adminBtnX = 5,
     adminBtnY = 5,
-    adminBtnSize = 24
+    adminBtnSize = 24,
+
+    -- Mode strip: sits along the bottom of the banner, directly above the glass
+    -- and clear of the branding higher up. Drawn only when a machine offers
+    -- more than one mode, so every shop that only sells looks as it always has.
+    --
+    -- Anchored by its BOTTOM edge, five above the glass at bannerH: the gap to
+    -- the door is what the eye reads, and a taller strip should grow up into
+    -- the banner rather than push down into the machine. Change the height and
+    -- move the Y by the same amount in the opposite direction.
+    --
+    -- There is only about 28px between the header border the machine art draws
+    -- and the top of the glass, so the strip has to live inside that. Height is
+    -- what pays for clearing the border, since the gap below is the part worth
+    -- keeping.
+    modeStripY = 110,
+    modeStripH = 20,
+
+    -- Inset left and right by the margin the preview box leaves against the
+    -- right edge of the window: panelX + panelW is 475 on a 480 canvas, so 5.
+    -- Not written down here as a number, because both edges are floored
+    -- independently at the current font scale and the gap that actually shows
+    -- is not always that 5 scaled. buildModeStrip derives it from the same
+    -- arithmetic instead, so the strip stays flush with the panel below it.
+    --
+    -- Starting at glassX aligned the strip with the item grid but hung it
+    -- off-centre against a banner spanning the whole machine, so it read as a
+    -- floating control rather than part of the cabinet.
 }
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -249,8 +276,14 @@ function UI:createChildren()
     self.controls.grid:initialise()
     self:addChild(self.controls.grid)
 
-    -- ── buy button (green zone, bottom-right) ────────────────────────────────
-    self.controls.buyBtn = ISButton:new(rightX, trayY, rightW, trayH, getText("IGUI_PhunMart_Buy"), self, UI.onBuy)
+    -- Mode strip buttons are built per shop in setData, since which modes apply
+    -- depends on the machine and one window serves them all.
+    self.controls.modeBtns = {}
+
+    -- ── action button (green zone, bottom-right) ─────────────────────────────
+    -- Says BUY on every machine that only sells, which is all of them until a
+    -- mod registers a second mode. The active mode owns its title and handler.
+    self.controls.buyBtn = ISButton:new(rightX, trayY, rightW, trayH, getText("IGUI_PhunMart_Buy"), self, UI.onAction)
     self.controls.buyBtn:initialise()
     self.controls.buyBtn:instantiate()
     self.controls.buyBtn:setEnable(false)
@@ -399,6 +432,250 @@ end
 -- data
 -- ─────────────────────────────────────────────────────────────────────────────
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- modes
+--
+-- One window serves every machine, and which modes a machine offers is a
+-- property of the machine, so the strip is rebuilt each time the window is
+-- handed new data rather than once when it is built.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+--- Buying, which is what a vending machine did before any of this existed.
+---
+--- Registered rather than special-cased so there is exactly one path through
+--- the window: if Buy went around the registry, every hook below would need a
+--- "unless we are buying" branch and the first mode a mod wrote would be the
+--- first to find the parts that were never really general.
+Core.registerShopMode({
+    key = "buy",
+    label = "IGUI_PhunMart_Buy",
+    order = 10,
+    getGridData = function(ui)
+        return ui.data
+    end,
+    actionLabel = function(ui, offer)
+        -- price.selfPay is set by bakePrice() for kind="self" offers: the price
+        -- IS the displayed item, so the player is selling to the shop rather
+        -- than buying from it, as Collectors and PrawnStars do.
+        local isSell = offer and offer.price and offer.price.selfPay == true
+        return getText(isSell and "IGUI_PhunMart_Sell" or "IGUI_PhunMart_Buy")
+    end,
+    canAction = function(ui, offer, id)
+        return id ~= nil and ui:canPurchase(offer, id)
+    end,
+    onAction = function(ui)
+        ui:onBuy()
+    end
+})
+
+--- Rebuild the strip for the machine now on screen.
+---
+--- Buttons are destroyed and remade rather than hidden, because the set is
+--- different per machine and a stale button that is merely invisible is still
+--- in the child list and still takes clicks.
+function UI:buildModeStrip()
+    for _, btn in ipairs(self.controls.modeBtns or {}) do
+        self:removeChild(btn)
+    end
+    self.controls.modeBtns = {}
+
+    self.modes = Core.shopModesFor(self.data)
+
+    -- One mode needs no chooser. Every shipped machine lands here, and the
+    -- window looks exactly as it did before modes existed.
+    if #self.modes < 2 then
+        return
+    end
+
+    local function px(n)
+        return math.floor(n * FS)
+    end
+    -- Mirror the preview box's margin on both sides. Read off the panel's own
+    -- right edge rather than scaling a constant, so the strip lines up with
+    -- what is actually drawn below it however the two floors land, and stays
+    -- lined up if the panel ever moves.
+    --
+    -- Measured against self.width rather than the base canvas for the same
+    -- reason: the last segment then finishes exactly on the intended edge.
+    local inset = self.width - (px(L.panelX) + px(L.panelW))
+    if inset < 0 then
+        inset = 0
+    end
+    local x0 = inset
+    local x1 = self.width - inset
+    local h = px(L.modeStripH)
+    local y = px(L.modeStripY)
+    local span = x1 - x0
+    local count = #self.modes
+
+    for i, mode in ipairs(self.modes) do
+        -- Edges divided proportionally rather than each segment taking a fixed
+        -- width: the remainder of an uneven division is spread across the strip
+        -- instead of being left as a gap at the right end, so the last segment
+        -- finishes exactly on the panel edge at every font scale.
+        --
+        -- Segments butt together with no gap, which is what makes the strip
+        -- read as one control on the machine rather than three buttons that
+        -- happen to be in a row.
+        local bx = x0 + math.floor(span * (i - 1) / count)
+        local bw = x0 + math.floor(span * i / count) - bx
+
+        -- Upper-cased here rather than left to each label, because the strip
+        -- sits beside a BUY button that is already shouting and a mode reading
+        -- "Sell" next to one reading "BUY" looks like a mistake. Non-ASCII is
+        -- untouched by string.upper, so a translated label is no worse off.
+        -- Falls back to the key rather than calling getText(nil), which throws,
+        -- so a mode registered without a label is merely ugly and not fatal.
+        local title = (mode.label and getText(mode.label)) or mode.key
+        title = tostring(title):upper()
+
+        local btn = ISButton:new(bx, y, bw, h, title, self, UI.onModeButton)
+        btn.internal = mode.key
+        btn:initialise()
+        btn:instantiate()
+        btn.font = UIFont.Small
+        self:addChild(btn)
+        table.insert(self.controls.modeBtns, btn)
+    end
+end
+
+function UI:onModeButton(btn)
+    self:setMode(btn.internal)
+end
+
+--- Tint the strip so the active mode reads as pressed rather than merely last
+--- clicked.
+---
+--- Greens are the buy button's family, so the strip belongs to the same
+--- machine. The inactive segments are deliberately quiet in all three of
+--- background, border and text: with the segments butted together, a bright
+--- border on every one of them turns the strip into a grid of boxes and the
+--- active segment stops standing out at a glance, which is the only job it has.
+function UI:paintModeStrip()
+    for _, btn in ipairs(self.controls.modeBtns or {}) do
+        local on = (btn.internal == self.modeKey)
+        if on then
+            btn.backgroundColor = {
+                r = 0.09,
+                g = 0.28,
+                b = 0.10,
+                a = 0.95
+            }
+            btn.backgroundColorMouseOver = {
+                r = 0.13,
+                g = 0.38,
+                b = 0.14,
+                a = 0.97
+            }
+            btn.borderColor = {
+                r = 0.22,
+                g = 0.72,
+                b = 0.24,
+                a = 1.00
+            }
+            btn.textColor = {
+                r = 1.00,
+                g = 1.00,
+                b = 1.00,
+                a = 1.00
+            }
+        else
+            btn.backgroundColor = {
+                r = 0.05,
+                g = 0.05,
+                b = 0.06,
+                a = 0.88
+            }
+            btn.backgroundColorMouseOver = {
+                r = 0.10,
+                g = 0.17,
+                b = 0.11,
+                a = 0.92
+            }
+            btn.borderColor = {
+                r = 0.20,
+                g = 0.21,
+                b = 0.24,
+                a = 1.00
+            }
+            btn.textColor = {
+                r = 0.62,
+                g = 0.65,
+                b = 0.63,
+                a = 1.00
+            }
+        end
+    end
+end
+
+--- The mode to land on for the data just loaded: the one already showing if
+--- this machine still offers it, otherwise the first.
+---
+--- Worth the lookup because setData runs again on every restock and reroll
+--- broadcast, not only when the window opens. Without it, a machine restocking
+--- while the player was part-way through something on another mode would throw
+--- them back to Buy with no explanation.
+function UI:preferredModeKey()
+    for _, mode in ipairs(self.modes or {}) do
+        if mode.key == self.modeKey then
+            return self.modeKey
+        end
+    end
+    return self.modes and self.modes[1] and self.modes[1].key
+end
+
+function UI:currentMode()
+    if self.modes then
+        for _, mode in ipairs(self.modes) do
+            if mode.key == self.modeKey then
+                return mode
+            end
+        end
+    end
+    return self.modes and self.modes[1]
+end
+
+--- Switch modes, clearing the selection on the way.
+---
+--- The selection is an offer id belonging to whatever the previous mode was
+--- showing, so carrying it across would leave the details pane describing a row
+--- the grid no longer holds and the action button live on it.
+function UI:setMode(key, force)
+    if not force and key == self.modeKey then
+        return
+    end
+    local previous = self:currentMode()
+    if previous and previous.key ~= key and previous.onExit then
+        previous.onExit(self)
+    end
+
+    self.modeKey = key
+    self.selectedId = nil
+    self.selectedOffer = nil
+    self.selectedEntry = nil
+
+    local mode = self:currentMode()
+    if mode and mode.onEnter then
+        mode.onEnter(self)
+    end
+
+    self:paintModeStrip()
+    self:refreshGrid()
+    self.controls.buyBtn:setEnable(false)
+    self:updateBuyButtonTitle(nil)
+end
+
+--- Hand the grid whatever the active mode wants shown. A mode that does not
+--- care gets the payload, which is what buying has always used.
+function UI:refreshGrid()
+    local mode = self:currentMode()
+    local data = self.data
+    if mode and mode.getGridData then
+        data = mode.getGridData(self)
+    end
+    self.controls.grid:setData(data or self.data)
+end
+
 function UI:setData(data)
     self.data = data or {}
     self.shopKey = data and data.key
@@ -427,9 +704,10 @@ function UI:setData(data)
         p3d:setVisible(false)
     end
 
-    self.controls.grid:setData(data)
-    self.controls.buyBtn:setEnable(false)
-    self:updateBuyButtonTitle(nil)
+    -- Rebuild the strip before choosing a mode: which modes exist depends on
+    -- the machine this payload came from, and setMode reads that list.
+    self:buildModeStrip()
+    self:setMode(self:preferredModeKey(), true)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -486,18 +764,25 @@ function UI:canPurchase(offer, offerId)
     return true
 end
 
--- price.selfPay is set by bakePrice() for kind="self" offers: the price IS the
--- displayed item, so the player is selling to the shop rather than buying from it.
+--- Title the action button, asking the active mode what it is about to do.
+--- A mode that does not say gets BUY, which is what the button said when it was
+--- the only thing the window could do.
 function UI:updateBuyButtonTitle(offer)
-    local isSell = offer and offer.price and offer.price.selfPay == true
-    self.controls.buyBtn:setTitle(getText(isSell and "IGUI_PhunMart_Sell" or "IGUI_PhunMart_Buy"))
+    local mode = self:currentMode()
+    local title = mode and mode.actionLabel and mode.actionLabel(self, offer)
+    self.controls.buyBtn:setTitle(title or getText("IGUI_PhunMart_Buy"))
 end
 
 function UI:onOfferSelected(id, offer, entry)
     self.selectedId = id
     self.selectedOffer = offer
     self.selectedEntry = entry
-    self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
+    local mode = self:currentMode()
+    if mode and mode.canAction then
+        self.controls.buyBtn:setEnable(mode.canAction(self, offer, id) == true)
+    else
+        self.controls.buyBtn:setEnable(id ~= nil and self:canPurchase(offer, id))
+    end
     -- Collector/pawn offers hand the displayed item over for currency, so that's a sale,
     -- so label the button SELL instead of BUY.
     self:updateBuyButtonTitle(offer)
@@ -536,6 +821,17 @@ function UI:onOfferSelected(id, offer, entry)
             p3d.vehicleName = nil
             p3d:setVisible(false)
         end
+    end
+end
+
+--- The action button was pressed. Hand it to the active mode, which for every
+--- shipped machine is Buy.
+function UI:onAction()
+    local mode = self:currentMode()
+    if mode and mode.onAction then
+        mode.onAction(self)
+    else
+        self:onBuy()
     end
 end
 

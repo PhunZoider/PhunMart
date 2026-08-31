@@ -744,6 +744,172 @@ Core.defaultPaths = {
     shops = {"PhunMart/defaults/shops"}
 }
 
+--- Shop-definition fields carried through compilation and out to the client on
+--- top of the ones the compiler names for itself.
+---
+--- The compiler builds each `runtime.shops` entry from an explicit list of
+--- fields, which is what keeps a compiled shop small and predictable, and what
+--- stops an admin override smuggling arbitrary keys into the runtime. The cost
+--- is that a flag another mod invents is dropped silently somewhere between the
+--- definition that declared it and the table anything actually reads, leaving
+--- no evidence beyond a condition that never fires.
+---
+--- Appending a name here is how a mod keeps its own flag. It has to happen
+--- before the first compile, which for a mod's shared file means load time, the
+--- same window `Core.defaultPaths` is extended in:
+---
+---     table.insert(Core.shopDefPassthrough, "consignment")
+---
+--- PhunMart declares none of its own, so the list ships empty: everything the
+--- base mod needs is named in the compiler already.
+Core.shopDefPassthrough = {}
+
+--- Tabs in the admin shell.
+---
+--- `module` is a key on `Core.ui` rather than the panel table itself, because
+--- the shell resolves it when the window opens rather than when this list is
+--- built, and a panel registers itself as its own file loads. That indirection
+--- is what lets a tab be registered before the panel behind it exists.
+---
+--- `order` places a tab in the strip. The shipped ones are spaced ten apart so
+--- another mod can sit between any two without renumbering, and Tools sits far
+--- out at 1000 because it belongs last whatever else arrives.
+---
+--- `admin = false` marks the one tab a non-editor may see. Every other tab is
+--- shown only to a player who passes `Core.canEditConfig`.
+Core.ui.adminTabs = {}
+
+--- Add a tab to the admin shell, or replace one by key.
+---
+--- Replacing is deliberate: re-registering a shipped key is the only way to
+--- swap a panel out without editing this mod, and a mod that does it has said
+--- so explicitly rather than ending up with two tabs of the same name.
+function Core.registerAdminTab(spec)
+    if type(spec) ~= "table" or type(spec.key) ~= "string" or spec.key == "" then
+        Core.debugLn("registerAdminTab: ignored a spec with no key")
+        return false
+    end
+    spec.order = tonumber(spec.order) or 0
+    for i, existing in ipairs(Core.ui.adminTabs) do
+        if existing.key == spec.key then
+            Core.ui.adminTabs[i] = spec
+            return true
+        end
+    end
+    table.insert(Core.ui.adminTabs, spec)
+    return true
+end
+
+--- The registered tabs, in the order they should be drawn.
+---
+--- Sorted on read rather than on registration, so a mod may register at any
+--- point before the window first opens. The registration index carries through
+--- as the tiebreak because `table.sort` is not stable: without it, two tabs
+--- sharing an order would be free to swap places between one opening and the
+--- next.
+function Core.adminTabsInOrder()
+    local decorated = {}
+    for i, spec in ipairs(Core.ui.adminTabs) do
+        decorated[i] = {
+            spec = spec,
+            seq = i
+        }
+    end
+    table.sort(decorated, function(a, b)
+        if a.spec.order ~= b.spec.order then
+            return a.spec.order < b.spec.order
+        end
+        return a.seq < b.seq
+    end)
+    local ordered = {}
+    for i, entry in ipairs(decorated) do
+        ordered[i] = entry.spec
+    end
+    return ordered
+end
+
+--- Modes in the shop window: what the machine can be asked to do.
+---
+--- Every machine has bought its stock before the player arrives, so the window
+--- has only ever had one job and never needed to say which one it was doing.
+--- A machine that also takes goods in has two, and the player has to be able to
+--- say which. Modes are how that choice is offered, and registering one is how
+--- a mod adds a job to a window it does not own.
+---
+--- A mode spec:
+---   key      unique; also what setMode takes
+---   label    text key for the strip button
+---   order    position in the strip, shipped ones spaced ten apart
+---   flag     optional; a field on the shop payload that must be truthy for
+---            this mode to appear. The usual way to scope a mode to one machine
+---   applies  optional; function(data) for anything a flag cannot express
+---
+--- Declaring neither `flag` nor `applies` puts the mode on every machine in the
+--- game, which is what Buy wants and almost never what anything else does.
+---
+--- The behaviour hooks are all optional, and the window falls back to its own
+--- buying behaviour for each one a mode leaves out:
+---   onEnter(ui) / onExit(ui)    switching to and away from this mode
+---   getGridData(ui)             what the item grid should render
+---   actionLabel(ui, offer)      title for the action button
+---   canAction(ui, offer, id)    whether that button is live
+---   onAction(ui)                the button was pressed
+Core.ui.shopModes = {}
+
+--- Add a mode to the shop window, or replace one by key.
+function Core.registerShopMode(spec)
+    if type(spec) ~= "table" or type(spec.key) ~= "string" or spec.key == "" then
+        Core.debugLn("registerShopMode: ignored a spec with no key")
+        return false
+    end
+    spec.order = tonumber(spec.order) or 0
+    for i, existing in ipairs(Core.ui.shopModes) do
+        if existing.key == spec.key then
+            Core.ui.shopModes[i] = spec
+            return true
+        end
+    end
+    table.insert(Core.ui.shopModes, spec)
+    return true
+end
+
+--- The modes that apply to one shop payload, in strip order.
+---
+--- Takes the payload rather than the definition because the window has nothing
+--- else: it is handed a payload when it opens and never sees a shop def. That
+--- is also why a mode's `flag` has to be named in Core.shopDefPassthrough to be
+--- worth testing -- otherwise it is dropped before it reaches here, and the
+--- mode silently never appears.
+function Core.shopModesFor(data)
+    local decorated = {}
+    for i, spec in ipairs(Core.ui.shopModes) do
+        local ok = true
+        if spec.flag and not (data and data[spec.flag]) then
+            ok = false
+        end
+        if ok and spec.applies and not spec.applies(data) then
+            ok = false
+        end
+        if ok then
+            table.insert(decorated, {
+                spec = spec,
+                seq = i
+            })
+        end
+    end
+    table.sort(decorated, function(a, b)
+        if a.spec.order ~= b.spec.order then
+            return a.spec.order < b.spec.order
+        end
+        return a.seq < b.seq
+    end)
+    local ordered = {}
+    for i, entry in ipairs(decorated) do
+        ordered[i] = entry.spec
+    end
+    return ordered
+end
+
 --- Which files on disk hold the overrides for each category. Server-side only
 --- in practice, but declared here beside defaultPaths because two things now
 --- need the same list: the compile that reads them, and the migrations that

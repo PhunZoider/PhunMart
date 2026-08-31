@@ -314,7 +314,7 @@ end
 function ServerSystem.buildShopPayload(shopObj)
     local shopDef = Core.runtime and Core.runtime.shops and Core.runtime.shops[shopObj.type]
     local shopCfg = Core.shops and Core.shops[shopObj.type]
-    return {
+    local payload = {
         key = shopObj:getKey(),
         shopType = shopObj.type,
         location = {
@@ -330,6 +330,17 @@ function ServerSystem.buildShopPayload(shopObj)
         lastRestock = shopObj.lastRestock,
         restockFrequency = (shopCfg and shopCfg.restock) or 24
     }
+
+    -- The flags another mod kept through compilation travel on to the window
+    -- as well. A shop window mode is chosen from these, and the client has no
+    -- other route to a definition: it draws entirely from this payload.
+    for _, field in ipairs(Core.shopDefPassthrough or {}) do
+        if payload[field] == nil then
+            payload[field] = shopDef and shopDef[field]
+        end
+    end
+
+    return payload
 end
 
 --- Tell clients this machine's stock changed, so a shop window standing open in
@@ -612,7 +623,18 @@ end
 -- would only make the shop rarer without making it any less empty in January.
 -- Seasonal pools are filtered where it can actually change with the calendar,
 -- which is buildOffers on each restock.
+--
+-- `stocksNothing` shops are exempt. A machine whose stock comes from somewhere
+-- other than a pool -- players listing their own goods, say -- has no poolSets
+-- to offer, and the test below answers "no eligible pool" for an empty list.
+-- That is the right answer to the question being asked and the wrong answer to
+-- the question that matters: such a shop is never empty for want of a pool, so
+-- refusing to place it would keep it out of the world entirely, with no way for
+-- an admin to force one in either, since this test survives ignoreDistance.
 local function shopHasEligiblePool(shopDef, x, y)
+    if shopDef.stocksNothing == true then
+        return true
+    end
     local fn = Core.poolPassesZoneFilter
     for _, poolSet in ipairs(shopDef.poolSets or {}) do
         for _, poolRef in ipairs(poolSet.keys or {}) do
