@@ -107,6 +107,12 @@ local L = {
     modeStripY = 110,
     modeStripH = 20,
 
+    -- A strip a mode may own, between the glass and the grid inside it. Only
+    -- reserved when the active mode asks for one, so a machine that just sells
+    -- keeps the full height of its door for stock.
+    filterStripH = 26,
+    filterStripGap = 4,
+
     -- Inset left and right by the margin the preview box leaves against the
     -- right edge of the window: panelX + panelW is 475 on a 480 canvas, so 5.
     -- Not written down here as a number, because both edges are floored
@@ -277,8 +283,10 @@ function UI:createChildren()
     self:addChild(self.controls.grid)
 
     -- Mode strip buttons are built per shop in setData, since which modes apply
-    -- depends on the machine and one window serves them all.
+    -- depends on the machine and one window serves them all. The filter strip
+    -- goes the same way, per mode rather than per machine.
     self.controls.modeBtns = {}
+    self.controls.filterWidgets = {}
 
     -- ── action button (green zone, bottom-right) ─────────────────────────────
     -- Says BUY on every machine that only sells, which is all of them until a
@@ -551,6 +559,50 @@ function UI:onModeButton(btn)
     self:setMode(btn.internal)
 end
 
+--- Give the active mode its strip above the grid, or take it away again.
+---
+--- A mode showing hundreds of rows needs somewhere to put the controls that
+--- narrow them down, and there is nowhere in this window to put anything: it is
+--- drawn against a photograph and every region is spoken for. So a mode may
+--- claim a strip along the top of the glass, and the grid gives up the height.
+---
+--- The mode builds its own widgets and this only places and owns them, because
+--- what belongs in that strip is entirely the mode's business -- a dropdown and
+--- a search box for one, possibly nothing at all for the next.
+---
+--- Rebuilt on every mode change rather than hidden, for the same reason the
+--- mode buttons are: a stale widget that is merely invisible is still in the
+--- child list and still takes clicks.
+function UI:buildModeFilter()
+    for _, widget in ipairs(self.controls.filterWidgets or {}) do
+        self:removeChild(widget)
+    end
+    self.controls.filterWidgets = {}
+
+    local function px(n)
+        return math.floor(n * FS)
+    end
+    local gridX, gridW = px(L.glassX), px(L.glassW)
+    local top = px(L.bannerH)
+    local stripH = px(L.filterStripH)
+
+    local mode = self:currentMode()
+    local widgets = mode and mode.createFilter and
+                        mode.createFilter(self, gridX, top, gridW, stripH - px(L.filterStripGap))
+
+    if widgets and #widgets > 0 then
+        for _, widget in ipairs(widgets) do
+            self:addChild(widget)
+            table.insert(self.controls.filterWidgets, widget)
+        end
+        self.controls.grid:setY(top + stripH)
+        self.controls.grid:setHeight(px(L.glassH) - stripH)
+    else
+        self.controls.grid:setY(top)
+        self.controls.grid:setHeight(px(L.glassH))
+    end
+end
+
 --- Tint the strip so the active mode reads as pressed rather than merely last
 --- clicked.
 ---
@@ -668,6 +720,8 @@ function UI:setMode(key, force)
     end
 
     self:paintModeStrip()
+    -- Before the grid is filled, because this is what decides how tall it is.
+    self:buildModeFilter()
     self:refreshGrid()
     self.controls.buyBtn:setEnable(false)
     self:updateBuyButtonTitle(nil)
