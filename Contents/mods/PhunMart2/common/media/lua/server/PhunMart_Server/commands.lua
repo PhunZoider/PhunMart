@@ -964,8 +964,8 @@ local function buildPoolPayload(poolKey)
         offers = pool and pool.offers or {},
         conditionsDefs = Core.runtime and Core.runtime.conditionsDefs,
         blacklisted = (Core.getBlacklist().items or {}).exclude or {},
-        unavailable = (not pool) and
-            poolUnavailableReason(Core.defs and Core.defs.pools and Core.defs.pools[poolKey]) or nil
+        unavailable = (not pool) and poolUnavailableReason(Core.defs and Core.defs.pools and Core.defs.pools[poolKey]) or
+            nil
     }
 end
 

@@ -63,6 +63,26 @@ Core.contexts.open = function(player, context, worldobjects, test)
                 end
             end
         end
+        -- A machine with no type is not offered as a shop.
+        --
+        -- It can happen: a machine outlives the definition that made it, which
+        -- is what a shop being disabled or a mod being removed leaves behind.
+        -- Opening one cannot work, so the menu says nothing rather than offering
+        -- something that fails.
+        --
+        -- It also used to throw, once per right-click, which is how it was
+        -- found. `..` is right-associative, so
+        --     "IGUI_PhunMart_Shop_" .. obj.type .. "_tooltip"
+        -- groups as "IGUI_PhunMart_Shop_" .. (obj.type .. "_tooltip"), and the
+        -- inner concatenation is the one that failed -- hence a log full of
+        -- "__concat not defined for operands: null and _tooltip", which names
+        -- the suffix rather than the thing that was actually missing.
+        if obj and (obj.type == nil or obj.type == "") then
+            Core.debugLn("context: machine at " .. tostring(wObj:getSquare() and wObj:getSquare():getX()) ..
+                             " has no shop type; not offering it as a shop")
+            obj = nil
+        end
+
         if obj then
             isShop = true
             wsq = wObj:getSquare()
