@@ -221,16 +221,62 @@ end
 --- it appears nowhere in the game's own Lua -- so the forced tick was not a
 --- fallback that rarely ran, it was the only path.
 ---
---- The retry loop went with it, since the reason it existed is now the engine's
---- job. It also called AdjacentFreeTileFinder and threw the square away, so it
---- never did the one thing its name suggests: the player still lands on the
---- machine's own tile rather than beside it. Worth fixing, separately.
+--- Landing beside the machine rather than on it needs a second hop, because the
+--- square has to exist before anything can be found adjacent to it. So: go
+--- there, then step aside once the cell has arrived. The loop this replaced
+--- called AdjacentFreeTileFinder and threw away the square it returned,
+--- re-placing the player on the original coordinates, which is why it never did
+--- the one thing its name suggests.
+---
+--- Failing to find a free tile leaves the player standing on the machine's own
+--- square, which is where they used to end up every time. A machine boxed in on
+--- all sides is not worth refusing to travel to.
 function UI:doPort(destinationX, destinationY, destinationZ)
     local player = self.player
     if not player then
         return
     end
-    player:teleportTo(destinationX, destinationY, destinationZ)
+
+    local x = math.floor(destinationX)
+    local y = math.floor(destinationY)
+    local z = math.floor(destinationZ or 0)
+
+    -- Only ever one of these in flight. The list teleports on double-click and
+    -- there is a button besides, so firing twice in quick succession is a thing
+    -- a person does, and two live settles would fight over where to stand.
+    if self._settle then
+        Events.OnPlayerUpdate.Remove(self._settle)
+        self._settle = nil
+    end
+
+    -- Half a tile, so the player stands in the middle of the square rather than
+    -- on its corner. Same as the game's own teleports.
+    player:teleportTo(x + 0.5, y + 0.5, z)
+
+    -- Bounded: a square that never streams in would otherwise leave this
+    -- running for the rest of the session.
+    local retries = 100
+    local settle
+    settle = function()
+        retries = retries - 1
+        local cell = getCell()
+        local target = cell and cell:getGridSquare(x, y, z)
+
+        if target then
+            Events.OnPlayerUpdate.Remove(settle)
+            self._settle = nil
+            local free = AdjacentFreeTileFinder.Find(target, player)
+            if free then
+                player:teleportTo(free:getX() + 0.5, free:getY() + 0.5, free:getZ())
+            end
+        elseif retries <= 0 then
+            Events.OnPlayerUpdate.Remove(settle)
+            self._settle = nil
+        end
+    end
+
+    self._settle = settle
+    Events.OnPlayerUpdate.Add(settle)
 end
 
 ---------------------------------------------------------------------------
