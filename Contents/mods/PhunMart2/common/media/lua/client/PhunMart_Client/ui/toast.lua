@@ -6,7 +6,7 @@ local Core = PhunMart
 -- ---------------------------------------------------------------------------
 -- Toast notification system
 -- Displays a slide-in panel from the right side of the screen.
--- Usage: Core.ui.toast.show({ text="...", icon="media/textures/...", duration=4, color={r,g,b} })
+-- Usage: Core.ui.toast.show({ text="...", icon="media/textures/...", duration=4, color={r=1,g=1,b=1} })
 -- Multiple toasts are queued and displayed one at a time.
 -- ---------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ local FADE_DURATION  = 0.4
 --   text     (string, required)  Message to display.
 --   icon     (string, optional)  Texture path, e.g. "media/textures/Item_Token.png".
 --   duration (number, optional)  Seconds to hold before fading out. Default: 4.
---   color    ({r,g,b}, optional) Accent colour. Default: gold.
+--   color    (table, optional)   Accent colour, {r=,g=,b=} or {r,g,b}. Default: gold.
 function Toast.show(opts)
     if not opts or not opts.text then return end
     table.insert(Toast.queue, opts)
@@ -57,7 +57,24 @@ function Toast:_create(opts)
     panel.moveWithMouse = false
     panel.alwaysOnTop   = true
 
-    local color     = opts.color or { r = 0.95, g = 0.78, b = 0.2 }
+    -- Accepts { r=, g=, b= } and { r, g, b } alike, and falls back to gold for
+    -- anything else.
+    --
+    -- Everything below reads color.r, so a positional triple used to hand three
+    -- nils to drawRect and drawText -- which fails as a NullPointerException
+    -- from inside the render loop, once per frame, naming a Java method and no
+    -- part of the call that caused it. Since other mods call this now, being
+    -- forgiving here is worth more than being strict.
+    local color = { r = 0.95, g = 0.78, b = 0.2 }
+    if type(opts.color) == "table" then
+        local given = opts.color
+        local r = given.r or given[1]
+        local g = given.g or given[2]
+        local b = given.b or given[3]
+        if type(r) == "number" and type(g) == "number" and type(b) == "number" then
+            color = { r = r, g = g, b = b }
+        end
+    end
     local startTime = getTimestamp()
     local duration  = opts.duration or 4
     local text      = opts.text or ""
