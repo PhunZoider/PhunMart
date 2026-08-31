@@ -4,4 +4,5 @@ id=phunmart2
 authors=UburGeek
 description=Shop Smart. Shop PhunMart. Your total apocalyptic vending solution.
 poster=poster.png
+pack=phunmart
 tiledef=phunmart 1420
