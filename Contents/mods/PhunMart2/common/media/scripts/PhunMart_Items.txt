@@ -61,7 +61,7 @@ module PhunMart
     {
         DisplayName     =   Vehicle Claim Key,
         ItemType        =   base:normal,
-        Weight          =   0.05,
+        Weight          =   10,
         Icon            =   CarKey,
         DisplayCategory =   Currency,
     }
@@ -70,7 +70,7 @@ module PhunMart
     {
         DisplayName     =   Livestock Claim Cage,
         ItemType        =   base:normal,
-        Weight          =   5.0,
+        Weight          =   10,
         Icon            =   TrapCage,
         DisplayCategory =   Animal,
         WorldStaticModel = TrapCage,
