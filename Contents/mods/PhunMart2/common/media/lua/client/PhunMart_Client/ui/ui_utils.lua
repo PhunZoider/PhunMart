@@ -257,6 +257,36 @@ function tools.resolveOfferTexture(offer)
     return nil
 end
 
+--- What a collector or pawn offer hands back, in the shortest form that still
+--- says which currency: "3t", "$1.50", or a count plus the texture of the item
+--- being given. nil when the reward pays out nothing a badge can show.
+local function payoutShort(offer)
+    local actions = offer and offer.reward and offer.reward.actions
+    if type(actions) ~= "table" then
+        return nil
+    end
+    -- Repeated giveItem entries for the same item read as one total, the same
+    -- way the tooltip's "Receive:" line adds them up.
+    local giveItem, giveTotal = nil, 0
+    for _, a in ipairs(actions) do
+        if a.type == "grantBoundTokens" then
+            return tostring(a.amount or 1) .. getText("IGUI_PhunMart_TokenSuffix")
+        elseif a.type == "adjustBalance" then
+            return tools.formatCents(a.amount or 0)
+        elseif a.type == "giveItem" and a.item then
+            giveItem = giveItem or a.item
+            if a.item == giveItem then
+                giveTotal = giveTotal + (tonumber(a.amount) or 1)
+            end
+        end
+    end
+    if giveItem then
+        local si = getScriptManager():FindItem(giveItem)
+        return tostring(giveTotal), si and si:getNormalTexture()
+    end
+    return nil
+end
+
 -- Format a price for compact display (grid badges, list rows).
 -- Returns (text, texture) where text is a short string like "FREE", "$1.50", "3t", "25";
 -- texture is the item icon for kind="items" (nil otherwise).
@@ -286,6 +316,19 @@ function tools.formatPriceShort(offer)
     if price.kind == "items" and price.items and price.items[1] then
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
+        -- A collector or pawn offer is paid for with the very item on the tile,
+        -- so the icon beside the number was the picture directly above it, and
+        -- the number read as the cost of something being handed over. Say what
+        -- the trade actually is: how many to bring, and what comes back.
+        if price.selfPay or pi.item == offer.item then
+            local payout, payoutTex = payoutShort(offer)
+            if payout then
+                return getText("IGUI_PhunMart_TradeBadge", tostring(amt), payout), payoutTex
+            end
+            -- Nothing nameable coming back. The count still means something;
+            -- the duplicate icon never did.
+            return tostring(amt)
+        end
         local tex
         if pi.item then
             local si = getScriptManager():FindItem(pi.item)
@@ -424,6 +467,27 @@ function tools.tileTexture(name)
     return ok and tex or nil
 end
 
+--- The texture behind whatever a display.texture field holds: a path under
+--- media/, or a script item name, which is the other thing resolveOfferTexture
+--- accepts there. nil when it names neither, so a preview showing nothing is
+--- the honest answer to a path typed wrong. Guarded for the same reason
+--- tileTexture is: the loaders are the game's, and a name from a mod that is
+--- not loaded should draw an empty frame rather than end the form.
+function tools.imageTexture(path)
+    if not path or path == "" then
+        return nil
+    end
+    local ok, tex = pcall(function()
+        local t = getTexture(path)
+        if t then
+            return t
+        end
+        local si = getScriptManager():getItem(path)
+        return si and si:getNormalTexture() or nil
+    end)
+    return ok and tex or nil
+end
+
 -- Truncate text with "..." if it exceeds maxWidth.
 function tools.truncate(text, maxWidth, font)
     if getTextManager():MeasureStringX(font, text) <= maxWidth then
@@ -545,12 +609,17 @@ local function sameValue(a, b)
     return true
 end
 
-local function isEmptyTable(t)
+--- Exported as well as local: the specials editor asks the same question about
+--- an action it has just pruned, and was calling this name as a global, which
+--- is nil there. Nothing shipped inherits actions from a template, so the call
+--- has never been reached; it would have ended the save the day one did.
+function tools.isEmptyTable(t)
     for _ in pairs(t) do
         return false
     end
     return true
 end
+local isEmptyTable = tools.isEmptyTable
 
 --- Strip from `node` anything `parentNode` already provides, so a child keeps
 --- only what makes it different.

@@ -12,6 +12,8 @@ local Traits = require "PhunMart/traits"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 local tools = require "PhunMart_Client/ui/ui_utils"
 
+local specialTexture = tools.imageTexture
+
 local PAD = ListPanel.PAD
 local ROW_H = ListPanel.ROW_H
 local FONT_SCALE = ListPanel.FONT_SCALE
@@ -57,12 +59,11 @@ local function formatDisplay(def)
     return ""
 end
 
--- Summarise the first action for the list.
-local function formatAction(def)
-    if not def.actions or not def.actions[1] then
+-- Summarise one action in a few words: what it does, to what.
+local function formatActionDetail(act)
+    if type(act) ~= "table" then
         return ""
     end
-    local act = def.actions[1]
     if act.type == "addTrait" then
         return "+" .. Traits.getLabel(act.trait or "")
     elseif act.type == "removeTrait" then
@@ -83,6 +84,21 @@ local function formatAction(def)
         return tostring(act.amount or 1) .. "x " .. (act.item or "?")
     end
     return act.type or ""
+end
+
+-- Summarise a whole definition's actions for the list column. Specials can now
+-- carry several, so the column says how many rather than pretending the first
+-- one is the whole story.
+local function formatAction(def)
+    local acts = def.actions
+    if type(acts) ~= "table" or not acts[1] then
+        return ""
+    end
+    local first = formatActionDetail(acts[1])
+    if #acts > 1 then
+        return first .. getText("IGUI_PhunMart_Lbl_PlusMore", tostring(#acts - 1))
+    end
+    return first
 end
 
 ---------------------------------------------------------------------------
@@ -245,28 +261,27 @@ end
 -- sameValue, isEmptyTable and pruneInherited moved to ui_utils when the price
 -- editor turned out to need the same rule.
 local pruneInherited = tools.pruneInherited
+local isEmptyTable = tools.isEmptyTable
 
 ---------------------------------------------------------------------------
 -- Provenance
 --
 -- Where each field on the form reads from, so the form can say whether the
 -- value on screen belongs to this entry or came down from its template. Only
--- four fields used to carry that marker, and `action` was not one of them,
--- which is the field whose inherited value looked like a real choice of
--- addTrait and got saved as one.
+-- four fields used to carry that marker, and the action was not one of them,
+-- which is the value that looked most like a real choice of addTrait and got
+-- saved as one.
 ---------------------------------------------------------------------------
-
---- A test for "the first action carries this field".
-local function fromAction(name)
-    return function(d)
-        local a = d.actions and d.actions[1]
-        return a ~= nil and a[name] ~= nil
-    end
-end
 
 local FIELD_SOURCE = {
     displayText = function(d)
         return d.display ~= nil and d.display.text ~= nil
+    end,
+    texture = function(d)
+        return d.display ~= nil and d.display.texture ~= nil
+    end,
+    overlay = function(d)
+        return d.display ~= nil and d.display.overlay ~= nil
     end,
     price = function(d)
         return d.price ~= nil
@@ -282,19 +297,13 @@ local FIELD_SOURCE = {
     enabled = function(d)
         return d.enabled ~= nil
     end,
-    action = fromAction("type"),
-    trait = fromAction("trait"),
-    xpSkill = fromAction("skill"),
-    xpAmount = fromAction("amount"),
-    boostSkill = fromAction("skill"),
-    boostMultiplier = fromAction("multiplier"),
-    animalType = fromAction("animal"),
-    animalBreed = fromAction("breed"),
-    tokenAmount = fromAction("amount"),
-    balanceAmount = fromAction("amount"),
-    pool = fromAction("pool"),
-    giveItemItem = fromAction("item"),
-    giveItemAmount = fromAction("amount")
+    -- One entry for the whole list, since that is what the form now shows. The
+    -- fields inside an action are marked nowhere, because a child that borrows
+    -- its parent's action borrows all of it: the list says where it came from,
+    -- and opening a row shows what it says.
+    actions = function(d)
+        return type(d.actions) == "table" and d.actions[1] ~= nil
+    end
 }
 
 --- Mark every field whose value the resolved definition has but the raw entry
@@ -311,6 +320,244 @@ local function markInheritedFields(form, raw, def)
             form:setFieldInherited(key, from)
         end
     end
+end
+
+---------------------------------------------------------------------------
+-- One action
+--
+-- Its own form, opened from the actions list on the main one. A purchase can
+-- reasonably do more than one thing (pay change and hand over a book, grant
+-- tokens and a trait), and the editor modelled exactly one: any others a
+-- definition carried were passed through the save untouched and invisible, so
+-- there was no way to add, read or remove them without editing the Lua.
+---------------------------------------------------------------------------
+local function createActionModal(action, isNew, onDone)
+    local cur = action or {}
+    local curType = cur.type or ACTION_TYPES[1]
+
+    local selectedTrait = cur.trait
+    local selectedVehicles = {}
+    if cur.scripts then
+        for _, s in ipairs(cur.scripts) do
+            table.insert(selectedVehicles, s)
+        end
+    elseif cur.script then
+        table.insert(selectedVehicles, cur.script)
+    end
+
+    -- A combo cannot show an option it does not have, and it does not complain:
+    -- it just sits on the first one, so an unrecognised action would read as
+    -- addTrait. Add it instead, and the save path leaves it alone because it has
+    -- no field group.
+    local actionOptions = {}
+    local knownType = false
+    for _, t in ipairs(ACTION_TYPES) do
+        table.insert(actionOptions, t)
+        if t == curType then
+            knownType = true
+        end
+    end
+    if not knownType and curType and curType ~= "" then
+        table.insert(actionOptions, curType)
+    end
+
+    local form = FormPanel:new({
+        width = math.floor(400 * FONT_SCALE),
+        title = getText(isNew and "IGUI_PhunMart_Title_AddAction" or "IGUI_PhunMart_Title_EditAction"),
+        onApply = function(f)
+            local actionType = f:getFieldValue("action")
+
+            -- Keeping the same type keeps everything this form does not model:
+            -- a boost's hours, an animal's size, a field some other mod reads.
+            -- Changing it starts clean, because those belonged to the type being
+            -- replaced.
+            local out = (actionType == cur.type) and Core.utils.deepCopy(cur) or {}
+            out.type = actionType
+
+            if actionType == "giveItem" then
+                out.item = f:getFieldValue("giveItemItem")
+                local amt = tonumber(f:getFieldValue("giveItemAmount"))
+                -- Blank means one per purchase.
+                out.amount = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
+            elseif actionType == "addTrait" or actionType == "removeTrait" then
+                out.trait = f:getFieldValue("trait")
+            elseif actionType == "giveXP" then
+                out.skill = trim(f:getFieldValue("xpSkill"))
+                out.amount = f:getFieldNumber("xpAmount")
+            elseif actionType == "applyBoost" then
+                out.skill = trim(f:getFieldValue("boostSkill"))
+                out.multiplier = f:getFieldNumber("boostMultiplier")
+            elseif actionType == "spawnVehicle" then
+                local scripts = f:getFieldValue("vehicleScripts") or {}
+                -- Both cleared first: one car is script and several are scripts,
+                -- so an edit crossing that line would otherwise leave the old key
+                -- behind alongside the new one.
+                out.script, out.scripts = nil, nil
+                if #scripts > 1 then
+                    out.scripts = scripts
+                else
+                    out.script = scripts[1]
+                end
+            elseif actionType == "spawnAnimal" then
+                out.animal = trim(f:getFieldValue("animalType"))
+                out.breed = trim(f:getFieldValue("animalBreed"))
+                out.size = out.size or "medium"
+            elseif actionType == "grantBoundTokens" then
+                out.amount = math.floor(f:getFieldNumber("tokenAmount"))
+            elseif actionType == "adjustBalance" then
+                out.amount = math.floor(f:getFieldNumber("balanceAmount"))
+                local poolVal = f:getFieldValue("pool")
+                out.pool = (poolVal and poolVal ~= "") and poolVal or "change"
+            end
+
+            if onDone then
+                onDone(out)
+            end
+            f:close()
+        end
+    })
+
+    form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
+        options = actionOptions,
+        selected = curType,
+        hint = getText("IGUI_PhunMart_Hint_ActionType"),
+        onChange = function(f)
+            applyActionGroups(f, f:getFieldValue("action"))
+        end
+    })
+
+    -- One field per action type rather than a single box whose meaning changed
+    -- with the combo above it. Each lives in its own group, so only the fields
+    -- the chosen action actually uses are on screen.
+    form:addPickerField("trait", getText("IGUI_PhunMart_Lbl_Trait"), {
+        value = selectedTrait,
+        display = selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"),
+        hint = getText("IGUI_PhunMart_Hint_TraitPick"),
+        group = "act_trait",
+        required = true,
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), getTraitOptions(), selectedTrait and {selectedTrait} or {},
+                function(picked)
+                    selectedTrait = picked
+                    f:setPickerValue("trait", selectedTrait,
+                        selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"))
+                end, {
+                    title = getText("IGUI_PhunMart_Admin_PickTrait"),
+                    singleSelect = true
+                })
+        end
+    })
+    form:addTextField("xpSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
+        default = cur.skill or "",
+        hint = getText("IGUI_PhunMart_Hint_Skill"),
+        group = "act_xp",
+        required = true
+    })
+    form:addTextField("xpAmount", getText("IGUI_PhunMart_Lbl_XPAmount"), {
+        default = cur.amount and tostring(cur.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_XPAmount"),
+        group = "act_xp",
+        required = true,
+        numeric = true,
+        min = 0
+    })
+    form:addTextField("boostSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
+        default = cur.skill or "",
+        hint = getText("IGUI_PhunMart_Hint_Skill"),
+        group = "act_boost",
+        required = true
+    })
+    form:addTextField("boostMultiplier", getText("IGUI_PhunMart_Lbl_BoostMultiplier"), {
+        default = cur.multiplier and tostring(cur.multiplier) or "",
+        hint = getText("IGUI_PhunMart_Hint_BoostMultiplier"),
+        group = "act_boost",
+        required = true,
+        numeric = true,
+        min = 0
+    })
+    -- No hours field, because nothing reads it. grantReward's applyBoost branch
+    -- calls setPerkBoost(perk, level) and never looks at hours, so a boost lasts
+    -- as long as the game decides. What the shipped data carries survives the
+    -- round trip untouched; demanding a number for something inert was the wrong
+    -- thing to ask.
+    -- A picker rather than free text. Script names are not guessable, a typo
+    -- here silently disables the offer at compile time, and there was no list
+    -- of valid ones anywhere in the UI.
+    form:addPickerField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
+        value = selectedVehicles,
+        display = formatVehicleList(selectedVehicles),
+        hint = getText("IGUI_PhunMart_Hint_VehiclePick"),
+        group = "act_vehicle",
+        required = true,
+        onPick = function(f, field)
+            VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
+                selectedVehicles = keys or {}
+                f:setPickerValue("vehicleScripts", selectedVehicles, formatVehicleList(selectedVehicles))
+            end)
+        end
+    })
+    form:addTextField("animalType", getText("IGUI_PhunMart_Lbl_AnimalType"), {
+        default = cur.animal or "",
+        hint = getText("IGUI_PhunMart_Hint_AnimalType"),
+        group = "act_animal",
+        required = true
+    })
+    form:addTextField("animalBreed", getText("IGUI_PhunMart_Lbl_AnimalBreed"), {
+        default = cur.breed or "",
+        hint = getText("IGUI_PhunMart_Hint_AnimalBreed"),
+        group = "act_animal",
+        required = true
+    })
+    form:addTextField("tokenAmount", getText("IGUI_PhunMart_Lbl_TokenAmount"), {
+        default = cur.amount and tostring(cur.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_TokenAmount"),
+        group = "act_tokens",
+        required = true,
+        integer = true
+    })
+    form:addTextField("balanceAmount", getText("IGUI_PhunMart_Lbl_BalanceAmount"), {
+        default = cur.amount and tostring(cur.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_ChangeAmount"),
+        group = "act_balance",
+        required = true,
+        integer = true
+    })
+    -- The currency pools, read off the wallet rather than typed. There are two
+    -- and they are defined in code, so no Open button: there is no editor to
+    -- open, unlike the price and inherit fields on the form this opened from.
+    local poolOptions = {}
+    for poolKey in pairs(Core.wallet and Core.wallet.pools or {}) do
+        table.insert(poolOptions, poolKey)
+    end
+    table.sort(poolOptions)
+    form:addComboField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
+        options = poolOptions,
+        selected = cur.pool or "change",
+        hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
+        group = "act_balance"
+    })
+    form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
+        default = cur.item or "",
+        hint = getText("IGUI_PhunMart_Hint_ItemKey"),
+        group = "act_item",
+        required = true
+    })
+    form:addTextField("giveItemAmount", getText("IGUI_PhunMart_Lbl_ItemAmount"), {
+        default = cur.amount and tostring(cur.amount) or "",
+        hint = getText("IGUI_PhunMart_Hint_ItemAmount"),
+        group = "act_item",
+        integer = true,
+        min = 1
+    })
+
+    -- Before initialise, so the window is sized from the fields the chosen type
+    -- actually shows rather than from all of them at once.
+    applyActionGroups(form, curType, false)
+
+    form:initialise()
+    form:addToUIManager()
+    form:bringToTop()
+    return form
 end
 
 local function createEditModal(specialKey, specialDef, isNew, cb)
@@ -334,23 +581,13 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- covered four of twenty-eight fields and never updated once you typed. It
     -- is markInheritedFields plus FormPanel now, for every field and live.
 
-    -- Each action type reads its own fields off the stored action, rather than
-    -- everything being flattened into one string.
-    local curAction = def.actions and def.actions[1]
-    local selectedTrait = curAction and curAction.trait or nil
-    local selectedVehicles = {}
-    if curAction then
-        if curAction.scripts then
-            for _, s in ipairs(curAction.scripts) do
-                table.insert(selectedVehicles, s)
-            end
-        elseif curAction.script then
-            table.insert(selectedVehicles, curAction.script)
-        end
+    -- Everything this entry does, as an editable copy. The list field owns it
+    -- from here and each row opens its own form, so the copy is what keeps a
+    -- cancelled edit out of the definition on screen.
+    local editActions = {}
+    for _, a in ipairs(def.actions or {}) do
+        table.insert(editActions, Core.utils.deepCopy(a))
     end
-    local animalTypeDefault = (curAction and curAction.animal) or ""
-    local animalBreedDefault = (curAction and curAction.breed) or ""
-    local amountDefault = (curAction and curAction.amount) and tostring(curAction.amount) or ""
 
     -- Build inherit options from template keys
     local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
@@ -406,20 +643,6 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 local cat = f:getFieldValue("category")
                 result.category = (cat ~= "") and cat or nil
 
-                local tex = f:getFieldValue("texture")
-                local ovl = f:getFieldValue("overlay")
-                if tex ~= "" or ovl ~= "" then
-                    result.display = {}
-                    if tex ~= "" then
-                        result.display.texture = tex
-                    end
-                    if ovl ~= "" then
-                        result.display.overlay = ovl
-                    end
-                else
-                    result.display = nil
-                end
-
                 -- Instance-only shape doesn't belong on a template.
                 result.inherit = nil
                 result.actions = nil
@@ -432,67 +655,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 local inheritIdx = f._fieldsByKey["inherit"]._combo.selected
                 result.inherit = inheritIdx > 1 and f:getFieldValue("inherit") or nil
 
-                local dispText = f:getFieldValue("displayText")
-                result.display = (dispText ~= "") and {
-                    text = dispText
-                } or nil
-
-                -- Each branch reads only its own fields. Validation has already
-                -- run, so anything required here is present and well formed.
-                local actionType = f:getFieldValue("action")
-                local action
-
-                if actionType == "giveItem" then
-                    local amt = tonumber(f:getFieldValue("giveItemAmount"))
-                    action = {
-                        type = "giveItem",
-                        item = f:getFieldValue("giveItemItem"),
-                        -- Blank means one per purchase.
-                        amount = (amt and math.floor(amt) >= 1) and math.floor(amt) or 1
-                    }
-                elseif ACTION_GROUPS[actionType] then
-                    action = {
-                        type = actionType
-                    }
-                    if actionType == "addTrait" or actionType == "removeTrait" then
-                        action.trait = f:getFieldValue("trait")
-                    elseif actionType == "giveXP" then
-                        action.skill = trim(f:getFieldValue("xpSkill"))
-                        action.amount = f:getFieldNumber("xpAmount")
-                    elseif actionType == "applyBoost" then
-                        action.skill = trim(f:getFieldValue("boostSkill"))
-                        action.multiplier = f:getFieldNumber("boostMultiplier")
-                    elseif actionType == "spawnVehicle" then
-                        local scripts = f:getFieldValue("vehicleScripts") or {}
-                        if #scripts > 1 then
-                            action.scripts = scripts
-                        else
-                            action.script = scripts[1]
-                        end
-                    elseif actionType == "spawnAnimal" then
-                        action.animal = trim(f:getFieldValue("animalType"))
-                        action.breed = trim(f:getFieldValue("animalBreed"))
-                        action.size = (curAction and curAction.size) or "medium"
-                    elseif actionType == "grantBoundTokens" then
-                        action.amount = math.floor(f:getFieldNumber("tokenAmount"))
-                    elseif actionType == "adjustBalance" then
-                        action.amount = math.floor(f:getFieldNumber("balanceAmount"))
-                        local poolVal = f:getFieldValue("pool")
-                        action.pool = (poolVal and poolVal ~= "") and poolVal or "change"
-                    end
-                end
-
-                -- Only written when the form actually modelled the type. An
-                -- action this form knows nothing about keeps whatever it had:
-                -- rebuilding it from fields that were never shown is how a
-                -- giveXP action became an empty addTrait, and the same would
-                -- happen to any type added later or by another mod.
-                if action then
-                    -- This form only edits the first action. Keep any others the
-                    -- definition already had rather than truncating the list.
-                    result.actions = result.actions or {}
-                    result.actions[1] = action
-                end
+                -- The list owns every action, in order, already built by the
+                -- form that edited each one. An empty list stores nothing, so a
+                -- child that never had actions of its own goes on inheriting
+                -- its template's.
+                local acts = f:getFieldValue("actions") or {}
+                result.actions = (#acts > 0) and Core.utils.deepCopy(acts) or nil
 
                 local priceVal = f:getFieldValue("price")
                 result.price = (priceVal and priceVal ~= "") and priceVal or nil
@@ -534,6 +702,33 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 result.kind = nil
                 result.category = nil
             end
+
+            -- Display is built the same way for both shapes. A template used to
+            -- be the only thing that could carry a texture, which left every
+            -- instance stuck with whatever picture its parent chose and no way
+            -- to say otherwise; a one-off special with no template had no
+            -- picture at all. Label stays instance-only: a template names
+            -- nothing, it is the shape its children fill in.
+            local disp = {}
+            local anyDisp = false
+            if not tpl then
+                local dispText = f:getFieldValue("displayText")
+                if dispText ~= "" then
+                    disp.text = dispText
+                    anyDisp = true
+                end
+            end
+            local tex = f:getFieldValue("texture")
+            if tex ~= "" then
+                disp.texture = tex
+                anyDisp = true
+            end
+            local ovl = f:getFieldValue("overlay")
+            if ovl ~= "" then
+                disp.overlay = ovl
+                anyDisp = true
+            end
+            result.display = anyDisp and disp or nil
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
@@ -607,13 +802,45 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         default = def.category or "",
         group = "template"
     })
+    -- No group: the picture an offer shows is not a template-only idea, and
+    -- pinning these two to the template shape is what made a one-off special
+    -- unable to have its own icon at all.
     form:addTextField("texture", getText("IGUI_PhunMart_Lbl_Texture"), {
         default = (def.display and def.display.texture) or "",
-        group = "template"
+        hint = getText("IGUI_PhunMart_Hint_SpecialTexture"),
+        onChange = function(f)
+            f:reflowFields()
+        end
     })
     form:addTextField("overlay", getText("IGUI_PhunMart_Lbl_Overlay"), {
         default = (def.display and def.display.overlay) or "",
-        group = "template"
+        hint = getText("IGUI_PhunMart_Hint_SpecialOverlay"),
+        onChange = function(f)
+            f:reflowFields()
+        end
+    })
+    -- The picture itself, so a path typed wrong is visibly wrong here rather
+    -- than found later as a blank tile in a machine.
+    form:addImageField("texturePreview", getText("IGUI_PhunMart_Lbl_Preview"), {
+        height = math.floor(48 * FONT_SCALE),
+        images = function()
+            local out = {}
+            -- A filled-in field always gets a slot, even when nothing resolves:
+            -- an empty frame is how the preview says the name matched nothing,
+            -- and dropping the slot would read as "you left this blank".
+            local function add(key, label)
+                local path = form:getFieldValue(key)
+                if path and path ~= "" then
+                    table.insert(out, {
+                        texture = specialTexture(path),
+                        label = getText(label)
+                    })
+                end
+            end
+            add("texture", "IGUI_PhunMart_Lbl_Texture")
+            add("overlay", "IGUI_PhunMart_Lbl_Overlay")
+            return out
+        end
     })
 
     -- Instance-only fields
@@ -642,160 +869,37 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         hint = getText("IGUI_PhunMart_Hint_DisplayText"),
         group = "instance"
     })
-    local curActionType = curAction and curAction.type or ACTION_TYPES[1]
-
-    -- A combo cannot show an option it does not have, and it does not complain:
-    -- it just sits on the first one, so an unrecognised action would read as
-    -- addTrait. Add it instead, and the save path leaves it alone because it has
-    -- no field group.
-    local actionOptions = {}
-    local knownType = false
-    for _, t in ipairs(ACTION_TYPES) do
-        table.insert(actionOptions, t)
-        if t == curActionType then
-            knownType = true
-        end
-    end
-    if not knownType and curActionType and curActionType ~= "" then
-        table.insert(actionOptions, curActionType)
-    end
-    local extraActions = (def.actions and #def.actions > 1) and (#def.actions - 1) or 0
-    form:addComboField("action", getText("IGUI_PhunMart_Lbl_Action"), {
-        options = actionOptions,
-        selected = curActionType,
+    -- Every action, not just the first. They run in the order shown.
+    form:addListField("actions", getText("IGUI_PhunMart_Lbl_Actions"), {
+        items = editActions,
         group = "instance",
-        -- Only the first action is editable here. Say so when there are more,
-        -- rather than letting them look absent (they are preserved on save).
-        hint = extraActions > 0 and getText("IGUI_PhunMart_Hint_MoreActions", tostring(extraActions)) or
-            getText("IGUI_PhunMart_Hint_ActionType"),
-        onChange = function(f, field)
-            applyActionGroups(f, f:getFieldValue("action"))
-        end
-    })
-
-    -- One field per action type rather than a single box whose meaning changed
-    -- with the combo above it. Each lives in its own group, so only the fields
-    -- the chosen action actually uses are on screen.
-    form:addPickerField("trait", getText("IGUI_PhunMart_Lbl_Trait"), {
-        value = selectedTrait,
-        display = selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"),
-        hint = getText("IGUI_PhunMart_Hint_TraitPick"),
-        group = "act_trait",
-        required = true,
-        onPick = function(f, field)
-            KeyPicker.open(getSpecificPlayer(0), getTraitOptions(), selectedTrait and {selectedTrait} or {},
-                function(picked)
-                    selectedTrait = picked
-                    f:setPickerValue("trait", selectedTrait,
-                        selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"))
-                end, {
-                    title = getText("IGUI_PhunMart_Admin_PickTrait"),
-                    singleSelect = true
-                })
-        end
-    })
-    form:addTextField("xpSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
-        default = (curAction and curAction.skill) or "",
-        hint = getText("IGUI_PhunMart_Hint_Skill"),
-        group = "act_xp",
-        required = true
-    })
-    form:addTextField("xpAmount", getText("IGUI_PhunMart_Lbl_XPAmount"), {
-        default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
-        hint = getText("IGUI_PhunMart_Hint_XPAmount"),
-        group = "act_xp",
-        required = true,
-        numeric = true,
-        min = 0
-    })
-    form:addTextField("boostSkill", getText("IGUI_PhunMart_Lbl_Skill"), {
-        default = (curAction and curAction.skill) or "",
-        hint = getText("IGUI_PhunMart_Hint_Skill"),
-        group = "act_boost",
-        required = true
-    })
-    form:addTextField("boostMultiplier", getText("IGUI_PhunMart_Lbl_BoostMultiplier"), {
-        default = (curAction and curAction.multiplier) and tostring(curAction.multiplier) or "",
-        hint = getText("IGUI_PhunMart_Hint_BoostMultiplier"),
-        group = "act_boost",
-        required = true,
-        numeric = true,
-        min = 0
-    })
-    -- Not required, because nothing reads it. grantReward's applyBoost branch
-    -- calls setPerkBoost(perk, level) and never looks at hours, so a boost
-    -- lasts as long as the game decides. Kept as a field because the shipped
-    -- data carries it and dropping it would discard the intent, but demanding
-    -- a number for something inert was the wrong thing to ask.
-    -- A picker rather than free text. Script names are not guessable, a typo
-    -- here silently disables the offer at compile time, and there was no list
-    -- of valid ones anywhere in the UI.
-    form:addPickerField("vehicleScripts", getText("IGUI_PhunMart_Lbl_VehicleScripts"), {
-        value = selectedVehicles,
-        display = formatVehicleList(selectedVehicles),
-        hint = getText("IGUI_PhunMart_Hint_VehiclePick"),
-        group = "act_vehicle",
-        required = true,
-        onPick = function(f, field)
-            VehiclePicker.open(getSpecificPlayer(0), selectedVehicles, function(keys)
-                selectedVehicles = keys or {}
-                f:setPickerValue("vehicleScripts", selectedVehicles, formatVehicleList(selectedVehicles))
+        rows = 3,
+        hint = getText("IGUI_PhunMart_Hint_Actions"),
+        columns = {{
+            name = getText("IGUI_PhunMart_Col_Type"),
+            size = 0
+        }, {
+            name = getText("IGUI_PhunMart_Col_Action"),
+            size = 0.42
+        }},
+        formatColumns = function(a)
+            return {a.type or "?", formatActionDetail(a)}
+        end,
+        formatItem = function(a)
+            return (a.type or "?") .. "  " .. formatActionDetail(a)
+        end,
+        onAdd = function(f, field)
+            createActionModal(nil, true, function(newAction)
+                f:addListItem("actions", newAction)
+            end)
+        end,
+        onEdit = function(f, field, index, data)
+            createActionModal(Core.utils.deepCopy(data), false, function(editedAction)
+                f:updateListItem("actions", index, editedAction)
             end)
         end
     })
-    form:addTextField("animalType", getText("IGUI_PhunMart_Lbl_AnimalType"), {
-        default = animalTypeDefault,
-        hint = getText("IGUI_PhunMart_Hint_AnimalType"),
-        group = "act_animal",
-        required = true
-    })
-    form:addTextField("animalBreed", getText("IGUI_PhunMart_Lbl_AnimalBreed"), {
-        default = animalBreedDefault,
-        hint = getText("IGUI_PhunMart_Hint_AnimalBreed"),
-        group = "act_animal",
-        required = true
-    })
-    form:addTextField("tokenAmount", getText("IGUI_PhunMart_Lbl_TokenAmount"), {
-        default = amountDefault,
-        hint = getText("IGUI_PhunMart_Hint_TokenAmount"),
-        group = "act_tokens",
-        required = true,
-        integer = true
-    })
-    form:addTextField("balanceAmount", getText("IGUI_PhunMart_Lbl_BalanceAmount"), {
-        default = amountDefault,
-        hint = getText("IGUI_PhunMart_Hint_ChangeAmount"),
-        group = "act_balance",
-        required = true,
-        integer = true
-    })
-    -- The currency pools, read off the wallet rather than typed. There are two
-    -- and they are defined in code, so no Open button: there is no editor to
-    -- open, unlike the price and inherit fields this sits near.
-    local poolOptions = {}
-    for poolKey in pairs(Core.wallet and Core.wallet.pools or {}) do
-        table.insert(poolOptions, poolKey)
-    end
-    table.sort(poolOptions)
-    form:addComboField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
-        options = poolOptions,
-        selected = (curAction and curAction.pool) or "change",
-        hint = getText("IGUI_PhunMart_Hint_CurrencyPool"),
-        group = "act_balance"
-    })
-    form:addTextField("giveItemItem", getText("IGUI_PhunMart_Lbl_Item"), {
-        default = (curAction and curAction.item) or "",
-        hint = getText("IGUI_PhunMart_Hint_ItemKey"),
-        group = "act_item",
-        required = true
-    })
-    form:addTextField("giveItemAmount", getText("IGUI_PhunMart_Lbl_ItemAmount"), {
-        default = (curAction and curAction.amount) and tostring(curAction.amount) or "",
-        hint = getText("IGUI_PhunMart_Hint_ItemAmount"),
-        group = "act_item",
-        integer = true,
-        min = 1
-    })
+
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_Price"), {
         options = getPriceKeys(),
         selected = def.price or "",
@@ -856,6 +960,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
         category = "sp_more",
         texture = "sp_more",
         overlay = "sp_more",
+        texturePreview = "sp_more",
         weight = "sp_more",
         stock = "sp_more"
     }, "sp_basics")
@@ -870,11 +975,10 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
 
     -- Apply initial group visibility BEFORE initialise so the window height is
     -- computed from only the visible fields. Done after initialise, the hidden
-    -- template/pool fields still count toward the height and the form opens too
-    -- tall until the first user-triggered reflow.
+    -- half still counts toward the height and the form opens too tall until the
+    -- first user-triggered reflow.
     form:setGroupVisible("template", isTpl)
     form:setGroupVisible("instance", not isTpl)
-    applyActionGroups(form, curActionType, isTpl)
 
     markInheritedFields(form, raw, def)
 

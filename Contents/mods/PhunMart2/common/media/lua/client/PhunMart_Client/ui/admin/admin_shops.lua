@@ -365,6 +365,15 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             result.sprites = parseCSV(f:getFieldValue("sprites"))
             result.unpoweredSprites = parseCSV(f:getFieldValue("unpSprites"))
 
+            -- Same shape as enabled above, inverted: only written when true,
+            -- because absent already means the machine needs no power. Clearing
+            -- the key tombstones it, so turning the requirement back off sticks.
+            if f:getFieldValue("powered") then
+                result.powered = true
+            else
+                result.powered = nil
+            end
+
             local rollMin, rollMax = f:getFieldRange("roll")
             if rollMin and rollMax then
                 result.roll = {
@@ -454,6 +463,15 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         onChange = function(f)
             f:reflowFields()
         end
+    })
+    -- Directly above the unpowered sprites, because it is what decides whether
+    -- they are ever drawn: unticked, the machine ignores power entirely and the
+    -- list below it is dead weight.
+    form:addCheckField("powered", getText("IGUI_PhunMart_Lbl_Powered"), {
+        checked = def.powered == true,
+        text = getText("IGUI_PhunMart_Lbl_Powered_Checkbox"),
+        hint = getText("IGUI_PhunMart_Hint_Powered"),
+        section = "s_look"
     })
     form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_UnpSprites"), {
         default = def.unpoweredSprites and table.concat(def.unpoweredSprites, ", ") or "",

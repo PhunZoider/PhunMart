@@ -243,12 +243,16 @@ end
 -- onAdd(form, field): callback when Add is clicked; should call form:addListItem(key, data)
 -- onEdit(form, field, index, data): callback when Edit is clicked
 -- onRemove(form, field, index, data): callback when Remove is clicked
+-- hint: message row under the buttons, the same one every other field type has.
+--       A list carries provenance as well as guidance now: an inherited list is
+--       marked there, and it was the one field type with nowhere to say so.
 function FormPanel:addListField(key, label, opts)
     opts = opts or {}
     table.insert(self._fields, {
         type = "list",
         key = key,
         label = label,
+        hint = opts.hint,
         _items = opts.items or {},
         _rows = opts.rows or 4,
         _formatItem = opts.formatItem or function(d)
@@ -660,7 +664,14 @@ function FormPanel:_isShowingInherited(f)
         return false
     end
     if not f._inheritCaptured then
-        f.inheritedValue = self:getFieldValue(f.key)
+        local loaded = self:getFieldValue(f.key)
+        -- A list field hands back its live items table. Keeping that reference
+        -- would compare it against itself on every frame, so the marker could
+        -- never clear no matter what was added or removed.
+        if f.type == "list" then
+            loaded = PhunMart.utils.deepCopy(loaded)
+        end
+        f.inheritedValue = loaded
         f._inheritCaptured = true
         return true
     end
@@ -807,6 +818,9 @@ function FormPanel:_computeNeededHeight()
                 -- been built to set yet at this point.
                 if f.onAdd or f.onEdit or f.onRemove then
                     y = y + ROW_H
+                end
+                if f.hasMessageRow then
+                    y = y + 2 + FONT_HGT_SMALL
                 end
                 y = y + PAD
             else
@@ -1277,6 +1291,12 @@ function FormPanel:_createField(f)
             self:addChild(f._removeBtn)
         end
 
+        if f.hasMessageRow then
+            f._hint = ISLabel:new(0, 0, FONT_HGT_SMALL, f.hint or "", 0.5, 0.5, 0.5, 1, UIFont.Small, true)
+            f._hint:initialise()
+            self:addChild(f._hint)
+        end
+
         -- Populate initial items. Outside the branch above: a read-only list
         -- still has rows to show.
         self:_refreshListField(f)
@@ -1488,10 +1508,15 @@ function FormPanel:reflowFields()
                     f._editBtn:setY(y)
                     f._removeBtn:setX(x + (btnW2 + gap) * 2)
                     f._removeBtn:setY(y)
-                    y = y + ROW_H + PAD
-                else
-                    y = y + PAD
+                    y = y + ROW_H
                 end
+                if f._hint then
+                    y = y + 2
+                    f._hint:setX(x)
+                    f._hint:setY(y)
+                    y = y + FONT_HGT_SMALL
+                end
+                y = y + PAD
 
             elseif f.type == "separator" then
                 y = y + PAD
