@@ -297,6 +297,11 @@ local FIELD_SOURCE = {
     enabled = function(d)
         return d.enabled ~= nil
     end,
+    -- One entry for the whole picker, on the same reasoning as actions below: a
+    -- child that borrows its parent's gate borrows all of it.
+    conditions = function(d)
+        return d.conditions ~= nil
+    end,
     -- One entry for the whole list, since that is what the form now shows. The
     -- fields inside an action are marked nowhere, because a child that borrows
     -- its parent's action borrows all of it: the list says where it came from,
@@ -577,6 +582,12 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     -- deciding, on save, whether a value is its own or borrowed.
     local parentDef = tools.resolveParent(allSpecials, raw)
 
+    -- The picker edits the `all` list, every key of which must pass. Any `any`
+    -- or `notAny` buckets a hand-written entry carries are held here and put
+    -- back on save, so the form does not quietly turn an either-or gate into a
+    -- must-have-all one.
+    local selectedConditions, conditionExtras = tools.splitConditions(def.conditions)
+
     -- Provenance used to be four hand-marked hints appended at build time, which
     -- covered four of twenty-eight fields and never updated once you typed. It
     -- is markInheritedFields plus FormPanel now, for every field and live.
@@ -664,6 +675,10 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
 
                 local priceVal = f:getFieldValue("price")
                 result.price = (priceVal and priceVal ~= "") and priceVal or nil
+
+                -- nil when the picker is emptied and nothing else was carried,
+                -- which tombstones the key rather than leaving an empty array.
+                result.conditions = tools.joinConditions(selectedConditions, conditionExtras)
 
                 -- Offer: weight and stock.
                 --
@@ -926,6 +941,23 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 end
             end
         }
+    })
+    -- Under the price, because the two together are what decides whether a row
+    -- can be bought at all. Every one of the 75 shipped XP rewards gates itself
+    -- on a perk level this way and none of them could be edited here.
+    form:addPickerField("conditions", getText("IGUI_PhunMart_Lbl_Conditions"), {
+        value = selectedConditions,
+        display = tools.formatConditionList(selectedConditions),
+        hint = getText("IGUI_PhunMart_Hint_Conditions"),
+        group = "instance",
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), tools.conditionOptions(), selectedConditions, function(keys)
+                selectedConditions = keys or {}
+                f:setPickerValue("conditions", selectedConditions, tools.formatConditionList(selectedConditions))
+            end, {
+                title = getText("IGUI_PhunMart_Admin_PickConditions")
+            })
+        end
     })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = (def.offer and def.offer.weight) and tostring(def.offer.weight) or "",

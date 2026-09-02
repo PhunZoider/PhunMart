@@ -30,7 +30,11 @@ local CAN_DISABLE = {
     groups = true,
     items = true,
     specials = true,
-    prices = false
+    prices = false,
+    -- Like prices: a condition definition carries no `enabled` flag, and one
+    -- that ships is immovable. Disabling a gate would silently open whatever it
+    -- was holding shut, which is the wrong default for a safety check anyway.
+    conditionsDefs = false
 }
 
 local UPSERT_COMMAND = {

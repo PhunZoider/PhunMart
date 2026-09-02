@@ -26,6 +26,7 @@ require "PhunMart_Client/ui/admin/admin_groups"
 require "PhunMart_Client/ui/admin/admin_items"
 require "PhunMart_Client/ui/admin/admin_specials"
 require "PhunMart_Client/ui/admin/admin_prices"
+require "PhunMart_Client/ui/admin/admin_conditions"
 require "PhunMart_Client/ui/admin/admin_blacklist"
 require "PhunMart_Client/ui/admin/admin_rewards"
 require "PhunMart_Client/ui/admin/admin_wallet"
@@ -82,6 +83,13 @@ for _, spec in ipairs({{
     module = "admin_prices",
     label = "IGUI_PhunMart_Btn_Prices",
     order = 70
+}, {
+    -- After Prices, at the end of the chain that decides what an offer is: the
+    -- last question about a row is who may buy it.
+    key = "conditions",
+    module = "admin_conditions",
+    label = "IGUI_PhunMart_Btn_Conditions",
+    order = 75
 }, {
     key = "blacklist",
     module = "admin_blacklist",

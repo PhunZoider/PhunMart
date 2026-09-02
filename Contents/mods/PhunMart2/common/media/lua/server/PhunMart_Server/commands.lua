@@ -108,6 +108,17 @@ Commands[Core.commands.upsertPoolDef] = function(playerObj, args)
     Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("pools"), "pools", args.key, args.def)
 end
 
+-- The primary override is PhunMart_Conditions.json. The XP file beside it in
+-- overridePaths is read as well but never written to, the same way every other
+-- category with more than one source behaves: edits land in one known file.
+Commands[Core.commands.upsertConditionDef] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    Core.ServerSystem.instance:upsertDefinition(Core.primaryOverride("conditionsDefs"), "conditionsDefs", args.key,
+        args.def)
+end
+
 -- Which definition categories the editors may delete from. Shops are
 -- deliberately absent: a shop definition backs machines already placed in the
 -- world, so it can be disabled but never removed.
@@ -120,7 +131,8 @@ local DELETABLE_KINDS = {
     groups = true,
     items = true,
     prices = true,
-    specials = true
+    specials = true,
+    conditionsDefs = true
 }
 
 local function overrideFileFor(kind)

@@ -274,6 +274,17 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
     local priceKeys = getPriceKeys()
     local currentPrice = def.defaults and def.defaults.price or ""
 
+    -- The special every offer in this pool hands over, unless something further
+    -- down the chain names its own. `pool_prawnstars_core` is the shipped
+    -- example: a whole shelf that pays out change rather than giving an item.
+    local specials = Core.defs and Core.defs.specials or require "PhunMart/defaults/specials"
+    local specialKeys = getSortedKeys(specials)
+    local selectedSpecial = def.defaults and def.defaults.reward or nil
+
+    -- The picker edits the `all` list, every key of which must pass. Any `any`
+    -- or `notAny` buckets a hand-written entry carries ride along untouched.
+    local selectedConditions, conditionExtras = tools.splitConditions(def.defaults and def.defaults.conditions)
+
     local defaultsStock = def.defaults and def.defaults.offer and def.defaults.offer.stock
     local stockMinDefault = (defaultsStock and defaultsStock.min ~= nil) and tostring(defaultsStock.min) or ""
     local stockMaxDefault = (defaultsStock and defaultsStock.max ~= nil) and tostring(defaultsStock.max) or ""
@@ -335,6 +346,26 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
                 result.defaults.price = priceVal
             elseif result.defaults then
                 result.defaults.price = nil
+            end
+
+            -- Same shape as the price above it. Clearing relies on the
+            -- tombstone: nil unsets the key and the pool goes back to handing
+            -- over whatever each offer names for itself.
+            if selectedSpecial and selectedSpecial ~= "" then
+                result.defaults = result.defaults or {}
+                result.defaults.reward = selectedSpecial
+            elseif result.defaults then
+                result.defaults.reward = nil
+            end
+
+            -- Same shape again. joinConditions returns nil for an emptied
+            -- picker, which tombstones the key.
+            local conditionsOut = tools.joinConditions(selectedConditions, conditionExtras)
+            if conditionsOut then
+                result.defaults = result.defaults or {}
+                result.defaults.conditions = conditionsOut
+            elseif result.defaults then
+                result.defaults.conditions = nil
             end
 
             -- Defaults stock (optional). The compiler merges the whole of
@@ -481,8 +512,46 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             f:setHintText("defaultsPrice", priceHintFor(f:getFieldValue("defaultsPrice")))
         end,
     })
-    -- Beside the fallback price, because it is the same idea: what this pool
-    -- hands an offer that names nothing of its own.
+    -- Directly under the price, because the two are one question asked twice:
+    -- what an offer here costs, and what it hands over. The pool is the weakest
+    -- layer of the chain, so a group or an item override still wins.
+    form:addPickerField("special", getText("IGUI_PhunMart_Lbl_Grants"), {
+        value = selectedSpecial,
+        display = selectedSpecial or getText("IGUI_PhunMart_Lbl_None"),
+        hint = getText("IGUI_PhunMart_Hint_PoolGrants"),
+        section = "p_more",
+        onPick = function(f, field)
+            local initial = selectedSpecial and {selectedSpecial} or {}
+            KeyPicker.open(getSpecificPlayer(0), specialKeys, initial, function(key)
+                selectedSpecial = key
+                f:setPickerValue("special", selectedSpecial, selectedSpecial or getText("IGUI_PhunMart_Lbl_None"))
+            end, {
+                title = getText("IGUI_PhunMart_Admin_PickSpecials"),
+                singleSelect = true
+            })
+        end,
+    })
+    -- Under the price and reward, completing the same sentence: what an offer
+    -- here costs, what it hands over, and who may buy it. Conditions are the
+    -- one part that does not follow the most-specific-wins rule: every layer's
+    -- are combined and all of them must pass, so these add to what a group or
+    -- an item already asks for.
+    form:addPickerField("conditions", getText("IGUI_PhunMart_Lbl_Conditions"), {
+        value = selectedConditions,
+        display = tools.formatConditionList(selectedConditions),
+        hint = getText("IGUI_PhunMart_Hint_ConditionsLayered"),
+        section = "p_more",
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), tools.conditionOptions(), selectedConditions, function(keys)
+                selectedConditions = keys or {}
+                f:setPickerValue("conditions", selectedConditions, tools.formatConditionList(selectedConditions))
+            end, {
+                title = getText("IGUI_PhunMart_Admin_PickConditions")
+            })
+        end,
+    })
+    -- Beside the fallback price and reward, because it is the same idea: what
+    -- this pool hands an offer that names nothing of its own.
     form:addRangeField("defaultsStock", getText("IGUI_PhunMart_Lbl_Stock"), {
         minDefault = stockMinDefault,
         maxDefault = stockMaxDefault,

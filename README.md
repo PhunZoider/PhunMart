@@ -153,8 +153,9 @@ Everything an admin can change lives in one window, **PhunMart Setup**. Open it 
 following the chain a shop resolves through:
 
 **Shops** and **Locations** (what shop types exist, and where machines actually stand in the
-world) then **Pools**, **Groups**, **Specials**, **Item overrides** and **Prices** (what a
-machine ends up selling and what it charges) then **Blacklist**, **Rewards** and **Wallets**.
+world) then **Pools**, **Groups**, **Specials**, **Item overrides**, **Prices** and
+**Conditions** (what a machine ends up selling, what it charges, and who may buy it) then
+**Blacklist**, **Rewards** and **Wallets**.
 
 The last tab, **Tools**, holds the actions that are not edits:
 

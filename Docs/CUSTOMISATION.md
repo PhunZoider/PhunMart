@@ -175,6 +175,13 @@ Require Carpentry 3+ to buy a specific item, and limit it to one purchase per pl
 
 `oneTimePurchase` ships with the mod, so only `carpentryMid` needs defining.
 
+In game this is two steps and no file. The **Conditions** tab of PhunMart Setup lists every
+test that exists and what each one lets through; **New** asks which test you want and then
+only for the arguments that test takes, so a skill gate asks for a skill and a level range and
+nothing else. **Duplicate** is usually quicker, since the shipped perk gates already come in
+threes that differ by one number. Then open the offer you want gated, on whichever tab owns
+it, and pick your condition in its **Requires** field.
+
 ### Add vehicles from another mod
 
 See the dedicated guide: [Adding a Modded Vehicle](GUIDE_ADDING_MODDED_VEHICLE.md). The quick-start
@@ -462,8 +469,16 @@ If `display.texture` is omitted for an item special, the game icon for that item
 
 File: `PhunMart_Conditions.json`
 
-Named condition definitions. Referenced in offer `conditions` arrays and pool `defaults.conditions`.
-A condition is a named test applied server-side at purchase time and client-side for UI feedback.
+Named condition definitions. A condition is a named test applied server-side at purchase time
+and client-side for UI feedback. Four layers can name one: an item override's and a special's
+`conditions`, and a group's and a pool's `defaults.conditions`. They do not override each
+other the way prices do. Every layer's conditions are combined and all of them must pass.
+
+The **Conditions** tab of PhunMart Setup edits this file. Each row shows the rule in words
+rather than only the key, so `perk_Cooking_lt3` reads as `Cooking level 2 or less`, and the
+form asks only for the arguments the chosen test takes. Attaching one is a **Requires** picker
+on the Pools, Groups, Specials and Item overrides tabs, which writes the arrays described
+below. Everything here is equally editable by hand; the two routes are interchangeable.
 
 ```json
 {
@@ -665,6 +680,7 @@ than listing game items.
 | `defaults.offer.weight` | Default weight for items from this group                                     |
 | `defaults.offer.stock`  | Default stock (`min`, `max`, `restockHours`) for items from this group       |
 | `defaults.spawn`        | For vehicle groups: `condition` and `fuel` ranges the car arrives in         |
+| `defaults.conditions`   | Condition keys every offer from this group must pass, on top of the pool's   |
 | `categories`            | Game display categories to include (item-type groups)                        |
 | `items`                 | Explicit item full names, or vehicle script names, to include                |
 | `specialCategories`     | Special `category` values to include (non-item groups: traits, XP, vehicles) |
@@ -771,7 +787,9 @@ every restock with no roll.
 | `months`           | Optional in-game month filter, `1` to `12`. The pool is only stocked during those months. Checked at restock only. Omit to stock all year. See below. |
 | `sticky`           | Every offer in this pool appears on every restock, bypassing the roll. See below.                                                                                 |
 | `defaults.price`   | Price used by offers in this pool that name none of their own                                                                                                     |
+| `defaults.reward`  | Special key handed over by offers in this pool that name none. `pool_prawnstars_core` uses this to pay out change instead of giving an item.                       |
 | `defaults.offer.stock` | `{ min, max }` stock for offers in this pool that set none. Omit `max` for a fixed amount.                                                                     |
+| `defaults.conditions` | Condition keys every offer in this pool must pass. Combined with the group's and the item's rather than overridden by them.                                     |
 | `blacklist`        | Item keys this pool will not draw, on top of the global blacklist                                                                                                 |
 | `fallbackTexture`  | Icon of last resort, used only when the group supplies none                                                                                                       |
 | `fallbackCategory` | Category label of last resort, same rule                                                                                                                          |
@@ -869,6 +887,7 @@ menu. The weight on each key scales that pool's offer weights, which is why the 
 | `background`       | PNG file name from `media/textures/` (no path prefix)                                          |
 | `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                          |
 | `unpoweredSprites` | Sprite names shown when machine is unpowered                                                   |
+| `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless, and the unpowered sprites are never drawn. |
 | `defaultView`      | `"grid"` (default) or `"list"`, the layout the shop UI opens in                                |
 | `roll`             | Default roll: `{ "mode": "weighted", "count": { "min": N, "max": M } }`. Overridable per pool set. |
 | `poolSets`         | Array of pool sets (see below)                                                                 |
@@ -877,6 +896,7 @@ menu. The weight on each key scales that pool's offer weights, which is why the 
 | `restockFrequency` | In-game hours between restocks (overrides server default)                                      |
 | `rerollFrequency`  | In-game hours before a machine of this type becomes a different shop. See below.               |
 | `enabled`          | Set `false` to disable the shop entirely. Existing machines stop working.                      |
+| `title`            | Name for this shop in the admin lists and the shop window. Cosmetic; falls back to the key.    |
 
 **`category` is not just a label.** Spacing is enforced against the nearest machine of the same
 type *and* the nearest of anything sharing its category, whichever is closer. Giving two shops
@@ -924,6 +944,10 @@ Each pool set is an object with:
 **Multiple pool sets** = independent shelves (e.g. FinalAmendment has separate melee, ammo,
 guns, explosives shelves with different roll counts). **Multiple keys in one set** = blended
 menu (e.g. BudgetXPerience merges XP and boost pools into one selection).
+
+In game, pool sets are the list on a shop's **Stock** tab. Opening one gives a row per pool
+with its own weight, so a blended set can put one pool at `0.5` beside another at `1.0` the
+way BudgetXPerience does. Select a row and press **Edit** to change its weight.
 
 ---
 

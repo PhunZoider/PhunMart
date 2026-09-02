@@ -42,6 +42,7 @@ PhunMart = {
         upsertPriceDef = "PhunMartUpsertPriceDef",
         upsertSpecialDef = "PhunMartUpsertSpecialDef",
         upsertPoolDef = "PhunMartUpsertPoolDef",
+        upsertConditionDef = "PhunMartUpsertConditionDef",
         deleteDefinition = "PhunMartDeleteDefinition",
         revertDefinition = "PhunMartRevertDefinition",
         getShopList = "PhunMartGetShopList",

@@ -82,40 +82,11 @@ local function formatPrice(price)
     return tostring(price.kind or "-")
 end
 
-local function condLabel(condKey, conditionsDefs)
-    if type(condKey) ~= "string" then
-        return tostring(condKey)
-    end
-    local def = conditionsDefs and conditionsDefs[condKey]
-    if not def then
-        return condKey
-    end
-    local t = def.test
-    local a = def.args or {}
-    if t == "worldAgeHoursBetween" then
-        local min = a.min or 0
-        local max = a.max
-        return "Age:" .. min .. "h" .. (max and ("-" .. max .. "h") or "+")
-    elseif t == "perkLevelBetween" then
-        return (a.perk or "?") .. " lv" .. (a.min or 0) .. "+"
-    elseif t == "perkBoostBetween" then
-        return "Boost:" .. (a.perk or "?")
-    elseif t == "purchaseCountMax" then
-        return "Limit:" .. (a.max or "?")
-    elseif t == "professionIn" then
-        local profs = a.professions or {}
-        local s = type(profs) == "table" and table.concat(profs, "/") or tostring(profs)
-        return "Prof:" .. s
-    elseif t == "hasItems" then
-        return "Has items"
-    elseif t == "canGrantTrait" then
-        return "Trait avail"
-    elseif t == "canRemoveTrait" then
-        return "Has trait"
-    else
-        return condKey
-    end
-end
+-- Shared with the admin editors' condition pickers, which label their options
+-- the same way. This viewer passes the runtime defs it was sent, because a
+-- shop's conditionsDefs include the ones the compiler generated and the local
+-- definition tables do not.
+local condLabel = tools.conditionLabel
 
 local function conditionsText(conditions, conditionsDefs)
     if not conditions then

@@ -2266,6 +2266,6 @@ return {
         actions = {{
             skill = "Glassmaking"
         }}
-    },
+    }
 
 }

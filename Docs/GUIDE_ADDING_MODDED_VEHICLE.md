@@ -72,7 +72,9 @@ offer instead, and the car the player bought is the car they get.
 
 Everything that makes this the luxury tier is on the group: the price, how often it comes up,
 how many are in stock, and the condition and fuel the car arrives with. Your car joins the
-`items` list alongside the shipped ones and inherits all of it.
+`items` list alongside the shipped ones and inherits all of it. All five are on the group's
+**Advanced** tab in the editor, with condition and fuel appearing once the group lists at
+least one vehicle; both are asked for as percentages.
 
 So each car is its own selectable row, adding a car is one name in a list, and moving a car
 between tiers is moving that name between groups. There is no special to create and none to
@@ -95,8 +97,8 @@ keep in step.
 > a change that never touched them.
 >
 > Fuel is the exception: it never worked before, so migrated groups are left on the game's
-> default rather than being quietly moved onto the shipped 10-25% range. Add `fuel` to their
-> `spawn` block if you want it.
+> default rather than being quietly moved onto the shipped 10-25% range. Set it on the
+> **Groups** tab, under Advanced, or add `fuel` to their `spawn` block by hand.
 
 Equivalent by hand, in `PhunMart_Groups.json`:
 

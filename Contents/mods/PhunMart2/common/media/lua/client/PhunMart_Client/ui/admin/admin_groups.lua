@@ -196,6 +196,14 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local defaults = def.defaults or {}
     local offer = defaults.offer or {}
 
+    -- The picker edits the `all` list, every key of which must pass. Any `any`
+    -- or `notAny` buckets a hand-written entry carries ride along untouched.
+    local selectedConditions, conditionExtras = tools.splitConditions(defaults.conditions)
+
+    local defaultsStock = offer.stock
+    local stockMinDefault = (defaultsStock and defaultsStock.min ~= nil) and tostring(defaultsStock.min) or ""
+    local stockMaxDefault = (defaultsStock and defaultsStock.max ~= nil) and tostring(defaultsStock.max) or ""
+
     -- What a vehicle is like when it arrives, as opposed to `offer`, which is
     -- how it sits on the shelf. Both bounds are filled from a plain number,
     -- because a range whose ends agree rolls back to exactly that number and a
@@ -312,6 +320,10 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
             result.defaults.reward = (selectedSpecial and selectedSpecial ~= "") and selectedSpecial or nil
 
+            -- nil when the picker is emptied and nothing else was carried, and
+            -- the pruning at the end drops `defaults` if that leaves it bare.
+            result.defaults.conditions = tools.joinConditions(selectedConditions, conditionExtras)
+
             -- 1.0 is what an absent weight already means, so writing it puts a
             -- key in the override that says nothing. The box opens on 1.0 when
             -- the group has no weight of its own, which meant saving a group
@@ -321,6 +333,19 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 result.defaults.offer.weight = weightVal
             else
                 result.defaults.offer.weight = nil
+            end
+
+            -- Edited in place, like every other stock field, so a restockHours
+            -- underneath it survives a save.
+            local stockMin, stockMax = f:getFieldRange("stock")
+            if stockMin or stockMax then
+                local stock = result.defaults.offer.stock or {}
+                stock.min = stockMin and math.floor(stockMin) or nil
+                stock.max = stockMax and math.floor(stockMax) or nil
+                result.defaults.offer.stock = stock
+            else
+                -- Both blank means unlimited, and the timer goes with it.
+                result.defaults.offer.stock = nil
             end
 
             -- Edited in place rather than rebuilt, like the stock tables in the
@@ -596,10 +621,39 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             end, { title = getText("IGUI_PhunMart_Admin_PickSpecials"), singleSelect = true })
         end,
     })
+    -- Under Grants, because the pair say what buying from this group does and
+    -- who is allowed to. Every layer's conditions are combined and all of them
+    -- must pass, so these are added to what the pool and the item already ask
+    -- for rather than replacing either.
+    form:addPickerField("conditions", getText("IGUI_PhunMart_Lbl_Conditions"), {
+        value = selectedConditions,
+        display = tools.formatConditionList(selectedConditions),
+        hint = getText("IGUI_PhunMart_Hint_ConditionsLayered"),
+        section = "g_more",
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), tools.conditionOptions(), selectedConditions, function(keys)
+                selectedConditions = keys or {}
+                f:setPickerValue("conditions", selectedConditions, tools.formatConditionList(selectedConditions))
+            end, {
+                title = getText("IGUI_PhunMart_Admin_PickConditions")
+            })
+        end,
+    })
     form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
         default = tostring(offer.weight or "1.0"),
         hint = getText("IGUI_PhunMart_Hint_WeightOverride"),
         numeric = true, min = 0,
+        section = "g_more",
+    })
+    -- Directly under weight, because the two are the same kind of statement:
+    -- how often this group's offers appear, and how many of each are there when
+    -- they do. Every shipped vehicle group sets a stock of one and had to say
+    -- so by hand, this being the only defaults layer that could set a price and
+    -- a weight but not an amount.
+    form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
+        minDefault = stockMinDefault, maxDefault = stockMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_UnlimitedStock"),
+        integer = true, min = 0,
         section = "g_more",
     })
     form:addTextField("fallbackTexture", getText("IGUI_PhunMart_Lbl_DefaultTexture"), {

@@ -39,6 +39,10 @@ function UI:refreshAll()
         table.insert(rows, {
             type = shopType,
             label = shopLabel(shopType),
+            -- Not decoration: spacing is enforced against the nearest machine of
+            -- the same type and the nearest of anything sharing its category, so
+            -- which shops compete for space is a property of this column.
+            category = shopDef.category or "",
             enabled = shopDef.enabled ~= false
         })
     end
@@ -120,15 +124,27 @@ function UI:createChildren()
         self:onRowContextMenu(target.items[row].item, getMouseX(), getMouseY())
     end
 
+    -- Grey for a disabled shop, on both columns that come from the definition.
+    -- The count beside them is a live reading rather than a setting, so it is
+    -- left alone.
+    local function greyIfDisabled(d)
+        if not d.enabled then
+            return 0.5, 0.5, 0.5
+        end
+    end
+
     self:addListColumn(getText("IGUI_PhunMart_Col_Shop"), 0, {
         field = "label",
-        color = function(d)
-            if not d.enabled then
-                return 0.5, 0.5, 0.5
-            end
-        end
+        color = greyIfDisabled
     })
-    self:addListColumn(getText("IGUI_PhunMart_Col_InWorld"), 0.5, {
+    -- Which shops compete with which for space, which was previously only
+    -- discoverable by opening them one at a time. The docs have described this
+    -- column as being here for a while; it was not.
+    self:addListColumn(getText("IGUI_PhunMart_Col_Category"), 0.5, {
+        field = "category",
+        color = greyIfDisabled
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_InWorld"), 0.8, {
         -- Read live rather than baked into the row: in multiplayer the counts
         -- arrive after the list has already been built.
         text = function(d)
@@ -154,7 +170,9 @@ function UI:getRowKey(itemData)
 end
 
 function UI:getFilterText(itemData)
-    return (itemData.label or "") .. " " .. (itemData.type or "")
+    -- Category included, so typing one narrows the list to the shops that are
+    -- spaced against each other. That is the question the column invites.
+    return (itemData.label or "") .. " " .. (itemData.type or "") .. " " .. (itemData.category or "")
 end
 
 function UI:prerender()

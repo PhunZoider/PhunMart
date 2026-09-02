@@ -684,4 +684,157 @@ function tools.confirm(text, onYes, owner)
     return modal
 end
 
+---------------------------------------------------------------------------
+-- Conditions
+--
+-- An authored `conditions` value is one of three shapes: a single key, an
+-- array of keys, or a table of `all` / `any` / `notAny` buckets. The array is
+-- the compiler's `all`, meaning every key must pass, and it is the shape every
+-- shipped definition uses. The editors model that one and carry the other
+-- buckets through untouched rather than flattening them into it.
+---------------------------------------------------------------------------
+
+--- A short description of what a condition tests, for a list that would
+--- otherwise show only a key somebody invented.
+--- Falls back to the key for a test this does not know, which includes anything
+--- another mod registers.
+function tools.conditionLabel(condKey, defs)
+    if type(condKey) ~= "string" then
+        return tostring(condKey)
+    end
+    defs = defs or (Core.defs and Core.defs.conditionsDefs)
+    local def = defs and defs[condKey]
+    if not def then
+        return condKey
+    end
+    local t = def.test
+    local a = def.args or {}
+    if t == "worldAgeHoursBetween" then
+        local min = a.min or 0
+        local max = a.max
+        return "Age:" .. min .. "h" .. (max and ("-" .. max .. "h") or "+")
+    elseif t == "perkLevelBetween" then
+        return (a.perk or "?") .. " lv" .. (a.min or 0) .. "+"
+    elseif t == "perkBoostBetween" then
+        return "Boost:" .. (a.perk or "?")
+    elseif t == "purchaseCountMax" then
+        return "Limit:" .. (a.max or "?")
+    elseif t == "professionIn" then
+        local profs = a.professions or {}
+        local s = type(profs) == "table" and table.concat(profs, "/") or tostring(profs)
+        return "Prof:" .. s
+    elseif t == "hasItems" then
+        return "Has items"
+    elseif t == "canGrantTrait" then
+        return "Trait avail"
+    elseif t == "canRemoveTrait" then
+        return "Has trait"
+    else
+        return condKey
+    end
+end
+
+--- Condition keys for a picker, each labelled with what it tests. Sorted, so
+--- the 75 generated perk gates sit together rather than wherever pairs() left
+--- them.
+function tools.conditionOptions()
+    local defs = Core.defs and Core.defs.conditionsDefs or {}
+    local options = {}
+    for k in pairs(defs) do
+        local label = tools.conditionLabel(k, defs)
+        table.insert(options, {
+            key = k,
+            display = (label ~= k) and (k .. "  (" .. label .. ")") or k
+        })
+    end
+    table.sort(options, function(a, b)
+        return a.key < b.key
+    end)
+    return options
+end
+
+--- Split an authored `conditions` value into the `all` list a form edits and
+--- whatever else it carried.
+--- @return table allKeys, table|nil extras
+function tools.splitConditions(cond)
+    if type(cond) == "string" then
+        return {cond}, nil
+    end
+    if type(cond) ~= "table" then
+        return {}, nil
+    end
+
+    local all = {}
+    local extras = nil
+
+    if cond.all == nil and cond.any == nil and cond.notAny == nil then
+        -- The array form. An empty table lands here too and yields nothing,
+        -- which is the right answer for both readings of it.
+        for _, k in ipairs(cond) do
+            table.insert(all, k)
+        end
+        return all, nil
+    end
+
+    for _, k in ipairs(cond.all or {}) do
+        table.insert(all, k)
+    end
+    if cond.any or cond.notAny then
+        extras = {}
+        if cond.any then
+            extras.any = Core.utils.deepCopy(cond.any)
+        end
+        if cond.notAny then
+            extras.notAny = Core.utils.deepCopy(cond.notAny)
+        end
+    end
+    return all, extras
+end
+
+--- Put the two halves back together, in the simplest shape that holds them.
+--- Returns nil when there is nothing to store, so clearing a picker tombstones
+--- the key rather than writing an empty table.
+function tools.joinConditions(allKeys, extras)
+    local hasAll = allKeys and #allKeys > 0
+    if not hasAll and not extras then
+        return nil
+    end
+
+    if not extras then
+        local out = {}
+        for _, k in ipairs(allKeys) do
+            table.insert(out, k)
+        end
+        return out
+    end
+
+    local out = {}
+    if hasAll then
+        out.all = {}
+        for _, k in ipairs(allKeys) do
+            table.insert(out.all, k)
+        end
+    end
+    out.any = extras.any
+    out.notAny = extras.notAny
+    return out
+end
+
+--- What the picker field shows when it is closed.
+function tools.formatConditionList(keys)
+    if not keys or #keys == 0 then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
+    local limit = math.min(#keys, 3)
+    local names = {}
+    for i = 1, limit do
+        names[i] = keys[i]
+    end
+    local text = table.concat(names, ", ")
+    if #keys > limit then
+        text = text .. " +" .. tostring(#keys - limit) .. " more"
+    end
+    return text
+end
+
 return tools

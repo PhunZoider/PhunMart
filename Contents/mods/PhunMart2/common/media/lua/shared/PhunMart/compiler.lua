@@ -1139,7 +1139,6 @@ function Compiler.compileAll(ctx)
             local poolRuntime = {
                 key = poolKey,
                 sticky = poolDef.sticky == true,
-                gate = poolDef.gate,
                 zones = poolDef.zones,
                 months = months,
                 offers = {}
@@ -1323,7 +1322,6 @@ function Compiler.compileAll(ctx)
                 powered = shopDef.powered,
                 roll = shopDef.roll,
                 poolSets = compiledPoolSets,
-                throttle = shopDef.throttle,
                 restockFrequency = shopDef.restockFrequency,
                 -- Explicit rather than absent when a shop opts out, because
                 -- nil here means "use the server default" and 0 means "never".

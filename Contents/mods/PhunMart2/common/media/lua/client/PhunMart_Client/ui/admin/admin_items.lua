@@ -6,6 +6,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
+local KeyPicker = require "PhunMart_Client/ui/base/key_picker"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
 local tools = require "PhunMart_Client/ui/ui_utils"
 
@@ -84,6 +85,10 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
         stockMaxDefault = tostring(def.offer.stock.max or "")
     end
 
+    -- The picker edits the `all` list, every key of which must pass. Any `any`
+    -- or `notAny` buckets a hand-written entry carries ride along untouched.
+    local selectedConditions, conditionExtras = tools.splitConditions(def.conditions)
+
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddItem") or getText("IGUI_PhunMart_Title_EditX", itemKey or "")
 
     local form = FormPanel:new({
@@ -110,6 +115,10 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
 
             local specialVal = f:getFieldValue("special")
             result.reward = (specialVal ~= "") and specialVal or nil
+
+            -- nil when the picker is emptied and nothing else was carried, so
+            -- clearing it tombstones the key rather than storing an empty array.
+            result.conditions = tools.joinConditions(selectedConditions, conditionExtras)
 
             -- 1.0 is what an absent weight already means, so writing it puts a
             -- key in the override that says nothing. The box opens on 1.0 when
@@ -224,6 +233,23 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
                 end
             end
         },
+    })
+    -- After price and grants, because the three together are the whole of what
+    -- an override says about one row: what it costs, what it hands over, and
+    -- who may buy it.
+    form:addPickerField("conditions", getText("IGUI_PhunMart_Lbl_Conditions"), {
+        value = selectedConditions,
+        display = tools.formatConditionList(selectedConditions),
+        hint = getText("IGUI_PhunMart_Hint_Conditions"),
+        section = "i_basics",
+        onPick = function(f, field)
+            KeyPicker.open(getSpecificPlayer(0), tools.conditionOptions(), selectedConditions, function(keys)
+                selectedConditions = keys or {}
+                f:setPickerValue("conditions", selectedConditions, tools.formatConditionList(selectedConditions))
+            end, {
+                title = getText("IGUI_PhunMart_Admin_PickConditions")
+            })
+        end,
     })
     form:addRangeField("stock", getText("IGUI_PhunMart_Lbl_Stock"), {
         minDefault = stockMinDefault, maxDefault = stockMaxDefault,

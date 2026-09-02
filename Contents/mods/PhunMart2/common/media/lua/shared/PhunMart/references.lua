@@ -32,7 +32,8 @@ local REFERENCEABLE = {
     groups = true,
     pools = true,
     specials = true,
-    items = true
+    items = true,
+    conditionsDefs = true
 }
 
 function refs.canBeReferenced(kind)
@@ -140,6 +141,42 @@ function refs.find(kind, key)
         for k, d in pairs(defs.pools or {}) do
             if listHas(d.blacklist, key) then
                 add("pools", k, "blacklist")
+            end
+        end
+
+    elseif kind == "conditionsDefs" then
+        -- A conditions value is a bare array on items and specials, and lives
+        -- under `defaults` on groups and pools. It can also be a single string
+        -- or a table of all/any/notAny buckets, so every bucket is searched
+        -- rather than only the common array.
+        local function namesCondition(cond)
+            if cond == key then
+                return true
+            end
+            if type(cond) ~= "table" then
+                return false
+            end
+            return listHas(cond, key) or listHas(cond.all, key) or listHas(cond.any, key) or
+                       listHas(cond.notAny, key)
+        end
+        for k, d in pairs(defs.items or {}) do
+            if namesCondition(d.conditions) then
+                add("items", k, "conditions")
+            end
+        end
+        for k, d in pairs(defs.specials or {}) do
+            if namesCondition(d.conditions) then
+                add("specials", k, "conditions")
+            end
+        end
+        for k, d in pairs(defs.groups or {}) do
+            if d.defaults and namesCondition(d.defaults.conditions) then
+                add("groups", k, "default conditions")
+            end
+        end
+        for k, d in pairs(defs.pools or {}) do
+            if d.defaults and namesCondition(d.defaults.conditions) then
+                add("pools", k, "default conditions")
             end
         end
     end
