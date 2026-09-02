@@ -343,15 +343,20 @@ local function createEditModal(poolKey, poolDef, isNew, cb)
             -- pools the one layer in the chain that could set a price but not
             -- an amount. Either bound alone is valid, same as the item and
             -- special editors.
+            --
+            -- The table is edited rather than rebuilt, because it can carry a
+            -- restockHours the form does not show: the per-offer refill timer
+            -- the runtime reads. Rebuilding it from the two boxes dropped it.
             local stockMin, stockMax = f:getFieldRange("defaultsStock")
             if stockMin or stockMax then
                 result.defaults = result.defaults or {}
                 result.defaults.offer = result.defaults.offer or {}
-                result.defaults.offer.stock = {
-                    min = stockMin and math.floor(stockMin) or nil,
-                    max = stockMax and math.floor(stockMax) or nil
-                }
+                local stock = result.defaults.offer.stock or {}
+                stock.min = stockMin and math.floor(stockMin) or nil
+                stock.max = stockMax and math.floor(stockMax) or nil
+                result.defaults.offer.stock = stock
             elseif result.defaults and result.defaults.offer then
+                -- Unlimited, so the timer goes with it.
                 result.defaults.offer.stock = nil
             end
 

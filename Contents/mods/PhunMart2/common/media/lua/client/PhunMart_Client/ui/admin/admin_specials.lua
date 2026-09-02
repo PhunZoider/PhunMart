@@ -665,25 +665,29 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                 local priceVal = f:getFieldValue("price")
                 result.price = (priceVal and priceVal ~= "") and priceVal or nil
 
-                -- Offer: weight and stock
+                -- Offer: weight and stock.
+                --
+                -- The existing tables are edited rather than replaced. `offer`
+                -- holds more than the two things on screen: `stock.restockHours`
+                -- is the per-offer refill timer the runtime reads, and three of
+                -- the shipped XP rewards set it to 48. Building a fresh table
+                -- from the boxes threw it away, so adjusting a reward's stock
+                -- silently stopped it refilling between shop restocks.
                 local weightVal = f:getFieldNumber("weight")
                 -- One range field now, so both bounds come back together.
                 local stockMin, stockMax = f:getFieldRange("stock")
-                if weightVal or stockMin or stockMax then
-                    result.offer = {}
-                    if weightVal then
-                        result.offer.weight = weightVal
-                    end
-                    if stockMin or stockMax then
-                        result.offer.stock = {}
-                        if stockMin then
-                            result.offer.stock.min = math.floor(stockMin)
-                        end
-                        if stockMax then
-                            result.offer.stock.max = math.floor(stockMax)
-                        end
-                    end
+                result.offer = result.offer or {}
+                result.offer.weight = weightVal
+                if stockMin or stockMax then
+                    local stock = result.offer.stock or {}
+                    stock.min = stockMin and math.floor(stockMin) or nil
+                    stock.max = stockMax and math.floor(stockMax) or nil
+                    result.offer.stock = stock
                 else
+                    -- Unlimited, so the timer goes too: nothing to refill.
+                    result.offer.stock = nil
+                end
+                if next(result.offer) == nil then
                     result.offer = nil
                 end
 

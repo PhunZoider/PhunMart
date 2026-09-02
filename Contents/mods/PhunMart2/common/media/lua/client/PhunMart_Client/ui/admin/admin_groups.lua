@@ -196,6 +196,34 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
     local defaults = def.defaults or {}
     local offer = defaults.offer or {}
 
+    -- What a vehicle is like when it arrives, as opposed to `offer`, which is
+    -- how it sits on the shelf. Both bounds are filled from a plain number,
+    -- because a range whose ends agree rolls back to exactly that number and a
+    -- half-filled range does not: the redeem code reads a missing max as 99.
+    local spawn = defaults.spawn or {}
+    local function spawnRangeDefaults(range, scale)
+        local function fmt(v)
+            if type(v) ~= "number" then
+                return ""
+            end
+            return tostring(math.floor(v * scale + 0.5))
+        end
+        if type(range) == "number" then
+            local one = fmt(range)
+            return one, one
+        end
+        if type(range) ~= "table" then
+            return "", ""
+        end
+        return fmt(range.min), fmt(range.max)
+    end
+    local condMinDefault, condMaxDefault = spawnRangeDefaults(spawn.condition, 1)
+    -- Fuel is stored as a 0-to-1 fraction and asked for as a percentage, the
+    -- same trade the price editor makes between cents and dollars. A tenth of a
+    -- tank reads as 10, which is how the docs describe it in prose anyway, and
+    -- rollFraction discards anything finer than a percentage point regardless.
+    local fuelMinDefault, fuelMaxDefault = spawnRangeDefaults(spawn.fuel, 100)
+
     local groups = Core.defs and Core.defs.groups or require "PhunMart/defaults/groups"
     local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
     local priceOpts = {""}
@@ -284,7 +312,51 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
             result.defaults.reward = (selectedSpecial and selectedSpecial ~= "") and selectedSpecial or nil
 
-            result.defaults.offer.weight = f:getFieldNumber("weight") or 1.0
+            -- 1.0 is what an absent weight already means, so writing it puts a
+            -- key in the override that says nothing. The box opens on 1.0 when
+            -- the group has no weight of its own, which meant saving a group
+            -- you had opened for some other reason stamped one in.
+            local weightVal = f:getFieldNumber("weight")
+            if weightVal and weightVal ~= 1.0 then
+                result.defaults.offer.weight = weightVal
+            else
+                result.defaults.offer.weight = nil
+            end
+
+            -- Edited in place rather than rebuilt, like the stock tables in the
+            -- other editors, so a key under `spawn` this form does not model
+            -- survives. Not cleared when the group stops listing vehicles
+            -- either: the fields only hide, and dropping what they hold would
+            -- make unticking one car destroy the whole tier's setup.
+            local spawnOut = (type(result.defaults.spawn) == "table") and result.defaults.spawn or nil
+
+            local condMin, condMax = f:getFieldRange("spawnCondition")
+            if condMin or condMax then
+                spawnOut = spawnOut or {}
+                spawnOut.condition = {
+                    min = condMin and math.floor(condMin) or nil,
+                    max = condMax and math.floor(condMax) or nil
+                }
+            elseif spawnOut then
+                spawnOut.condition = nil
+            end
+
+            -- Back to the 0-to-1 fraction the roller wants.
+            local fuelMin, fuelMax = f:getFieldRange("spawnFuel")
+            if fuelMin or fuelMax then
+                spawnOut = spawnOut or {}
+                spawnOut.fuel = {
+                    min = fuelMin and (math.floor(fuelMin) / 100) or nil,
+                    max = fuelMax and (math.floor(fuelMax) / 100) or nil
+                }
+            elseif spawnOut then
+                spawnOut.fuel = nil
+            end
+
+            if spawnOut and next(spawnOut) == nil then
+                spawnOut = nil
+            end
+            result.defaults.spawn = spawnOut
 
             local labelText = f:getFieldValue("label")
             result.label = (labelText ~= "") and labelText or nil
@@ -322,6 +394,19 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
+
+            -- `defaults` and `defaults.offer` are created unconditionally above
+            -- so the fields this form models have somewhere to land. Dropped
+            -- again when nothing landed in them, so a group that sets no
+            -- defaults does not carry a pair of empty tables. Anything the form
+            -- does not model -- stock, spawn, conditions -- is still in there
+            -- and keeps them.
+            if next(result.defaults.offer) == nil then
+                result.defaults.offer = nil
+            end
+            if next(result.defaults) == nil then
+                result.defaults = nil
+            end
 
             if cb then cb(key, result) end
             f:close()
@@ -365,6 +450,15 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             priceWarningFor(f:getFieldValue("price"), selectedItems, selectedCats, selectedVehicles))
     end
 
+    -- The spawn ranges answer a question only a vehicle group is asked, so they
+    -- follow the vehicle picker rather than standing on every group's Advanced
+    -- tab describing nothing.
+    local function refreshSpawnFields(f)
+        local show = #selectedVehicles > 0
+        f:setFieldVisible("spawnCondition", show)
+        f:setFieldVisible("spawnFuel", show)
+    end
+
     -- Seven pickers in a column, alternating between the two ways of naming
     -- things: pick this exact item, or pick everything in a category. Ordered
     -- and divided so the two are read as two, because which one you are looking
@@ -401,6 +495,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 selectedVehicles = keys or {}
                 f:setPickerValue("vehicles", selectedVehicles, formatVehicleList(selectedVehicles))
                 refreshPriceWarning(f)
+                refreshSpawnFields(f)
             end)
         end,
     })
@@ -517,6 +612,22 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
         hint = getText("IGUI_PhunMart_Hint_DefaultCategory"),
         section = "g_more",
     })
+    -- Only a vehicle group has any use for these, so they appear only when the
+    -- group lists vehicles, and appear as soon as it does: the picker that adds
+    -- them is on the other tab and calls back here.
+    form:addRangeField("spawnCondition", getText("IGUI_PhunMart_Lbl_SpawnCondition"), {
+        minDefault = condMinDefault, maxDefault = condMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_SpawnCondition"),
+        integer = true, min = 0, max = 100,
+        section = "g_more",
+    })
+    form:addRangeField("spawnFuel", getText("IGUI_PhunMart_Lbl_SpawnFuel"), {
+        minDefault = fuelMinDefault, maxDefault = fuelMaxDefault,
+        hint = getText("IGUI_PhunMart_Hint_SpawnFuel"),
+        integer = true, min = 0, max = 100,
+        section = "g_more",
+    })
+    refreshSpawnFields(form)
 
     form:setSections({{
         section = "g_basics",

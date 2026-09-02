@@ -49,6 +49,36 @@ local function getPriceKeys()
     return keys
 end
 
+-- The last entry on the category combo, so a name the mod has never seen is
+-- still reachable. Same string and same behaviour as the wizard's dropdowns.
+local OTHER = "IGUI_PhunMart_Wiz_Other"
+
+local function isOther(value)
+    return value == getText(OTHER)
+end
+
+-- Categories already in use. Blank leads, because a shop is allowed to have
+-- none, and Other trails, so bringing your own reads as the deliberate choice.
+-- `current` is folded in for a shop read from the runtime fallback, which may
+-- name a category no definition still declares.
+local function getCategoryKeys(current)
+    local seen = {}
+    local keys = {}
+    for _, def in pairs(Core.defs and Core.defs.shops or {}) do
+        if type(def.category) == "string" and def.category ~= "" and not seen[def.category] then
+            seen[def.category] = true
+            table.insert(keys, def.category)
+        end
+    end
+    if type(current) == "string" and current ~= "" and not seen[current] then
+        table.insert(keys, current)
+    end
+    table.sort(keys)
+    table.insert(keys, 1, "")
+    table.insert(keys, getText(OTHER))
+    return keys
+end
+
 -- Deep-copy a pool set so edits don't mutate the original.
 local function copySet(set)
     if not set then
@@ -148,53 +178,58 @@ local function createSetEditForm(setData, isNew, cb)
 
     local currentPrice = type(set.price) == "string" and set.price or ""
 
-    -- Collect selected pool keys
-    local selectedPools = {}
-    for _, entry in ipairs(set.keys or {}) do
-        table.insert(selectedPools, entry.key)
-    end
-
-    -- Build weight lookup from existing data
-    local weightByKey = {}
-    for _, entry in ipairs(set.keys or {}) do
-        weightByKey[entry.key] = entry.weight or 1.0
-    end
-
-    -- What the Weight field opens on, and what "unchanged" means for it.
+    -- One row per pool, each carrying its own weight.
     --
-    -- The field used to default to 1.0 whatever the pools actually held, and on
-    -- save it was applied only to pools that had no weight yet. So it misreported
-    -- the current state, and editing it did nothing to any pool already in the
-    -- set: a control that looked live and was not.
-    --
-    -- Now it shows the weight when they all agree, and blank when they do not.
-    -- Blank means leave each pool as it is. Anything else is applied to every
-    -- pool in the set, which is what a single field labelled Weight should do.
-    local commonWeight, mixedWeights = nil, false
+    -- This was a picker for membership with a single Weight box beside it, and
+    -- that box could only say one thing about every pool in the set. It could
+    -- report a mixture, by going blank, but it could not create one: there was
+    -- no way to put a pool at 0.5 next to one at 1.0. Blended sets are exactly
+    -- where the weights matter -- BudgetXPerience ships with its boost pools at
+    -- half the weight of the XP pools beside them -- so the shape the defaults
+    -- lean on was the one shape this form could not produce. A list of rows can.
+    local keyRows = {}
     for _, entry in ipairs(set.keys or {}) do
-        local w = entry.weight or 1.0
-        if commonWeight == nil then
-            commonWeight = w
-        elseif commonWeight ~= w then
-            mixedWeights = true
-        end
+        table.insert(keyRows, {
+            key = entry.key,
+            weight = entry.weight or 1.0
+        })
     end
-    local weightDefault = mixedWeights and "" or tostring(commonWeight or 1.0)
 
-    local function formatPoolDisplay(keys)
-        if not keys or #keys == 0 then
-            return getText("IGUI_PhunMart_Lbl_None")
-        end
-        local limit = math.min(#keys, 3)
-        local names = {}
-        for i = 1, limit do
-            names[i] = keys[i]
-        end
-        local text = table.concat(names, ", ")
-        if #keys > limit then
-            text = text .. " +" .. tostring(#keys - limit) .. " more"
-        end
-        return text
+    local function formatKeyColumns(row)
+        return {row.key, tostring(row.weight or 1.0)}
+    end
+
+    local function formatKeyRow(row)
+        return row.key
+    end
+
+    -- One number, for the row already chosen. The pool itself is not editable
+    -- here: swapping a row's pool is deleting it and adding the other, and a
+    -- combo of every pool sitting beside the weight would make the small edit
+    -- look like the large one.
+    local function editRowWeight(form, field, index, data)
+        local wf = FormPanel:new({
+            width = math.floor(300 * FONT_SCALE),
+            title = data.key,
+            onApply = function(w)
+                form:updateListItem("keys", index, {
+                    key = data.key,
+                    weight = w:getFieldNumber("weight") or 1.0
+                })
+                w:close()
+            end
+        })
+        wf:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
+            default = tostring(data.weight or 1.0),
+            hint = getText("IGUI_PhunMart_Hint_PoolWeightRow"),
+            numeric = true,
+            min = 0,
+            required = true
+        })
+        wf:initialise()
+        wf:addToUIManager()
+        wf:bringToTop()
+        return wf
     end
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPoolSet") or getText("IGUI_PhunMart_Title_EditPoolSet")
@@ -204,9 +239,16 @@ local function createSetEditForm(setData, isNew, cb)
     local form = FormPanel:new({
         width = math.floor(420 * FONT_SCALE),
         title = titleText,
+        -- A set with no pools sells nothing. The picker this replaced was marked
+        -- required for the same reason; a list field has no such flag, so the
+        -- rule moves to the form.
+        validate = function(f)
+            local rows = f:getFieldValue("keys")
+            if not rows or #rows == 0 then
+                return getText("IGUI_PhunMart_Err_NeedPool")
+            end
+        end,
         onApply = function(f)
-            local pools = f:getFieldValue("pools")
-
             local result = {
                 keys = {}
             }
@@ -227,13 +269,10 @@ local function createSetEditForm(setData, isNew, cb)
                 result.price = price
             end
 
-            -- A number applies to every pool here; blank keeps what each one
-            -- already had, and gives a pool just added the usual 1.0.
-            local weight = f:getFieldNumber("weight")
-            for _, poolKey in ipairs(pools) do
+            for _, row in ipairs(f:getFieldValue("keys") or {}) do
                 table.insert(result.keys, {
-                    key = poolKey,
-                    weight = weight or weightByKey[poolKey] or 1.0
+                    key = row.key,
+                    weight = row.weight or 1.0
                 })
             end
 
@@ -244,26 +283,44 @@ local function createSetEditForm(setData, isNew, cb)
         end
     })
 
-    form:addPickerField("pools", getText("IGUI_PhunMart_Lbl_Pools"), {
-        value = selectedPools,
-        display = formatPoolDisplay(selectedPools),
-        required = true,
-        onPick = function(f, field)
-            local poolKeys = getPoolKeys()
-            KeyPicker.open(getSpecificPlayer(0), poolKeys, selectedPools, function(keys)
-                selectedPools = keys or {}
-                f:setPickerValue("pools", selectedPools, formatPoolDisplay(selectedPools))
+    form:addListField("keys", getText("IGUI_PhunMart_Lbl_Pools"), {
+        items = keyRows,
+        rows = 4,
+        hint = getText("IGUI_PhunMart_Hint_PoolList"),
+        columns = {{
+            name = getText("IGUI_PhunMart_Col_Pool"),
+            size = 0
+        }, {
+            name = getText("IGUI_PhunMart_Col_Weight"),
+            size = 0.70
+        }},
+        formatColumns = formatKeyColumns,
+        formatItem = formatKeyRow,
+        -- Offers only the pools not already here, so the same pool cannot land
+        -- in one set twice carrying two different weights.
+        onAdd = function(f, field)
+            local inSet = {}
+            for _, row in ipairs(f:getFieldValue("keys") or {}) do
+                inSet[row.key] = true
+            end
+            local available = {}
+            for _, k in ipairs(getPoolKeys()) do
+                if not inSet[k] then
+                    table.insert(available, k)
+                end
+            end
+            KeyPicker.open(getSpecificPlayer(0), available, {}, function(keys)
+                for _, k in ipairs(keys or {}) do
+                    f:addListItem("keys", {
+                        key = k,
+                        weight = 1.0
+                    })
+                end
             end, {
                 title = getText("IGUI_PhunMart_Admin_PickPools")
             })
-        end
-    })
-    form:addTextField("weight", getText("IGUI_PhunMart_Lbl_Weight"), {
-        default = weightDefault,
-        hint = mixedWeights and getText("IGUI_PhunMart_Hint_PoolWeightMixed") or
-            getText("IGUI_PhunMart_Hint_PoolWeight"),
-        numeric = true,
-        min = 0
+        end,
+        onEdit = editRowWeight
     })
     form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
         options = priceKeys,
@@ -346,6 +403,15 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
                 result.enabled = false
             end
             result.probability = f:getFieldNumber("probability")
+
+            -- Blank clears it, which tombstones the key and puts the shop back
+            -- to being spaced against its own type alone.
+            local category = f:getFieldValue("category")
+            if isOther(category) then
+                category = f:getFieldValue("categoryOther")
+            end
+            result.category = (category and category ~= "") and category or nil
+
             result.minDistance = f:getFieldNumber("minDistance")
             result.restockFrequency = f:getFieldNumber("restockFrequency")
             -- getFieldNumber returns nil for an empty box, which is the third
@@ -417,6 +483,31 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         min = 0,
         section = "s_basics"
     })
+    -- Not a label. Placement keeps a machine away from the nearest of its own
+    -- type and from the nearest of anything sharing its category, whichever is
+    -- closer, which is what stops two food machines landing on one street. The
+    -- wizard has always asked for it and the edit form never did, so a category
+    -- could be chosen once when the shop was created and never changed again.
+    -- It sits directly above minDistance because that is the number it changes
+    -- the meaning of.
+    form:addComboField("category", getText("IGUI_PhunMart_Lbl_Category"), {
+        options = getCategoryKeys(def.category),
+        selected = def.category or "",
+        hint = getText("IGUI_PhunMart_Hint_ShopCategory"),
+        section = "s_basics",
+        onChange = function(f)
+            f:setFieldVisible("categoryOther", isOther(f:getFieldValue("category")))
+        end
+    })
+    form:addTextField("categoryOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Wiz_Hint_CategoryOther"),
+        section = "s_basics",
+        conditional = true
+    })
+    -- Hidden until Other is chosen. A form opens on a real category or on none,
+    -- never on Other, so this always starts closed.
+    form:setFieldVisible("categoryOther", false)
     form:addTextField("minDistance", getText("IGUI_PhunMart_Lbl_MinDistance"), {
         default = def.minDistance and tostring(def.minDistance) or "",
         hint = getText("IGUI_PhunMart_Hint_MinDistance"),

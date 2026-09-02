@@ -1837,6 +1837,16 @@ function FormPanel._builtinChecks(form, f, value)
         if f.min and ((mn and mn < f.min) or (mx and mx < f.min)) then
             return getText("IGUI_PhunMart_Err_Min", tostring(f.min))
         end
+        -- `max` and `integer` were declared by range call sites and enforced by
+        -- none of them: only `min` was ever read here. So a stock or roll field
+        -- saying integer accepted 2.5 and the editor floored it without saying
+        -- so, and an upper bound meant nothing at all.
+        if f.max and ((mn and mn > f.max) or (mx and mx > f.max)) then
+            return getText("IGUI_PhunMart_Err_Max", tostring(f.max))
+        end
+        if f.integer and ((mn and mn % 1 ~= 0) or (mx and mx % 1 ~= 0)) then
+            return getText("IGUI_PhunMart_Err_Integer")
+        end
     elseif f.numeric or f.integer or f.min ~= nil or f.max ~= nil then
         local n = tonumber(value)
         if not n then

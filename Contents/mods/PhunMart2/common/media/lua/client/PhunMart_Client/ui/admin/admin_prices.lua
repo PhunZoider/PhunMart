@@ -197,14 +197,54 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         factorDefault = tostring(def.factor)
     end
 
-    -- Resolve initial items for picker (from legacy .item or .items array)
+    -- Resolve initial items for picker (from legacy .item or .items array).
+    --
+    -- `lineByItem` keeps what each line said alongside the flat list the picker
+    -- wants, because a line is more than an item name. `substitutes` is the part
+    -- that matters: the colour and style variants that count as equivalent
+    -- payment, a fully implemented feature with no field on this form. Rebuilding
+    -- every line from the picker alone silently dropped them.
     local selectedItems = {}
+    local lineByItem = {}
     if def.item then
         table.insert(selectedItems, def.item)
+        -- The shorthand carries no substitutes: the compiler expands
+        -- `item = "X"` into a line without them, so there are none to keep.
+        lineByItem[def.item] = {
+            amount = def.amount
+        }
     elseif def.items then
         for _, entry in ipairs(def.items) do
-            if entry.item then table.insert(selectedItems, entry.item) end
+            if entry.item then
+                table.insert(selectedItems, entry.item)
+                lineByItem[entry.item] = {
+                    amount = entry.amount,
+                    substitutes = entry.substitutes
+                }
+            end
         end
+    end
+
+    -- An items price carries its amount per line rather than at the top level,
+    -- so read the lines: one figure when they all agree, blank when they do not.
+    -- Blank then means "leave each line as it is" on save, the same bargain the
+    -- pool set weight field makes.
+    --
+    -- This used to read def.amount, which a multi-line barter price does not
+    -- have. So a two-line price opened showing an empty box and saved both lines
+    -- at 1, turning five nails and three planks into one of each.
+    local mixedAmounts = false
+    if def.kind == "items" and next(lineByItem) ~= nil then
+        local common
+        for _, line in pairs(lineByItem) do
+            local a = (type(line.amount) == "number") and line.amount or 1
+            if common == nil then
+                common = a
+            elseif common ~= a then
+                mixedAmounts = true
+            end
+        end
+        amountDefault = mixedAmounts and "" or tostring(common or 1)
     end
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPrice") or getText("IGUI_PhunMart_Title_EditX", priceKey or "")
@@ -260,15 +300,40 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 result.amount = math.floor(amtLo + 0.5)
             elseif kind == "items" then
                 local items = f:getFieldValue("items")
-                local amt = amtLo and math.floor(amtLo + 0.5) or 1
-                if #items == 1 then
-                    result.item = items[1]
-                    result.amount = amt
-                else
-                    result.items = {}
-                    for _, itemKey in ipairs(items) do
-                        table.insert(result.items, { item = itemKey, amount = amt })
+                -- Blank keeps the amount each line already had, which is what
+                -- lets a barter price with different amounts per line survive
+                -- being opened. A number is applied to every line. An item just
+                -- added to the picker has no previous amount and gets one.
+                local amt = amtLo and math.floor(amtLo + 0.5) or nil
+                local lines = {}
+                local anySubs = false
+                for _, itemKey in ipairs(items) do
+                    local prev = lineByItem[itemKey]
+                    local subs = prev and prev.substitutes or nil
+                    if subs then
+                        subs = Core.utils.deepCopy(subs)
+                        anySubs = true
                     end
+                    local lineAmt = amt
+                    if lineAmt == nil then
+                        -- Verbatim, so a {min,max} line amount is kept as one
+                        -- rather than flattened to a number.
+                        lineAmt = (prev and prev.amount ~= nil) and Core.utils.deepCopy(prev.amount) or 1
+                    end
+                    table.insert(lines, {
+                        item = itemKey,
+                        amount = lineAmt,
+                        substitutes = subs
+                    })
+                end
+                -- The single-item shorthand cannot carry substitutes, so a lone
+                -- item that has them stays in the array form. Everything else
+                -- still collapses, which is the shape the shipped prices use.
+                if #lines == 1 and not anySubs then
+                    result.item = lines[1].item
+                    result.amount = lines[1].amount
+                else
+                    result.items = lines
                 end
             end
 
@@ -378,7 +443,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     form:addRangeField("amount", getText("IGUI_PhunMart_Lbl_Amount"), {
         minDefault = amountDefault,
         maxDefault = maxDefault,
-        hint = getText("IGUI_PhunMart_Hint_AmountRange"),
+        hint = mixedAmounts and getText("IGUI_PhunMart_Hint_AmountMixed") or getText("IGUI_PhunMart_Hint_AmountRange"),
         group = "amount",
         numeric = true, min = 0,
         validate = function(value, f)

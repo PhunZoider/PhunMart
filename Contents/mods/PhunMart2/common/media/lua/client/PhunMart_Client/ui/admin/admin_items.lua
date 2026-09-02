@@ -111,7 +111,16 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
             local specialVal = f:getFieldValue("special")
             result.reward = (specialVal ~= "") and specialVal or nil
 
-            result.offer.weight = f:getFieldNumber("weight") or 1.0
+            -- 1.0 is what an absent weight already means, so writing it puts a
+            -- key in the override that says nothing. The box opens on 1.0 when
+            -- the entry has no weight, which meant every save of an untouched
+            -- entry stamped one in.
+            local weightVal = f:getFieldNumber("weight")
+            if weightVal and weightVal ~= 1.0 then
+                result.offer.weight = weightVal
+            else
+                result.offer.weight = nil
+            end
 
             -- Either bound alone is a valid shape, so this takes what it is
             -- given rather than demanding the pair. The compiler reads a
@@ -119,15 +128,30 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
             -- stock of three; requiring both discarded that entry silently and
             -- turned it back into unlimited. The specials editor has always
             -- accepted it this way.
+            --
+            -- The table is edited rather than rebuilt from the two boxes,
+            -- because it carries a third field this form does not show:
+            -- restockHours, the per-offer refill timer the runtime reads and
+            -- the shipped XP entries set to 48. Rebuilding dropped it, so
+            -- nudging an entry's stock quietly turned a two-day refill into
+            -- one that never came back until the whole shop restocked.
             local stockMin, stockMax = f:getFieldRange("stock")
             if stockMin or stockMax then
-                result.offer.stock = {
-                    min = stockMin and math.floor(stockMin) or nil,
-                    max = stockMax and math.floor(stockMax) or nil
-                }
+                local stock = result.offer.stock or {}
+                stock.min = stockMin and math.floor(stockMin) or nil
+                stock.max = stockMax and math.floor(stockMax) or nil
+                result.offer.stock = stock
             else
-                -- Both blank means unlimited; clear any previous limit.
+                -- Both blank means unlimited; clear any previous limit. The
+                -- timer goes with it, which is right: unlimited stock never
+                -- restocks, so an hours figure beside it would mean nothing.
                 result.offer.stock = nil
+            end
+
+            -- Nothing left worth storing. Without this an entry that models
+            -- neither weight nor stock still carried an empty `offer`.
+            if next(result.offer) == nil then
+                result.offer = nil
             end
 
             -- Only written when disabled; absent already means enabled.
