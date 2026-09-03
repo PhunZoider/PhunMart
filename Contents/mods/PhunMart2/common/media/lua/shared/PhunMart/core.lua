@@ -942,6 +942,58 @@ function Core.primaryOverride(kind)
     return names and names[1] or nil
 end
 
+--- What the server currently calls money.
+---
+--- `currency_base` is the entry every currency price inherits from, so whatever
+--- it says the kind is, is what money is. Reading it is the whole answer: there
+--- is no second place a currency is configured, and a caller that keeps its own
+--- copy of the question drifts the moment an admin opens the Currency tool.
+---
+--- Returns one of:
+---   { kind = "currency", pool = "change" }
+---   { kind = "items",    item = "Base.Money" }
+---
+--- Shipped as the first. The second is the item currency described in
+--- Docs/GUIDE_ITEM_CURRENCY.md. `factor` is deliberately not reported: it
+--- scales the shipped price ladder, and a caller pricing something of its own
+--- has no ladder to scale.
+---
+--- Shared rather than client-side because a mod extending PhunMart has to ask
+--- this on the server too, where it decides what to take out of a bag.
+function Core.currencyDef()
+    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
+    local base = prices and prices.currency_base
+
+    -- Shipped currency_base names its own kind, so this normally does not walk
+    -- at all. It is here because an override file can say anything, and a base
+    -- that inherited its kind would otherwise read as change and quietly price
+    -- an item-currency server in a wallet nobody is filling.
+    local depth = 0
+    while base and base.kind == nil and base.inherit and depth < 10 do
+        base = prices[base.inherit]
+        depth = depth + 1
+    end
+
+    if base and base.kind == "items" then
+        local item = base.item or (base.items and base.items[1] and base.items[1].item)
+        if item then
+            return {
+                kind = "items",
+                item = item
+            }
+        end
+        -- Says items and names none. Falling back is the safe direction: the
+        -- alternative is handing callers a currency with no item in it, which
+        -- prices everything in nil.
+        Core.debugLn("currencyDef: currency_base is kind=items but names no item; using change")
+    end
+
+    return {
+        kind = "currency",
+        pool = (base and base.pool) or "change"
+    }
+end
+
 --- The mutable files that are not per-kind overrides. Here rather than beside
 --- their readers so that every filename the mod writes is in one place, which
 --- is what makes a format change like the move to JSON checkable.

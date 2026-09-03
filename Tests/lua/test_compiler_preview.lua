@@ -242,6 +242,95 @@ end
 
 ---------------------------------------------------------------------------
 
+
+print("-- an item currency reaches the whole price ladder --")
+do
+    -- currency_base exactly as the Currency tool and GUIDE_ITEM_CURRENCY write
+    -- it: kind items, one line naming the item, and a factor to bring a ladder
+    -- written in cents down to a count of things.
+    --
+    -- The line carries an amount of its own, so every child inherits that 1. If
+    -- the line is allowed to win, the entire ladder compiles to one item and a
+    -- nickel costs the same as fifty dollars. That is what this pins.
+    local function itemPriceOf(priceKey, amount)
+        local defs = {
+            prices = {
+                currency_base = {
+                    kind = "items",
+                    items = {{
+                        item = "Base.Money",
+                        amount = 1
+                    }},
+                    factor = 0.04
+                },
+                [priceKey] = {
+                    inherit = "currency_base",
+                    amount = amount
+                }
+            },
+            specials = {},
+            conditionsDefs = {},
+            items = {},
+            pools = {},
+            shops = {},
+            groups = {
+                g = {
+                    defaults = {price = priceKey},
+                    items = {"Base.Axe"}
+                }
+            }
+        }
+        local pool = Compiler.previewGroup(defs, "g")
+        for _, offer in pairs(pool and pool.offers or {}) do
+            local line = offer.price and offer.price.items and offer.price.items[1]
+            return line and line.amount, line and line.item
+        end
+    end
+
+    local cheap, item = itemPriceOf("currency_25", 25)
+    ok("the cheap end scales to one", cheap == 1, tostring(cheap))
+    ok("and names the currency item", item == "Base.Money", tostring(item))
+
+    local dear = itemPriceOf("currency_500", 500)
+    -- ceil(500 * 0.04). The table in GUIDE_ITEM_CURRENCY says 20, and the shop
+    -- window has always drawn 20; only the compiler disagreed.
+    ok("the dear end is twenty, not one", dear == 20, tostring(dear))
+
+    -- A barter basket has no top-level amount to bridge and every line means
+    -- its own count, so nothing here may touch it.
+    local defs = {
+        prices = {
+            basket = {
+                kind = "items",
+                items = {{
+                    item = "Base.Money",
+                    amount = 2
+                }, {
+                    item = "Base.Saw",
+                    amount = 3
+                }}
+            }
+        },
+        specials = {},
+        conditionsDefs = {},
+        items = {},
+        pools = {},
+        shops = {},
+        groups = {
+            g = {
+                defaults = {price = "basket"},
+                items = {"Base.Axe"}
+            }
+        }
+    }
+    local pool = Compiler.previewGroup(defs, "g")
+    local lines
+    for _, offer in pairs(pool and pool.offers or {}) do
+        lines = offer.price and offer.price.items
+    end
+    ok("a basket keeps both of its lines", lines and #lines == 2, lines and tostring(#lines))
+    ok("each at its own count", lines and lines[1].amount == 2 and lines[2].amount == 3)
+end
 print("")
 print("passed: " .. passed .. "  failed: " .. failed)
 if failed > 0 then

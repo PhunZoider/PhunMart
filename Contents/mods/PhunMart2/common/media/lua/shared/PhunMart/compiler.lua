@@ -516,14 +516,32 @@ local function resolvePrice(pricesTable, priceRefOrInline, logger)
         return nil
     end
 
-    -- Bridge top-level amount into item lines that have no explicit amount.
-    -- This allows inherited prices like { inherit="currency_base", amount=25 }
-    -- to work when the base switches to kind="items".
+    -- Bridge the top-level amount onto the item lines.
+    --
+    -- This is what lets an inherited price work once currency_base switches to
+    -- kind="items": every child in the shipped ladder carries only its own
+    -- amount, and the items list it has is the base's.
+    --
+    -- On a single line the top-level amount WINS over an amount already there,
+    -- which is the part that was wrong. currency_base is written with a line of
+    -- its own -- {item="Base.Money", amount=1} is what the Currency tool and
+    -- the guide both produce -- so every child inherited that 1, the line kept
+    -- it, and the whole ladder compiled to one item: a nickel tool and a fifty
+    -- dollar rifle both cost a single note. ui_utils.formatPriceAmount has
+    -- always read it the other way and shown the child's figure, so the shop
+    -- window quoted a price the compiler had already discarded.
+    --
+    -- Several lines is the barter basket -- {items={{A,2},{B,3}}} -- where each
+    -- line means its own count and a top-level amount can only fill a gap.
     local topAmount = p.amount
     if topAmount ~= nil then
-        for _, line in ipairs(items) do
-            if line.amount == nil then
-                line.amount = topAmount
+        if #items == 1 then
+            items[1].amount = topAmount
+        else
+            for _, line in ipairs(items) do
+                if line.amount == nil then
+                    line.amount = topAmount
+                end
             end
         end
         p.amount = nil
