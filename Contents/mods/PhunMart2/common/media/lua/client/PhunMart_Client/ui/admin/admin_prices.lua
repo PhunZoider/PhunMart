@@ -98,7 +98,9 @@ end
 ---------------------------------------------------------------------------
 
 local function resolveItemDisplay(itemKey)
-    if not itemKey then return getText("IGUI_PhunMart_Lbl_None") end
+    if not itemKey then
+        return getText("IGUI_PhunMart_Lbl_None")
+    end
     local si = getScriptManager():getItem(itemKey)
     return si and si:getDisplayName() or itemKey
 end
@@ -234,7 +236,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     -- have. So a two-line price opened showing an empty box and saved both lines
     -- at 1, turning five nails and three planks into one of each.
     local mixedAmounts = false
-    if def.kind == "items" and next(lineByItem) ~= nil then
+    if def.kind == "items" and not tools.isEmptyTable(lineByItem) then
         local common
         for _, line in pairs(lineByItem) do
             local a = (type(line.amount) == "number") and line.amount or 1
@@ -247,7 +249,8 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         amountDefault = mixedAmounts and "" or tostring(common or 1)
     end
 
-    local titleText = isNew and getText("IGUI_PhunMart_Title_AddPrice") or getText("IGUI_PhunMart_Title_EditX", priceKey or "")
+    local titleText = isNew and getText("IGUI_PhunMart_Title_AddPrice") or
+                          getText("IGUI_PhunMart_Title_EditX", priceKey or "")
 
     local form = FormPanel:new({
         width = math.floor(360 * FONT_SCALE),
@@ -286,13 +289,20 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 local maxAmt = amtHi
                 if result.pool == "change" then
                     amt = math.floor(amt * 100 + 0.5)
-                    if maxAmt then maxAmt = math.floor(maxAmt * 100 + 0.5) end
+                    if maxAmt then
+                        maxAmt = math.floor(maxAmt * 100 + 0.5)
+                    end
                 else
                     amt = math.floor(amt + 0.5)
-                    if maxAmt then maxAmt = math.floor(maxAmt + 0.5) end
+                    if maxAmt then
+                        maxAmt = math.floor(maxAmt + 0.5)
+                    end
                 end
                 if maxAmt and maxAmt > amt then
-                    result.amount = { min = amt, max = maxAmt }
+                    result.amount = {
+                        min = amt,
+                        max = maxAmt
+                    }
                 else
                     result.amount = amt
                 end
@@ -353,29 +363,32 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 tools.pruneInherited(result, parentDef)
             end
 
-            if cb then cb(key, result) end
+            if cb then
+                cb(key, result)
+            end
             f:close()
-        end,
+        end
     })
 
     -- Key first, then name, the same two rows in the same order as every other
     -- editor: the required field before the optional one that overrides how it
     -- is shown.
     form:addTextField("key", getText("IGUI_PhunMart_Lbl_Key"), {
-        default = priceKey or "", editable = isNew,
+        default = priceKey or "",
+        editable = isNew,
         required = true,
         hint = getText(isNew and "IGUI_PhunMart_Hint_Key" or "IGUI_PhunMart_Hint_KeyFixed"),
         validate = isNew and function(value)
             if prices[value] then
                 return getText("IGUI_PhunMart_Err_KeyInUse")
             end
-        end or nil,
+        end or nil
     })
     form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
         -- Raw, not resolved: a name is this entry's own or it has none, and
         -- showing the parent's would suggest it had been given one.
         default = raw.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
+        hint = getText("IGUI_PhunMart_Hint_Title")
     })
 
     -- Directly under the key, above everything it supplies a default for.
@@ -426,12 +439,14 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     form:addComboField("kind", getText("IGUI_PhunMart_Lbl_PriceKind"), {
         options = {"free", "currency", "self", "items"},
         selected = def.kind or "free",
-        onChange = function(f) onKindChanged(f) end,
+        onChange = function(f)
+            onKindChanged(f)
+        end
     })
     form:addComboField("pool", getText("IGUI_PhunMart_Lbl_Pool"), {
         options = {"change", "tokens"},
         selected = def.pool or "change",
-        group = "currency",
+        group = "currency"
     })
     -- One range rather than an Amount box and a Max box. Leaving the second box
     -- blank is a fixed price; filling it makes the price roll between the two.
@@ -445,7 +460,8 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
         maxDefault = maxDefault,
         hint = mixedAmounts and getText("IGUI_PhunMart_Hint_AmountMixed") or getText("IGUI_PhunMart_Hint_AmountRange"),
         group = "amount",
-        numeric = true, min = 0,
+        numeric = true,
+        min = 0,
         validate = function(value, f)
             local kind = f:getFieldValue("kind")
             local lo = value and value.min or ""
@@ -458,7 +474,7 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             if hi ~= "" and kind ~= "currency" then
                 return getText("IGUI_PhunMart_Err_MaxCurrencyOnly")
             end
-        end,
+        end
     })
     form:addPickerField("items", getText("IGUI_PhunMart_Lbl_Items"), {
         value = selectedItems,
@@ -470,12 +486,13 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                 selectedItems = keys or {}
                 f:setPickerValue("items", selectedItems, formatItemList(selectedItems))
             end)
-        end,
+        end
     })
     form:addTextField("factor", getText("IGUI_PhunMart_Lbl_Factor"), {
         default = factorDefault,
         hint = getText("IGUI_PhunMart_Hint_Factor"),
-        numeric = true, min = 0,
+        numeric = true,
+        min = 0
     })
 
     -- Say which values came from the parent, before initialise: a marked field
@@ -530,8 +547,13 @@ function UI:createChildren()
     self.list:setOnMouseDoubleClick(self, self.onDoubleClick)
 
     self:addNameColumn()
-    self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.38, {field = "kind"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Inherit"), 0.56, {field = "inherit", color = {0.6, 0.8, 0.6}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Kind"), 0.38, {
+        field = "kind"
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Inherit"), 0.56, {
+        field = "inherit",
+        color = {0.6, 0.8, 0.6}
+    })
     self:addListColumn(getText("IGUI_PhunMart_Col_Amount"), 0.76, {
         field = "amount",
         color = {1, 1, 1},

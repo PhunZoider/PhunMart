@@ -159,7 +159,7 @@ local function createEditModal(itemKey, itemDef, isNew, cb)
 
             -- Nothing left worth storing. Without this an entry that models
             -- neither weight nor stock still carried an empty `offer`.
-            if next(result.offer) == nil then
+            if tools.isEmptyTable(result.offer) then
                 result.offer = nil
             end
 

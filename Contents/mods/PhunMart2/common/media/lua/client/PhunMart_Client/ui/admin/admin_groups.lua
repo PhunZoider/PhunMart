@@ -378,7 +378,7 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
                 spawnOut.fuel = nil
             end
 
-            if spawnOut and next(spawnOut) == nil then
+            if spawnOut and tools.isEmptyTable(spawnOut) then
                 spawnOut = nil
             end
             result.defaults.spawn = spawnOut
@@ -426,10 +426,10 @@ local function createEditModal(groupKey, groupDef, isNew, cb)
             -- defaults does not carry a pair of empty tables. Anything the form
             -- does not model -- stock, spawn, conditions -- is still in there
             -- and keeps them.
-            if next(result.defaults.offer) == nil then
+            if tools.isEmptyTable(result.defaults.offer) then
                 result.defaults.offer = nil
             end
-            if next(result.defaults) == nil then
+            if tools.isEmptyTable(result.defaults) then
                 result.defaults = nil
             end
 

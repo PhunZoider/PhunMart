@@ -702,7 +702,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
                     -- Unlimited, so the timer goes too: nothing to refill.
                     result.offer.stock = nil
                 end
-                if next(result.offer) == nil then
+                if isEmptyTable(result.offer) then
                     result.offer = nil
                 end
 
