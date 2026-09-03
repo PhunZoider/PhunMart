@@ -117,6 +117,17 @@ The `currency_25` entry overrides just that one child.
   as `kind = "self"`, meaning the displayed item is what the player hands over. Those never
   touch `currency_base`.
 
+- **Milestone rewards are separate.** The playtime and kill rewards under the Rewards tab
+  hand out whatever item they name, and they do not follow `currency_base`. The shipped
+  entries pay `PhunMart.Token`, which is credited to the token wallet rather than spawned.
+  To pay milestones in your new currency, edit each entry to name that item: any item that
+  is not one of PhunMart's own coins or tokens is spawned into the player's bag.
+
+- **Phlea Market keeps its own prices.** Player-to-player listings are priced in change by
+  the seller at listing time, not from the `prices` table, so switching `currency_base` does
+  not reach them. Running both means running two currencies side by side. If you are moving
+  the server to an item currency, turn Phlea Market off.
+
 - **Any stackable item works.** `Base.Money` is the usual pick because players find it while
   looting, but nails, ammunition or anything else will do. The item picker lists everything
   registered in the game, mods included.

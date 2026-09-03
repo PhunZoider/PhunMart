@@ -258,8 +258,20 @@ function Core:grantConfigReward(player, reward, reason)
             Core.wallet:adjustByPool(player, "bound", currency.pool, totalValue)
         end
     else
+        -- Transmitted, not just added. On a dedicated server AddItem alone
+        -- builds the item in the server's copy of the bag and the client never
+        -- hears about it, so a milestone paying out an ordinary item (which is
+        -- every item once an admin switches the currency to something lootable)
+        -- looked like it granted nothing. Same pairing as every other grant
+        -- path above.
+        local inv = player:getInventory()
         for i = 1, amount do
-            player:getInventory():AddItem(item)
+            local added = inv:AddItem(item)
+            if added then
+                sendAddItemToContainer(inv, added)
+            else
+                Core.debugLn("grantConfigReward: AddItem failed for '" .. tostring(item) .. "'")
+            end
         end
     end
 
