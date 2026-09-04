@@ -19,15 +19,14 @@ end
 -- for years and lit nothing, which is the proof; they have been taken off, and
 -- this file owns the whole of it.
 --
--- Finding the machines is the registry's job rather than the world's.
--- ClientSystem is a CGlobalObjectSystem, so the engine already keeps a list of
--- every machine there is and hands it over whether or not the chunk it stands
--- in is loaded. Walking that list is the only approach that does not depend on
--- catching a square at the moment it arrives, and catching squares is a bad
--- bet: a chunk raises one of two different events depending on whether the
--- engine made the square or took it back off its own pile, a machine's sprite
--- is not always resolvable at that moment, and a machine that was already in
--- the world when the shop definitions reached this client gets no event at all.
+-- Machines are met as their squares arrive and kept in a set from there, which
+-- is the only population worth walking: one in a chunk nobody has loaded has
+-- nothing to light. Squares cover everything except the beginning of a session.
+-- Core.shops reaches a client a round trip after the world has started loading
+-- around it, so the squares that arrived first were tested against an empty
+-- table, and a square that never left does not arrive twice. For that one
+-- moment the engine's own list of machines is read instead -- ClientSystem is a
+-- CGlobalObjectSystem and has had it all along -- once, and then not again.
 --
 -- Every client does this for itself. A lamppost is a fact about rendering, it
 -- is never sent anywhere, and there is nothing here to keep in step between
@@ -194,6 +193,9 @@ end
 --- a sprite this build cannot resolve, which has no properties to read at all
 --- -- the same state the server repairs on load, and common enough there that
 --- it prints an explanation when it does.
+---
+--- Answers whether a machine was standing there at all, which is false both
+--- for a square that is not loaded and for one whose machine has gone.
 local function settleAt(x, y, z, shopKey)
     local key = keyFor(x, y, z)
     local cell = getCell()
@@ -213,92 +215,131 @@ local function settleAt(x, y, z, shopKey)
         -- Either the square is not loaded or what stood on it has gone, and a
         -- lamppost burning over nothing is the same mistake either way.
         extinguish(key)
-        return
+        return false
     end
     local colour = lightFor(def)
     if not colour or not shouldBurn(def, square) then
         extinguish(key)
-        return
+        return true
     end
     local lx, ly, lz = lightSquare(object, square)
     ignite(key, lx, ly, lz, colour)
+    return true
 end
 
 ---------------------------------------------------------------------------
 -- When to look
 ---------------------------------------------------------------------------
 
---- Walk every machine the engine knows about.
+--- The machines this client has met, by square, as {x, y, z, type}.
 ---
---- This is what actually gets a machine lit. It also re-decides the ones that
---- are: nothing announces the grid going down, and the cell holds a lamppost
---- until it is told otherwise, so one whose chunk has unloaded has to be put
---- out from here.
-local function sweep()
-    local system = Core.ClientSystem and Core.ClientSystem.instance
-    -- Answers false, not zero, until the system is up.
-    local count = system and system:getLuaObjectCount()
-    if not count then
-        return
-    end
+--- Only the ones whose squares have been in front of somebody, which is the
+--- only population worth walking: a machine in a chunk nobody has loaded has
+--- nothing to light.
+local met = {}
 
-    local seen = {}
-    for i = 1, count do
-        local machine = system:getLuaObjectByIndex(i)
-        if machine and machine.x and machine.y and machine.z then
-            seen[keyFor(machine.x, machine.y, machine.z)] = true
-            settleAt(machine.x, machine.y, machine.z, machine.type)
-        end
-    end
+local function note(x, y, z, shopKey)
+    local key = keyFor(x, y, z)
+    met[key] = {x = x, y = y, z = z, type = shopKey}
+    settleAt(x, y, z, shopKey)
+end
 
-    -- A machine carried off while its square was unloaded leaves the registry
-    -- without ever passing through the loop above, and its lamppost with it.
-    for key in pairs(lit) do
-        if not seen[key] then
-            extinguish(key)
-        end
-    end
+local function forget(key)
+    met[key] = nil
+    extinguish(key)
 end
 
 --- A square that has just arrived, read in case it is carrying a machine.
 ---
---- Not the mechanism, only a head start: the sweep is what guarantees a machine
---- is lit, and this spares it the wait when a chunk turns up with one on it.
---- Both events are wanted, because the engine raises LoadGridsquare for a
---- square it has just made and ReuseGridsquare for one it has taken back off
---- its own pile.
+--- Both events are wanted. The engine raises LoadGridsquare for a square it
+--- has just made and ReuseGridsquare for one it has taken back off its own
+--- pile, and after a player has moved about for a while it is nearly always
+--- the second.
 local function readSquare(square)
-    if machineOn(square) then
-        settleAt(square:getX(), square:getY(), square:getZ())
+    local object, def = machineOn(square)
+    if object then
+        note(square:getX(), square:getY(), square:getZ(), def.key)
     end
 end
+
+--- Decide every machine that has been met.
+---
+--- Nothing announces the grid going down, so the powered ones are asked again.
+--- And the cell holds a lamppost until it is told otherwise, so a machine whose
+--- chunk has gone is put out and dropped here; it comes back with its chunk,
+--- through the same square events that found it the first time.
+local function sweep()
+    for key, at in pairs(met) do
+        if not settleAt(at.x, at.y, at.z, at.type) then
+            forget(key)
+        end
+    end
+end
+
+--- Catch up on the machines that were already standing in loaded chunks.
+---
+--- The square events are the whole mechanism except for one moment. Core.shops
+--- reaches a client a round trip after the world has begun loading around it,
+--- so every square that arrived before it ran the test above against an empty
+--- table and found nothing, and a square that never left does not arrive twice.
+--- ClientSystem is a CGlobalObjectSystem, so the engine already has the list of
+--- what is standing where and this reads it -- once, when the definitions land,
+--- rather than on a timer.
+---
+--- Answers whether it managed it. getLuaObjectCount says false rather than zero
+--- until the system is up, and this runs early enough to find it that way.
+local function catchUp()
+    local system = Core.ClientSystem and Core.ClientSystem.instance
+    local count = system and system:getLuaObjectCount()
+    if not count then
+        return false
+    end
+    for i = 1, count do
+        local machine = system:getLuaObjectByIndex(i)
+        if machine and machine.x and machine.y and machine.z then
+            note(machine.x, machine.y, machine.z, machine.type)
+        end
+    end
+    return true
+end
+
+--- Set when the definitions land or change, cleared by the sweep that acts on
+--- it. Deferred rather than done on the spot because the definitions can arrive
+--- before there is a world to look at, and a catch-up then finds nothing.
+local owed = true
 
 Events.LoadGridsquare.Add(readSquare)
 Events.ReuseGridsquare.Add(readSquare)
 
 Events.OnObjectAdded.Add(function(isoObject)
-    local square = shopOf(isoObject) and isoObject:getSquare()
+    local def = shopOf(isoObject)
+    local square = def and isoObject:getSquare()
     if square then
-        settleAt(square:getX(), square:getY(), square:getZ())
+        note(square:getX(), square:getY(), square:getZ(), def.key)
     end
 end)
 
 Events.OnObjectAboutToBeRemoved.Add(function(isoObject)
     local square = shopOf(isoObject) and isoObject:getSquare()
     if square then
-        extinguish(keyFor(square:getX(), square:getY(), square:getZ()))
+        forget(keyFor(square:getX(), square:getY(), square:getZ()))
     end
 end)
 
-Events.EveryOneMinute.Add(sweep)
+Events.EveryOneMinute.Add(function()
+    sweep()
+    if owed then
+        owed = not catchUp()
+    end
+end)
 
 --- Colour, reach and the power requirement all come off the definitions, and
 --- this is the moment they land or change. Everything burning is put out first,
 --- because ignite will not touch a light that is already lit and so would keep
---- an old colour alive; the sweep then decides them all again.
+--- an old colour alive.
 Events[Core.events.OnDefsUpdated].Add(function()
     for key in pairs(lit) do
         extinguish(key)
     end
-    sweep()
+    owed = true
 end)
