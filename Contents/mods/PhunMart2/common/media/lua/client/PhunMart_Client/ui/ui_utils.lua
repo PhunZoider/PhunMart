@@ -272,7 +272,14 @@ local function payoutShort(offer)
         if a.type == "grantBoundTokens" then
             return Core.utils.formatWholeNumber(a.amount or 1) .. getText("IGUI_PhunMart_TokenSuffix")
         elseif a.type == "adjustBalance" then
-            return tools.formatCents(a.amount or 0)
+            -- Through the same conversion the payout itself goes through, or
+            -- the tile promises dollars on a server that pays in tins.
+            local amt, item = Core.currencyValueOf(a.amount or 0)
+            if item then
+                local si = getScriptManager():FindItem(item)
+                return Core.utils.formatWholeNumber(amt), si and si:getNormalTexture()
+            end
+            return tools.formatCents(amt)
         elseif a.type == "giveItem" and a.item then
             giveItem = giveItem or a.item
             if a.item == giveItem then
@@ -348,6 +355,16 @@ end
 --- server that has named its currency means it everywhere the currency is
 --- named, and the alternative is finding out one screen at a time which ones
 --- were wired up.
+--- Whether this item is what the server currently uses as money.
+---
+--- Separate from currencyLabelFor because the two questions differ: a currency
+--- with no label set still is the currency, and a caller deciding whether to
+--- draw the name beside an icon has to know that.
+function tools.isCurrencyItem(fullType)
+    local def = Core.currencyDef and Core.currencyDef()
+    return def ~= nil and def.kind == "items" and def.item == fullType
+end
+
 function tools.currencyLabelFor(fullType)
     local def = Core.currencyDef and Core.currencyDef()
     if def and def.kind == "items" and def.item == fullType then

@@ -1615,11 +1615,18 @@ function UI:renderDetails(z)
             itemName = si:getDisplayName() or itemName
             priceItemTex = si:getNormalTexture()
         end
-        -- A server that has renamed its currency means it here too, not only on
-        -- the tile badge. Only when this item is the currency: a barter price
-        -- naming something else keeps that item's own name.
-        itemName = tools.currencyLabelFor(pi.item) or itemName
-        priceText = getText("IGUI_PhunMart_PriceItems", amt, itemName)
+        -- Money needs no naming when its picture is right there. "275x Dollars"
+        -- beside a picture of the money says it twice; the icon is doing the
+        -- same job the dollar sign does on a change server.
+        --
+        -- Only for the currency, and only when there is an icon to carry it. A
+        -- barter price naming some other item still says which item, because
+        -- nothing else on the tile would.
+        if priceItemTex and tools.isCurrencyItem(pi.item) then
+            priceText = getText("IGUI_PhunMart_PriceItemsBare", amt)
+        else
+            priceText = getText("IGUI_PhunMart_PriceItems", amt, itemName)
+        end
     else
         priceText = getText("IGUI_PhunMart_PriceUnknown")
     end
@@ -1670,7 +1677,17 @@ function UI:renderDetails(z)
                 receiveText = getText("IGUI_PhunMart_ReceiveTokens", tostring(action.amount or 1))
                 break
             elseif action.type == "adjustBalance" then
-                receiveText = getText("IGUI_PhunMart_ReceiveChange", fmtCents(action.amount or 0))
+                -- Through the same conversion the payout goes through. On an
+                -- item currency the icon says what it is, so the figure stands
+                -- alone the way a cash amount does.
+                local amt, item = Core.currencyValueOf(action.amount or 0)
+                if item then
+                    local si = getScriptManager and getScriptManager():FindItem(item)
+                    receiveTex = si and si:getNormalTexture()
+                    receiveText = getText("IGUI_PhunMart_ReceiveChange", group(amt))
+                else
+                    receiveText = getText("IGUI_PhunMart_ReceiveChange", fmtCents(amt))
+                end
                 break
             elseif action.type == "giveItem" and action.item then
                 giveItemName = giveItemName or action.item

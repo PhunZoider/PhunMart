@@ -79,6 +79,7 @@
   "IGUI_PhunMart_PriceAmount": "Price: %1",
   "IGUI_PhunMart_PriceRange": "Price: %1 - %2",
   "IGUI_PhunMart_PriceItems": "Price: %1x %2",
+  "IGUI_PhunMart_PriceItemsBare": "Price: %1x",
   "IGUI_PhunMart_BringItems": "Bring: %1x %2",
   "IGUI_PhunMart_ReceiveTokens": "Receive: %1 token(s)",
   "IGUI_PhunMart_ReceiveChange": "Receive: %1",

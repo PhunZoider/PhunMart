@@ -232,9 +232,36 @@ function Core:grantReward(player, action, qty, context)
         Core.wallet:adjustByPool(player, "bound", "tokens", amt)
 
     elseif t == "adjustBalance" then
-        -- Credit a wallet pool (e.g. change from pawn shop sales).
-        local amt = (action.amount or 0) * qty
-        Core.wallet:adjustByPool(player, "current", action.pool or "change", amt)
+        -- Pay for something the machine has bought: the pawn payouts, and
+        -- anything else crediting the wallet.
+        --
+        -- The figure is written in cents like every shipped price, so it goes
+        -- through the same conversion they do. On an item currency it becomes
+        -- that item, scaled by currency_base's factor and handed over
+        -- physically. Left as a wallet credit it paid into a pool such a server
+        -- has usually turned off, so PrawnStars took the goods and gave back
+        -- nothing that could be spent.
+        --
+        -- A pool named explicitly and not the currency one -- tokens -- is left
+        -- alone. That is a deliberate choice by whoever wrote the action, not a
+        -- figure that meant "money".
+        local cents = (action.amount or 0) * qty
+        local pool = action.pool or "change"
+        local amt, item = Core.currencyValueOf(cents)
+        if item and pool == "change" then
+            local inv = player:getInventory()
+            for _ = 1, amt do
+                local added = inv:AddItem(item)
+                if added then
+                    sendAddItemToContainer(inv, added)
+                else
+                    Core.debugLn("grantReward: AddItem failed for currency '" .. tostring(item) .. "'")
+                    break
+                end
+            end
+        else
+            Core.wallet:adjustByPool(player, "current", pool, cents)
+        end
 
     else
         Core.debugLn("grantReward: unknown action type '" .. tostring(t) .. "'")

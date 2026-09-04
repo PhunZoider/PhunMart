@@ -985,7 +985,13 @@ function Core.currencyDef()
                 -- reads oddly in "3 Money" and is not what a server running on
                 -- bottle caps or scrip wants said either. Optional: nil means
                 -- fall back to the item name, which is the shipped behaviour.
-                label = base.label
+                label = base.label,
+                -- Reported so a caller holding an amount written on the shipped
+                -- cents ladder can scale it the same way the compiler scales a
+                -- price. A caller inventing its own figures has no ladder and
+                -- should ignore this: Phlea Market does, because a seller types
+                -- whole items already.
+                factor = tonumber(base.factor) or 1
             }
         end
         -- Says items and names none. Falling back is the safe direction: the
@@ -998,6 +1004,29 @@ function Core.currencyDef()
         kind = "currency",
         pool = (base and base.pool) or "change"
     }
+end
+
+--- A payout written on the shipped cents ladder, in the currency actually used.
+---
+--- Every shipped figure that means money is written in cents: prices, and the
+--- pawn payouts that pay for the things PrawnStars buys. The compiler scales a
+--- price by currency_base's factor when the currency becomes an item, and a
+--- payout has to travel exactly the same way or a machine that charges twenty
+--- of something still pays out five hundred of nothing.
+---
+--- Returns the amount and, when the currency is an item, that item. A nil item
+--- means the wallet, and the amount is unchanged cents.
+---
+--- Same arithmetic as the compiler: ceil, never less than one. A payout that
+--- rounded to nothing would be a machine that takes an item and gives nothing
+--- back, which is worse than paying a little over the odds.
+function Core.currencyValueOf(cents)
+    cents = tonumber(cents) or 0
+    local def = Core.currencyDef()
+    if def.kind == "items" and def.item then
+        return math.max(1, math.ceil(cents * (def.factor or 1))), def.item
+    end
+    return math.floor(cents), nil
 end
 
 --- The mutable files that are not per-kind overrides. Here rather than beside
