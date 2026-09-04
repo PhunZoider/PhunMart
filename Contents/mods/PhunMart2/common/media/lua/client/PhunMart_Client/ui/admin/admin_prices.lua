@@ -6,6 +6,7 @@ local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local FormPanel = require "PhunMart_Client/ui/base/form_panel"
 local tools = require "PhunMart_Client/ui/ui_utils"
+local group = Core.utils.formatWholeNumber
 local ItemPicker = require "PhunMart_Client/ui/base/item_picker"
 local DeleteHelper = require "PhunMart_Client/ui/base/delete_helper"
 local PendingRestock = require "PhunMart_Client/ui/admin/pending_restock"
@@ -55,9 +56,9 @@ local function formatAmount(priceDef)
         end
         local amt = priceDef.amount or (items and items[1] and items[1].amount) or 1
         if type(amt) == "table" then
-            return tostring(amt.min) .. "-" .. tostring(amt.max) .. "x " .. (item or "?")
+            return group(amt.min) .. "-" .. group(amt.max) .. "x " .. (item or "?")
         end
-        return tostring(amt) .. "x " .. (item or "?")
+        return group(amt) .. "x " .. (item or "?")
     end
     local amount = resolveField(priceDef, "amount")
     if amount == nil then
@@ -65,14 +66,15 @@ local function formatAmount(priceDef)
     end
     if type(amount) == "table" then
         if pool == "change" then
-            return tools.formatCents(amount.min) .. " - " .. tools.formatCents(amount.max)
+            local pence = not ((amount.min or 0) % 100 == 0 and (amount.max or 0) % 100 == 0)
+            return tools.formatCents(amount.min, pence) .. " - " .. tools.formatCents(amount.max, pence)
         end
-        return tostring(amount.min) .. " - " .. tostring(amount.max)
+        return group(amount.min) .. " - " .. group(amount.max)
     end
     if pool == "change" then
         return tools.formatCents(amount)
     end
-    return tostring(amount)
+    return group(amount)
 end
 
 -- Format the kind column display.

@@ -39,14 +39,11 @@ local UI = Core.ui.client.poolViewer
 UI.instances = {}
 
 -- --- helpers ----------------------------------------------------------------
-
-local function formatCents(cents)
-    if cents % 100 == 0 then
-        return "$" .. tostring(cents / 100)
-    else
-        return string.format("$%.2f", cents / 100)
-    end
-end
+-- The shared ones. This file had its own copy of formatCents, which is the
+-- third that existed and the third that had drifted: it always drew two
+-- decimal places and grouped no digits.
+local formatCents = tools.formatCents
+local group = Core.utils.formatWholeNumber
 
 local function formatPrice(price)
     if not price then
@@ -60,7 +57,7 @@ local function formatPrice(price)
         if type(amt) == "table" then
             if amt.min and amt.max and amt.min ~= amt.max then
                 if price.pool == "tokens" then
-                    return amt.min .. "-" .. amt.max .. "t"
+                    return group(amt.min) .. "-" .. group(amt.max) .. "t"
                 else
                     return formatCents(amt.min) .. "-" .. formatCents(amt.max)
                 end
@@ -68,7 +65,7 @@ local function formatPrice(price)
             amt = amt.min or amt.max or 0
         end
         if price.pool == "tokens" then
-            return tostring(amt) .. "t"
+            return group(amt) .. "t"
         else
             return formatCents(amt)
         end
@@ -77,7 +74,8 @@ local function formatPrice(price)
         local pi = price.items[1]
         local amt = type(pi.amount) == "table" and pi.amount.min or (pi.amount or 1)
         local nm = pi.item and pi.item:match("[^.]+$") or "item"
-        return tostring(amt) .. "x " .. nm
+        nm = tools.currencyLabelFor(pi.item) or nm
+        return group(amt) .. "x " .. nm
     end
     return tostring(price.kind or "-")
 end

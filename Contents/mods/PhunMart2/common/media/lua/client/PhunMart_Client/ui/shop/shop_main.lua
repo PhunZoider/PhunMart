@@ -1450,9 +1450,8 @@ function UI:render()
             local fmt = Core.wallet.pools[pool] and Core.wallet.pools[pool].format
             if fmt == "cents" then
                 return tools.formatCents(amount)
-            else
-                return tostring(amount)
             end
+            return Core.utils.formatWholeNumber(amount)
         end
 
         local pad = 6
@@ -1567,6 +1566,10 @@ function UI:renderDetails(z)
     -- price
     local price = offer.price
     local fmtCents = tools.formatCents
+    -- Grouped here as well as on the tile badge. The detail panel is where the
+    -- big numbers actually live, and a vehicle at 3824 was the one place still
+    -- printing them a digit at a time.
+    local group = Core.utils.formatWholeNumber
     local priceText
     local priceItemTex
     local isCollector = price and price.selfPay == true
@@ -1579,7 +1582,7 @@ function UI:renderDetails(z)
         local isTokens = price.pool == "tokens"
         local function fmtAmt(n)
             if isTokens then
-                return tostring(n) .. "t"
+                return group(n) .. "t"
             end
             return fmtCents(n)
         end
@@ -1593,7 +1596,8 @@ function UI:renderDetails(z)
     elseif isCollector and price.items and price.items[1] then
         -- Collector offer: the displayed item IS the price. Show "Bring: Nx item".
         local pi = price.items[1]
-        local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
+        local amt = type(pi.amount) == "table" and (group(pi.amount.min) .. "-" .. group(pi.amount.max)) or
+                        group(pi.amount or 1)
         local itemName = pi.item or "?"
         local si = getScriptManager and getScriptManager():FindItem(itemName)
         if si then
@@ -1603,13 +1607,18 @@ function UI:renderDetails(z)
         priceText = getText("IGUI_PhunMart_BringItems", amt, itemName)
     elseif price.items and price.items[1] then
         local pi = price.items[1]
-        local amt = type(pi.amount) == "table" and (pi.amount.min .. "-" .. pi.amount.max) or tostring(pi.amount or 1)
+        local amt = type(pi.amount) == "table" and (group(pi.amount.min) .. "-" .. group(pi.amount.max)) or
+                        group(pi.amount or 1)
         local itemName = pi.item or "?"
         local si = getScriptManager and getScriptManager():FindItem(itemName)
         if si then
             itemName = si:getDisplayName() or itemName
             priceItemTex = si:getNormalTexture()
         end
+        -- A server that has renamed its currency means it here too, not only on
+        -- the tile badge. Only when this item is the currency: a barter price
+        -- naming something else keeps that item's own name.
+        itemName = tools.currencyLabelFor(pi.item) or itemName
         priceText = getText("IGUI_PhunMart_PriceItems", amt, itemName)
     else
         priceText = getText("IGUI_PhunMart_PriceUnknown")

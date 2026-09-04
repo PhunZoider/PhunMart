@@ -4,6 +4,7 @@ end
 require "ISUI/ISPanel"
 require "ISUI/ISTextBox"
 local Core = PhunMart
+local tools = require "PhunMart_Client/ui/ui_utils"
 
 local BUTTON_HGT = 25
 local BUTTON_PAD = 6
@@ -26,15 +27,10 @@ local function setup()
     end
 end
 
-local function formatWholeNumber(number)
-    number = number or 0
-    -- Round the number to remove the decimal part
-    local roundedNumber = math.floor(number + 0.5)
-    -- Convert to string and format with commas
-    local formattedNumber = tostring(roundedNumber):reverse():gsub("(%d%d%d)", "%1,")
-    formattedNumber = formattedNumber:reverse():gsub("^,", "")
-    return formattedNumber
-end
+-- The shared one. This file carried a byte-identical copy, and duplicated
+-- formatters are exactly how the price ones came to disagree: two of a thing
+-- that is never wrong at the moment it is duplicated.
+local formatWholeNumber = Core.utils.formatWholeNumber
 
 function UI:new(x, y, width, height, player)
     local o = ISPanel:new(x, y, width, height);
@@ -278,9 +274,11 @@ function UI:drawDatas(y, item, alt)
     local raw = wallet.current[item.text] or 0
     local value
     if item.item.format == "cents" then
-        value = string.format("$%.2f", raw / 100)
+        -- The shared formatter, which groups the digits. This was the fourth
+        -- place drawing money and the fourth doing its own arithmetic.
+        value = tools.formatCents(raw, true)
     else
-        value = tostring(raw)
+        value = formatWholeNumber(raw)
     end
 
     if item.item.texture then

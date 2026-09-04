@@ -270,7 +270,7 @@ local function payoutShort(offer)
     local giveItem, giveTotal = nil, 0
     for _, a in ipairs(actions) do
         if a.type == "grantBoundTokens" then
-            return tostring(a.amount or 1) .. getText("IGUI_PhunMart_TokenSuffix")
+            return Core.utils.formatWholeNumber(a.amount or 1) .. getText("IGUI_PhunMart_TokenSuffix")
         elseif a.type == "adjustBalance" then
             return tools.formatCents(a.amount or 0)
         elseif a.type == "giveItem" and a.item then
@@ -282,7 +282,7 @@ local function payoutShort(offer)
     end
     if giveItem then
         local si = getScriptManager():FindItem(giveItem)
-        return tostring(giveTotal), si and si:getNormalTexture()
+        return Core.utils.formatWholeNumber(giveTotal), si and si:getNormalTexture()
     end
     return nil
 end
@@ -337,19 +337,43 @@ function tools.formatPriceShort(offer)
     return nil
 end
 
+--- What to call an item when it is the money, rather than what the game calls
+--- it.
+---
+--- Returns nil for anything that is not the configured currency, so a caller
+--- reads it as "or the item's own display name" and a barter price naming some
+--- other item is left alone.
+---
+--- Here rather than inline at the one place that first needed it, because a
+--- server that has named its currency means it everywhere the currency is
+--- named, and the alternative is finding out one screen at a time which ones
+--- were wired up.
+function tools.currencyLabelFor(fullType)
+    local def = Core.currencyDef and Core.currencyDef()
+    if def and def.kind == "items" and def.item == fullType then
+        local label = def.label
+        if label and label ~= "" then
+            return label
+        end
+    end
+    return nil
+end
+
 -- Format cents as a currency string ("$1.50", "$2", "$12,750").
 --
 -- Grouped, because the figures stopped being small. A vehicle at three thousand
 -- seven hundred and eighty five drawn as 3785 is a number the eye has to count
 -- the digits of, sitting in a list where everything else is loose change, and
 -- misreading it by a factor of ten is the expensive direction to be wrong in.
-function tools.formatCents(n)
+-- `forcePence` keeps the .00 on a whole number of dollars. Only a range wants
+-- that: "$2.50 - $6" reads as a mismatch where "$2.50 - $6.00" reads as a pair.
+function tools.formatCents(n, forcePence)
     n = tonumber(n) or 0
     local sign = n < 0 and "-" or ""
     local abs = math.abs(math.floor(n))
     local whole = Core.utils.formatWholeNumber(math.floor(abs / 100))
     local rem = abs % 100
-    if rem == 0 then
+    if rem == 0 and not forcePence then
         return sign .. "$" .. whole
     end
     return sign .. "$" .. whole .. string.format(".%02d", rem)
@@ -375,11 +399,12 @@ function tools.formatPriceAmount(priceDef)
         return getText("IGUI_PhunMart_Free")
     end
 
+    local group = Core.utils.formatWholeNumber
     local function amountText(amt, suffix)
         if type(amt) == "table" then
-            return tostring(amt.min) .. " - " .. tostring(amt.max) .. (suffix or "")
+            return group(amt.min) .. " - " .. group(amt.max) .. (suffix or "")
         end
-        return tostring(amt) .. (suffix or "")
+        return group(amt) .. (suffix or "")
     end
 
     if kind == "items" then
@@ -397,6 +422,7 @@ function tools.formatPriceAmount(priceDef)
         if si then
             name = si:getDisplayName()
         end
+        name = tools.currencyLabelFor(item) or name
         return amountText(amt, "x ") .. name
     end
 
@@ -421,10 +447,8 @@ function tools.formatPriceAmount(priceDef)
         -- currency_low came out "$2.50 - $6". If either end wants pence, both
         -- get them.
         local lo, hi = tonumber(amount.min) or 0, tonumber(amount.max) or 0
-        if lo % 100 == 0 and hi % 100 == 0 then
-            return tools.formatCents(lo) .. " - " .. tools.formatCents(hi)
-        end
-        return string.format("$%.2f - $%.2f", lo / 100, hi / 100)
+        local pence = not (lo % 100 == 0 and hi % 100 == 0)
+        return tools.formatCents(lo, pence) .. " - " .. tools.formatCents(hi, pence)
     end
 
     if pool == "tokens" then
