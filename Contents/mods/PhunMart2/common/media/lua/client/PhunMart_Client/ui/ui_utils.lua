@@ -328,7 +328,14 @@ function tools.formatPriceShort(offer)
         if price.selfPay or pi.item == offer.item then
             local payout, payoutTex = payoutShort(offer)
             if payout then
-                return getText("IGUI_PhunMart_TradeBadge", Core.utils.formatWholeNumber(amt), payout), payoutTex
+                -- Only what comes back. How many to bring is returned
+                -- separately and drawn in its own corner of the tile, because
+                -- one badge saying "1>$5" makes the reader parse a sentence
+                -- where two numbers in fixed places do not.
+                --
+                -- The list view has no corners, so it puts the two back
+                -- together itself.
+                return payout, payoutTex, amt
             end
             -- Nothing nameable coming back. The count still means something;
             -- the duplicate icon never did.

@@ -87,6 +87,7 @@
   "IGUI_PhunMart_TradeBadge": "%1>%2",
   "IGUI_PhunMart_Msg_OutBadge": "OUT",
   "IGUI_PhunMart_StockBadge": "x%1",
+  "IGUI_PhunMart_BringBadge": "%1x",
   "IGUI_PhunMart_StockLeft": "In stock: %1",
   "IGUI_PhunMart_StockUnlimited": "In stock: unlimited",
   "IGUI_PhunMart_StockOut": "Out of stock",

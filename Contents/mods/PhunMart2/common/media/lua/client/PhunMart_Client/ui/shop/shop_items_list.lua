@@ -589,22 +589,46 @@ function UI:renderGrid()
                     end
                     self:drawText(stockText, sx, cy + 1, sr, sg, sb, 1, UIFont.Small)
                 end
-
                 -- price/OOS badge bottom-right
-                local badge, badgeTex
+                local badge, badgeTex, bringQty
                 if isOOS then
                     badge = getText("IGUI_PhunMart_Msg_OutBadge")
                 else
-                    badge, badgeTex = formatPrice(e.offer)
+                    badge, badgeTex, bringQty = formatPrice(e.offer)
                 end
+
+                -- Geometry for both bottom badges worked out before either is
+                -- drawn, because they grow towards each other: a long price on
+                -- a small tile is exactly when the count on the left would be
+                -- overdrawn, and that is the tile where being told to bring
+                -- twenty of something matters most.
+                local by = cy + cs - FONT_SM - 2
+                local badgeIconSz = badgeTex and FONT_SM or 0
+                local badgeGap = badgeTex and 1 or 0
+                local badgeTextW = badge and getTextManager():MeasureStringX(UIFont.Small, badge) or 0
+                local badgeW = badge and (badgeTextW + badgeGap + badgeIconSz) or 0
+                local badgeX = cx + cs - badgeW - 3
+
+                -- How many to hand over, bottom-left, and only when it is more
+                -- than one. Every offer asks for one unless it says otherwise,
+                -- so drawing it always would be labelling the default across
+                -- most of the grid and leaving the eye to pick out which tiles
+                -- are the exceptions. Cyan, the same colour the price badge
+                -- uses for "bring this item", because it is that same idea.
+                if bringQty and bringQty > 1 and not isOOS then
+                    local bringText = getText("IGUI_PhunMart_BringBadge", Core.utils.formatWholeNumber(bringQty))
+                    local btw = getTextManager():MeasureStringX(UIFont.Small, bringText)
+                    -- Dropped rather than overlapped when the two would meet.
+                    -- The details panel still says it in full, so nothing is
+                    -- lost that cannot be read by selecting the tile.
+                    if not badge or (cx + 3 + btw) < (badgeX - 2) then
+                        self:drawRect(cx + 2, by - 1, btw + 2, FONT_SM + 2, 0.75, 0, 0, 0)
+                        self:drawText(bringText, cx + 3, by, 0.30, 0.85, 0.85, 1, UIFont.Small)
+                    end
+                end
+
                 if badge then
-                    local iconSz = badgeTex and FONT_SM or 0
-                    local gap = badgeTex and 1 or 0
-                    local textW = getTextManager():MeasureStringX(UIFont.Small, badge)
-                    local bw = textW + gap + iconSz
-                    local bx = cx + cs - bw - 3
-                    local by = cy + cs - FONT_SM - 2
-                    self:drawRect(bx - 1, by - 1, bw + 2, FONT_SM + 2, 0.75, 0, 0, 0)
+                    self:drawRect(badgeX - 1, by - 1, badgeW + 2, FONT_SM + 2, 0.75, 0, 0, 0)
                     local tr, tg, tb
                     if isOOS then
                         tr, tg, tb = 0.85, 0.25, 0.25
@@ -615,9 +639,10 @@ function UI:renderGrid()
                     else
                         tr, tg, tb = 0.92, 0.88, 0.30
                     end
-                    self:drawText(badge, bx, by, tr, tg, tb, 1, UIFont.Small)
+                    self:drawText(badge, badgeX, by, tr, tg, tb, 1, UIFont.Small)
                     if badgeTex then
-                        self:drawTextureScaledAspect(badgeTex, bx + textW + gap, by, iconSz, iconSz, 1, 1, 1, 1)
+                        self:drawTextureScaledAspect(badgeTex, badgeX + badgeTextW + badgeGap, by, badgeIconSz,
+                            badgeIconSz, 1, 1, 1, 1)
                     end
                 end
             end
@@ -685,11 +710,16 @@ function UI:renderList()
                 end
 
                 -- price/OOS badge (compute width first so name can avoid it)
-                local badge, badgeTex
+                local badge, badgeTex, bringQty
                 if isOOS then
                     badge = getText("IGUI_PhunMart_Msg_OutBadge")
                 else
-                    badge, badgeTex = formatPrice(e.offer)
+                    badge, badgeTex, bringQty = formatPrice(e.offer)
+                end
+                -- One line and no corners to spread across, so the two halves
+                -- go back together the way they used to be drawn.
+                if badge and bringQty and bringQty > 1 then
+                    badge = getText("IGUI_PhunMart_TradeBadge", Core.utils.formatWholeNumber(bringQty), badge)
                 end
                 local badgeIconSz = badgeTex and fontH or 0
                 local badgeGap = badgeTex and 1 or 0
