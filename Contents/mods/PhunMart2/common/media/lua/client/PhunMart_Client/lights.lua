@@ -46,9 +46,6 @@ local AHEAD = {
 -- How far in front to hang it. Zero puts the light back on the machine.
 local AHEAD_TILES = 1
 
--- How far around a player to look when the definitions arrive. See rescan.
-local RESCAN_TILES = 30
-
 --- Every machine this client has seen, keyed by its own square. The light is
 --- remembered separately as {x, y, z}, because it does not hang on that square.
 local known = {}
@@ -223,9 +220,9 @@ end
 --- Read a square that has just come in.
 ---
 --- OnObjectAdded covers a machine that appears while somebody is watching it.
---- Squares are read as they load as well, because the ordinary way to meet a
---- machine is to walk back to one that arrives with its chunk, and reading the
---- same machine twice costs nothing.
+--- Squares are read as they arrive as well, because the ordinary way to meet a
+--- machine is to walk to one that comes in with its chunk, and reading the same
+--- machine twice costs nothing.
 local function readSquare(square)
     local machine, def = machineOn(square)
     if machine then
@@ -255,13 +252,15 @@ local function sweep()
     end
 end
 
---- Look again at everything within sight of a player.
+--- Look again at every square already loaded around a player.
 ---
 --- A machine is only recognisable once Core.shops has arrived, and on a client
---- that is a round trip after the world around the player has already loaded.
---- LoadGridsquare does not fire twice for a square that never left, so without
---- this the machine standing outside somebody's spawn point stays dark for the
---- whole session.
+--- that is a round trip after the world has begun filling in around the player.
+--- Neither square event fires a second time for a square that never left, so
+--- without this the machines that were already in the chunk map when the
+--- definitions landed stay dark until their chunks have been away and come
+--- back. The bounds are the chunk map's own, so this is exactly what is loaded
+--- and no more; a machine on another floor waits for its chunk.
 local function rescan()
     local cell = getCell()
     if not cell then
@@ -269,20 +268,26 @@ local function rescan()
     end
     for i = 0, getNumActivePlayers() - 1 do
         local player = getSpecificPlayer(i)
-        if player then
-            local px = math.floor(player:getX())
-            local py = math.floor(player:getY())
-            local pz = math.floor(player:getZ())
-            for x = px - RESCAN_TILES, px + RESCAN_TILES do
-                for y = py - RESCAN_TILES, py + RESCAN_TILES do
-                    readSquare(cell:getGridSquare(x, y, pz))
+        local chunkMap = player and cell:getChunkMap(player:getPlayerNum())
+        if chunkMap then
+            local z = math.floor(player:getZ())
+            for x = chunkMap:getWorldXMinTiles(), chunkMap:getWorldXMaxTiles() do
+                for y = chunkMap:getWorldYMinTiles(), chunkMap:getWorldYMaxTiles() do
+                    readSquare(cell:getGridSquare(x, y, z))
                 end
             end
         end
     end
 end
 
+--- Both halves of a chunk arriving. The engine raises LoadGridsquare for a
+--- square it has just made and ReuseGridsquare for one it has taken back off
+--- its own pile, and once a player has moved about for a while it is almost
+--- always the second. Listening only to the first lit the machines somebody
+--- built while watching, and left every machine that was already standing
+--- there dark.
 Events.LoadGridsquare.Add(readSquare)
+Events.ReuseGridsquare.Add(readSquare)
 
 Events.OnObjectAdded.Add(function(isoObject)
     local def = shopOf(isoObject)
