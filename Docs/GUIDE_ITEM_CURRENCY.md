@@ -13,7 +13,9 @@ would rather charge in something players loot, like `Base.Money`, `Base.Nails` o
 3. Set **Pay with** to `An item players carry`.
 4. Click **Pick...** next to **Item** and choose your item, for example `Base.Money`.
 5. Adjust **Scale by** until the preview reads sensibly.
-6. **Apply**.
+6. Optionally set **Call it** to what your server calls this money. Left blank,
+   prices are written with the item's own name, so `Base.Money` reads as "3 Money".
+7. **Apply**.
 
 ![Edit currency_base](https://github.com/PhunZoider/PhunMart/blob/main/Docs/images/ChangeToBaseMoney.png)
 
@@ -73,12 +75,16 @@ Create or edit `PhunMart_Prices.json` in your server's `Zomboid/Lua/` folder:
   "currency_base": {
     "kind": "items",
     "items": [{ "item": "Base.Money", "amount": 1 }],
-    "factor": 0.04
+    "factor": 0.04,
+    "label": "Caps"
   }
 }
 ```
 
 Every child that inherits from it picks up the new `kind` and `factor` automatically.
+
+`label` is optional and only affects wording. Without it, prices are written with the
+item's own display name.
 
 ### Overriding individual children
 

@@ -304,14 +304,12 @@ function tools.formatPriceShort(offer)
             amt = amt.min
         end
         if price.pool == "tokens" then
-            return tostring(amt) .. getText("IGUI_PhunMart_TokenSuffix")
-        else
-            if amt % 100 == 0 then
-                return "$" .. tostring(amt / 100)
-            else
-                return string.format("$%.2f", amt / 100)
-            end
+            return Core.utils.formatWholeNumber(amt) .. getText("IGUI_PhunMart_TokenSuffix")
         end
+        -- Through formatCents rather than a second copy of it. The two had
+        -- already drifted: this one always drew two decimal places, so a badge
+        -- read $2.00 where the panel beside it read $2.
+        return tools.formatCents(amt)
     end
     if price.kind == "items" and price.items and price.items[1] then
         local pi = price.items[1]
@@ -323,29 +321,38 @@ function tools.formatPriceShort(offer)
         if price.selfPay or pi.item == offer.item then
             local payout, payoutTex = payoutShort(offer)
             if payout then
-                return getText("IGUI_PhunMart_TradeBadge", tostring(amt), payout), payoutTex
+                return getText("IGUI_PhunMart_TradeBadge", Core.utils.formatWholeNumber(amt), payout), payoutTex
             end
             -- Nothing nameable coming back. The count still means something;
             -- the duplicate icon never did.
-            return tostring(amt)
+            return Core.utils.formatWholeNumber(amt)
         end
         local tex
         if pi.item then
             local si = getScriptManager():FindItem(pi.item)
             tex = si and si:getNormalTexture()
         end
-        return tostring(amt), tex
+        return Core.utils.formatWholeNumber(amt), tex
     end
     return nil
 end
 
--- Format cents as a currency string ("$1.50" or "$2").
+-- Format cents as a currency string ("$1.50", "$2", "$12,750").
+--
+-- Grouped, because the figures stopped being small. A vehicle at three thousand
+-- seven hundred and eighty five drawn as 3785 is a number the eye has to count
+-- the digits of, sitting in a list where everything else is loose change, and
+-- misreading it by a factor of ten is the expensive direction to be wrong in.
 function tools.formatCents(n)
-    if n % 100 == 0 then
-        return "$" .. tostring(n / 100)
-    else
-        return string.format("$%.2f", n / 100)
+    n = tonumber(n) or 0
+    local sign = n < 0 and "-" or ""
+    local abs = math.abs(math.floor(n))
+    local whole = Core.utils.formatWholeNumber(math.floor(abs / 100))
+    local rem = abs % 100
+    if rem == 0 then
+        return sign .. "$" .. whole
     end
+    return sign .. "$" .. whole .. string.format(".%02d", rem)
 end
 
 --- What a price key actually costs, in words, resolved through its inherit

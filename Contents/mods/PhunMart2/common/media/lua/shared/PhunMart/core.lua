@@ -979,7 +979,13 @@ function Core.currencyDef()
         if item then
             return {
                 kind = "items",
-                item = item
+                item = item,
+                -- What a server calls its money, when that is not what the
+                -- game calls the item. Base.Money displays as "Money", which
+                -- reads oddly in "3 Money" and is not what a server running on
+                -- bottle caps or scrip wants said either. Optional: nil means
+                -- fall back to the item name, which is the shipped behaviour.
+                label = base.label
             }
         end
         -- Says items and names none. Falling back is the safe direction: the

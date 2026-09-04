@@ -198,6 +198,12 @@ function CurrencyTool.open(player, onDone)
                 }}
                 local factor = tonumber(f:getFieldValue("factor")) or 1
                 result.factor = factor
+                -- Blank means "call it whatever the game calls the item",
+                -- which is the shipped behaviour, so an empty box clears the
+                -- key rather than storing an empty string that every reader
+                -- would then have to treat as absent.
+                local label = tostring(f:getFieldValue("label") or ""):match("^%s*(.-)%s*$")
+                result.label = label ~= "" and label or nil
             else
                 -- Back to the built in wallet. The item shape has to go or it
                 -- would sit alongside the currency shape and win.
@@ -207,6 +213,7 @@ function CurrencyTool.open(player, onDone)
                 result.item = nil
                 result.items = nil
                 result.factor = 1
+                result.label = nil
             end
 
             sendClientCommand(Core.name, Core.commands.upsertPriceDef, {
@@ -233,6 +240,7 @@ function CurrencyTool.open(player, onDone)
         onChange = function(f)
             local item = isItemMode()
             f:setFieldVisible("item", item)
+            f:setFieldVisible("label", item)
             f:setFieldVisible("factor", item)
             -- currency_base ships with factor 1, which is right for cents and
             -- absurd for items: a five cent price would ask for five of them.
@@ -261,6 +269,11 @@ function CurrencyTool.open(player, onDone)
             end)
         end
     })
+    form:addTextField("label", getText("IGUI_PhunMart_Cur_Lbl_Label"), {
+        default = base.label or "",
+        hint = getText("IGUI_PhunMart_Cur_Hint_Label"),
+        conditional = true
+    })
     form:addTextField("factor", getText("IGUI_PhunMart_Cur_Lbl_Factor"), {
         default = tostring(base.factor or 0.04),
         hint = getText("IGUI_PhunMart_Cur_Hint_Factor"),
@@ -287,6 +300,7 @@ function CurrencyTool.open(player, onDone)
     })
 
     form:setFieldVisible("item", usingItems)
+    form:setFieldVisible("label", usingItems)
     form:setFieldVisible("factor", usingItems)
 
     form:initialise()
