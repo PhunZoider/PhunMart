@@ -888,6 +888,7 @@ menu. The weight on each key scales that pool's offer weights, which is why the 
 | `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                          |
 | `unpoweredSprites` | Sprite names shown when machine is unpowered                                                   |
 | `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless, and the unpowered sprites are never drawn. |
+| `light`            | The glow the machine casts: `{ "r": 255, "g": 214, "b": 170, "radius": 2 }`, colours in 0-255 and radius in tiles. Absent takes that warm white. Set `false` for a machine that stays dark. The light hangs on the square the machine faces, not on the machine. |
 | `defaultView`      | `"grid"` (default) or `"list"`, the layout the shop UI opens in                                |
 | `roll`             | Default roll: `{ "mode": "weighted", "count": { "min": N, "max": M } }`. Overridable per pool set. |
 | `poolSets`         | Array of pool sets (see below)                                                                 |

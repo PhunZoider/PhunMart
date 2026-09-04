@@ -1338,6 +1338,10 @@ function Compiler.compileAll(ctx)
                 sprites = shopDef.sprites,
                 unpoweredSprites = shopDef.unpoweredSprites,
                 powered = shopDef.powered,
+                -- {r, g, b, radius} for the glow a machine casts, in 0..255 and
+                -- tiles. Absent takes the default warm white; false is a shop
+                -- whose machines stay dark.
+                light = shopDef.light,
                 roll = shopDef.roll,
                 poolSets = compiledPoolSets,
                 restockFrequency = shopDef.restockFrequency,

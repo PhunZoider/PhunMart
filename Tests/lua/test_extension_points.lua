@@ -346,6 +346,36 @@ do
     ok("is absent when not declared", plain and plain.stocksNothing == nil)
 end
 
+print("-- light --")
+do
+    local compiled = compileShop({
+        category = "Test",
+        light = {
+            r = 10,
+            g = 20,
+            b = 30,
+            radius = 4
+        }
+    })
+    -- The client reads colour and reach off the compiled table. Dropped here
+    -- and every machine of this shop quietly falls back to the default white.
+    ok("survives compilation", compiled and compiled.light ~= nil and compiled.light.r == 10 and
+        compiled.light.radius == 4)
+
+    local dark = compileShop({
+        category = "Test",
+        light = false
+    })
+    -- false has to arrive as false rather than as nil, because nil is the shop
+    -- that never said anything and takes the default.
+    ok("and false is not the same as absent", dark and dark.light == false)
+
+    local plain = compileShop({
+        category = "Test"
+    })
+    ok("which is absent when not declared", plain and plain.light == nil)
+end
+
 print("-- a flag another mod asked to keep --")
 do
     local dropped = compileShop({
