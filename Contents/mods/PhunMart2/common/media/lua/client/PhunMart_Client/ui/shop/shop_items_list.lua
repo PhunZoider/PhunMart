@@ -572,14 +572,22 @@ function UI:renderGrid()
                 local globalRow = gl.rowOffset + row
                 local code = string.char(65 + globalRow) .. tostring(col + 1)
                 self:drawText(code, cx + 2, cy + 1, 0.35, 0.35, 0.35, 1, UIFont.Small)
-
                 -- how many are left, top-right, and only when that is a finite
                 -- number. An unmarked cell is unlimited; the details panel says
                 -- as much in words, so nothing here has to be inferred from an
                 -- absence. Amber at two or fewer, which is the point at which
                 -- "am I about to buy this out" becomes a real question.
-                if stockQty and stockQty ~= -1 and stockQty > 0 then
-                    local stockText = getText("IGUI_PhunMart_StockBadge", tostring(stockQty))
+                --
+                -- What counts as worth a badge is the offer's to say. On a shop
+                -- shelf almost everything is unlimited, so a number at all means
+                -- "only this many exist" and one is the scarcest case there is.
+                -- Somewhere every offer is finite -- a market of listings, where
+                -- most are a single item -- one is the default instead, and the
+                -- same badge would sit on nearly every tile saying nothing. Such
+                -- a grid sets minStockBadge and the count starts at two.
+                local minStock = (e.offer.offer and e.offer.offer.minStockBadge) or 1
+                if stockQty and stockQty ~= -1 and stockQty > 0 and stockQty >= minStock then
+                    local stockText = getText("IGUI_PhunMart_StockBadge", Core.utils.formatWholeNumber(stockQty))
                     local stw = getTextManager():MeasureStringX(UIFont.Small, stockText)
                     local sx = cx + cs - stw - 3
                     self:drawRect(sx - 1, cy + 1, stw + 2, FONT_SM + 1, 0.75, 0, 0, 0)
