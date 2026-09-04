@@ -37,7 +37,12 @@ local Core = PhunMart
 --- What a machine burns with when its shop says nothing: a warm white, against
 --- a night the game paints blue, at the two tiles vanilla gives a vending
 --- machine.
-local DEFAULT_LIGHT = {r = 255, g = 214, b = 170, radius = 2}
+local DEFAULT_LIGHT = {
+    r = 255,
+    g = 214,
+    b = 170,
+    radius = 2
+}
 
 --- Which way a tile faces, in squares.
 ---
@@ -46,10 +51,22 @@ local DEFAULT_LIGHT = {r = 255, g = 214, b = 170, radius = 2}
 --- of it rather than on the machine. The glow then lands on the ground the
 --- glass is facing, and the machine, being solid, shades its own back.
 local AHEAD = {
-    N = {x = 0, y = -1},
-    S = {x = 0, y = 1},
-    E = {x = 1, y = 0},
-    W = {x = -1, y = 0}
+    N = {
+        x = 0,
+        y = -1
+    },
+    S = {
+        x = 0,
+        y = 1
+    },
+    E = {
+        x = 1,
+        y = 0
+    },
+    W = {
+        x = -1,
+        y = 0
+    }
 }
 
 -- How far in front to hang it. Zero puts the light back on the machine.
@@ -240,7 +257,12 @@ local met = {}
 
 local function note(x, y, z, shopKey)
     local key = keyFor(x, y, z)
-    met[key] = {x = x, y = y, z = z, type = shopKey}
+    met[key] = {
+        x = x,
+        y = y,
+        z = z,
+        type = shopKey
+    }
     settleAt(x, y, z, shopKey)
 end
 
