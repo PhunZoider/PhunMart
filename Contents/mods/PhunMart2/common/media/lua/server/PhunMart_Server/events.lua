@@ -28,8 +28,20 @@ Events.OnCharacterDeath.Add(function(character)
 
     Core.playtimeRewards:getPlayerData(character).previousHours = character:getHoursSurvived()
 
-    -- Drop wallet item if enabled
-    if Core.settings.DropOnDeath then
+    -- What death does to a balance, per the WalletOnDeath sandbox option. One
+    -- setting rather than the DropOnDeath boolean and a second one beside it,
+    -- because the two could be set to contradict each other: dropping moves the
+    -- balance out of the wallet and into an item, so drop-and-keep together
+    -- would put the same money in two places and a death would double it.
+    -- Three exclusive states say what an admin actually gets to choose between.
+    local DEATH_DROP = 1 -- a wallet on the body, scaled by ReturnRate
+    local DEATH_KEEP = 2 -- straight over to the next character
+    local DEATH_LOSE = 3 -- gone
+    local onDeath = Core.getOption("WalletOnDeath", DEATH_DROP)
+
+    -- Move the balance onto the body, scaled by ReturnRate. Whatever the rate
+    -- holds back is left in the wallet for the reset below to wipe.
+    if onDeath == DEATH_DROP then
         local walletData = Core.wallet:get(character)
         local current = walletData and walletData.current or {}
         -- ReturnRate, which is what sandbox-options.txt actually declares.
@@ -64,8 +76,19 @@ Events.OnCharacterDeath.Add(function(character)
         end
     end
 
-    -- Reset wallet (zero unbound, restore bound)
-    Core.wallet:reset(character)
+    if onDeath == DEATH_KEEP then
+        -- reset would zero the unbound pools, which is the one thing this mode
+        -- exists to prevent. It also tops bound pools back up though, a separate
+        -- mechanic that has nothing to do with the choice being made here, so
+        -- run that half on its own: a spent token allowance still refills on
+        -- death rather than the setting quietly carrying that off with it.
+        Core.wallet:restoreBound(character)
+    else
+        -- DEATH_LOSE, and anything unrecognised. Zero the unbound pools and
+        -- restore the bound ones, which is also what DEATH_DROP wants for the
+        -- remainder the return rate held back.
+        Core.wallet:reset(character)
+    end
 end)
 
 -- The wallet used to be flushed to disk here as well. It lives only in ModData

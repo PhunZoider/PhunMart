@@ -247,6 +247,38 @@ function Core.wallet:setPlayerData(player, data)
     end
 end
 
+--- Top the bound pools back up to their bound amount, leaving the unbound ones
+--- alone. Half of what reset does, on its own.
+---
+--- WalletOnDeath = Kept skips reset to save the unbound balance, and skipping all
+--- of it would quietly carry off the bound-pool refill too: spend half your
+--- tokens, die, and you would come back with half rather than the full
+--- allowance the bound amount promises. That refill is its own mechanic and not
+--- the thing the option is turning off.
+---
+--- Only ever tops up, where reset assigns, so a balance somehow above its bound
+--- amount is left alone. Taking money off somebody is the wrong direction for a
+--- setting whose whole promise is that dying costs them nothing.
+function Core.wallet:restoreBound(player)
+    local name = self:nameOf(player)
+    local w = self:get(name)
+    if not w then
+        return
+    end
+    for pool, def in pairs(self.pools) do
+        if def.bound then
+            local boundAmt = w.bound[pool] or 0
+            local cur = w.current[pool] or 0
+            if boundAmt > cur then
+                w.current[pool] = boundAmt
+                if Core.fileUtils then
+                    Core.fileUtils.logTo(self.log, name, pool, boundAmt - cur)
+                end
+            end
+        end
+    end
+end
+
 -- Reset: zeroes unbound pools, restores bound pools to their bound amount.
 --
 -- Accepts a player, a username, or a raw key from the wallet table. That last

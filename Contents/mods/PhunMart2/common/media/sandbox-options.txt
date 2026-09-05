@@ -41,12 +41,14 @@ option PhunMart.ChangeDropMode
     valueTranslation = PhunMart_ChangeDropMode,
 }
 
-option PhunMart.DropOnDeath
+option PhunMart.WalletOnDeath
 {
-    type = boolean,
-    default = true,
+    type = enum,
+    numValues = 3,
+    default = 1,
     page = PhunMart,
-    translation = PhunMart_WalletDropOnDeath,
+    translation = PhunMart_WalletOnDeath,
+    valueTranslation = PhunMart_WalletOnDeath,
 }
 
 option PhunMart.OnlyPickupOwn
