@@ -47,6 +47,17 @@ module PhunMart
         DisplayCategory = Currency,
     }
 
+    item Change
+    {
+        DisplayName = Change,
+        ItemType = base:normal,
+        Weight = 0.1,
+        Icon = SilverDollar,
+        WorldStaticModel = SilverCoin,
+        StaticModel = SilverCoin,
+        DisplayCategory = Currency,
+    }
+
     item Token
     {
         Weight = 0.01,

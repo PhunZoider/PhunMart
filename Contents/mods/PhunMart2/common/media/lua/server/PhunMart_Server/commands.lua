@@ -712,7 +712,12 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
         end
     end
     if not walletItem then
-        walletItem = inv:getFirstTypeRecurse("PhunMart.DroppedWallet")
+        for itemType in pairs(Core.wallet.walletItems) do
+            walletItem = inv:getFirstTypeRecurse(itemType)
+            if walletItem then
+                break
+            end
+        end
     end
     if walletItem then
         local container = walletItem:getContainer()

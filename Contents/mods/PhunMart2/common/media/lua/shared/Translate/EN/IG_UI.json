@@ -567,6 +567,7 @@
   "IGUI_PhunMart_Template": "template",
   "IGUI_ItemCat_Currency": "Currency",
   "IGUI_PhunMart_CharsWallet": "%1's Wallet",
+  "IGUI_PhunMart_ChangeAmount": "Change (%1)",
   "IGUI_PhunMart_Title_EditReward": "Edit Milestone",
   "IGUI_PhunMart_Title_AddReward": "Add Milestone",
   "IGUI_PhunMart_Btn_Rewards": "Rewards",

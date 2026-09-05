@@ -385,22 +385,11 @@ end
 
 -- Format cents as a currency string ("$1.50", "$2", "$12,750").
 --
--- Grouped, because the figures stopped being small. A vehicle at three thousand
--- seven hundred and eighty five drawn as 3785 is a number the eye has to count
--- the digits of, sitting in a list where everything else is loose change, and
--- misreading it by a factor of ten is the expensive direction to be wrong in.
--- `forcePence` keeps the .00 on a whole number of dollars. Only a range wants
--- that: "$2.50 - $6" reads as a mismatch where "$2.50 - $6.00" reads as a pair.
+-- The body lives in Core.utils now, because the server names a Change item with
+-- it and cannot reach this file. Kept here as an alias rather than chased
+-- through the twenty-odd call sites that already read tools.formatCents.
 function tools.formatCents(n, forcePence)
-    n = tonumber(n) or 0
-    local sign = n < 0 and "-" or ""
-    local abs = math.abs(math.floor(n))
-    local whole = Core.utils.formatWholeNumber(math.floor(abs / 100))
-    local rem = abs % 100
-    if rem == 0 and not forcePence then
-        return sign .. "$" .. whole
-    end
-    return sign .. "$" .. whole .. string.format(".%02d", rem)
+    return Core.utils.formatCents(n, forcePence)
 end
 
 --- What a price key actually costs, in words, resolved through its inherit

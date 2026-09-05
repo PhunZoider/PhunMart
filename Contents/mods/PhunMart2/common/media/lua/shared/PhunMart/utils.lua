@@ -291,6 +291,29 @@ function utils.formatWholeNumber(n)
     return sign .. s
 end
 
+--- Cents as dollars: 250 -> "$2.50", 300 -> "$3", 378500 -> "$3,785".
+---
+--- Grouped, because the figures stopped being small. A vehicle at three thousand
+--- seven hundred and eighty five drawn as 3785 is a number the eye has to count
+--- the digits of, sitting in a list where everything else is loose change, and
+--- misreading it by a factor of ten is the expensive direction to be wrong in.
+--- `forcePence` keeps the .00 on a whole number of dollars. Only a range wants
+--- that: "$2.50 - $6" reads as a mismatch where "$2.50 - $6.00" reads as a pair.
+---
+--- Shared rather than client-side, which is where it used to live, because the
+--- server names a Change item after the amount inside it.
+function utils.formatCents(n, forcePence)
+    n = tonumber(n) or 0
+    local sign = n < 0 and "-" or ""
+    local abs = math.abs(math.floor(n))
+    local whole = utils.formatWholeNumber(math.floor(abs / 100))
+    local rem = abs % 100
+    if rem == 0 and not forcePence then
+        return sign .. "$" .. whole
+    end
+    return sign .. "$" .. whole .. string.format(".%02d", rem)
+end
+
 function utils.formatNumber(number, decimals)
     number = number or 0
     local roundedNumber = math.floor(number + (decimals and 0.005 or 0.5))

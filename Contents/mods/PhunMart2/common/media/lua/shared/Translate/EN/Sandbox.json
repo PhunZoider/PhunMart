@@ -12,6 +12,12 @@
   "Sandbox_PhunMart_MaxCoinsToDrop": "Maximum cents to drop",
   "Sandbox_PhunMart_MaxCoinsToDrop_tooltip": "The maximum number of cents a zombie can drop upon death.",
 
+  "Sandbox_PhunMart_ChangeDropMode": "How zombies pay out",
+  "Sandbox_PhunMart_ChangeDropMode_tooltip": "How a zombie's coin drop reaches the player. This only picks the form it arrives in: the drop chance and the min/max amounts above still apply to all three, as does any per-zone tuning from PhunZones.",
+  "Sandbox_PhunMart_ChangeDropMode_option1": "Loose coins",
+  "Sandbox_PhunMart_ChangeDropMode_option2": "A single Change item",
+  "Sandbox_PhunMart_ChangeDropMode_option3": "Straight into the wallet",
+
   "Sandbox_PhunMart_WalletDropOnDeath": "Drop wallet on death",
   "Sandbox_PhunMart_WalletDropOnDeath_tooltip": "If enabled, players will drop their wallet upon death",
 
@@ -25,10 +31,10 @@
   "Sandbox_PhunMart_WalletReturnRate_tooltip": "The percentage of money that is returned to the player on death. 0 means no money is returned, 100 means all money is returned.",
 
   "Sandbox_PhunMart_ChangeCapCents": "Change Balance Cap (cents)",
-  "Sandbox_PhunMart_ChangeCapCents_tooltip": "Maximum cents a player can carry (9999 = $99.99). At cap, coins left on the ground will not be consumed.",
+  "Sandbox_PhunMart_ChangeCapCents_tooltip": "Maximum cents a player can carry (9999 = $99.99). At cap, coins left on the ground will not be consumed. Set to 0 for no cap.",
 
   "Sandbox_PhunMart_TokenCap": "Token Balance Cap",
-  "Sandbox_PhunMart_TokenCap_tooltip": "Maximum number of special tokens a player can carry.",
+  "Sandbox_PhunMart_TokenCap_tooltip": "Maximum number of special tokens a player can carry. Set to 0 for no cap.",
 
   "Sandbox_PhunMart_EnableChangePool": "Enable Change Pool",
   "Sandbox_PhunMart_EnableChangePool_tooltip": "Show the change (coin) currency pool in the shop UI and wallet tab. Disabling hides it from players but does not delete balances.",

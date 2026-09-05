@@ -25,8 +25,8 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
     local itemType = item:getFullType()
     local wallet = nil
 
-    if itemType == "PhunMart.DroppedWallet" then
-        -- picking up a players dropped wallet
+    if Wallet:isWalletItem(itemType) then
+        -- picking up a dropped wallet, or a zombie's change
         wallet = item:getModData().PhunWallet
         if wallet then
             local name = player:getUsername()

@@ -43,21 +43,63 @@ Core.wallet = {
             format = "count",
             bound = true
         }
+    },
+
+    -- Item types that carry a balance in their own modData rather than a fixed
+    -- value. Deliberately not in currencies above: an entry there maps a type
+    -- to one flat pool amount, and these hold whatever they were built with.
+    -- Adding one to currencies would make isCurrency true for it, at which
+    -- point the coin path treats it as a fixed pickup and grantConfigReward
+    -- credits a constant for it.
+    --
+    -- Change is named for the pool label the shop UI already prices everything
+    -- in, and carries its own icon rather than the wallet's: most zombies spawn
+    -- holding a vanilla Wallet, and two items both reading "Wallet" in one
+    -- corpse, only one of which pays out, is the confusion the whole mode
+    -- exists to avoid.
+    walletItems = {
+        -- Somebody's balance, dropped where they died. Carries their name.
+        ["PhunMart.DroppedWallet"] = true,
+        -- Came off a zombie, so it belongs to whoever finds it.
+        ["PhunMart.Change"] = true
     }
 }
 
--- Returns the cap for a given pool, read from sandbox settings.
+--- The ceiling for a pool, in that pool's own units, or nil for no ceiling.
+---
+--- Zero means unlimited rather than a cap of nothing. Both options declare
+--- min = 0 in sandbox-options.txt, so an admin can pick it, and read literally
+--- it meant players could never hold a cent: coin pickups were refused outright
+--- and left on the ground, while the wallet and Change paths credited nothing
+--- and consumed the item anyway, destroying the money. "Nobody has any money"
+--- is what EnableChangePool = false says properly, so a 0 here is far more
+--- likely to be somebody reaching for "no limit".
+---
+--- nil is what every caller already tests for. The `cap and ...` guards through
+--- the pickup paths were written expecting it, but until now getCap only
+--- returned nil for a pool it did not recognise, so those branches never ran.
 function Core.wallet:getCap(pool)
+    local cap
     if pool == "change" then
-        return Core.settings.ChangeCapCents or 9999
+        cap = Core.settings.ChangeCapCents or 9999
     elseif pool == "tokens" then
-        return Core.settings.TokenCap or 99
+        cap = Core.settings.TokenCap or 99
     end
-    return nil
+    if cap == 0 then
+        return nil
+    end
+    return cap
 end
 
 function Core.wallet:isCurrency(item)
     return Core.wallet.currencies[item] ~= nil
+end
+
+--- True for the items that carry a balance in modData: a dropped wallet, or the
+--- change off a zombie. Both ride the same pickup path, which reads the amount
+--- off the item rather than off a lookup table.
+function Core.wallet:isWalletItem(item)
+    return Core.wallet.walletItems[item] == true
 end
 
 function Core.wallet:isBound(item)
@@ -306,6 +348,115 @@ function Core.wallet:getBalance(player, pool)
     return 0
 end
 
+--- Builds the item a balance travels in, without placing it anywhere.
+---
+--- Split out of spawnDroppedItem because a zombie's payout goes into the
+--- corpse's inventory rather than onto a square. Everything up to the placement
+--- is the same for both.
+---
+--- opts.itemType picks the vessel and defaults to DroppedWallet. Pass nil for
+--- ownerValue and ownerName to get the anonymous kind: no owner to check
+--- OnlyPickupOwn against, and no name override, so it shows the DisplayName
+--- from its item script instead of being called somebody's wallet.
+function Core.wallet:makeWalletItem(entries, ownerValue, ownerName, opts)
+    opts = opts or {}
+    local itemType = opts.itemType or "PhunMart.DroppedWallet"
+    local item = instanceItem(itemType)
+    if not item then
+        error("instanceItem returned nil for " .. tostring(itemType))
+    end
+    if ownerName then
+        -- getText is client-side only; on a dedicated server it returns the raw
+        -- key, which then gets transmitted to clients as the item name. Only
+        -- translate in SP (where isLocal is true); in MP leave the plain string.
+        local walletName = ownerName .. "'s Wallet"
+        if Core.isLocal then
+            pcall(function()
+                walletName = getText("IGUI_PhunMart_CharsWallet", ownerName)
+            end)
+        end
+        item:setName(walletName)
+    end
+    item:getModData().PhunWallet = {
+        owner = ownerValue,
+        wallet = entries,
+        anyone = opts.anyone == true or nil
+    }
+    return item
+end
+
+--- What a Change item calls itself: "Change ($0.40)".
+---
+--- The amount is on the label because the item is looted out of a corpse, where
+--- the only thing the player has to go on is the name in the list. Coins mode
+--- never had this problem, a Quarter says what it is worth, and an unlabelled
+--- Change item would be the one thing in the loot window whose value you can
+--- only learn by taking it.
+---
+--- Same getText handling as the wallet name below it: client-side only, so a
+--- dedicated server would transmit the raw key as the item's name. Translate in
+--- singleplayer, plain string in multiplayer.
+local function changeItemName(entries)
+    local parts = {}
+    for _, entry in ipairs(entries or {}) do
+        local poolDef = Core.wallet.pools[entry.pool]
+        local amount = tonumber(entry.amount) or 0
+        if poolDef and amount > 0 then
+            if poolDef.format == "cents" then
+                table.insert(parts, Core.utils.formatCents(amount))
+            else
+                table.insert(parts, amount .. " " .. tostring(poolDef.label))
+            end
+        end
+    end
+    if #parts == 0 then
+        return nil
+    end
+
+    local amounts = table.concat(parts, ", ")
+    local name = "Change (" .. amounts .. ")"
+    if Core.isLocal then
+        pcall(function()
+            name = getText("IGUI_PhunMart_ChangeAmount", amounts)
+        end)
+    end
+    return name
+end
+
+--- Puts an anonymous Change item into a container, which is how a zombie's
+--- payout reaches the player: they loot it off the corpse like anything else.
+---
+--- anyone is forced on rather than left to the caller. OnlyPickupOwn compares a
+--- pickup against the item's owner field, and change off a zombie has no owner,
+--- so without the flag a server running that option would let nobody take it.
+---
+--- AddItem paired with sendAddItemToContainer, the same as grantConfigReward:
+--- on a dedicated server AddItem alone builds the item in the server's copy of
+--- the container and the client never hears about it.
+--- Only call from a server/SP context.
+function Core.wallet:addChangeToContainer(container, entries)
+    if not container or not entries or #entries == 0 then
+        return
+    end
+    local ok, err = pcall(function()
+        local item = self:makeWalletItem(entries, nil, nil, {
+            itemType = "PhunMart.Change",
+            anyone = true
+        })
+        local name = changeItemName(entries)
+        if name then
+            item:setName(name)
+        end
+        local added = container:AddItem(item)
+        if added then
+            sendAddItemToContainer(container, added)
+        end
+    end)
+    if not ok then
+        Core.debugLn("addChangeToContainer failed: " .. tostring(err))
+    end
+end
+
 -- Spawns a DroppedWallet item containing the given pool amounts on the square.
 -- entries = { {pool="change", amount=500}, ... }. Caller deducts balances first.
 -- opts.anyone = true lets any player pick it up regardless of OnlyPickupOwn.
@@ -327,25 +478,7 @@ function Core.wallet:spawnDroppedItem(player, square, entries, opts)
     end
 
     local ok, err = pcall(function()
-        local item = instanceItem("PhunMart.DroppedWallet")
-        if not item then
-            error("instanceItem returned nil for PhunMart.DroppedWallet")
-        end
-        -- getText is client-side only; on a dedicated server it returns the raw
-        -- key, which then gets transmitted to clients as the item name. Only
-        -- translate in SP (where isLocal is true); in MP leave the plain string.
-        local walletName = username .. "'s Wallet"
-        if Core.isLocal then
-            pcall(function()
-                walletName = getText("IGUI_PhunMart_CharsWallet", username)
-            end)
-        end
-        item:setName(walletName)
-        item:getModData().PhunWallet = {
-            owner = ownerValue,
-            wallet = entries,
-            anyone = opts.anyone == true or nil
-        }
+        local item = self:makeWalletItem(entries, ownerValue, username, opts)
         -- Mirror ISDropWorldItemAction's spawn pattern exactly so the resulting
         -- world object is tracked like any other dropped item and the standard
         -- ISInventoryTransferAction pickup path cleans it off the square

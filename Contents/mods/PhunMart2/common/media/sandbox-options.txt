@@ -31,6 +31,16 @@ option PhunMart.MaxCoinsToDrop
     translation = PhunMart_MaxCoinsToDrop,
 }
 
+option PhunMart.ChangeDropMode
+{
+    type = enum,
+    numValues = 3,
+    default = 1,
+    page = PhunMart,
+    translation = PhunMart_ChangeDropMode,
+    valueTranslation = PhunMart_ChangeDropMode,
+}
+
 option PhunMart.DropOnDeath
 {
     type = boolean,
