@@ -111,9 +111,20 @@ The `currency_25` entry overrides just that one child.
 
 ## Things to keep in mind
 
-- **The change wallet becomes decorative.** With `kind = "items"` the system checks inventory
-  instead of the wallet, so the balance in the character panel no longer buys anything. Turn
-  the pool off entirely with the **EnableChangePool** sandbox setting.
+- **Turn the change pool off.** This is the one step people miss. With `kind = "items"` the
+  system checks inventory instead of the wallet, so the change balance no longer buys
+  anything, but nothing else stops on its own: zombies carry on paying out nickels, dimes and
+  quarters into a balance that has become decorative, and players carry on collecting a
+  currency they cannot spend. Set **EnableChangePool** to false in the sandbox settings.
+
+  That single setting covers all of it. It gates the whole zombie payout, so no coins, no
+  Change item and no wallet credit regardless of what `ChangeDropMode` says, and it hides the
+  change row from both the wallet tab and the shop's balance panel. `ChanceToDropChange` does
+  not need setting to 0 as well.
+
+  It does not retroactively clean up: coins already lying in the world stay there, and
+  balances already banked stay on the record, they simply stop being visible or useful. Use
+  the admin Wallets grid to zero them if you want a clean start.
 
 - **Token prices are unaffected.** Prices using `pool = "tokens"` inherit from `token_base`,
   not `currency_base`, so token-priced shops such as TraiterJoes carry on as before. Switch
