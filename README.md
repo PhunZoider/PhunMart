@@ -2,11 +2,11 @@
 
 A Project Zomboid (B42) mod that converts vanilla vending machines into 16 themed automated
 shops, dispensing food, gear, weapons, vehicles, livestock, skill books, traits, XP boosts, and more.
-Stock rotates on a timer. Coins come from scavenging. Tokens come from surviving.
+Stock rotates on a timer. Coins come off the dead. Tokens come from surviving.
 
 Shops source from the game's item catalogue by category, so **modded items show up
 automatically**, no config needed. Right-click a machine, browse the shop UI, and buy with
-**change** (coins found as loot) or **tokens** (earned through milestones and trade-ins).
+**change** (dropped by the zombies you kill) or **tokens** (earned through milestones and trade-ins).
 Admins can place machines manually and override every aspect of the system through Lua files.
 
 > **Requires:** Project Zomboid Build 42 (singleplayer or multiplayer)
@@ -51,17 +51,20 @@ PhunMart uses two separate wallets:
 
 ### Change (loose coin)
 
-- Found as loot throughout the world: **Nickel** (5¢), **Dime** (10¢), **Quarter** (25¢)
-- Stored as a cents balance (integer). Cap: **$99.99** by default (configurable)
+- Dropped by the zombies you kill: **Nickel** (5¢), **Dime** (10¢), **Quarter** (25¢). Not found in
+  containers. Also credited by trade-ins at PrawnStars
+- How a payout arrives is configurable: loose coins, a single **Change** item holding the lot, or
+  credited straight to the wallet with no item to pick up. See `ChangeDropMode`
+- Stored as a cents balance (integer). Cap: **$99.99** by default (configurable, 0 for no cap)
 - Used for everyday purchases: food, tools, medical, clothing, books
-- On death, the player drops a wallet containing their coins that only they can pick up
-  (configurable return rate via sandbox settings)
+- On death the balance is dropped where the player fell, kept, or lost, per `WalletOnDeath`. A
+  dropped wallet can be set so only its owner may pick it up
 
 ### Tokens (bound)
 
 - **Not found as loot**. Earned only through milestones and the Collectors machine
 - Bound to the account, so they survive character death
-- Cap: **60 tokens** by default (configurable)
+- Cap: **60 tokens** by default (configurable, 0 for no cap)
 - Used for high-value purchases, specifically traits
 
 The wallet balance is shown in the shop UI so players always know what they can afford.
@@ -122,22 +125,26 @@ All settings live on the **PhunMart** page of the server sandbox editor, or unde
 
 | Option               | Default | Description                                                                    |
 | -------------------- | ------- | ------------------------------------------------------------------------------ |
-| `ChangeCapCents`     | 9999    | Maximum change balance per player, in cents (9999 = $99.99)                    |
-| `TokenCap`           | 60      | Maximum token balance per player                                               |
+| `ChangeCapCents`     | 9999    | Maximum change balance per player, in cents (9999 = $99.99). 0 for no cap      |
+| `TokenCap`           | 60      | Maximum token balance per player. 0 for no cap                                 |
 | `EnableChangePool`   | true    | Whether the change wallet exists at all                                        |
 | `EnableTokenPool`    | true    | Whether the token wallet exists at all                                         |
-| `DropOnDeath`        | true    | Whether the player drops a wallet item on death                                |
-| `ReturnRate`         | 100     | Percent of change returned in the dropped wallet (100 = all, 0 = none)         |
+| `WalletOnDeath`      | Dropped | What death does to a balance: dropped where they died, kept, or lost           |
+| `ReturnRate`         | 100     | Percent of change that reaches the dropped wallet. Only used when it is Dropped |
 | `OnlyPickupOwn`      | true    | Whether only the owner can pick up their death wallet                          |
 | `AllowWalletDrop`    | true    | Whether players can drop currency by hand. Deliberate drops are always public. |
 
-**Coin loot**
+**Zombie payouts**
 
-| Option               | Default | Description                                            |
-| -------------------- | ------- | ------------------------------------------------------ |
-| `ChanceToDropChange` | 30      | Percent chance a searched container yields loose coins |
-| `MinCoinsToDrop`     | 5       | Lowest coin value dropped, in cents                    |
-| `MaxCoinsToDrop`     | 75      | Highest coin value dropped, in cents                   |
+| Option               | Default     | Description                                                                    |
+| -------------------- | ----------- | ------------------------------------------------------------------------------ |
+| `ChangeDropMode`     | Loose coins | How a payout reaches the player: loose coins, one Change item holding the lot, or credited straight to the wallet. Only picks the form, so the three settings below apply to all three |
+| `ChanceToDropChange` | 30          | Percent chance a zombie pays out at all when killed                             |
+| `MinCoinsToDrop`     | 5           | Lowest payout, in cents                                                         |
+| `MaxCoinsToDrop`     | 75          | Highest payout, in cents                                                        |
+
+With [PhunZones](https://github.com/PhunZoider/PhunZones) installed, the chance and the min/max can
+be overridden per zone, and again for sprinters if PhunSprinters is loaded.
 
 **Access and diagnostics**
 
