@@ -19,8 +19,8 @@
   "Sandbox_PhunMart_ChangeDropMode_option3": "Straight into the wallet",
 
   "Sandbox_PhunMart_WalletOnDeath": "What happens to a balance on death",
-  "Sandbox_PhunMart_WalletOnDeath_tooltip": "Dropped leaves a wallet on the body to be recovered, scaled by the return rate below. Kept carries the balance straight over to the next character, with nothing to walk back for. Lost wipes it. Bound pools such as tokens are restored to their allowance in all three.",
-  "Sandbox_PhunMart_WalletOnDeath_option1": "Dropped on the body",
+  "Sandbox_PhunMart_WalletOnDeath_tooltip": "Dropped leaves a wallet on the ground where the player died, to be walked back for, scaled by the return rate below. It lands on the ground rather than on the corpse so that a zombie wandering into a zone that clears zombies cannot carry it off. Kept moves the balance straight to the next character, with nothing to recover. Lost wipes it. Bound pools such as tokens are restored to their allowance in all three.",
+  "Sandbox_PhunMart_WalletOnDeath_option1": "Dropped where they died",
   "Sandbox_PhunMart_WalletOnDeath_option2": "Kept by the player",
   "Sandbox_PhunMart_WalletOnDeath_option3": "Lost",
 

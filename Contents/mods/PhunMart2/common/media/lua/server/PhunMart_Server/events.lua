@@ -34,13 +34,18 @@ Events.OnCharacterDeath.Add(function(character)
     -- balance out of the wallet and into an item, so drop-and-keep together
     -- would put the same money in two places and a death would double it.
     -- Three exclusive states say what an admin actually gets to choose between.
-    local DEATH_DROP = 1 -- a wallet on the body, scaled by ReturnRate
+    local DEATH_DROP = 1 -- a wallet on the ground where they fell, per ReturnRate
     local DEATH_KEEP = 2 -- straight over to the next character
     local DEATH_LOSE = 3 -- gone
     local onDeath = Core.getOption("WalletOnDeath", DEATH_DROP)
 
-    -- Move the balance onto the body, scaled by ReturnRate. Whatever the rate
-    -- holds back is left in the wallet for the reset below to wipe.
+    -- Move the balance onto the square the player died on, scaled by
+    -- ReturnRate. Whatever the rate holds back stays in the wallet for the
+    -- reset below to wipe.
+    --
+    -- The ground rather than the corpse, deliberately: a body can be a zombie
+    -- that walks, and one wandering into a zone that clears zombies would take
+    -- somebody's balance with it.
     if onDeath == DEATH_DROP then
         local walletData = Core.wallet:get(character)
         local current = walletData and walletData.current or {}
