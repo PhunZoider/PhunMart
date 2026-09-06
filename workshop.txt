@@ -14,12 +14,14 @@ description=Sell livestock.
 description=Sell rewards for rare items.
 description=Sell whatever your server dreams up.
 description=
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522]New! Player shops![/url]
+description=
 description=[h2]What Makes PhunMart Different[/h2]
 description=PhunMart isn't just a shop mod. It's a [b]complete economy framework[/b] built into vending machines.
 description=[list]
 description=[*][b]Works out of the box[/b]: subscribe, launch, and themed shops appear in the world with no setup required
-description=[*][b]Built-in currency system[/b]: PhunWallet tracks change (looted) and tokens (earned through gameplay) per player
-description=[*][b]Bring your own currency[/b]: use any physical item as payment (cash, gold, tokens from other mods) with a single config line
+description=[*][b]Built-in currency system[/b]: the Wallet tracks change (looted) and tokens (earned through gameplay) per player and can be found in the character info window
+description=[*][b]Bring your own currency[/b]: Want to use a different system? You can use any physical item as payment (cash, gold, or tokens from other mods) with a simple switch
 description=[*][b]Sell the unsellable[/b]: not just items. XP boosts, traits, vehicles, livestock, and custom rewards are all on the menu
 description=[*][b]PrawnStars[/b]: a built-in pawn shop where players sell valuables back for currency
 description=[*][b]Works with modded items[/b]: any item in the game, vanilla or modded, can be stocked and sold
@@ -55,11 +57,6 @@ description=Both pools have configurable caps, earn rates, and death-recovery se
 description=
 description=[b]Want to use a different currency?[/b] PhunMart supports [b]any physical item as payment[/b]: cash items, gold bars, tokens from other mods, custom items. If it exists in the game, it can be a currency. See the guide below for setup.
 description=
-description=[h2]Upgrading from before B42.20.4[/h2]
-description=That build removed loadstring, so the old .txt config files can no longer be read and PhunMart's override files are JSON now. Your old files are untouched and the server log names any it cannot read. This only affects you if you hand-edited them.
-description=
-description=[url=https://steamcommunity.com/workshop/filedetails/discussion/3689006725/582806854239822290/]Converting your config files[/url]
-description=
 description=[h2]Customisation[/h2]
 description=PhunMart is deeply configurable, but to keep this page readable the full guides live here:
 description=
@@ -90,7 +87,7 @@ description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
 description=
 description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522][img]https://i.ibb.co/k2k39f8w/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url] 
-description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3792193021][img]https://i.ibb.co/vCBcKtp8/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url]  [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522][img]https://i.ibb.co/k2k39f8w/preview.png[/img][/url]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3792193021][img]https://i.ibb.co/vCBcKtp8/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522][img]https://i.ibb.co/k2k39f8w/preview.png[/img][/url]
 description=
 description=Coded with love for the awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=
