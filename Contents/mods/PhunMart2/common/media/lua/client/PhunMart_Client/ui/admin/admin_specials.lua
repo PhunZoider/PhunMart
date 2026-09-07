@@ -149,8 +149,8 @@ local ACTION_GROUPS = {
     giveItem = "act_item"
 }
 
-local ALL_ACTION_GROUPS = {"act_trait", "act_xp", "act_boost", "act_vehicle", "act_animal", "act_tokens",
-                           "act_balance", "act_item"}
+local ALL_ACTION_GROUPS = {"act_trait", "act_xp", "act_boost", "act_vehicle", "act_animal", "act_tokens", "act_balance",
+                           "act_item"}
 
 -- Which filter tab an action type belongs to. "Special" means nothing to
 -- someone looking for a vehicle, so the list is grouped by what the thing
@@ -291,8 +291,7 @@ local FIELD_SOURCE = {
     end,
     -- One key, matching the one range field that replaced the two boxes.
     stock = function(d)
-        return d.offer ~= nil and d.offer.stock ~= nil and
-                   (d.offer.stock.min ~= nil or d.offer.stock.max ~= nil)
+        return d.offer ~= nil and d.offer.stock ~= nil and (d.offer.stock.min ~= nil or d.offer.stock.max ~= nil)
     end,
     enabled = function(d)
         return d.enabled ~= nil
@@ -444,8 +443,8 @@ local function createActionModal(action, isNew, onDone)
             KeyPicker.open(getSpecificPlayer(0), getTraitOptions(), selectedTrait and {selectedTrait} or {},
                 function(picked)
                     selectedTrait = picked
-                    f:setPickerValue("trait", selectedTrait,
-                        selectedTrait and Traits.getLabel(selectedTrait) or getText("IGUI_PhunMart_Lbl_None"))
+                    f:setPickerValue("trait", selectedTrait, selectedTrait and Traits.getLabel(selectedTrait) or
+                        getText("IGUI_PhunMart_Lbl_None"))
                 end, {
                     title = getText("IGUI_PhunMart_Admin_PickTrait"),
                     singleSelect = true
@@ -797,7 +796,7 @@ local function createEditModal(specialKey, specialDef, isNew, cb)
     })
     form:addTextField("title", getText("IGUI_PhunMart_Lbl_Title"), {
         default = def.title or "",
-        hint = getText("IGUI_PhunMart_Hint_Title"),
+        hint = getText("IGUI_PhunMart_Hint_Title")
     })
 
     -- Template checkbox
@@ -1054,9 +1053,16 @@ function UI:createChildren()
             return 0.9, 0.85, 0.3
         end
     end)
-    self:addListColumn(getText("IGUI_PhunMart_Col_Type"), 0.32, {field = "typeCol"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Display"), 0.55, {field = "display"})
-    self:addListColumn(getText("IGUI_PhunMart_Col_Action"), 0.78, {field = "action", color = {0.7, 0.7, 0.7}})
+    self:addListColumn(getText("IGUI_PhunMart_Col_Type"), 0.32, {
+        field = "typeCol"
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Display"), 0.55, {
+        field = "display"
+    })
+    self:addListColumn(getText("IGUI_PhunMart_Col_Action"), 0.78, {
+        field = "action",
+        color = {0.7, 0.7, 0.7}
+    })
 
     local tabs = {}
     for _, t in ipairs(DOMAIN_TABS) do

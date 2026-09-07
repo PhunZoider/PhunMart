@@ -227,6 +227,25 @@ function ServerSystem.addToWorld(square, shop, direction)
     square:AddSpecialObject(isoObject, -1)
     triggerEvent("OnObjectAdded", isoObject)
     isoObject:transmitCompleteItemToClients()
+    -- Sent again, by name, because the complete-item packet does not reliably
+    -- carry a modded sprite. The machine arrives on the client named and real
+    -- but wearing nothing: it draws nothing, it hands RecalcProperties no solid
+    -- flag to fold in, and it carries no CustomName for the client's
+    -- checkObjectAdded to recognise -- so a player walks through a machine they
+    -- cannot right-click. transmitUpdatedSpriteToClients is the path that
+    -- survives, and it is already what applyTypeSprite uses to put the face
+    -- back on a machine whose sprite a client could not resolve.
+    isoObject:transmitUpdatedSpriteToClients()
+    -- An IsoThumpable carried its own collision; a plain IsoObject does not. The
+    -- machine blocks movement only once the square has folded the sprite's
+    -- solid/solidtrans flag into its own properties, and nothing on the way here
+    -- does that: the transmitRemoveItemFromSquare that precedes most calls drops
+    -- the old machine's flags, and AddSpecialObject does not put the new one's
+    -- back. Without these two the machine draws, lights, opens and sells, and
+    -- the player walks straight through it. Every vanilla placement path in
+    -- ISMoveableSpriteProps ends on the same pair.
+    square:RecalcProperties()
+    square:RecalcAllWithNeighbours(true)
     return true
 
 end

@@ -39,6 +39,25 @@ Events.OnObjectAdded.Add(function(object)
     Core.ClientSystem.instance:checkObjectAdded(object)
 end)
 
+-- A machine arriving without its sprite leaves a square nothing has folded a
+-- solid flag into. The sprite follows in its own packet, which updates the
+-- sprite and raises no event, so the system watches the square for a few
+-- seconds and finishes the job when it lands. Costs a table lookup on a tick
+-- with nothing waiting, which is every tick but those few.
+Events.OnTick.Add(function()
+    if Core.ClientSystem.instance then
+        Core.ClientSystem.instance:pollPendingSolids()
+    end
+end)
+
+-- Recovery for machines already standing in a save with a walk-through square:
+-- their sprite is back, but the flags were folded in while it was missing.
+Events.LoadGridsquare.Add(function(square)
+    if Core.ClientSystem.instance then
+        Core.ClientSystem.instance:checkSquareLoaded(square)
+    end
+end)
+
 Events.OnPreFillWorldObjectContextMenu.Add(function(playerObj, context, worldobjects, test)
     Core.contexts.open(playerObj, context, worldobjects, test)
     Core:reloadShopDefinitions()

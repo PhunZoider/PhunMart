@@ -498,6 +498,17 @@ end
 
 --- Put the machine's face in step with its type, whatever that type now is.
 ---
+--- setSpriteFromName, not setSprite. IsoObject carries both setSprite(IsoSprite)
+--- and setSprite(String), and handed a Lua string the bridge takes the IsoSprite
+--- overload and passes null: the machine loses its face, and with it every tile
+--- property behind it. It stops drawing, its square stops folding in a solid
+--- flag so players walk through it, and its CustomName is gone so the client no
+--- longer recognises it as a shop at all. That is what put "a machine was
+--- standing here with a sprite this build could not resolve" in the log of a
+--- world minutes old, and why the repair below never held -- it was made with
+--- the same call that caused it. setSpriteFromName takes a String and only a
+--- String, so there is nothing to resolve wrongly.
+---
 --- updateSprite cannot do this job, because neither of its branches is about
 --- the type changing. For a shop declaring powered = true it swaps sprites only
 --- when the power state moved; for every other shop, which is all sixteen of
@@ -526,7 +537,7 @@ function ServerObject:applyTypeSprite()
         return false
     end
 
-    isoObject:setSprite(sprite)
+    isoObject:setSpriteFromName(sprite)
     isoObject:transmitUpdatedSpriteToClients()
     return true
 end
@@ -549,9 +560,9 @@ function ServerObject:updateSprite(force)
         end
         local idx = self:getSpriteIndex()
         if hasPower then
-            isoObject:setSprite(def.sprites[idx])
+            isoObject:setSpriteFromName(def.sprites[idx])
         else
-            isoObject:setSprite((def.unpoweredSprites or {})[idx] or def.sprites[idx])
+            isoObject:setSpriteFromName((def.unpoweredSprites or {})[idx] or def.sprites[idx])
         end
         isoObject:transmitUpdatedSpriteToClients()
         self.powered = hasPower
@@ -564,7 +575,7 @@ function ServerObject:updateSprite(force)
             unpoweredSet[s] = true
         end
         if unpoweredSet[sprite] then
-            isoObject:setSprite(def.sprites[self:getSpriteIndex()])
+            isoObject:setSpriteFromName(def.sprites[self:getSpriteIndex()])
             isoObject:transmitUpdatedSpriteToClients()
         end
     end
