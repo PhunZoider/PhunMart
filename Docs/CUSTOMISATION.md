@@ -44,10 +44,10 @@ PhunMart Setup are in this same order for the same reason.
 
 ```
 SHOP  (PhunMart_Shops.json)
-  Machine sprite, pool sets, default pricing and roll count
+  Machine sprite, pool sets and roll count
   │
   └─► POOL SET  (defined inline on the shop)
-        One shelf: which pools feed it, its roll count and fallback price
+        One shelf: which pools feed it and its roll count
         │
         └─► POOL  (PhunMart_Pools.json)
               Which groups to draw from, zone and season gating, always-available flag
@@ -588,8 +588,11 @@ tier now.
 | `offer.stock.max`          | int      | Maximum stock on restock (default 1)                      |
 | `offer.stock.restockHours` | number   | In-game hours between restocks                            |
 
-Pool sets on shops supply a default `price` for every offer rolled from that set, described
-under [Shops](#10-shops). Groups and pools can also set a `defaults.price` of their own.
+An offer's price is baked when the definitions compile. It comes from the group's
+`defaults.price`, the pool's `defaults.price`, the special the offer resolves to, or the item
+override, whichever is most specific. A pool set can name a `price` too, but only as a last
+resort for an offer that ends up with none of those. See
+[Price precedence](#pool-sets).
 
 ---
 
@@ -874,7 +877,9 @@ pools into one candidate list, then rolls a random subset.
 }
 ```
 
-`PittyTheTool` is the simple case: one pool set, with the roll and price set at shop level.
+`PittyTheTool` is the simple case: one pool set, with the roll set at shop level. Its
+`price` is the fallback described below, and is not what the shelf actually charges: every
+group behind `pool_pittythetool` prices its own items.
 `BudgetXPerience` is blended, putting several pools in *one* set so they merge into a single
 menu. The weight on each key scales that pool's offer weights, which is why the boost pools at
 `0.5` appear about half as often as the XP pools beside them.
@@ -934,11 +939,23 @@ created rather than from hour zero, so enabling it does not turn the whole map o
 Each pool set is an object with:
 
 - `keys`: array of `{ key, weight }` pool references
-- `price` (optional): default price for all offers in this set
 - `roll` (optional): roll count for this set, overriding the shop's
+- `price` (optional): last-resort price, read only when an offer has no price of its own
 
 **Price precedence,** most specific first: offer `price`, the special's `price`, group
 `defaults.price`, pool `defaults.price`, then `poolSet.price`.
+
+`poolSet.price` is genuinely the last of those, and it is weaker than it looks. Every other
+layer is baked into the offer when the definitions compile; the pool set is consulted at
+restock, and only if that baking produced nothing. All the shipped groups price their items,
+either on `defaults.price` or through a special or item override, so no shipped shop can
+reach it. Several shipped shops carry one anyway, restating the price their groups already
+set. Treat it as an escape hatch for a hand-written group that deliberately prices nothing,
+not as a way to reprice a shop: to do that, edit the group, the item or the price definition.
+
+For the same reason there is no price field in the pool set editor. It could not change a
+price on a shelf, and sitting beside a roll that *does* override the pool's, it read as
+though it would.
 
 **Roll fallback:** `poolSet.roll`, then `shop.roll`, then a built-in `{ "min": 5, "max": 8 }`.
 

@@ -234,7 +234,7 @@ function FormPanel:addRangeField(key, label, opts)
 end
 
 --- Embedded list field (scrolling list + Add/Edit/Remove buttons).
--- opts: { items, rows, group, onAdd, onEdit, onRemove, formatItem, columns, formatColumns }
+-- opts: { items, rows, group, onAdd, onEdit, onRemove, formatItem, columns, formatColumns, buttons }
 -- items: array of data objects to display
 -- rows: visible row count (default 4)
 -- formatItem(data): returns display string for a row (used when columns not set)
@@ -243,6 +243,12 @@ end
 -- onAdd(form, field): callback when Add is clicked; should call form:addListItem(key, data)
 -- onEdit(form, field, index, data): callback when Edit is clicked
 -- onRemove(form, field, index, data): callback when Remove is clicked
+-- buttons: extra buttons appended to the row after Add/Edit/Delete, as an array
+--          of { text, onClick(form, field, index, data), requireSelection }.
+--          requireSelection defaults to true, which greys the button until a row
+--          is picked, because most of them act on the row rather than the list.
+--          A list with no onAdd/onEdit/onRemove can still carry these: read-only
+--          does not mean there is nowhere worth navigating to.
 -- hint: message row under the buttons, the same one every other field type has.
 --       A list carries provenance as well as guidance now: an inherited list is
 --       marked there, and it was the one field type with nowhere to say so.
@@ -263,6 +269,7 @@ function FormPanel:addListField(key, label, opts)
         onAdd = opts.onAdd,
         onEdit = opts.onEdit,
         onRemove = opts.onRemove,
+        buttons = opts.buttons,
         group = opts.group,
         visible = true
     })
@@ -766,12 +773,11 @@ function FormPanel:_refreshListField(f)
 end
 
 function FormPanel:_updateListButtons(f)
-    local hasSel = f._list and f._list.selected and f._list.selected > 0
-    if f._editBtn then
-        f._editBtn:setEnable(hasSel)
-    end
-    if f._removeBtn then
-        f._removeBtn:setEnable(hasSel)
+    local hasSel = (f._list and f._list.selected and f._list.selected > 0) and true or false
+    for _, entry in ipairs(f._btnRow or {}) do
+        if entry.needsSel then
+            entry.btn:setEnable(hasSel)
+        end
     end
 end
 
@@ -1250,17 +1256,41 @@ function FormPanel:_createField(f)
         -- one used to show what an edit is about to do, was still growing Add,
         -- Edit and Delete buttons that did nothing when pressed.
         f._editable = (f.onAdd ~= nil) or (f.onEdit ~= nil) or (f.onRemove ~= nil)
+
+        -- One ordered row, so layout, visibility and the enable pass do not each
+        -- need to know which buttons a given list happens to have. It was three
+        -- named fields checked one at a time, which worked while three was the
+        -- only possible answer.
+        f._btnRow = {}
+        local function addRowButton(text, needsSel, onClick, cancelColor)
+            -- Sized to its label rather than a flat 60, since an extra button
+            -- names what it does. The built-in three keep that width as a floor.
+            local bw = math.max(math.floor(60 * FONT_SCALE),
+                getTextManager():MeasureStringX(UIFont.Small, text) + PAD * 2)
+            local btn = ISButton:new(0, 0, bw, ROW_H, text, self, onClick)
+            btn:initialise()
+            if needsSel then
+                btn:setEnable(false)
+            end
+            if cancelColor and btn.enableCancelColor then
+                btn:enableCancelColor()
+            end
+            self:addChild(btn)
+            table.insert(f._btnRow, {
+                btn = btn,
+                needsSel = needsSel
+            })
+            return btn
+        end
+
         if f._editable then
-            local btnW = math.floor(60 * FONT_SCALE)
-            f._addBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Add"), self, function()
+            f._addBtn = addRowButton(getText("IGUI_PhunMart_Btn_Add"), false, function()
                 if f.onAdd then
                     f.onAdd(self, f)
                 end
             end)
-            f._addBtn:initialise()
-            self:addChild(f._addBtn)
 
-            f._editBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Edit"), self, function()
+            f._editBtn = addRowButton(getText("IGUI_PhunMart_Btn_Edit"), true, function()
                 local sel = f._list.selected
                 if sel and sel > 0 and f._items[sel] then
                     if f.onEdit then
@@ -1268,11 +1298,8 @@ function FormPanel:_createField(f)
                     end
                 end
             end)
-            f._editBtn:initialise()
-            f._editBtn:setEnable(false)
-            self:addChild(f._editBtn)
 
-            f._removeBtn = ISButton:new(0, 0, btnW, ROW_H, getText("IGUI_PhunMart_Btn_Delete"), self, function()
+            f._removeBtn = addRowButton(getText("IGUI_PhunMart_Btn_Delete"), true, function()
                 local sel = f._list.selected
                 if sel and sel > 0 and f._items[sel] then
                     if f.onRemove then
@@ -1282,13 +1309,21 @@ function FormPanel:_createField(f)
                         self:_refreshListField(f)
                     end
                 end
+            end, true)
+        end
+
+        for _, spec in ipairs(f.buttons or {}) do
+            local needsSel = spec.requireSelection ~= false
+            addRowButton(spec.text or "?", needsSel, function()
+                local sel = f._list.selected
+                local row = (sel and sel > 0) and f._items[sel] or nil
+                if needsSel and row == nil then
+                    return
+                end
+                if spec.onClick then
+                    spec.onClick(self, f, sel, row)
+                end
             end)
-            f._removeBtn:initialise()
-            f._removeBtn:setEnable(false)
-            if f._removeBtn.enableCancelColor then
-                f._removeBtn:enableCancelColor()
-            end
-            self:addChild(f._removeBtn)
         end
 
         if f.hasMessageRow then
@@ -1499,15 +1534,22 @@ function FormPanel:reflowFields()
                 y = y + listH + 4
                 -- Position buttons in a row, when there are any. A read-only
                 -- list also gets its row of space back.
-                if f._addBtn then
-                    local btnW2 = math.floor(60 * FONT_SCALE)
+                if f._btnRow and #f._btnRow > 0 then
                     local gap = 4
-                    f._addBtn:setX(x)
-                    f._addBtn:setY(y)
-                    f._editBtn:setX(x + btnW2 + gap)
-                    f._editBtn:setY(y)
-                    f._removeBtn:setX(x + (btnW2 + gap) * 2)
-                    f._removeBtn:setY(y)
+                    local bx = x
+                    for _, entry in ipairs(f._btnRow) do
+                        local bw = entry.btn:getWidth()
+                        -- Wrap rather than run off the right edge. This was laid
+                        -- out for exactly three buttons of one fixed width; a
+                        -- list can carry five now, and their labels vary.
+                        if bx > x and (bx + bw) > (x + w) then
+                            bx = x
+                            y = y + ROW_H + 2
+                        end
+                        entry.btn:setX(bx)
+                        entry.btn:setY(y)
+                        bx = bx + bw + gap
+                    end
                     y = y + ROW_H
                 end
                 if f._hint then
@@ -1647,14 +1689,8 @@ function FormPanel:_setFieldWidgetsVisible(f, vis)
     if f._list then
         f._list:setVisible(vis)
     end
-    if f._addBtn then
-        f._addBtn:setVisible(vis)
-    end
-    if f._editBtn then
-        f._editBtn:setVisible(vis)
-    end
-    if f._removeBtn then
-        f._removeBtn:setVisible(vis)
+    for _, entry in ipairs(f._btnRow or {}) do
+        entry.btn:setVisible(vis)
     end
 end
 

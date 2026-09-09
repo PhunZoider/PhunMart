@@ -1157,6 +1157,14 @@ Commands[Core.commands.blacklistInPool] = function(playerObj, args)
     table.insert(override[poolKey].blacklist, itemKey)
     Core.fileUtils.saveTable(Core.primaryOverride("pools"), override)
     Core.ServerSystem.instance:recompileShops()
+
+    -- After the recompile, so the viewer redraws from the pool that now exists
+    -- rather than the one that was replaced. Only when asked: the pool viewer
+    -- has the row on screen and wants it gone, the shop panel makes the same
+    -- edit with nowhere to put a pool payload.
+    if args.refresh then
+        sendPool(playerObj, poolKey, true)
+    end
 end
 
 -- Weight used to be written straight onto the compiled runtime and nowhere

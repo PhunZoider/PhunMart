@@ -637,26 +637,61 @@ function UI:showContextMenu(row, absX, absY)
     local count = #sel
 
     if count <= 1 then
-        -- Both directions, because this menu could put an item on the global
-        -- blacklist and nothing here could take it off again: the only way back
-        -- was the Blacklists tab, if you knew that is where it went.
-        if row._blacklisted then
-            context:addOption(getText("IGUI_PhunMart_Admin_RemoveFromBlacklist"), self, UI.onUnblacklistRow, row)
-        else
-            context:addOption(getText("IGUI_PhunMart_Admin_AddToBlacklist"), self, UI.onBlacklistRow, row)
+        -- Edit source leads, because a row in here is nearly always being read
+        -- to find out where its price came from, and the group is the answer
+        -- most of the time.
+        --
+        -- Both entries can show at once, and for a group row usually do. They
+        -- are different answers to "reprice this" rather than alternatives: the
+        -- group prices everything its categories pulled in, an override prices
+        -- the one item and beats it.
+        --
+        -- This used to be a chain of three branches keyed on sourceType, the last
+        -- of which tested for "reward". The compiler only ever writes "group",
+        -- "item" or "special", so that branch could not run and a "special" row
+        -- fell off the end of the chain offering nothing.
+        --
+        -- Falling back to the shipped tables the way every editor does: Core.defs
+        -- is the merged view and is not always there yet on a client.
+        local groups = (Core.defs and Core.defs.groups) or require "PhunMart/defaults/groups"
+        if row.sourceKey and groups[row.sourceKey] then
+            context:addOption(getText("IGUI_PhunMart_Admin_EditGroupX", row.sourceKey), self, UI.onEditSourceGroup,
+                row)
         end
+        local rowItem = row.offer and row.offer.item
+        if rowItem then
+            local items = (Core.defs and Core.defs.items) or require "PhunMart/defaults/items"
+            if items[rowItem] then
+                context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditSourceItem, row)
+            end
+        end
+
         -- Weight is stored per item and applies wherever the item is drawn, so
         -- it is editable from a group preview too.
         context:addOption(getText("IGUI_PhunMart_Admin_EditWeight"), self, UI.onEditWeightRow, row)
 
-        -- Edit source: open the appropriate admin editor
-        if row.sourceType == "group" and row.sourceKey then
-            context:addOption(getText("IGUI_PhunMart_Admin_EditGroupX", row.sourceKey), self, UI.onEditSource, row)
-        elseif row.sourceType == "item" then
-            context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditSource, row)
-        elseif row.sourceType == "reward" then
-            context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditSource, row)
+        -- Behind a submenu, matching the shop panel, and after the edits rather
+        -- than above them: these entries take an item off a shelf and the global
+        -- one takes it off every shelf on the server.
+        --
+        -- Both directions on the global entry, because this menu could add to
+        -- the list and nothing here could take it off again: the only way back
+        -- was the Blacklists tab, if you knew that is where it went.
+        --
+        -- In this pool is new. It is what Move to pool has always done to the
+        -- pool being moved out of, and there was no way to ask for just that
+        -- half of it from here.
+        local blacklistMenu = context:getNew(context)
+        if not self.isGroup then
+            blacklistMenu:addOption(getText("IGUI_PhunMart_Admin_BlacklistHere"), self, UI.onBlacklistRowInPool, row)
         end
+        if row._blacklisted then
+            blacklistMenu:addOption(getText("IGUI_PhunMart_Admin_RemoveFromBlacklist"), self, UI.onUnblacklistRow, row)
+        else
+            blacklistMenu:addOption(getText("IGUI_PhunMart_Admin_BlacklistEverywhere"), self, UI.onBlacklistRow, row)
+        end
+        local blacklistOpt = context:addOption(getText("IGUI_PhunMart_Btn_Blacklist"))
+        context:addSubMenu(blacklistOpt, blacklistMenu)
     else
         context:addOption(getText("IGUI_PhunMart_Admin_BlacklistNItems", tostring(count)), self, UI.onBlacklistSelected)
     end
@@ -670,16 +705,16 @@ function UI:showContextMenu(row, absX, absY)
     end
 end
 
-function UI:onEditSource(row)
-    if row.sourceType == "group" and row.sourceKey then
-        if Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
-            Core.ui.admin_groups.OnEditGroup(self.player, row.sourceKey)
-        end
-    elseif row.sourceType == "item" or row.sourceType == "reward" then
-        local itemKey = row.offer and row.offer.item
-        if itemKey and Core.ui.admin_items and Core.ui.admin_items.OnEditItem then
-            Core.ui.admin_items.OnEditItem(self.player, itemKey)
-        end
+function UI:onEditSourceGroup(row)
+    if row.sourceKey and Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
+        Core.ui.admin_groups.OnEditGroup(self.player, row.sourceKey)
+    end
+end
+
+function UI:onEditSourceItem(row)
+    local itemKey = row.offer and row.offer.item
+    if itemKey and Core.ui.admin_items and Core.ui.admin_items.OnEditItem then
+        Core.ui.admin_items.OnEditItem(self.player, itemKey)
     end
 end
 
@@ -712,6 +747,28 @@ function UI:onBlacklistRow(row)
             self:applyFilters()
         end
     end, self)
+end
+
+--- Bar the item from this pool only, which is what the shop panel's own
+--- blacklist submenu offers and what Move to pool does to the pool it moves out
+--- of. No confirm: it touches one pool, and the pool editor can untick it again.
+function UI:onBlacklistRowInPool(row)
+    local itemKey = row.offer and row.offer.item
+    if not itemKey or self.isGroup or not self.poolKey then
+        return
+    end
+    sendClientCommand(Core.name, Core.commands.blacklistInPool, {
+        poolKey = self.poolKey,
+        -- The row leaves this pool on the recompile the server is about to do,
+        -- and the viewer is holding a payload from before it. Ask to be sent the
+        -- pool again rather than guessing at what changed. Only the viewer asks:
+        -- the shop panel makes the same edit with nowhere to put the answer.
+        refresh = true,
+        itemKey = itemKey
+    })
+    if Core.ui.pending_restock then
+        Core.ui.pending_restock.note("pools", self.poolKey)
+    end
 end
 
 function UI:onUnblacklistRow(row)

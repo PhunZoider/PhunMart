@@ -30,25 +30,6 @@ local function getPoolKeys()
     return keys
 end
 
--- Get sorted price definition keys for the combo.
-local function getPriceKeys()
-    local prices = Core.defs and Core.defs.prices or require "PhunMart/defaults/prices"
-    local keys = {""}
-    for k in pairs(prices) do
-        table.insert(keys, k)
-    end
-    table.sort(keys, function(a, b)
-        if a == "" then
-            return true
-        end
-        if b == "" then
-            return false
-        end
-        return a < b
-    end)
-    return keys
-end
-
 -- The last entry on the category combo, so a name the mod has never seen is
 -- still reachable. Same string and same behaviour as the wizard's dropdowns.
 local OTHER = "IGUI_PhunMart_Wiz_Other"
@@ -122,12 +103,7 @@ local function copyPoolSets(poolSets)
     return result
 end
 
--- Resolve the effective price for a pool set row.
-local function resolveSetPrice(set)
-    return set.price or nil
-end
-
--- Format a pool set into column cells: {pools, price, roll}
+-- Format a pool set into column cells: {pools, roll}
 local function formatSetColumns(set)
     -- Pools column
     local poolParts = {}
@@ -140,10 +116,6 @@ local function formatSetColumns(set)
     end
     local poolsText = table.concat(poolParts, ", ")
 
-    -- Price column (may be a string key or a resolved table from runtime; display the key)
-    local rawPrice = resolveSetPrice(set)
-    local price = type(rawPrice) == "string" and rawPrice or ""
-
     -- Roll column
     local rollText = ""
     if set.roll and set.roll.count then
@@ -151,7 +123,7 @@ local function formatSetColumns(set)
         rollText = tostring(c.min) .. "-" .. tostring(c.max)
     end
 
-    return {poolsText, price, rollText}
+    return {poolsText, rollText}
 end
 
 -- Also keep a simple format for the list item text (used internally by ISScrollingListBox)
@@ -175,8 +147,6 @@ local function createSetEditForm(setData, isNew, cb)
         rollMinDefault = tostring(set.roll.count.min or "")
         rollMaxDefault = tostring(set.roll.count.max or "")
     end
-
-    local currentPrice = type(set.price) == "string" and set.price or ""
 
     -- One row per pool, each carrying its own weight.
     --
@@ -234,8 +204,6 @@ local function createSetEditForm(setData, isNew, cb)
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPoolSet") or getText("IGUI_PhunMart_Title_EditPoolSet")
 
-    local priceKeys = getPriceKeys()
-
     local form = FormPanel:new({
         width = math.floor(420 * FONT_SCALE),
         title = titleText,
@@ -264,9 +232,11 @@ local function createSetEditForm(setData, isNew, cb)
                 }
             end
 
-            local price = f:getFieldValue("price")
-            if price and price ~= "" then
-                result.price = price
+            -- Not on the form any more, but a hand written override may still
+            -- carry one, so an edit here must not silently delete it. See the
+            -- note further down, where that combo used to sit.
+            if type(set.price) == "string" then
+                result.price = set.price
             end
 
             for _, row in ipairs(f:getFieldValue("keys") or {}) do
@@ -320,13 +290,42 @@ local function createSetEditForm(setData, isNew, cb)
                 title = getText("IGUI_PhunMart_Admin_PickPools")
             })
         end,
-        onEdit = editRowWeight
+        onEdit = editRowWeight,
+        -- The set names pools by key and says nothing else about them, so deciding
+        -- whether the right ones are in here meant leaving the form, finding the
+        -- pool in the Pools tab and coming back. Both destinations already
+        -- existed; neither was reachable from the place that asks the question.
+        buttons = {{
+            text = getText("IGUI_PhunMart_Btn_Open"),
+            onClick = function(f, field, index, data)
+                if Core.ui.admin_pools and Core.ui.admin_pools.OnEditPool then
+                    Core.ui.admin_pools.OnEditPool(getSpecificPlayer(0), data.key)
+                end
+            end
+        }, {
+            text = getText("IGUI_PhunMart_Btn_ViewContents"),
+            onClick = function(f, field, index, data)
+                sendClientCommand(Core.name, Core.commands.requestPool, {
+                    poolKey = data.key
+                })
+            end
+        }}
     })
-    form:addComboField("price", getText("IGUI_PhunMart_Lbl_DefaultPrice"), {
-        options = priceKeys,
-        selected = currentPrice,
-        hint = getText("IGUI_PhunMart_Hint_SetPrice")
-    })
+    -- There was a "Fallback price" combo here. A pool set's price is only read
+    -- when the offer itself has none (system_object.lua, bakePrice), and an
+    -- offer gets its price baked at compile time from pool defaults, group
+    -- defaults, its special or its item override. Forty-nine of the fifty-nine
+    -- shipped groups set defaults.price and the other ten are priced by their
+    -- special or per item, so nothing shipped can reach the fallback: the value
+    -- here could not change a single price on a shelf.
+    --
+    -- It read as the opposite. It sat beside a roll that does override the
+    -- pool's, under a label promising the default price for the set, so the
+    -- obvious way to reprice a shop was to change it, and the obvious result was
+    -- nothing at all. Prices live on the group (or the item, or the special);
+    -- that is where an admin has to go, and a dead lever pointing elsewhere is
+    -- worse than no lever. The data key still works if anyone writes one by
+    -- hand, and an edit here preserves it.
     form:addRangeField("roll", getText("IGUI_PhunMart_Lbl_DefaultRoll"), {
         minDefault = rollMinDefault,
         maxDefault = rollMaxDefault,
@@ -625,9 +624,6 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             name = getText("IGUI_PhunMart_Col_Pool"),
             size = 0
         }, {
-            name = getText("IGUI_PhunMart_Col_Price"),
-            size = 0.55
-        }, {
             name = getText("IGUI_PhunMart_Col_Roll"),
             size = 0.80
         }},
@@ -673,7 +669,8 @@ end
 ---------------------------------------------------------------------------
 
 function AdminShops.OnOpenPanel(player, shopKey)
-    -- Read from defs (uncompiled) so poolSet.price is still a string key.
+    -- Read from defs (uncompiled) so pool set fields are still raw keys rather
+    -- than the resolved tables the runtime carries.
     -- Fall back to runtime for fields not in defs (backwards compat).
     local defs = Core.defs and Core.defs.shops
     local shopDef = defs and defs[shopKey]

@@ -1131,9 +1131,65 @@ function UI:onItemRightClick(id, offer, screenX, screenY)
     end
     local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
     context:clear()
-    context:addOption(getText("IGUI_PhunMart_Admin_BlacklistInPool"), self, UI.onBlacklistInPool, id, offer)
-    context:addOption(getText("IGUI_PhunMart_Admin_GlobalBlacklist"), self, UI.onBlacklistOffer, id, offer)
+
+    -- Where this row came from, first, because "why does this cost that" is the
+    -- question the shelf raises and the answer is never on the shelf. An offer's
+    -- price is baked at compile time from its group, its item override or its
+    -- special, and finding out which meant walking the shop's pool sets to the
+    -- pools, then the pools to their groups, then reading each one. Every
+    -- compiled offer already carries the group that produced it, so the walk is
+    -- a menu entry.
+    --
+    -- Falling back to the shipped tables the way every editor does: Core.defs is
+    -- the merged view and is not always there yet on a client, and an entry that
+    -- opens nothing is the thing this whole change is trying to stop shipping.
+    local meta = offer and offer.meta or {}
+    local groups = (Core.defs and Core.defs.groups) or require "PhunMart/defaults/groups"
+    if meta.sourceGroup and groups[meta.sourceGroup] then
+        context:addOption(getText("IGUI_PhunMart_Admin_EditGroupX", meta.sourceGroup), self, UI.onEditOfferGroup,
+            meta.sourceGroup)
+    end
+
+    -- The group prices everything it pulled in, so the group entry above is the
+    -- wrong lever for one item out of two hundred. An override is the right one
+    -- when there is already an override to open; offering to create one from
+    -- here put a whole editor behind a right click on a shelf, which is further
+    -- than this menu should reach.
+    local itemKey = offer and offer.item
+    if itemKey then
+        local items = (Core.defs and Core.defs.items) or require "PhunMart/defaults/items"
+        if items[itemKey] then
+            context:addOption(getText("IGUI_PhunMart_Admin_EditItemDef"), self, UI.onEditOfferItem, itemKey)
+        end
+    end
+
     context:addOption(getText("IGUI_PhunMart_Admin_MoveToPool"), self, UI.onMoveOfferToPool, id, offer)
+
+    -- Behind a submenu, and last. Both entries take an item off a shelf, the
+    -- global one off every shelf on the server until someone finds the
+    -- Blacklists tab, and they used to sit at the top of a flat list one slip
+    -- away from Edit. A submenu costs a deliberate second movement, which is
+    -- about right for the damage.
+    local blacklistMenu = context:getNew(context)
+    blacklistMenu:addOption(getText("IGUI_PhunMart_Admin_BlacklistHere"), self, UI.onBlacklistInPool, id, offer)
+    blacklistMenu:addOption(getText("IGUI_PhunMart_Admin_BlacklistEverywhere"), self, UI.onBlacklistOffer, id, offer)
+    local blacklistOpt = context:addOption(getText("IGUI_PhunMart_Btn_Blacklist"))
+    context:addSubMenu(blacklistOpt, blacklistMenu)
+end
+
+-- Reached through Core.ui rather than required, the same way this panel reaches
+-- the shop and pool editors: the admin modules pull in enough of each other that
+-- a direct require here is a cycle.
+function UI:onEditOfferGroup(groupKey)
+    if Core.ui.admin_groups and Core.ui.admin_groups.OnEditGroup then
+        Core.ui.admin_groups.OnEditGroup(self.player, groupKey)
+    end
+end
+
+function UI:onEditOfferItem(itemKey)
+    if Core.ui.admin_items and Core.ui.admin_items.OnEditItem then
+        Core.ui.admin_items.OnEditItem(self.player, itemKey)
+    end
 end
 
 -- ── Action stubs (each will become a panel) ───────────────────────────────
