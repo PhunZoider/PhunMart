@@ -78,6 +78,19 @@ end)
 
 -- Events.EveryOneMinute.Add(ConfigTiles)
 
+-- Repairs characters carrying leftovers from a trait removal that happened
+-- before PhunMart cleaned up after itself. A player who bought "Remove: Smoker"
+-- mid-withdrawal kept a stress moodle nothing on the character could spend, and
+-- there is no reason to make them go and buy the trait back to shake it off.
+Events.OnCreatePlayer.Add(function(playerNum, player)
+    local Traits = require "PhunMart/traits"
+    for _, stat in ipairs(Traits.repairOrphanedStats(player)) do
+        if isClient() and sendPlayerStat then
+            sendPlayerStat(player, stat)
+        end
+    end
+end)
+
 local function setup()
     Events.OnTick.Remove(setup)
     Core:ini()

@@ -72,6 +72,7 @@ PhunMart = {
         serverPurchaseFailed = "PhunMartServerPurchaseFailed",
         payWithInventory = "PhunMartPayWithInventory",
         modifyTraits = "PhunMartModifyTraits",
+        clearTraitStats = "PhunMartClearTraitStats",
         spawnVehicle = "PhunMartSpawnVehicle",
         spawnAnimal = "PhunMartSpawnAnimal",
         -- History / misc

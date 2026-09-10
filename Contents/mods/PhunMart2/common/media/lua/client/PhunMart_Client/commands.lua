@@ -209,6 +209,21 @@ Commands[Core.commands.requestPool] = function(args)
     end
 end
 
+-- Sent after a trait removal that strands a vanilla stat. The stress moodle
+-- reads the smoker's withdrawal stat whether or not the trait is still held,
+-- and only this side's copy of the stats is the one the moodles are drawn from.
+Commands[Core.commands.clearTraitStats] = function(args)
+    local player = Core.utils.getPlayerByUsername(args.username)
+    if not player then
+        return
+    end
+    local Traits = require "PhunMart/traits"
+    local cleared = Traits.clearRemovalSideEffects(player, args.trait)
+    if cleared and isClient() and sendPlayerStat then
+        sendPlayerStat(player, cleared)
+    end
+end
+
 -- Server sends this after granting a VehicleKeySpawner so the client knows the vehicle script
 -- without relying on transmitModData (which may not exist in B42).
 Commands[Core.commands.spawnVehicle] = function(args)

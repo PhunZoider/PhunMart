@@ -75,6 +75,21 @@ function Core:grantReward(player, action, qty, context)
             else
                 player:getCharacterTraits():remove(traitType)
                 player:modifyTraitXPBoost(traitType, true)
+                -- Taking a trait away does not undo the stats it was feeding,
+                -- and some of those only ever come down through the trait's own
+                -- upkeep. See Traits.clearRemovalSideEffects: Smoker leaves its
+                -- withdrawal stat behind, and that stat is added straight into
+                -- the stress moodle whether or not the character still smokes.
+                local cleared = Traits.clearRemovalSideEffects(player, action.trait)
+                if cleared and not Core.isLocal then
+                    -- The client owns its character's stats -- the server's copy
+                    -- is overwritten by the next player packet -- so the clear
+                    -- has to happen over there as well.
+                    sendServerCommand(player, Core.name, Core.commands.clearTraitStats, {
+                        username = player:getUsername(),
+                        trait = action.trait
+                    })
+                end
             end
             SyncXp(player)
         else
