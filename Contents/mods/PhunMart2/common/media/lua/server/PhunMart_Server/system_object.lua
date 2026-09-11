@@ -15,6 +15,10 @@ local SandboxVars = SandboxVars
 -- buildOffers helpers
 -- -----------------------------
 
+-- Shared by all three paying kinds, because all three store an amount the same
+-- way and all three used to roll it differently. See utils.rollAmount.
+local rollAmount = Core.utils.rollAmount
+
 -- Return a copy of a compiled price with any {min,max} amounts resolved to concrete numbers.
 -- selfItem: the offer's item type, used to resolve price.kind="self"
 local function bakePrice(price, selfItem)
@@ -30,13 +34,7 @@ local function bakePrice(price, selfItem)
     -- Bake into a standard items price so canAfford/deduct need no special-casing.
     -- Carries substitutes through so purchasing counts variant items toward the total.
     if price.kind == "self" then
-        local amt = price.amount
-        local bakedAmt
-        if type(amt) == "table" and amt.min and amt.max then
-            bakedAmt = amt.min + ZombRand(0, amt.max - amt.min + 1)
-        else
-            bakedAmt = amt or 1
-        end
+        local bakedAmt = rollAmount(price.amount) or 1
         local subs = type(price.substitutes) == "table" and price.substitutes or nil
         return {
             kind = "items",
@@ -49,19 +47,14 @@ local function bakePrice(price, selfItem)
         }
     end
     if price.kind == "currency" then
-        local amt = price.amount
-        local bakedAmt
-        if type(amt) == "table" and amt.min and amt.max then
-            -- resolve range to a concrete nickel-aligned value at restock time
-            local steps = math.floor((amt.max - amt.min) / 5)
-            bakedAmt = amt.min + ZombRand(0, steps + 1) * 5
-        else
-            bakedAmt = amt
-        end
+        -- Change rolls in fives, so a rolled price stays nickel-aligned the way
+        -- the compiler already snapped the two ends of the range. Tokens are
+        -- counted one at a time; rolling those in fives too meant a 1 to 5
+        -- token range had no whole step in it and came out at 1 every restock.
         return {
             kind = "currency",
             pool = price.pool,
-            amount = bakedAmt
+            amount = rollAmount(price.amount, price.pool == "change" and 5 or 1)
         }
     end
     -- kind = "items"
@@ -75,12 +68,7 @@ local function bakePrice(price, selfItem)
             itemAny = line.itemAny,
             substitutes = line.substitutes
         }
-        local amt = line.amount
-        if type(amt) == "table" then
-            bl.amount = ZombRand(amt.min or 1, amt.max or amt.min or 1)
-        else
-            bl.amount = amt or 1
-        end
+        bl.amount = rollAmount(line.amount) or 1
         table.insert(baked.items, bl)
     end
     return baked

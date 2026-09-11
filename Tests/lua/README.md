@@ -62,6 +62,7 @@ because `require` needs the loader machinery that strip takes away.
 | --------------------- | ------------------------------------------------------------------- |
 | `test_json.lua`       | Encode/decode round-trips, every shipped defaults file, `utils_file` |
 | `test_playerdata.lua` | The singleplayer key, `repairKeys`, and importing a converted file   |
+| `test_price_ranges.lua` | A price written `{min,max}`: how it compiles, and how a restock rolls it |
 
 Wallets and the reward trackers live in ModData on this branch rather than in
 files, so `test_playerdata.lua` is about which key a record is filed under

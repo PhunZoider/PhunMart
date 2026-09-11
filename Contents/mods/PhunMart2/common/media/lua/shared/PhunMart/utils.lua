@@ -609,4 +609,46 @@ function utils.rollFraction(spec, rand)
     return value
 end
 
+--- Resolve a price amount from either a plain number or a {min, max} range.
+---
+--- Every paying kind rolls the same way, and each used to roll its own: the
+--- items one asked ZombRand for (min, max) directly, whose upper bound is
+--- exclusive, so a price written 1 to 50 never once asked for 50 and a line
+--- written 5 to 5 asked ZombRand for an empty span.
+---
+--- `step` is for change, which is nickel-aligned: the roll counts whole steps
+--- up from min rather than landing between them.
+---
+--- Tolerates a reversed range and a half-written one, because these numbers
+--- come from a config file an admin typed.
+---@param spec number|table An amount, or {min = number, max = number}
+---@param step number|nil Roll in multiples of this, up from min. Default 1.
+---@param rand function|nil Integer roller, [lo, hi). Defaults to ZombRand.
+---@return number|nil amount A concrete amount, or nil when spec is nil
+function utils.rollAmount(spec, step, rand)
+    if spec == nil then
+        return nil
+    end
+    if type(spec) ~= "table" then
+        return tonumber(spec)
+    end
+
+    local lo, hi = tonumber(spec.min), tonumber(spec.max)
+    if lo == nil and hi == nil then
+        return nil
+    end
+    lo, hi = lo or hi, hi or lo
+    if hi < lo then
+        lo, hi = hi, lo
+    end
+
+    step = (step and step > 0) and step or 1
+    -- The count of whole steps that fit, plus one for the low end itself. The
+    -- +1 is what puts the top of the range in reach, ZombRand stopping one
+    -- short of the bound it is given.
+    local steps = math.floor((hi - lo) / step)
+    local roll = rand or ZombRand
+    return lo + roll(0, steps + 1) * step
+end
+
 return utils

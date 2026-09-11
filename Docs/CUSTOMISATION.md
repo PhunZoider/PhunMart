@@ -375,8 +375,11 @@ Taking those in turn:
 | `items`    | Items taken from inventory, listed in `items`                                    |
 | `self`     | Copies of the displayed item itself. Used by the Collectors and PrawnStars shops |
 
-`amount` may be a fixed number or a `{ min, max }` range rolled fresh at each restock.
-`factor` scales every amount in the entry after inheritance resolves, as
+`amount` may be a fixed number or a `{ min, max }` range rolled fresh at each restock. This
+works for every paying kind: `{ "min": 1, "max": 50 }` on an `items` price asking for gold
+bars means each machine stocks that offer at somewhere between 1 and 50 bars. A `change`
+range rolls in multiples of 5, since the wallet deals in nickels; everything else rolls one
+at a time. `factor` scales every amount in the entry after inheritance resolves, as
 `ceil(amount * factor)` with a floor of 1.
 
 ### Substitutes

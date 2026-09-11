@@ -137,8 +137,8 @@ local function onKindChanged(form, kind)
     local isItems = kind == "items"
 
     form:setFieldVisible("pool", isCurrency)
-    -- Amount is one range field now; its upper half is only meaningful for a
-    -- currency price, which the field validates rather than hides.
+    -- Amount is one range field now, and its upper half means the same thing
+    -- for every paying kind: fill it and the price rolls between the two.
     form:setFieldVisible("amount", not isFree)
     form:setFieldVisible("items", isItems)
 end
@@ -237,18 +237,40 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     -- This used to read def.amount, which a multi-line barter price does not
     -- have. So a two-line price opened showing an empty box and saved both lines
     -- at 1, turning five nails and three planks into one of each.
+    --
+    -- Compared through a key rather than by value, because a line amount can be
+    -- a range: two lines both asking 1 to 50 agree, and reading a range as the
+    -- number 1 used to make a ranged line look like a plain one and save it
+    -- back as one.
     local mixedAmounts = false
     if def.kind == "items" and not tools.isEmptyTable(lineByItem) then
-        local common
+        local function amountKey(a)
+            if type(a) == "table" then
+                return tostring(a.min or 1) .. "-" .. tostring(a.max or a.min or 1)
+            end
+            return tostring(a)
+        end
+        local common, commonKey
         for _, line in pairs(lineByItem) do
-            local a = (type(line.amount) == "number") and line.amount or 1
-            if common == nil then
-                common = a
-            elseif common ~= a then
+            local a = line.amount
+            if type(a) ~= "table" and type(a) ~= "number" then
+                a = 1
+            end
+            local key = amountKey(a)
+            if commonKey == nil then
+                common, commonKey = a, key
+            elseif commonKey ~= key then
                 mixedAmounts = true
             end
         end
-        amountDefault = mixedAmounts and "" or tostring(common or 1)
+        if mixedAmounts then
+            amountDefault, maxDefault = "", ""
+        elseif type(common) == "table" then
+            amountDefault = tostring(common.min or 1)
+            maxDefault = tostring(common.max or common.min or 1)
+        else
+            amountDefault, maxDefault = tostring(common or 1), ""
+        end
     end
 
     local titleText = isNew and getText("IGUI_PhunMart_Title_AddPrice") or
@@ -285,38 +307,40 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             -- One range field, so both bounds arrive together.
             local amtLo, amtHi = f:getFieldRange("amount")
 
+            -- A pair of whole numbers becomes {min,max}; anything else becomes
+            -- the single figure. Written once because all three paying kinds
+            -- store an amount the same way and roll it the same way.
+            local function amountFrom(lo, hi)
+                if lo == nil then
+                    return nil
+                end
+                lo = math.floor(lo + 0.5)
+                hi = hi and math.floor(hi + 0.5)
+                if hi and hi > lo then
+                    return {
+                        min = lo,
+                        max = hi
+                    }
+                end
+                return lo
+            end
+
             if kind == "currency" then
                 result.pool = f:getFieldValue("pool")
-                local amt = amtLo
-                local maxAmt = amtHi
-                if result.pool == "change" then
-                    amt = math.floor(amt * 100 + 0.5)
-                    if maxAmt then
-                        maxAmt = math.floor(maxAmt * 100 + 0.5)
-                    end
-                else
-                    amt = math.floor(amt + 0.5)
-                    if maxAmt then
-                        maxAmt = math.floor(maxAmt + 0.5)
-                    end
-                end
-                if maxAmt and maxAmt > amt then
-                    result.amount = {
-                        min = amt,
-                        max = maxAmt
-                    }
-                else
-                    result.amount = amt
-                end
+                -- Change is typed in dollars and stored in cents; tokens are
+                -- counted as they are typed.
+                local scale = (result.pool == "change") and 100 or 1
+                result.amount = amountFrom(amtLo * scale, amtHi and amtHi * scale)
             elseif kind == "self" then
-                result.amount = math.floor(amtLo + 0.5)
+                result.amount = amountFrom(amtLo, amtHi)
             elseif kind == "items" then
                 local items = f:getFieldValue("items")
                 -- Blank keeps the amount each line already had, which is what
                 -- lets a barter price with different amounts per line survive
-                -- being opened. A number is applied to every line. An item just
-                -- added to the picker has no previous amount and gets one.
-                local amt = amtLo and math.floor(amtLo + 0.5) or nil
+                -- being opened. A figure, or a range, is applied to every line.
+                -- An item just added to the picker has no previous amount and
+                -- gets one.
+                local amt = amountFrom(amtLo, amtHi)
                 local lines = {}
                 local anySubs = false
                 for _, itemKey in ipairs(items) do
@@ -326,7 +350,9 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
                         subs = Core.utils.deepCopy(subs)
                         anySubs = true
                     end
-                    local lineAmt = amt
+                    -- Copied per line: a range is a table, and handing the same
+                    -- one to every line would leave them sharing it.
+                    local lineAmt = (type(amt) == "table") and Core.utils.deepCopy(amt) or amt
                     if lineAmt == nil then
                         -- Verbatim, so a {min,max} line amount is kept as one
                         -- rather than flattened to a number.
@@ -453,10 +479,10 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
     -- One range rather than an Amount box and a Max box. Leaving the second box
     -- blank is a fixed price; filling it makes the price roll between the two.
     --
-    -- A range cannot hide half of itself, and the upper bound is only read for
-    -- currency prices: an items price carries one amount per item and a self
-    -- price is a flat number. Rather than showing a box that silently does
-    -- nothing, it says so when something is typed into it.
+    -- Every paying kind rolls: bakePrice resolves a range at restock time for
+    -- currency, self and items alike, so a shop can ask 1 to 50 gold bars the
+    -- same way it asks $2.50 to $6. This used to refuse an upper bound on
+    -- anything but currency, which was never a limit of the data.
     form:addRangeField("amount", getText("IGUI_PhunMart_Lbl_Amount"), {
         minDefault = amountDefault,
         maxDefault = maxDefault,
@@ -473,8 +499,11 @@ local function createEditModal(priceKey, priceDef, isNew, cb)
             if lo == "" and (kind == "currency" or kind == "self") then
                 return getText("IGUI_PhunMart_Err_Required")
             end
-            if hi ~= "" and kind ~= "currency" then
-                return getText("IGUI_PhunMart_Err_MaxCurrencyOnly")
+            -- An upper bound with nothing under it has no low end to roll from,
+            -- and on an items price a blank low end means something else again:
+            -- leave each line as it is.
+            if hi ~= "" and lo == "" then
+                return getText("IGUI_PhunMart_Err_RangeBoth")
             end
         end
     })

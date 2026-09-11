@@ -18,7 +18,7 @@ if "%LUA%"=="" (
 
 set FAILED=0
 
-for %%T in (test_json test_playerdata test_months test_migrations test_restock_revision test_compiler_vehicles test_compiler_preview test_extension_points) do (
+for %%T in (test_json test_playerdata test_months test_migrations test_restock_revision test_compiler_vehicles test_compiler_preview test_extension_points test_price_ranges) do (
     echo.
     echo ==================== %%T ====================
     "%LUA%" "%~dp0%%T.lua"
