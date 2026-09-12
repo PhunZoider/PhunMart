@@ -102,7 +102,7 @@ option PhunMart.ChangeCapCents
     type = integer,
     default = 9999,
     min = 0,
-    max = 999999,
+    max = 99999999,
     page = PhunMart,
     translation = PhunMart_ChangeCapCents,
 }
