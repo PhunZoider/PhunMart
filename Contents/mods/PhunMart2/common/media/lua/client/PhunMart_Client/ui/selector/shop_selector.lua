@@ -5,6 +5,7 @@ end
 local Core = PhunMart
 local ListPanel = require "PhunMart_Client/ui/base/list_panel"
 local ShopWizard = require "PhunMart_Client/ui/admin/shop_wizard"
+local Toast = require "PhunMart_Client/ui/toast"
 
 Core.ui.shop_selector = ListPanel:derive("PhunMartUIShopListing")
 Core.ui.shop_selector.instances = {}
@@ -19,6 +20,57 @@ UI._defKind = "shops"
 
 local function shopLabel(shopType)
     return Core.shopLabel(shopType)
+end
+
+---------------------------------------------------------------------------
+-- The machine as an item
+--
+-- A shortcut, and only a shortcut. Every shipped shop already has a scripted
+-- moveable named after it in PhunMart_Items.txt, and an admin could always get
+-- one: open the Items List, find the PhunMart module, double-click the row,
+-- then right-click it in the inventory and install it. This does the first
+-- three steps from the list where the admin already is.
+--
+-- Deliberately the same item the Items List hands out, rather than one built
+-- from the shop's sprite the way a pickup builds one. Building from the sprite
+-- looks more general and is not: what a placed machine becomes is decided by
+-- the sprite's CustomName (see ServerSystem.initializeShopObject), so a shop
+-- the wizard created with the "looks like <other shop>" appearance would have
+-- quietly installed as that other shop. The set of shops that can be placed at
+-- all is the set whose sprite CustomName is their own key -- which is exactly
+-- the set with a scripted item. So asking for the item is not the narrower
+-- test, it is the accurate one.
+---------------------------------------------------------------------------
+
+--- Give `player` the machine item for `shopType`. Returns true, or false and a
+--- message saying why not.
+local function spawnShopItem(player, shopType)
+    local def = Core.defs and Core.defs.shops and Core.defs.shops[shopType]
+
+    -- The list shows disabled shops so their editor stays reachable, which puts
+    -- one click away a machine the server would refuse to register: the compiler
+    -- drops a disabled shop, and the sprite's CustomName is looked up in the
+    -- compiled table. The admin would install it, right-click it and get nothing.
+    if def and def.enabled == false then
+        return false, getText("IGUI_PhunMart_Msg_ShopDisabled", shopLabel(shopType))
+    end
+
+    -- One item per shop, named for the shop key. A shop added by an admin or
+    -- another mod has no such item and cannot be installed this way; saying so
+    -- beats handing over something that installs as a different shop.
+    local fullType = Core.name .. "." .. shopType
+    if not getScriptManager():getItem(fullType) then
+        return false, getText("IGUI_PhunMart_Msg_NoItemForShop", shopLabel(shopType))
+    end
+
+    local inventory = player:getInventory()
+    local item = inventory:AddItem(fullType)
+    if not item then
+        return false, getText("IGUI_PhunMart_Msg_NoItemForShop", shopLabel(shopType))
+    end
+    sendAddItemToContainer(inventory, item)
+    ISInventoryPage.dirtyUI()
+    return true
 end
 
 function UI:refreshAll()
@@ -156,6 +208,10 @@ function UI:createChildren()
     -- nothing in the UI could create a shop, only edit one that already existed.
     self._newBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_New"), self.onNewShop)
     self._editBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_Edit"), self.onEdit, true)
+    -- Not gated with the other two: this places a machine rather than changing
+    -- a definition, so it follows the same rule as the rest of the admin powers
+    -- over the world instead of the editor role.
+    self._spawnBtn = self:addBottomButton(getText("IGUI_PhunMart_Btn_SpawnItem"), self.onSpawnItem, true)
     -- An "Admin Tools" button used to sit here, opening a context menu holding
     -- the wallet editor, recompile and restock-all. They live on the Tools tab
     -- now, where each one is a labelled row rather than a bare verb in a menu
@@ -184,6 +240,9 @@ function UI:prerender()
     end
     if self._editBtn then
         self._editBtn:setVisible(canEdit)
+    end
+    if self._spawnBtn then
+        self._spawnBtn:setVisible(Core.utils.isAdmin(self.player))
     end
     ListPanel.prerender(self)
 end
@@ -214,11 +273,38 @@ function UI:onEdit(item)
     end
 end
 
+--- Put a placeable copy of the selected shop in the admin's inventory.
+function UI:onSpawnItem()
+    if not Core.utils.isAdmin(self.player) then
+        return
+    end
+    local sel = self.list.selected
+    local row = sel and sel > 0 and self.list.items[sel]
+    local shopType = row and row.item and row.item.type
+    if shopType then
+        self:spawnItemFor(shopType)
+    end
+end
+
+--- Shared by the button and the context menu, so the two cannot report the
+--- same failure differently.
+function UI:spawnItemFor(shopType)
+    local ok, why = spawnShopItem(self.player, shopType)
+    Toast.show({
+        text = ok and getText("IGUI_PhunMart_Msg_SpawnedShopItem", shopLabel(shopType)) or why
+    })
+end
+
 function UI:onRowContextMenu(item, screenX, screenY)
     local context = ISContextMenu.get(self.playerIndex, screenX, screenY)
     context:addOption(getText("IGUI_PhunMart_Btn_Locations"), self, function()
         Core.ui.shop_instances.open(self.player, item.type)
     end)
+    if Core.utils.isAdmin(self.player) then
+        context:addOption(getText("IGUI_PhunMart_Btn_SpawnItem"), self, function()
+            self:spawnItemFor(item.type)
+        end)
+    end
     if Core.canEditConfig(self.player) then
         context:addOption(getText("IGUI_PhunMart_Btn_Config"), self, function()
             Core.ui.admin_shops.OnOpenPanel(self.player, item.type)
