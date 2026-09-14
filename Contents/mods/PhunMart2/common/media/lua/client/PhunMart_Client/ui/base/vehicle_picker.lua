@@ -55,6 +55,8 @@ function VehiclePicker:populateItems()
     -- No icons: vehicle scripts have no inventory texture, and a column of
     -- empty placeholders reads as broken artwork rather than as absence.
     self._noIcons = true
+    -- Nor is a vehicle crafted, foraged or looted, so that column goes too.
+    self._noObtained = true
 
     local catSet = {}
     for _, v in ipairs(Core.getAllVehicles() or {}) do

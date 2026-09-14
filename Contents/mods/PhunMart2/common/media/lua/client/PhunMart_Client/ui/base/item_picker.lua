@@ -11,12 +11,52 @@ local ROW_H = PickerPanel.ROW_H
 local CHECK_SZ = PickerPanel.CHECK_SZ
 local ICON_SZ = FONT_HGT_SMALL
 local BUTTON_HGT = PickerPanel.BUTTON_HGT
+local HEADER_H = ROW_H
 
 local ItemPicker = PickerPanel:derive("PhunMartItemPicker")
+
+-- Display names are not unique. A mod can ship two items both called "Jacket"
+-- where only one is meant to be handed out, and the other throws tooltip errors
+-- once it exists. From the name alone the two rows were identical, so the
+-- picker now shows what tells them apart: the script name, and whether the game
+-- itself ever crafts, forages or loots the item. The same three flags vanilla's
+-- Items List shows. An item that is none of them is usually the one to leave
+-- alone.
+
+--- How the game itself hands this item out, as the words to print. nil when the
+--- engine could not say, which blanks the column rather than dropping the row.
+local function obtainedFor(item, words)
+    local ok, craft, forage, loot = pcall(function()
+        return item:isCraftRecipeProduct(), item:canBeForaged(), item:canSpawnAsLoot()
+    end)
+    if not ok then
+        return nil
+    end
+    local parts = {}
+    if craft then
+        table.insert(parts, words.craft)
+    end
+    if forage then
+        table.insert(parts, words.forage)
+    end
+    if loot then
+        table.insert(parts, words.loot)
+    end
+    if #parts == 0 then
+        return {text = words.none, none = true}
+    end
+    return {text = table.concat(parts, ", ")}
+end
 
 function ItemPicker:populateItems()
     local items = getScriptManager():getAllItems()
     local catSet = {}
+    local words = {
+        craft = getText("IGUI_PhunMart_Obtain_Craft"),
+        forage = getText("IGUI_PhunMart_Obtain_Forage"),
+        loot = getText("IGUI_PhunMart_Obtain_Loot"),
+        none = getText("IGUI_PhunMart_Obtain_None"),
+    }
     for i = 0, items:size() - 1 do
         local item = items:get(i)
         if item then
@@ -27,7 +67,11 @@ function ItemPicker:populateItems()
                        item:getNormalTexture()
             end)
             if ok and key then
-                self:addPickerItem(key, display, {category = cat, texture = tex})
+                self:addPickerItem(key, display, {
+                    category = cat,
+                    texture = tex,
+                    obtained = obtainedFor(item, words),
+                })
                 if cat and cat ~= "" then
                     catSet[cat] = true
                 end
@@ -35,9 +79,14 @@ function ItemPicker:populateItems()
         end
     end
 
-    -- Sort alphabetically by display name
+    -- Sort alphabetically by display name, then by script name so duplicate
+    -- names always come out in the same order.
     table.sort(self._allItems, function(a, b)
-        return a.display:lower() < b.display:lower()
+        local an, bn = a.display:lower(), b.display:lower()
+        if an ~= bn then
+            return an < bn
+        end
+        return a.key < b.key
     end)
 
     -- Build category list for combo filter
@@ -73,6 +122,54 @@ function ItemPicker:createChildren()
     end
 
     self._lastCatSelected = 1
+
+    -- Column headings, drawn on the content panel in the strip prerender leaves
+    -- above the list. The list's own rows scroll, so they cannot carry them.
+    local mainRender = self._mainPanel.render
+    self._mainPanel.render = function(panel)
+        mainRender(panel)
+        self:drawHeader(panel)
+    end
+end
+
+--- Where each column starts, relative to the list's left edge. Shared by the
+--- header and the rows so the two cannot drift apart.
+function ItemPicker:columnLayout(listW)
+    local nameX = PAD + CHECK_SZ + PAD
+    if not self._noIcons then
+        nameX = nameX + ICON_SZ + PAD
+    end
+    if self._noObtained then
+        return {
+            name = nameX,
+            type = math.floor(listW * 0.42),
+            category = math.floor(listW * 0.72),
+            right = listW - PAD,
+        }
+    end
+    return {
+        name = nameX,
+        type = math.floor(listW * 0.33),
+        category = math.floor(listW * 0.58),
+        obtained = math.floor(listW * 0.77),
+        right = listW - PAD,
+    }
+end
+
+function ItemPicker:drawHeader(panel)
+    local list = self._list
+    local cols = self:columnLayout(list:getWidth())
+    local x0 = list:getX()
+    local top = list:getY() - HEADER_H
+    local ty = top + math.floor((HEADER_H - FONT_HGT_SMALL) / 2)
+
+    panel:drawRect(x0, top, list:getWidth(), HEADER_H, 0.3, 0.4, 0.4, 0.4)
+    panel:drawText(getText("IGUI_PhunMart_Col_Name"), x0 + cols.name, ty, 0.8, 0.8, 0.8, 1, UIFont.Small)
+    panel:drawText(getText("IGUI_PhunMart_Col_Type"), x0 + cols.type, ty, 0.8, 0.8, 0.8, 1, UIFont.Small)
+    panel:drawText(getText("IGUI_PhunMart_Col_Category"), x0 + cols.category, ty, 0.8, 0.8, 0.8, 1, UIFont.Small)
+    if cols.obtained then
+        panel:drawText(getText("IGUI_PhunMart_Col_Obtained"), x0 + cols.obtained, ty, 0.8, 0.8, 0.8, 1, UIFont.Small)
+    end
 end
 
 function ItemPicker:getSelectedCategory()
@@ -127,6 +224,7 @@ function ItemPicker:doDrawItem(y, item, alt, listSelf)
     local entry = item.item
     local isChecked = self._selectedSet[entry.key]
     local extra = entry.extra or {}
+    local cols = self:columnLayout(listSelf:getWidth())
 
     -- Row background
     if isChecked then
@@ -155,7 +253,6 @@ function ItemPicker:doDrawItem(y, item, alt, listSelf)
         else
             listSelf:drawRect(cx, iy, ICON_SZ, ICON_SZ, 0.9, 0.20, 0.20, 0.20)
         end
-        cx = cx + ICON_SZ + PAD
     end
 
     local ty = y + math.floor((ROW_H - FONT_HGT_SMALL) / 2)
@@ -164,15 +261,31 @@ function ItemPicker:doDrawItem(y, item, alt, listSelf)
         r, g, b = 0.7, 1.0, 0.7
     end
 
-    -- Display name
-    local catColW = math.floor(listSelf:getWidth() * 0.3)
-    listSelf:drawText(entry.display, cx, ty, r, g, b, 0.9, UIFont.Small)
-
-    -- Category (right-aligned)
-    local catX = listSelf:getWidth() - catColW
-    if extra.category and extra.category ~= "" then
-        listSelf:drawText(extra.category, catX, ty, 0.5, 0.5, 0.5, 0.7, UIFont.Small)
+    -- Each text column is clipped to its own width, the way vanilla's Items
+    -- List does it. A long name or script name would otherwise print into the
+    -- next column. Clip rects are in unscrolled coordinates.
+    local clipY = math.max(0, y + listSelf:getYScroll())
+    local clipY2 = math.min(listSelf.height, y + listSelf:getYScroll() + ROW_H)
+    local function cell(text, x, nextX, cr, cg, cb, ca)
+        if not text or text == "" then
+            return
+        end
+        listSelf:setStencilRect(x, clipY, math.max(0, nextX - PAD - x), clipY2 - clipY)
+        listSelf:drawText(text, x, ty, cr, cg, cb, ca, UIFont.Small)
+        listSelf:clearStencilRect()
     end
+
+    cell(entry.display, cols.name, cols.type, r, g, b, 0.9)
+    cell(entry.key, cols.type, cols.category, 0.6, 0.75, 0.9, 0.8)
+    cell(extra.category, cols.category, cols.obtained or cols.right, 0.5, 0.5, 0.5, 0.7)
+    if cols.obtained and extra.obtained then
+        if extra.obtained.none then
+            cell(extra.obtained.text, cols.obtained, cols.right, 0.9, 0.55, 0.3, 0.9)
+        else
+            cell(extra.obtained.text, cols.obtained, cols.right, 0.6, 0.8, 0.6, 0.8)
+        end
+    end
+    listSelf:repaintStencilRect(0, clipY, listSelf.width, clipY2 - clipY)
 
     return y + ROW_H
 end
@@ -196,6 +309,13 @@ function ItemPicker:prerender()
     local filterRight = catRightEdge - self._catComboW - self._catLblW - PAD
     self._filterEntry:setWidth(filterRight - PAD - filterLblW)
 
+    -- Room for the column headings. The base places the list every frame, so
+    -- this moves it down after that rather than once.
+    local listY = PAD + BUTTON_HGT + PAD
+    local listH = self._list:getHeight()
+    self._list:setY(listY + HEADER_H)
+    self._list:setHeight(listH - HEADER_H)
+
     -- Check if category combo changed
     local currentCat = self._catCombo and self._catCombo.selected or 1
     local currentFilter = self._filterEntry:getText()
@@ -212,9 +332,9 @@ function ItemPicker.open(player, selectedKeys, callback)
     local core = getCore()
     local sw = core:getScreenWidth()
     local sh = core:getScreenHeight()
-    -- Wider than the rest: this one also carries a category dropdown on the
-    -- filter row.
-    local w, h = PickerPanel.sizeFor(680, 600)
+    -- Wider than the rest: this one carries a category dropdown on the filter
+    -- row and four text columns per row.
+    local w, h = PickerPanel.sizeFor(820, 600)
     local x = math.floor((sw - w) / 2)
     local y = math.floor((sh - h) / 2)
 
