@@ -1,0 +1,4047 @@
+version = 1
+tileset
+{
+    file = phunmart_01
+    size = 8,8
+    id = 1
+    // phunmart_01_0
+    tile
+    {
+        xy = 0,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = E
+        GroupName = None
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_1
+    tile
+    {
+        xy = 1,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = S
+        GroupName = None
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_2
+    tile
+    {
+        xy = 2,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = W
+        GroupName = None
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_3
+    tile
+    {
+        xy = 3,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = N
+        GroupName = None
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_4
+    tile
+    {
+        xy = 4,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = E
+        GroupName = Unplugged None
+        HitByCar = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_5
+    tile
+    {
+        xy = 5,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = S
+        GroupName = Unplugged None
+        HitByCar = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_6
+    tile
+    {
+        xy = 6,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = W
+        GroupName = Unplugged None
+        HitByCar = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_7
+    tile
+    {
+        xy = 7,0
+        BlocksPlacement = 
+        CustomName = Vending
+        Facing = N
+        GroupName = Unplugged None
+        HitByCar = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_8
+    tile
+    {
+        xy = 0,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = E
+        GroupName = Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_9
+    tile
+    {
+        xy = 1,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = S
+        GroupName = Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_10
+    tile
+    {
+        xy = 2,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = W
+        GroupName = Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_11
+    tile
+    {
+        xy = 3,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = N
+        GroupName = Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_12
+    tile
+    {
+        xy = 4,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = E
+        GroupName = Unplugged Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_13
+    tile
+    {
+        xy = 5,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = S
+        GroupName = Unplugged Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_14
+    tile
+    {
+        xy = 6,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = W
+        GroupName = Unplugged Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_15
+    tile
+    {
+        xy = 7,1
+        BlocksPlacement = 
+        CustomName = GoodPhoods
+        Facing = N
+        GroupName = Unplugged Good Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_16
+    tile
+    {
+        xy = 0,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = E
+        GroupName = Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_17
+    tile
+    {
+        xy = 1,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = S
+        GroupName = Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_18
+    tile
+    {
+        xy = 2,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = W
+        GroupName = Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_19
+    tile
+    {
+        xy = 3,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = N
+        GroupName = Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_20
+    tile
+    {
+        xy = 4,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = E
+        GroupName = Unplugged Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_21
+    tile
+    {
+        xy = 5,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = S
+        GroupName = Unplugged Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_22
+    tile
+    {
+        xy = 6,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = W
+        GroupName = Unplugged Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_23
+    tile
+    {
+        xy = 7,2
+        BlocksPlacement = 
+        CustomName = PhatPhoods
+        Facing = N
+        GroupName = Unplugged Phat Phoods
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_24
+    tile
+    {
+        xy = 0,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = E
+        GroupName = Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_25
+    tile
+    {
+        xy = 1,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = S
+        GroupName = Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_26
+    tile
+    {
+        xy = 2,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = W
+        GroupName = Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_27
+    tile
+    {
+        xy = 3,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = N
+        GroupName = Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_28
+    tile
+    {
+        xy = 4,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = E
+        GroupName = Unplugged Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_29
+    tile
+    {
+        xy = 5,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = S
+        GroupName = Unplugged Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_30
+    tile
+    {
+        xy = 6,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = W
+        GroupName = Unplugged Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_31
+    tile
+    {
+        xy = 7,3
+        BlocksPlacement = 
+        CustomName = PittyTheTool
+        Facing = N
+        GroupName = Unplugged Pitty The Tool
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_32
+    tile
+    {
+        xy = 0,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = E
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_33
+    tile
+    {
+        xy = 1,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = S
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_34
+    tile
+    {
+        xy = 2,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = W
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_35
+    tile
+    {
+        xy = 3,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = N
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_36
+    tile
+    {
+        xy = 4,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = E
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_37
+    tile
+    {
+        xy = 5,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = S
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_38
+    tile
+    {
+        xy = 6,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = W
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_39
+    tile
+    {
+        xy = 7,4
+        BlocksPlacement = 
+        CustomName = FinalAmendment
+        Facing = N
+        GroupName = Final Amendment
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_40
+    tile
+    {
+        xy = 0,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = E
+        GroupName = Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_41
+    tile
+    {
+        xy = 1,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = S
+        GroupName = Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_42
+    tile
+    {
+        xy = 2,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = W
+        GroupName = Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_43
+    tile
+    {
+        xy = 3,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = N
+        GroupName = Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_44
+    tile
+    {
+        xy = 4,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = E
+        GroupName = Unplugged Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_45
+    tile
+    {
+        xy = 5,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = S
+        GroupName = Unplugged Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_46
+    tile
+    {
+        xy = 6,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = W
+        GroupName = Unplugged Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_47
+    tile
+    {
+        xy = 7,5
+        BlocksPlacement = 
+        CustomName = WrentAWreck
+        Facing = N
+        GroupName = Unplugged Wrent a Wreck
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_48
+    tile
+    {
+        xy = 0,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = E
+        GroupName = Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_49
+    tile
+    {
+        xy = 1,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = S
+        GroupName = Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_50
+    tile
+    {
+        xy = 2,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = W
+        GroupName = Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_51
+    tile
+    {
+        xy = 3,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = N
+        GroupName = Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_52
+    tile
+    {
+        xy = 4,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = E
+        GroupName = Unplugged Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_53
+    tile
+    {
+        xy = 5,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = S
+        GroupName = Unplugged Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_54
+    tile
+    {
+        xy = 6,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = W
+        GroupName = Unplugged Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_55
+    tile
+    {
+        xy = 7,6
+        BlocksPlacement = 
+        CustomName = MichellesCrafts
+        Facing = N
+        GroupName = Unplugged Michelles Crafts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_56
+    tile
+    {
+        xy = 0,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = E
+        GroupName = Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_57
+    tile
+    {
+        xy = 1,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = S
+        GroupName = Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_58
+    tile
+    {
+        xy = 2,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = W
+        GroupName = Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_59
+    tile
+    {
+        xy = 3,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = N
+        GroupName = Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 200
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solid = 
+    }
+    // phunmart_01_60
+    tile
+    {
+        xy = 4,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = E
+        GroupName = Unplugged Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_61
+    tile
+    {
+        xy = 5,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = S
+        GroupName = Unplugged Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_62
+    tile
+    {
+        xy = 6,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = W
+        GroupName = Unplugged Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_01_63
+    tile
+    {
+        xy = 7,7
+        BlocksPlacement = 
+        CustomName = CarAParts
+        Facing = N
+        GroupName = Unplugged Car Parts
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+}
+tileset
+{
+    file = phunmart_02
+    size = 8,8
+    id = 2
+    // phunmart_02_0
+    tile
+    {
+        xy = 0,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = E
+        GroupName = Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_1
+    tile
+    {
+        xy = 1,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = S
+        GroupName = Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_2
+    tile
+    {
+        xy = 2,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = W
+        GroupName = Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_3
+    tile
+    {
+        xy = 3,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = N
+        GroupName = Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_4
+    tile
+    {
+        xy = 4,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = E
+        GroupName = Unplugged Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_5
+    tile
+    {
+        xy = 5,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = S
+        GroupName = Unplugged Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_6
+    tile
+    {
+        xy = 6,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = W
+        GroupName = Unplugged Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_7
+    tile
+    {
+        xy = 7,0
+        BlocksPlacement = 
+        CustomName = TraiterJoes
+        Facing = N
+        GroupName = Unplugged Traiter Joes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_8
+    tile
+    {
+        xy = 0,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = E
+        GroupName = CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_9
+    tile
+    {
+        xy = 1,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = S
+        GroupName = CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_10
+    tile
+    {
+        xy = 2,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = W
+        GroupName = CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_11
+    tile
+    {
+        xy = 3,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = N
+        GroupName = CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_12
+    tile
+    {
+        xy = 4,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = E
+        GroupName = Unplugged CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_13
+    tile
+    {
+        xy = 5,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = S
+        GroupName = Unplugged CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_14
+    tile
+    {
+        xy = 6,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = W
+        GroupName = Unplugged CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_15
+    tile
+    {
+        xy = 7,1
+        BlocksPlacement = 
+        CustomName = CSVPharmacy
+        Facing = N
+        GroupName = Unplugged CSV Pharmacy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_16
+    tile
+    {
+        xy = 0,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = E
+        GroupName = Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_17
+    tile
+    {
+        xy = 1,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = S
+        GroupName = Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_18
+    tile
+    {
+        xy = 2,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = W
+        GroupName = Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_19
+    tile
+    {
+        xy = 3,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = N
+        GroupName = Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_20
+    tile
+    {
+        xy = 4,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = E
+        GroupName = Unplugged Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_21
+    tile
+    {
+        xy = 5,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = S
+        GroupName = Unplugged Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_22
+    tile
+    {
+        xy = 6,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = W
+        GroupName = Unplugged Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_23
+    tile
+    {
+        xy = 7,2
+        BlocksPlacement = 
+        CustomName = RadioHacks
+        Facing = N
+        GroupName = Unplugged Radio Hacks
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_24
+    tile
+    {
+        xy = 0,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = E
+        GroupName = Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_25
+    tile
+    {
+        xy = 1,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = S
+        GroupName = Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_26
+    tile
+    {
+        xy = 2,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = W
+        GroupName = Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_27
+    tile
+    {
+        xy = 3,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = N
+        GroupName = Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_28
+    tile
+    {
+        xy = 4,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = E
+        GroupName = Unplugged Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_29
+    tile
+    {
+        xy = 5,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = S
+        GroupName = Unplugged Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_30
+    tile
+    {
+        xy = 6,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = W
+        GroupName = Unplugged Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_31
+    tile
+    {
+        xy = 7,3
+        BlocksPlacement = 
+        CustomName = Phish4U
+        Facing = N
+        GroupName = Unplugged Phish4U
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_32
+    tile
+    {
+        xy = 0,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = E
+        GroupName = Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_33
+    tile
+    {
+        xy = 1,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = S
+        GroupName = Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_34
+    tile
+    {
+        xy = 2,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = W
+        GroupName = Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_35
+    tile
+    {
+        xy = 3,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = N
+        GroupName = Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_36
+    tile
+    {
+        xy = 4,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = E
+        GroupName = Unplugged Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_37
+    tile
+    {
+        xy = 5,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = S
+        GroupName = Unplugged Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_38
+    tile
+    {
+        xy = 6,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = W
+        GroupName = Unplugged Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_39
+    tile
+    {
+        xy = 7,4
+        BlocksPlacement = 
+        CustomName = HoesNMoes
+        Facing = N
+        GroupName = Unplugged Hoes n Moes
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_40
+    tile
+    {
+        xy = 0,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = E
+        GroupName = Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_41
+    tile
+    {
+        xy = 1,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = S
+        GroupName = Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_42
+    tile
+    {
+        xy = 2,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = W
+        GroupName = Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_43
+    tile
+    {
+        xy = 3,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = N
+        GroupName = Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_44
+    tile
+    {
+        xy = 4,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = E
+        GroupName = Unplugged Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_45
+    tile
+    {
+        xy = 5,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = S
+        GroupName = Unplugged Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_46
+    tile
+    {
+        xy = 6,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = W
+        GroupName = Unplugged Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_47
+    tile
+    {
+        xy = 7,5
+        BlocksPlacement = 
+        CustomName = BudgetXPerience
+        Facing = N
+        GroupName = Unplugged Budget XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_48
+    tile
+    {
+        xy = 0,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = E
+        GroupName = Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_49
+    tile
+    {
+        xy = 1,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = S
+        GroupName = Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_50
+    tile
+    {
+        xy = 2,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = W
+        GroupName = Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_51
+    tile
+    {
+        xy = 3,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = N
+        GroupName = Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_52
+    tile
+    {
+        xy = 4,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = E
+        GroupName = Unplugged Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_53
+    tile
+    {
+        xy = 5,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = S
+        GroupName = Unplugged Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_54
+    tile
+    {
+        xy = 6,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = W
+        GroupName = Unplugged Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_55
+    tile
+    {
+        xy = 7,6
+        BlocksPlacement = 
+        CustomName = GiftedXPerience
+        Facing = N
+        GroupName = Unplugged Gifted XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_56
+    tile
+    {
+        xy = 0,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = E
+        GroupName = Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_57
+    tile
+    {
+        xy = 1,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = S
+        GroupName = Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_58
+    tile
+    {
+        xy = 2,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = W
+        GroupName = Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_59
+    tile
+    {
+        xy = 3,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = N
+        GroupName = Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_60
+    tile
+    {
+        xy = 4,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = E
+        GroupName = Unplugged Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_61
+    tile
+    {
+        xy = 5,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = S
+        GroupName = Unplugged Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_62
+    tile
+    {
+        xy = 6,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = W
+        GroupName = Unplugged Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_02_63
+    tile
+    {
+        xy = 7,7
+        BlocksPlacement = 
+        CustomName = LuxuryXPerience
+        Facing = N
+        GroupName = Unplugged Luxury XP
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+}
+tileset
+{
+    file = phunmart_03
+    size = 8,8
+    id = 3
+    // phunmart_03_0
+    tile
+    {
+        xy = 0,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = E
+        GroupName = HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_1
+    tile
+    {
+        xy = 1,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = S
+        GroupName = HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_2
+    tile
+    {
+        xy = 2,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = W
+        GroupName = HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_3
+    tile
+    {
+        xy = 3,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = N
+        GroupName = HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_4
+    tile
+    {
+        xy = 4,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = E
+        GroupName = Unplugged HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_5
+    tile
+    {
+        xy = 5,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = S
+        GroupName = Unplugged HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_6
+    tile
+    {
+        xy = 6,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = W
+        GroupName = Unplugged HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_7
+    tile
+    {
+        xy = 7,0
+        BlocksPlacement = 
+        CustomName = HardWear
+        Facing = N
+        GroupName = Unplugged HardWear
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_8
+    tile
+    {
+        xy = 0,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = E
+        GroupName = Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_9
+    tile
+    {
+        xy = 1,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = S
+        GroupName = Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_10
+    tile
+    {
+        xy = 2,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = W
+        GroupName = Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_11
+    tile
+    {
+        xy = 3,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = N
+        GroupName = Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_12
+    tile
+    {
+        xy = 4,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = E
+        GroupName = Unplugged Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_13
+    tile
+    {
+        xy = 5,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = S
+        GroupName = Unplugged Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_14
+    tile
+    {
+        xy = 6,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = W
+        GroupName = Unplugged Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_15
+    tile
+    {
+        xy = 7,1
+        BlocksPlacement = 
+        CustomName = Collectors
+        Facing = N
+        GroupName = Unplugged Collectors
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_16
+    tile
+    {
+        xy = 0,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = E
+        GroupName = Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_17
+    tile
+    {
+        xy = 1,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = S
+        GroupName = Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_18
+    tile
+    {
+        xy = 2,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = W
+        GroupName = Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_19
+    tile
+    {
+        xy = 3,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = N
+        GroupName = Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_20
+    tile
+    {
+        xy = 4,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = E
+        GroupName = Unplugged Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_21
+    tile
+    {
+        xy = 5,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = S
+        GroupName = Unplugged Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_22
+    tile
+    {
+        xy = 6,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = W
+        GroupName = Unplugged Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_23
+    tile
+    {
+        xy = 7,2
+        BlocksPlacement = 
+        CustomName = Travellers
+        Facing = N
+        GroupName = Unplugged Travel
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_24
+    tile
+    {
+        xy = 0,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = E
+        GroupName = Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_25
+    tile
+    {
+        xy = 1,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = S
+        GroupName = Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_26
+    tile
+    {
+        xy = 2,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = W
+        GroupName = Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_27
+    tile
+    {
+        xy = 3,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = N
+        GroupName = Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_28
+    tile
+    {
+        xy = 4,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = E
+        GroupName = Unplugged Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_29
+    tile
+    {
+        xy = 5,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = S
+        GroupName = Unplugged Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_30
+    tile
+    {
+        xy = 6,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = W
+        GroupName = Unplugged Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_31
+    tile
+    {
+        xy = 7,3
+        BlocksPlacement = 
+        CustomName = ShedsAndCommoners
+        Facing = N
+        GroupName = Unplugged Books
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_32
+    tile
+    {
+        xy = 0,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = E
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_33
+    tile
+    {
+        xy = 1,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = S
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_34
+    tile
+    {
+        xy = 2,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = W
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_35
+    tile
+    {
+        xy = 3,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = N
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_36
+    tile
+    {
+        xy = 4,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = E
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_37
+    tile
+    {
+        xy = 5,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = S
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_38
+    tile
+    {
+        xy = 6,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = W
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_39
+    tile
+    {
+        xy = 7,4
+        BlocksPlacement = 
+        CustomName = PrawnStars
+        Facing = N
+        GroupName = Pawn
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_40
+    tile
+    {
+        xy = 0,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = E
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_41
+    tile
+    {
+        xy = 1,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = S
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_42
+    tile
+    {
+        xy = 2,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = W
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_43
+    tile
+    {
+        xy = 3,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = N
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_44
+    tile
+    {
+        xy = 4,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = E
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_45
+    tile
+    {
+        xy = 5,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = S
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_46
+    tile
+    {
+        xy = 6,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = W
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_47
+    tile
+    {
+        xy = 7,5
+        BlocksPlacement = 
+        CustomName = Zetsy
+        Facing = N
+        GroupName = Zetsy
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_48
+    tile
+    {
+        xy = 0,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = E
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_49
+    tile
+    {
+        xy = 1,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = S
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_50
+    tile
+    {
+        xy = 2,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = W
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_51
+    tile
+    {
+        xy = 3,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = N
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_52
+    tile
+    {
+        xy = 4,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = E
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_53
+    tile
+    {
+        xy = 5,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = S
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_54
+    tile
+    {
+        xy = 6,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = W
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_55
+    tile
+    {
+        xy = 7,6
+        BlocksPlacement = 
+        CustomName = LootGoblin
+        Facing = N
+        GroupName = LootGoblin
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_56
+    tile
+    {
+        xy = 0,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = E
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_57
+    tile
+    {
+        xy = 1,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = S
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_58
+    tile
+    {
+        xy = 2,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = W
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_59
+    tile
+    {
+        xy = 3,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = N
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_60
+    tile
+    {
+        xy = 4,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = E
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_61
+    tile
+    {
+        xy = 5,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = S
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_62
+    tile
+    {
+        xy = 6,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = W
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+    // phunmart_03_63
+    tile
+    {
+        xy = 7,7
+        BlocksPlacement = 
+        CustomName = NecroMart
+        Facing = N
+        GroupName = NecroMart
+        HitByCar = 
+        IsMoveAble = 
+        ItemHeight = 70
+        Material = MetalPlates
+        Material2 = Electric
+        Material3 = Electric
+        PickUpWeight = 250
+        ScrapSize = Large
+        ScrapUseSkill = 
+        ScrapUseTool = 
+        StopCar = 
+        solidtrans = 
+    }
+}

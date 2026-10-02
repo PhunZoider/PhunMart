@@ -156,7 +156,7 @@ be overridden per zone, and again for sprinters if PhunSprinters is loaded.
 ### Admin Tools
 
 Everything an admin can change lives in one window, **PhunMart Setup**. Open it from the
-`** PhunMart **` button on the Admin Panel, or from the Debug Menu. It is a row of tabs
+**PhunMart** button on the Admin Panel, or from the Debug Menu. It is a row of tabs
 following the chain a shop resolves through:
 
 **Shops** and **Locations** (what shop types exist, and where machines actually stand in the

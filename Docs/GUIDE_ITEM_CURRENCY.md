@@ -8,7 +8,7 @@ would rather charge in something players loot, like `Base.Money`, `Base.Nails` o
 
 ## The easy way: the Currency tool
 
-1. Open the Admin Panel and click `** PhunMart **`, then go to the **Tools** tab.
+1. Open the Admin Panel and click **PhunMart**, then go to the **Tools** tab.
 2. Select **Change the currency** and click **Open**.
 3. Set **Pay with** to `An item players carry`.
 4. Click **Pick...** next to **Item** and choose your item, for example `Base.Money`.

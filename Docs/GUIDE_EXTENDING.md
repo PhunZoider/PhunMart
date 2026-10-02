@@ -59,12 +59,15 @@ The same works for `pools`, `groups`, `items`, `prices`, `specials` and `conditi
 
 Sprites come from your own tile pack, declared in your `mod.info` with `pack=` and
 `tiledef=`. Pick a tiledef index that collides with nothing else installed. Sprite names are
-global once a pack loads, so you *can* reference PhunMart's, but then your machine's art
+global once a pack loads, so you _can_ reference PhunMart's, but then your machine's art
 ships from a repository you do not own and the two have to be versioned together to change
 a sprite.
 
 The background is an ordinary texture and needs no pack: `shopDef.background` resolves
 against `media/textures/`, which merges across mods.
+
+[Machine Art Reference](MACHINE_ART.md) covers the eight-tile block layout and the size a
+background should be, plus the spare art PhunMart ships if you just want something to start from.
 
 ---
 

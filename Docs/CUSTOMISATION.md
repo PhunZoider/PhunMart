@@ -9,7 +9,7 @@ that you can override without touching the mod itself.
 > now `.json`. See [Converting your old config files](#converting-your-old-config-files).
 
 Every one of those files has an editor behind it in game. Open the Admin Panel and click
-`** PhunMart **`, or use the Debug Menu, and you get **PhunMart Setup**: one window with a
+**PhunMart**, or use the Debug Menu, and you get **PhunMart Setup**: one window with a
 tab per config layer, plus a **Tools** tab for the actions that are not edits. Saving in
 there writes the same override files this guide describes, so the two routes are
 interchangeable and you can mix them freely.
@@ -887,13 +887,16 @@ group behind `pool_pittythetool` prices its own items.
 menu. The weight on each key scales that pool's offer weights, which is why the boost pools at
 `0.5` appear about half as often as the XP pools beside them.
 
+PhunMart ships more machine tiles and backgrounds than its default shops use. See
+[Machine Art Reference](MACHINE_ART.md) for the spare ones and how a tile block is laid out.
+
 ### Shop fields
 
 | Field              | Description                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------- |
 | `category`         | Groups related shops. Shown in the admin lists, and shared by the spacing rule below.           |
-| `background`       | PNG file name from `media/textures/` (no path prefix)                                          |
-| `sprites`          | 4-element array of tile sprite names (E/S/W/N facing)                                          |
+| `background`       | PNG file name from `media/textures/` (no path prefix). Spare ones: [Machine Art](MACHINE_ART.md#unused-backgrounds) |
+| `sprites`          | 4-element array of tile sprite names (E/S/W/N facing). Spare ones: [Machine Art](MACHINE_ART.md#unused-tile-blocks) |
 | `unpoweredSprites` | Sprite names shown when machine is unpowered                                                   |
 | `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless, and the unpowered sprites are never drawn. |
 | `light`            | The glow the machine casts: `{ "r": 255, "g": 214, "b": 170, "radius": 2 }`, colours in 0-255 and radius in tiles. Absent takes that warm white. Set `false` for a machine that stays dark. The light hangs on the square the machine faces, not on the machine. |

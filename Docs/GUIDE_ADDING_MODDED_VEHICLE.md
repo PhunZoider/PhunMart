@@ -11,7 +11,7 @@ guide is about.
 If the vehicle mod is loaded, its cars are already in PhunMart's vehicle picker. You do not
 need script names, and you do not need to create anything.
 
-1. Open the Admin Panel and click `** PhunMart **`, then go to the **Groups** tab.
+1. Open the Admin Panel and click **PhunMart**, then go to the **Groups** tab.
 2. Pick the group matching the tier you want the vehicle to sell at, for example
    `vehicles_luxury` for high-end cars, and click **Edit**.
 3. Click **Pick...** next to **Vehicles**, find the vehicle by name, tick it, and confirm.
