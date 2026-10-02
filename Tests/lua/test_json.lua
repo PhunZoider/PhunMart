@@ -2,7 +2,6 @@
 -- runtime cut down to what PZ B42.20.4 offers.
 --
 -- Run: luajit test_json.lua   (or run.cmd, which runs all of them)
-
 local here = arg[0]:match("^(.*)[/\\][^/\\]*$") or "."
 local root = arg[1] or (here .. "/../..")
 package.path = here .. "/?.lua;" .. package.path
@@ -82,12 +81,21 @@ end
 ---------------------------------------------------------------------------
 print("\n-- the runtime is actually cut down --")
 
-check("loadstring is gone", not pcall(function() return loadstring("return 1") end))
-check("load is gone", not pcall(function() return load("return 1") end))
-check("next is gone", not pcall(function() return next({}) end))
+check("loadstring is gone", not pcall(function()
+    return loadstring("return 1")
+end))
+check("load is gone", not pcall(function()
+    return load("return 1")
+end))
+check("next is gone", not pcall(function()
+    return next({})
+end))
 check("pairs still works", pcall(function()
     local n = 0
-    for _ in pairs({a = 1, b = 2}) do
+    for _ in pairs({
+        a = 1,
+        b = 2
+    }) do
         n = n + 1
     end
     return n
@@ -99,30 +107,66 @@ print("\n-- the bug that was reported --")
 -- Single-player used to key player data on the number 0.
 encodeRefuses("SP wallet keyed on the number 0 is refused", {
     [0] = {
-        current = {change = 0, tokens = 0},
-        bound = {tokens = 0},
+        current = {
+            change = 0,
+            tokens = 0
+        },
+        bound = {
+            tokens = 0
+        },
         purchases = {}
     }
 }, "number")
 
-encodeRefuses("the refusal names the key", {[0] = {previousHours = 0}}, "(0)")
+encodeRefuses("the refusal names the key", {
+    [0] = {
+        previousHours = 0
+    }
+}, "(0)")
 
-encodeRefuses("a player object as a key is refused too", {[{}] = {previousHours = 0}}, "table")
+encodeRefuses("a player object as a key is refused too", {
+    [{}] = {
+        previousHours = 0
+    }
+}, "table")
 
 ---------------------------------------------------------------------------
 print("\n-- the shapes as they are now --")
 
 roundTrip("SP wallet on the string key", {
     ["0"] = {
-        current = {change = 250, tokens = 3},
-        bound = {tokens = 1},
+        current = {
+            change = 250,
+            tokens = 3
+        },
+        bound = {
+            tokens = 1
+        },
         purchases = {}
     }
 })
 
 roundTrip("MP wallet keyed on usernames", {
-    ["PhunZoider"] = {current = {change = 1000, tokens = 0}, bound = {tokens = 5}, purchases = {}},
-    ["Someone Else"] = {current = {change = 0, tokens = 0}, bound = {tokens = 0}, purchases = {}}
+    ["PhunZoider"] = {
+        current = {
+            change = 1000,
+            tokens = 0
+        },
+        bound = {
+            tokens = 5
+        },
+        purchases = {}
+    },
+    ["Someone Else"] = {
+        current = {
+            change = 0,
+            tokens = 0
+        },
+        bound = {
+            tokens = 0
+        },
+        purchases = {}
+    }
 })
 
 roundTrip("playtime tracking, the file from the screenshot", {
@@ -140,13 +184,19 @@ roundTrip("kill tracking", {
     ["0"] = {
         zombieKills = 137,
         sprinterKills = 0,
-        claimed = {["zombie_100"] = true}
+        claimed = {
+            ["zombie_100"] = true
+        }
     }
 })
 
 roundTrip("purchase history", {
     ["PhunZoider"] = {
-        ["offer:my_pistol"] = {{at = 1234567, shop = "FinalAmendment", qty = 1}}
+        ["offer:my_pistol"] = {{
+            at = 1234567,
+            shop = "FinalAmendment",
+            qty = 1
+        }}
     }
 })
 
@@ -174,7 +224,13 @@ harness.reset()
 
 check("loadTable on a missing file is nil", fileUtils.loadTable("PhunMart_Nothing.json") == nil)
 
-local sample = {pool_bobshardware = {sources = {groups = {"bobs_tools"}}}}
+local sample = {
+    pool_bobshardware = {
+        sources = {
+            groups = {"bobs_tools"}
+        }
+    }
+}
 check("saveTable reports success", fileUtils.saveTable("PhunMart_Pools.json", sample) == true)
 local reloaded = fileUtils.loadTable("PhunMart_Pools.json")
 local same, why = harness.deepEqual(sample, reloaded)
@@ -183,7 +239,9 @@ check("saveTable then loadTable returns the same table", same, why)
 -- The guarantee that matters: a table that cannot be encoded must not take the
 -- existing file down with it.
 local before = harness.files["PhunMart_Pools.json"]
-check("saveTable refuses an unencodable table", fileUtils.saveTable("PhunMart_Pools.json", {[0] = "bad"}) == false)
+check("saveTable refuses an unencodable table", fileUtils.saveTable("PhunMart_Pools.json", {
+    [0] = "bad"
+}) == false)
 check("the file on disk is untouched after a refusal", harness.files["PhunMart_Pools.json"] == before)
 local stillThere = fileUtils.loadTable("PhunMart_Pools.json")
 local same2, why2 = harness.deepEqual(sample, stillThere)
