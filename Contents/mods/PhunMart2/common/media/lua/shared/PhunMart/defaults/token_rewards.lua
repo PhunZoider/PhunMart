@@ -1,6 +1,6 @@
 -- PhunMart Token Rewards - Default Configuration
 -- This file defines when players automatically earn tokens/rewards for:
---   playtime      - rewards for cumulative online time
+--   playtime      - rewards for cumulative survived (game) time
 --   zombieKills   - rewards for cumulative zombie kills
 --   sprinterKills - rewards for cumulative sprinter kills
 --
@@ -16,41 +16,53 @@
 -- To override: place PhunMart_TokenRewards.json in your server Lua folder.
 -- The override file is loaded in full (not merged), so copy and modify this file.
 return {
-    -- playtime: one-time milestone rewards at cumulative online time thresholds.
-    -- Each milestone fires exactly once per wipe.
+    -- playtime: one-time milestone rewards at cumulative survived time thresholds.
+    -- Minutes are GAME minutes (getHoursSurvived), summed across the player's
+    -- characters in this save. At the default 1h day length, 1 game hour is
+    -- 2.5 real minutes (1 real minute = 24 game minutes). Comments give the
+    -- real-time equivalent. Each milestone fires exactly once per wipe.
     playtime = {{
-        atMinutes = 10,
+        atMinutes = 120,
         rewards = {{
             item = "PhunMart.Token",
             amount = 1
         }}
-    }, {
-        atMinutes = 60,
+    }, -- ~5 real minutes
+    {
+        atMinutes = 720,
         rewards = {{
             item = "PhunMart.Token",
             amount = 1
         }}
-    }, {
-        atMinutes = 300,
-        rewards = {{
-            item = "PhunMart.Token",
-            amount = 2
-        }}
-    }, -- 5h
+    }, -- ~30 real minutes
     {
-        atMinutes = 600,
+        atMinutes = 2880,
         rewards = {{
             item = "PhunMart.Token",
-            amount = 3
+            amount = 1
         }}
-    }, -- 10h
+    }, -- ~2 real hours
     {
-        atMinutes = 900,
+        atMinutes = 7200,
         rewards = {{
             item = "PhunMart.Token",
-            amount = 5
+            amount = 1
         }}
-    } -- 15h
+    }, -- ~5 real hours
+    {
+        atMinutes = 17280,
+        rewards = {{
+            item = "PhunMart.Token",
+            amount = 1
+        }}
+    }, -- ~12 real hours
+    {
+        atMinutes = 43200,
+        rewards = {{
+            item = "PhunMart.Token",
+            amount = 1
+        }}
+    } -- ~30 real hours
     },
 
     -- zombieKills: one-time milestone rewards for cumulative zombie kills.

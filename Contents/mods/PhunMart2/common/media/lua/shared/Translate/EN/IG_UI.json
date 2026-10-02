@@ -595,7 +595,7 @@
   "IGUI_PhunMart_Lbl_Threshold": "Threshold:",
   "IGUI_PhunMart_Lbl_Item": "Item:",
   "IGUI_PhunMart_Lbl_RewardAmount": "Amount:",
-  "IGUI_PhunMart_Hint_PlaytimeMinutes": "Minutes of playtime",
+  "IGUI_PhunMart_Hint_PlaytimeMinutes": "Total minutes played (game time, not real world time). Leave blank to ignore this milestone.",
   "IGUI_PhunMart_Hint_KillCount": "Number of kills",
   "IGUI_PhunMart_Hint_RewardAmount": "Number of items to award",
   "IGUI_PhunMart_Reward_playtime": "Playtime",
