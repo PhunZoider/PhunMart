@@ -63,6 +63,15 @@ local function spawnShopItem(player, shopType)
         return false, getText("IGUI_PhunMart_Msg_NoItemForShop", shopLabel(shopType))
     end
 
+    -- In MP the server has to create the item. One added here exists only on
+    -- this client: it shows in the inventory, but installing it sends the
+    -- server an item id it has never seen, and ISMoveablesAction:new errors on
+    -- the nil item. /additem is what the vanilla Items List uses for the same job.
+    if isClient() then
+        SendCommandToServer("/additem \"" .. player:getUsername() .. "\" \"" .. fullType .. "\"")
+        return true
+    end
+
     local inventory = player:getInventory()
     local item = inventory:AddItem(fullType)
     if not item then

@@ -225,7 +225,10 @@ function ServerSystem.addToWorld(square, shop, direction)
     local isoObject = IsoObject.new(square:getCell(), square, sprite)
     ServerSystem.initializeShopObject(isoObject)
     square:AddSpecialObject(isoObject, -1)
-    triggerEvent("OnObjectAdded", isoObject)
+    -- Clients must have the object before anything addresses it by index.
+    -- OnObjectAdded is fired last because it builds the Lua object, whose
+    -- stateFromIsoObject ends in transmitModData: sent ahead of this packet,
+    -- every client drops it with "ObjectModDataPacket.parse: object is null".
     isoObject:transmitCompleteItemToClients()
     -- Sent again, by name, because the complete-item packet does not reliably
     -- carry a modded sprite. The machine arrives on the client named and real
@@ -246,6 +249,7 @@ function ServerSystem.addToWorld(square, shop, direction)
     -- ISMoveableSpriteProps ends on the same pair.
     square:RecalcProperties()
     square:RecalcAllWithNeighbours(true)
+    triggerEvent("OnObjectAdded", isoObject)
     return true
 
 end
