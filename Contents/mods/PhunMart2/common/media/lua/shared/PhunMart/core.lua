@@ -216,6 +216,34 @@ function Core:reloadShopDefinitions()
     return self.shops
 end
 
+-- Whether players may pick up or sledgehammer a shop's machines. The shop's
+-- own setting wins when it has one; otherwise the sandbox option decides, and
+-- both default to no. Admins are never held to either, so callers check that
+-- themselves.
+local function shopAllows(shopKey, field, option)
+    local shop = shopKey and Core.shops and Core.shops[shopKey]
+    if shop and shop[field] ~= nil then
+        return shop[field] == true
+    end
+    return Core.settings[option] == true
+end
+
+function Core.isShopMoveable(shopKey)
+    return shopAllows(shopKey, "moveable", "ShopsMoveable")
+end
+
+function Core.isShopDestructible(shopKey)
+    return shopAllows(shopKey, "destructible", "ShopsDestructible")
+end
+
+-- The shop key an iso object is a machine of, or nil. Keyed on the sprite
+-- name rather than CustomName so the unpowered sprites count too.
+function Core.shopKeyForObject(obj)
+    local sprite = obj and obj.getSprite and obj:getSprite()
+    local name = sprite and sprite:getName()
+    return name and Core.spriteToShop[name] or nil
+end
+
 function Core:ini()
     self.inied = true
     if not isClient() then

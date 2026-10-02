@@ -92,21 +92,36 @@ Commands[Core.commands.onShopChange] = function(args)
     triggerEvent(Core.events.OnShopChange, args.key, args.data, args.replaced == true)
 end
 
+-- The IsMoveAble value each shop sprite shipped with, captured before we first
+-- touch it, so a shop that becomes moveable gets back exactly what its tile
+-- had. false means the tile was never moveable and is left alone.
+local originalMoveable = {}
+
+-- Hides the Pick Up option on machines players may not move. Sprite properties
+-- are shared by every machine wearing that sprite, which is fine because a
+-- sprite belongs to one shop. The rule itself is enforced in nodestroy.lua;
+-- this only keeps the menu honest. Re-run whenever defs change, since a shop
+-- can be switched either way while the game is running.
 local function ConfigTiles()
-    local c = Core
-    print("Configuring shop sprites...")
-    if Core.utils.isAdmin(getSpecificPlayer(0)) then
-        return
-    end
-
-    for tileName, _ in pairs(c.spriteToShop) do
-        print("Configuring tile " .. tileName)
+    local admin = Core.utils.isAdmin(getSpecificPlayer(0))
+    for tileName, shopKey in pairs(Core.spriteToShop) do
         local tile = IsoSpriteManager.instance:getSprite(tileName)
-        local props = tile:getProperties()
-        props:unset("IsMoveAble")
+        local props = tile and tile:getProperties()
+        if props then
+            if originalMoveable[tileName] == nil then
+                originalMoveable[tileName] = props:has("IsMoveAble") and (props:get("IsMoveAble") or "") or false
+            end
+            local original = originalMoveable[tileName]
+            if original and (admin or Core.isShopMoveable(shopKey)) then
+                props:set("IsMoveAble", original)
+            elseif original then
+                props:unset("IsMoveAble")
+            end
+        end
     end
-
 end
+
+Events[Core.events.OnDefsUpdated].Add(ConfigTiles)
 
 Commands[Core.commands.syncPurchases] = function(arguments)
     Core.debug("syncPurchases", arguments)

@@ -69,14 +69,18 @@ Events.OnFillWorldObjectContextMenu.Add(function(playerObj, context, worldobject
     end
     for _, obj in ipairs(worldobjects) do
         if Core.ClientSystem:isValidIsoObject(obj) then
-            context:removeOptionByName("Pick Up")
-            context:removeOptionByName("Dismantle")
+            local key = Core.shopKeyForObject(obj)
+            if not Core.isShopMoveable(key) then
+                context:removeOptionByName("Pick Up")
+            end
+            if not Core.isShopDestructible(key) then
+                context:removeOptionByName("Dismantle")
+            end
             break
         end
     end
 end)
 
--- Events.EveryOneMinute.Add(ConfigTiles)
 
 -- Repairs characters carrying leftovers from a trait removal that happened
 -- before PhunMart cleaned up after itself. A player who bought "Remove: Smoker"

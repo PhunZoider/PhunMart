@@ -67,6 +67,22 @@ option PhunMart.AllowWalletDrop
     translation = PhunMart_AllowWalletDrop,
 }
 
+option PhunMart.ShopsMoveable
+{
+    type = boolean,
+    default = false,
+    page = PhunMart,
+    translation = PhunMart_ShopsMoveable,
+}
+
+option PhunMart.ShopsDestructible
+{
+    type = boolean,
+    default = false,
+    page = PhunMart,
+    translation = PhunMart_ShopsDestructible,
+}
+
 option PhunMart.ReturnRate
 { 
     type = integer, 

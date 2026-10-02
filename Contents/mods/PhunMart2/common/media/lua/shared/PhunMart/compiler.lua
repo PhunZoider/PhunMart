@@ -1352,6 +1352,11 @@ function Compiler.compileAll(ctx)
                 defaultView = shopDef.defaultView,
                 probability = shopDef.probability,
                 minDistance = shopDef.minDistance,
+                -- Whether players may pick up or sledgehammer this shop's
+                -- machines. nil follows the sandbox option; true or false is
+                -- this shop overriding it. See Core.isShopMoveable.
+                moveable = shopDef.moveable,
+                destructible = shopDef.destructible,
                 -- A shop that fills its shelves from somewhere other than a
                 -- pool. Placement consults this; nothing else does.
                 stocksNothing = shopDef.stocksNothing

@@ -363,6 +363,34 @@ local function parseCSV(text)
     return result
 end
 
+-- A per-shop yes/no that may also defer to a sandbox option. The first entry
+-- names what the server currently says, so "default" is never a mystery.
+local function overrideOptions(option)
+    local server = SandboxVars.PhunMart and SandboxVars.PhunMart[option] == true
+    return {getText("IGUI_PhunMart_Opt_ServerDefault",
+        getText(server and "IGUI_PhunMart_Opt_Yes" or "IGUI_PhunMart_Opt_No")), getText("IGUI_PhunMart_Opt_Yes"),
+            getText("IGUI_PhunMart_Opt_No")}
+end
+
+local function overrideIndex(value)
+    if value == true then
+        return 2
+    elseif value == false then
+        return 3
+    end
+    return 1
+end
+
+-- nil when left on the server default, which tombstones the key on save.
+local function overrideValue(text)
+    if text == getText("IGUI_PhunMart_Opt_Yes") then
+        return true
+    elseif text == getText("IGUI_PhunMart_Opt_No") then
+        return false
+    end
+    return nil
+end
+
 -- `shopDef` populates the fields and may come from the compiled runtime as a
 -- fallback. `preserveBase` is the definition-table entry only. The compiled
 -- runtime carries resolved offers and prices that must never be written back
@@ -417,6 +445,9 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             -- state this field needs: nil follows the server setting, 0 opts
             -- out of it, and a number sets this shop's own pace.
             result.rerollFrequency = f:getFieldNumber("rerollFrequency")
+
+            result.moveable = overrideValue(f:getFieldValue("moveable"))
+            result.destructible = overrideValue(f:getFieldValue("destructible"))
 
             local title = f:getFieldValue("title")
             result.title = (title ~= "") and title or nil
@@ -522,6 +553,20 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         hint = getText("IGUI_PhunMart_Hint_RerollFrequency"),
         integer = true,
         min = 0,
+        section = "s_basics"
+    })
+    -- What players may do to a standing machine. Each defers to its sandbox
+    -- option until set here; admins are never restricted either way.
+    form:addComboField("moveable", getText("IGUI_PhunMart_Lbl_Moveable"), {
+        options = overrideOptions("ShopsMoveable"),
+        selected = overrideIndex(def.moveable),
+        hint = getText("IGUI_PhunMart_Hint_Moveable"),
+        section = "s_basics"
+    })
+    form:addComboField("destructible", getText("IGUI_PhunMart_Lbl_Destructible"), {
+        options = overrideOptions("ShopsDestructible"),
+        selected = overrideIndex(def.destructible),
+        hint = getText("IGUI_PhunMart_Hint_Destructible"),
         section = "s_basics"
     })
     -- Last in Basics rather than first in the form: a switch you flip rarely,
