@@ -20,12 +20,14 @@ description=[h2]What Makes PhunMart Different[/h2]
 description=PhunMart isn't just a shop mod. It's a [b]complete economy framework[/b] built into vending machines.
 description=[list]
 description=[*][b]Works out of the box[/b]: subscribe, launch, and themed shops appear in the world with no setup required
+description=[*][b]Real 3D machines[/b]: every shop is a 3D vending machine in its own livery that glows when it has power, and its shop window is the front of that machine
 description=[*][b]Built-in currency system[/b]: the Wallet tracks change (looted) and tokens (earned through gameplay) per player and can be found in the character info window
 description=[*][b]Bring your own currency[/b]: Want to use a different system? You can use any physical item as payment (cash, gold, or tokens from other mods) with a simple switch
 description=[*][b]Sell the unsellable[/b]: not just items. XP boosts, traits, vehicles, livestock, and custom rewards are all on the menu
 description=[*][b]PrawnStars[/b]: a built-in pawn shop where players sell valuables back for currency
 description=[*][b]Works with modded items[/b]: any item in the game, vanilla or modded, can be stocked and sold
 description=[*][b]Zone gating[/b]: optional PhunZones integration to tie shop availability to map regions and difficulty
+description=[*][b]First person friendly[/b]: works with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528]Viewpoint[/url]
 description=[/list]
 description=
 description=[h2]For Players[/h2]
@@ -37,11 +39,13 @@ description=[h2]For Server Admins[/h2]
 description=Build deep gameplay systems without writing a mod. Everything is editable in game, from one window, with no file editing and no restart.
 description=
 description=[list]
-description=[*]Create custom shops with their own themes, sprites, loot pools, and pricing, with a step by step wizard
+description=[*]Create custom shops with their own look, loot pools, and pricing, with a step by step wizard and a 3D preview
+description=[*]Spawn any shop straight into your inventory and install it wherever you like
 description=[*]Design progression systems: gate purchases behind skills, traits, professions, or playtime
 description=[*]Build server-wide economies with skill trainers, vehicle dealerships, starter hubs, and late-game vendors
 description=[*]Rotate stock on a timer, or let machines change into a different shop entirely
 description=[*]Control spawn rates, placement, and conversion of vanilla machines per shop type
+description=[*]Decide whether players may move or destroy machines, server wide or shop by shop
 description=[*]Tune every economic lever: earn rates, caps, pricing, restock timers, and more via sandbox settings
 description=[*]Restrict the editor to a single admin role, so not every admin can rewrite the economy
 description=[/list]
@@ -64,6 +68,8 @@ description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/CUSTOMISA
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ITEM_CURRENCY.md]Using a Physical Item as Currency[/url]
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_ADDING_MODDED_VEHICLE.md]Adding Modded Vehicles to WrentAWreck[/url]
 description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/GUIDE_EXTENDING.md]Extending PhunMart From Another Mod[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/MACHINE_ART.md]Machine Art: spare textures and making your own[/url]
+description=[url=https://github.com/PhunZoider/PhunMart/blob/main/Docs/UPGRADING.md]Upgrading a customised server or extension mod[/url]
 description=
 description=[h2]Translations[/h2]
 description=[list]
@@ -75,8 +81,10 @@ description=[h2]FAQs[/h2]
 description=[list]
 description=[*][b]Does it work with ExtraMoney / other currency mods?[/b] PhunMart can use any physical item as currency. If your currency mod adds an in-game item (like cash or coins), you can set that item as the payment method. See the currency guide above.
 description=[*][b]Can players sell items?[/b] Yes. The built-in PrawnStars pawn shop lets players sell valuables back for change.
-description=[*][b]Can I create my own shops from scratch?[/b] Yes. Define custom pools, groups, pricing, conditions, and sprites. The admin tools let you do most of this in-game.
-description=[*][b]What happens to my customisations when updating?[/b] Your shop, price and pool edits are saved beside your server and are never overwritten by an update. They survive restarts, wipes, and new versions. The one exception is the B42.20.4 move to JSON: your files are still there and still yours, but they need converting once before the game can read them again. See the link above.
+description=[*][b]Can I create my own shops from scratch?[/b] Yes. Define custom pools, groups, pricing, conditions, and the machine's look. The admin tools let you do most of this in-game.
+description=[*][b]What happens to my customisations when updating?[/b] Your shop, price and pool edits are saved beside your server and are never overwritten by an update. They survive restarts, wipes, and new versions. When an update changes how something is stored, your files are converted on the next start, with a backup taken first. The one exception is the B42.20.4 move to JSON: your files are still there and still yours, but they need converting once before the game can read them again. The upgrading guide above covers both.
+description=[*][b]Can players move or smash machines?[/b] Not by default. Two sandbox options allow it, and each shop can override them. A moved machine stays the same shop.
+description=[*][b]Can I turn the 3D machines off?[/b] Yes, each player can, under Options, Mods, PhunMart. The classic 2D sprites show instead.
 description=[*][b]What happens to player wallets on a wipe?[/b] Wallets, purchase history and reward progress belong to the save, so a wipe clears them along with everything else. Your configuration is untouched.
 description=[*][b]Does it work in Single Player?[/b] Yes. Designed for multiplayer servers but fully functional in SP.
 description=[*][b]Can I add into existing game?[/b] Yes

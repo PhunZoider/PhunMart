@@ -4,9 +4,10 @@ PhunMart is fully data-driven. Everything about what shops sell, what things cos
 conditions gate a purchase, and how tokens are earned is defined in plain JSON config files
 that you can override without touching the mod itself.
 
-> **Upgrading from before B42.20.4?** These files used to be Lua tables in `.txt` files. That
-> build removed `loadstring`, so the game can no longer read them, and the override files are
-> now `.json`. See [Converting your old config files](#converting-your-old-config-files).
+> **Upgrading?** Most changes are converted for you on the first start. The ones that are not,
+> and the full list of what changed, are in the [Upgrading guide](UPGRADING.md). In particular,
+> from before B42.20.4 these files were Lua tables in `.txt` files, which the game can no
+> longer read: see [Converting your old config files](#converting-your-old-config-files).
 
 Every one of those files has an editor behind it in game. Open the Admin Panel and click
 **PhunMart**, or use the Debug Menu, and you get **PhunMart Setup**: one window with a
@@ -44,7 +45,7 @@ PhunMart Setup are in this same order for the same reason.
 
 ```
 SHOP  (PhunMart_Shops.json)
-  Machine sprite, pool sets and roll count
+  Machine texture, pool sets and roll count
   │
   └─► POOL SET  (defined inline on the shop)
         One shelf: which pools feed it and its roll count
@@ -849,7 +850,7 @@ pools into one candidate list, then rolls a random subset.
 {
   "PittyTheTool": {
     "category": "Tool",
-    "background": "machine-pity-the-tool.png",
+    "texture": "pity-the-tool",
     "sprites": ["phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"],
     "unpoweredSprites": ["phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"],
     "roll": { "mode": "weighted", "count": { "min": 5, "max": 8 } },
@@ -864,7 +865,7 @@ pools into one candidate list, then rolls a random subset.
   "BudgetXPerience": {
     "category": "XP",
     "defaultView": "list",
-    "background": "machine-budget-xp.png",
+    "texture": "budget-xp",
     "sprites": ["phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"],
     "unpoweredSprites": ["phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"],
     "roll": { "mode": "weighted", "count": { "min": 4, "max": 8 } },
@@ -887,18 +888,22 @@ group behind `pool_pittythetool` prices its own items.
 menu. The weight on each key scales that pool's offer weights, which is why the boost pools at
 `0.5` appear about half as often as the XP pools beside them.
 
-PhunMart ships more machine tiles and backgrounds than its default shops use. See
-[Machine Art Reference](MACHINE_ART.md) for the spare ones and how a tile block is laid out.
+PhunMart ships more machine textures and tiles than its default shops use. See
+[Machine Art Reference](MACHINE_ART.md) for the spare ones, how a texture is laid out, and how
+to make your own.
 
 ### Shop fields
 
 | Field              | Description                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------- |
 | `category`         | Groups related shops. Shown in the admin lists, and shared by the spacing rule below.           |
-| `background`       | PNG file name from `media/textures/` (no path prefix). Spare ones: [Machine Art](MACHINE_ART.md#unused-backgrounds) |
-| `sprites`          | 4-element array of tile sprite names (E/S/W/N facing). Spare ones: [Machine Art](MACHINE_ART.md#unused-tile-blocks) |
-| `unpoweredSprites` | Sprite names shown when machine is unpowered                                                   |
+| `texture`          | The machine's picture: its 3D model and its shop window. A name under `media/textures/phunmart/`, no extension: `"zetsy"`. Spare ones: [Machine Art](MACHINE_ART.md#spare-textures) |
+| `background`       | Optional. An image under `media/textures/` drawn as the shop window instead of the texture's front. Leave it out unless the window should not look like the machine. See [The shop window](MACHINE_ART.md#the-shop-window) |
+| `sprites`          | Optional. 4-element array of tile sprite names (E/S/W/N facing), shown when a player turns 3D machines off. Absent stands the shop on the generic machine. See [2D tiles](MACHINE_ART.md#2d-tiles) |
+| `unpoweredSprites` | Tiles shown when the machine is unpowered. Not needed on the generic machine, which has its own. |
 | `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless, and the unpowered sprites are never drawn. |
+| `moveable`         | `true` or `false`: whether players may pick this shop's machines up and put them down elsewhere. Absent follows the `ShopsMoveable` sandbox option. Admins can always move them. |
+| `destructible`     | `true` or `false`: whether players may destroy this shop's machines with a sledgehammer. Absent follows `ShopsDestructible`. Admins can always destroy them. |
 | `light`            | The glow the machine casts: `{ "r": 255, "g": 214, "b": 170, "radius": 2 }`, colours in 0-255 and radius in tiles. Absent takes that warm white. Set `false` for a machine that stays dark. The light hangs on the square the machine faces, not on the machine. |
 | `defaultView`      | `"grid"` (default) or `"list"`, the layout the shop UI opens in                                |
 | `roll`             | Default roll: `{ "mode": "weighted", "count": { "min": N, "max": M } }`. Overridable per pool set. |
@@ -921,7 +926,7 @@ own type alone.
 Off by default. Set `DefaultNumOfHoursToReRoll` above 0 and machines periodically stop being
 one shop and become another, drawn from whatever is eligible where they stand, using the same
 probability, spacing and zone rules that placed them in the first place. The machine changes
-its sprite and rebuilds its stock to match, and its restock clock starts fresh.
+its look and rebuilds its stock to match, and its restock clock starts fresh.
 
 A machine holds off while any player is within 30 tiles, so it never changes in front of the
 person about to use it, and it never happens while someone has its shop window open. It changes
@@ -986,9 +991,9 @@ whole file before editing it.
 ```json
 {
   "playtime": [
-    { "atMinutes": 10, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
-    { "atMinutes": 60, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
-    { "atMinutes": 300, "rewards": [{ "item": "PhunMart.Token", "amount": 2 }] }
+    { "atMinutes": 120, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "atMinutes": 720, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] },
+    { "atMinutes": 2880, "rewards": [{ "item": "PhunMart.Token", "amount": 1 }] }
   ],
 
   "zombieKills": [
@@ -1004,8 +1009,17 @@ whole file before editing it.
 }
 ```
 
-Every milestone is one-time. `atMinutes` counts cumulative real-world minutes online, and the
-kill milestones reset per wipe.
+Every milestone fires once per player per wipe. `atMinutes` counts **game** minutes survived,
+added up across all of that player's characters in the save, not real time online. At the
+default one-hour day, a real minute is 24 game minutes, so `120` is about five real minutes and
+`43200` about thirty real hours. If your server runs a different day length, scale to match.
+
+The shipped schedule gives one token each at roughly 5 minutes, 30 minutes, 2 hours, 5 hours,
+12 hours and 30 hours of real play. The example above stops at the third, to keep it readable.
+
+For a reward that repeats, use `everyMinutes` in place of `atMinutes`, or `everyKills` in place
+of `kills`: `{ "everyKills": 250, "rewards": [...] }` pays out at 250, 500, 750 and so on. The
+**Rewards** tab in PhunMart Setup edits both kinds.
 
 A milestone can hand over more than one thing, since `rewards` is an array:
 
@@ -1341,9 +1355,7 @@ Items. This is what that file is for.
 {
   "BobsHardware": {
     "category": "Tool",
-    "background": "machine-hard-wear.png",
-    "sprites": ["phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"],
-    "unpoweredSprites": ["phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"],
+    "texture": "travellers",
     "roll": { "mode": "weighted", "count": { "min": 5, "max": 8 } },
     "poolSets": [
       {
@@ -1355,6 +1367,10 @@ Items. This is what that file is for.
 }
 ```
 
+`texture` borrows one of the spare machine textures. There are no `sprites`, so the machine
+stands on the generic tiles, which any number of shops can share. Do not borrow another shop's
+`sprites` here: a machine placed from that shop's item would come out as that shop.
+
 Note the missing `probability`. It defaults to 1, so the shop can still be placed
 automatically but will lose almost every roll against the shipped shops, which weight 15. Give
 it a comparable number if you want it to appear on its own, or leave it at 1 and place machines
@@ -1362,8 +1378,9 @@ by hand.
 
 On server start the compiler reads all seven files and resolves the references between them,
 and the shop is live. **Reload definitions** on the Tools tab does the same thing without a
-restart, which is what you want while iterating on files you are editing by hand. Then place a
-`BobsHardware` machine from the in-game Items List, or wait for one to convert.
+restart, which is what you want while iterating on files you are editing by hand. Then select
+`BobsHardware` on the **Shops** tab and press **Spawn Shop** to get a machine in your inventory,
+and right-click it to install it. Or wait for one to convert.
 
 If a reference does not resolve, the offer is dropped rather than the compile failing, and the
 reason is written to the server log. That is worth checking first when something you defined

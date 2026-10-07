@@ -23,6 +23,7 @@ with PhunMart in total.
 - [Modes: giving the shop window another job](#modes-giving-the-shop-window-another-job)
 - [A tab in the admin window](#a-tab-in-the-admin-window)
 - [Register once](#register-once)
+- [Sandbox settings](#sandbox-settings)
 
 ---
 
@@ -47,9 +48,7 @@ return {
         minDistance = 500,
         category = "YourShop",
         powered = true,
-        background = "machine-yourshop.png",
-        sprites          = {"yourshop_01_0", "yourshop_01_1", "yourshop_01_2", "yourshop_01_3"},
-        unpoweredSprites = {"yourshop_01_4", "yourshop_01_5", "yourshop_01_6", "yourshop_01_7"},
+        texture = "yourshop",
         poolSets = { ... }
     }
 }
@@ -57,17 +56,60 @@ return {
 
 The same works for `pools`, `groups`, `items`, `prices`, `specials` and `conditionsDefs`.
 
-Sprites come from your own tile pack, declared in your `mod.info` with `pack=` and
-`tiledef=`. Pick a tiledef index that collides with nothing else installed. Sprite names are
-global once a pack loads, so you _can_ reference PhunMart's, but then your machine's art
-ships from a repository you do not own and the two have to be versioned together to change
-a sprite.
+### Its look
 
-The background is an ordinary texture and needs no pack: `shopDef.background` resolves
-against `media/textures/`, which merges across mods.
+Every machine is the same 3D model wearing its shop's `texture`, and the shop window is the
+front of that texture, so one picture is all a machine needs. Ship it as
+`media/textures/phunmart/yourshop.png` in your own mod and name it without the folder or
+extension, as above. Textures folders merge across mods, so no pack is needed.
 
-[Machine Art Reference](MACHINE_ART.md) covers the eight-tile block layout and the size a
-background should be, plus the spare art PhunMart ships if you just want something to start from.
+If you have window art drawn for an older PhunMart (a `machine-yourshop.png`), PhunMart's
+Blender script turns it into a texture:
+
+```
+blender -b --factory-startup --python Tools/blender/make_wrap_textures.py -- --convert machine-yourshop.png yourshop.png
+```
+
+[Machine Art Reference](MACHINE_ART.md#making-a-texture) has the layout, for painting one from
+scratch.
+
+To offer admins a texture none of your shops wears yet, register it from a shared file so it
+appears in the editors' texture lists:
+
+```lua
+PhunMart.registerMachineTexture("yourshop-alt")
+```
+
+### Tiles
+
+Under the model, a machine still stands on 2D tiles. They set its facing, make the square
+solid, and show when a player turns 3D machines off. Leave `sprites` out and your shop stands
+on PhunMart's generic machine, which needs nothing from you. The machine remembers which shop
+it is, including when a player picks it up and puts it down.
+
+If you want tiles of your own for the 2D view, ship a pack declared in your `mod.info` with
+`pack=` and `tiledef=`, and add:
+
+```lua
+sprites          = {"yourshop_01_0", "yourshop_01_1", "yourshop_01_2", "yourshop_01_3"},
+unpoweredSprites = {"yourshop_01_4", "yourshop_01_5", "yourshop_01_6", "yourshop_01_7"},
+```
+
+Pick a tiledef index that collides with nothing else installed. Sprite names are global once a
+pack loads, so you _can_ reference PhunMart's themed blocks, but then your machine's art ships
+from a repository you do not own and the two have to be versioned together to change a sprite.
+[Machine Art Reference](MACHINE_ART.md#2d-tiles) covers the eight-tile block layout.
+
+### Finding your machines
+
+To ask which shop an object in the world is, call `PhunMart.shopKeyForObject(obj)`. Do not
+look the sprite up yourself: on the generic tiles the sprite names no shop, and the answer
+lives on the object.
+
+To hand someone a machine item, `PhunMart.newMachineItem("YourShop")` builds one already marked
+with its shop. In multiplayer, make it on the server and add it to the player's inventory
+there: an item a client makes is one the server has never seen, and installing it fails.
+Admins get the same from **Spawn Shop** on the Shops tab.
 
 ---
 
@@ -113,7 +155,7 @@ shop's own to buy. Register a mode that knows how to show what is really in it.
 > Do not use `enabled = false` to keep a machine out of the world conditionally. A disabled
 > definition is dropped from the runtime entirely, and machines already standing do not go
 > with it: they stay exactly where they are with nothing behind them, losing their
-> background, their modes and their stock. Use `probability = 0` instead, which keeps a
+> look, their modes and their stock. Use `probability = 0` instead, which keeps a
 > machine out of new placement while leaving the placed ones intact.
 
 ---

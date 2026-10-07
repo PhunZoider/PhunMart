@@ -7,7 +7,9 @@ Stock rotates on a timer. Coins come off the dead. Tokens come from surviving.
 Shops source from the game's item catalogue by category, so **modded items show up
 automatically**, no config needed. Right-click a machine, browse the shop UI, and buy with
 **change** (dropped by the zombies you kill) or **tokens** (earned through milestones and trade-ins).
-Admins can place machines manually and override every aspect of the system through Lua files.
+Every machine is drawn as a 3D vending machine in its shop's own livery, glowing when it has
+power. Admins can place machines by hand and change every part of the system from an in-game
+editor, or through JSON override files.
 
 > **Requires:** Project Zomboid Build 42 (singleplayer or multiplayer)
 > **Optional:** [PhunZones](https://github.com/PhunZoider/PhunZones) for zone-difficulty filtering on shop pools
@@ -82,12 +84,13 @@ Awarded automatically when thresholds are crossed, with no player action require
 
 | Milestone                    | Reward              |
 | ---------------------------- | ------------------- |
-| Playtime: first hour online  | Tokens              |
-| Playtime: 5 hours, 10 hours  | Tokens (increasing) |
+| Time survived: about 5 and 30 real minutes, then 2, 5, 12 and 30 real hours | 1 token each |
 | Zombie kills: 100, 500, 1000 | Tokens (increasing) |
 | Sprinter kills: 50, 200      | Tokens              |
 
-Exact amounts are configurable. See [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards) (player rewards).
+Time survived is counted in game time, across all of a player's characters in the save, so the
+real-time figures assume the default one-hour day. Exact amounts are configurable, and rewards
+can also repeat (every N kills or minutes). See [Customisation Guide](Docs/CUSTOMISATION.md#11-token-rewards) (player rewards).
 
 ### Collectors machine (repeatable)
 
@@ -120,6 +123,8 @@ All settings live on the **PhunMart** page of the server sandbox editor, or unde
 | `DefaultNumOfHoursToReRoll` | 0     | In-game hours before a machine becomes a different shop. 0 means machines never change.          |
 | `DefaultNumOfItemsWhenRestocking` | 5 | Items stocked by a shop that sets no roll count. The low end of a range, so 5 gives 5 to 8.     |
 | `MaxStickyItems`        | 10        | Size at which the compiler warns that an always-available pool has grown too big                 |
+| `ShopsMoveable`         | false     | Whether players can pick up machines and place them elsewhere. A shop can override this. Admins always can. |
+| `ShopsDestructible`     | false     | Whether players can destroy machines with a sledgehammer. A shop can override this. Admins always can. |
 
 **Wallets**
 
@@ -175,7 +180,17 @@ The last tab, **Tools**, holds the actions that are not edits:
 | Restock every machine   | Reroll the stock of every machine in the world at once                               |
 | Reload definitions      | Re-read the override files from disk, for when you have edited them by hand          |
 
-Machines can also be placed by hand from the in-game Items List.
+To place a machine by hand, select a shop on the **Shops** tab and press **Spawn Shop** (or
+right-click it). The machine lands in your inventory; right-click it to install. The shipped
+shops' machines are also in the in-game Items List. Admins can always pick a machine up or
+sledgehammer it; whether players can is up to `ShopsMoveable` and `ShopsDestructible`, or each
+shop's own setting. A machine that is picked up and put down again stays the same shop.
+
+### Player options
+
+Under **Options > Mods > PhunMart**, each player can turn the 3D machines off (showing the
+classic 2D tiles) or turn off full-detail drawing to save a little performance. See
+[Machine Art](Docs/MACHINE_ART.md#player-options).
 
 ### Admin Commands
 
@@ -204,17 +219,24 @@ rewards on top of the built-in defaults.
 > read. Convert them with the
 > [Phun configuration converter](https://phunzoider.github.io/PhunZones/converter/), which runs
 > in your browser and uploads nothing. See
-> [Converting your old config files](Docs/CUSTOMISATION.md#converting-your-old-config-files).
+> [Converting your old config files](Docs/CUSTOMISATION.md#converting-your-old-config-files),
+> and the [Upgrading guide](Docs/UPGRADING.md) for everything else that has changed.
 
 Full reference: **[Docs/CUSTOMISATION.md](Docs/CUSTOMISATION.md)** covers common admin recipes,
 deep-merge rules, condition tests, special kinds, and a complete shop-from-scratch walkthrough.
 
-Two common jobs have guides of their own:
+**Updating a server that has been customised, or a mod that extends PhunMart?** See
+**[Docs/UPGRADING.md](Docs/UPGRADING.md)** for what changed, what is converted for you, and
+what needs a hand.
+
+Three common jobs have guides of their own:
 
 - **[Adding modded vehicles to WrentAWreck](Docs/GUIDE_ADDING_MODDED_VEHICLE.md)**: four clicks
   in the admin UI, with no Lua editing at all if the vehicle mod is loaded.
 - **[Using an item as currency](Docs/GUIDE_ITEM_CURRENCY.md)**: charge in `Base.Money` or
   anything else lootable, and rescale every price to match.
+- **[Machine art](Docs/MACHINE_ART.md)**: the spare machine textures and tiles PhunMart ships,
+  and how to make a texture of your own.
 
 For mod authors rather than admins:
 
@@ -227,7 +249,10 @@ For mod authors rather than admins:
 ## Compatibility
 
 Build 42 only. Works in singleplayer and multiplayer. Mod-compatible by design: item shops
-source by category, so modded items appear automatically. No known conflicts; please
+source by category, so modded items appear automatically. Works with the
+[Viewpoint](https://steamcommunity.com/sharedfiles/filedetails/?id=3809306528) first person mod:
+machines can be opened from its interact list, and the shop window frees the mouse while it is
+open. No known conflicts; please
 [report issues on GitHub](https://github.com/PhunZoider/PhunMart/issues).
 
 ---
@@ -238,4 +263,7 @@ source by category, so modded items appear automatically. No known conflicts; pl
 - [Customisation Guide](Docs/CUSTOMISATION.md)
 - [Adding Modded Vehicles](Docs/GUIDE_ADDING_MODDED_VEHICLE.md)
 - [Using an Item as Currency](Docs/GUIDE_ITEM_CURRENCY.md)
+- [Machine Art](Docs/MACHINE_ART.md)
+- [Extending PhunMart From Another Mod](Docs/GUIDE_EXTENDING.md)
+- [Upgrading](Docs/UPGRADING.md)
 - [Issue Tracker](https://github.com/PhunZoider/PhunMart/issues)
