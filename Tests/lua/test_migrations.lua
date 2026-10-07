@@ -187,6 +187,44 @@ do
     ok("an empty set is survivable", changed == 0, "changed " .. tostring(changed))
 end
 
+local SHOPS = "PhunMart_Shops.json"
+
+print("-- v3: old window art becomes a 3D texture --")
+do
+    local files = {
+        [SHOPS] = {
+            -- Wizard-made: every field, the art picked from another shop.
+            MyShop = {background = "machine-zetsy.png", category = "Food"},
+            -- Shipped shop, admin picked different art and a texture too.
+            GoodPhoods = {background = "machine-hoes.png", texture = "csv"},
+            -- Art of the server's own, maybe painted for the window.
+            Custom = {background = "my-window.png"},
+            -- A mod's own machine-*.png, which has no texture of that name.
+            Modded = {background = "machine-mine.png"},
+            Untouched = {probability = 5}
+        }
+    }
+    local changed, touched = run(3, files)
+    local shops = files[SHOPS]
+    ok("two shops changed", changed == 2, "changed " .. tostring(changed))
+    ok("the file is marked for writing", touched[SHOPS] == true)
+    ok("picked art becomes the texture", shops.MyShop.texture == "zetsy", tostring(shops.MyShop.texture))
+    ok("and the background goes", shops.MyShop.background == nil)
+    ok("other fields stay", shops.MyShop.category == "Food")
+    ok("a chosen texture wins", shops.GoodPhoods.texture == "csv", tostring(shops.GoodPhoods.texture))
+    ok("its old background goes too", shops.GoodPhoods.background == nil)
+    ok("non-shipped art is left alone", shops.Custom.background == "my-window.png" and shops.Custom.texture == nil)
+    ok("a mod's machine-*.png is left alone",
+        shops.Modded.background == "machine-mine.png" and shops.Modded.texture == nil)
+    ok("shops with no background untouched", shops.Untouched.texture == nil and shops.Untouched.probability == 5)
+end
+
+print("-- v3: files absent from disk --")
+do
+    local changed, touched = run(3, {})
+    ok("an empty set is survivable", changed == 0 and isEmpty(touched), "changed " .. tostring(changed))
+end
+
 print("-- the version stamp covers every migration --")
 do
     local highest = 0

@@ -58,7 +58,9 @@ end
 -- menu. This is the rule, and it runs wherever the action is validated.
 local oldCanPickUpInternal = ISMoveableSpriteProps.canPickUpMoveableInternal
 function ISMoveableSpriteProps:canPickUpMoveableInternal(_character, _square, _object, _isMulti)
-    local key = self.spriteName and Core.spriteToShop[self.spriteName]
+    -- The object first: on the generic tiles the sprite is shared by many shops
+    -- and only the machine knows which one it is.
+    local key = Core.shopKeyForObject(_object) or (self.spriteName and Core.spriteToShop[self.spriteName])
     if key and not isExempt(_character) and not Core.isShopMoveable(key) then
         return false
     end

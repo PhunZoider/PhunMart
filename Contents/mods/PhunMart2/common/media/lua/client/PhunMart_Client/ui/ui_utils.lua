@@ -728,6 +728,36 @@ function tools.confirm(text, onYes, owner)
     return modal
 end
 
+--- Frees the mouse from first person mods while `panel` is showing.
+---
+--- Viewpoint (workshop 3809306528) captures the mouse for looking and only lets
+--- it go when `UIManager.isModalVisible()`, which is true while any visible
+--- element, or any child of one, has capture set. Capture on the window itself
+--- would route every click on the screen to it, inventory included, so a
+--- zero-size child holds it instead: a parent only hands a captured child the
+--- events that already landed on the parent. The child consumes nothing, so
+--- the controls under the cursor still get every click. Hiding the window
+--- hides it too, and the mouse goes back to looking.
+function tools.freeCursorWhileShown(panel)
+    local sentinel = ISUIElement:new(0, 0, 0, 0)
+    sentinel:initialise()
+    sentinel:instantiate()
+    sentinel.javaObject:setConsumeMouseEvents(false)
+    local pass = function()
+        return false
+    end
+    sentinel.onMouseDown = pass
+    sentinel.onMouseUp = pass
+    sentinel.onMouseMove = pass
+    sentinel.onMouseWheel = pass
+    sentinel.onRightMouseDown = pass
+    sentinel.onRightMouseUp = pass
+    sentinel.onMouseDoubleClick = pass
+    sentinel:setCapture(true)
+    panel:addChild(sentinel)
+    return sentinel
+end
+
 ---------------------------------------------------------------------------
 -- Conditions
 --

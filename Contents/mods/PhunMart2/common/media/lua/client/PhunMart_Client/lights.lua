@@ -31,6 +31,10 @@ end
 -- Every client does this for itself. A lamppost is a fact about rendering, it
 -- is never sent anywhere, and there is nothing here to keep in step between
 -- players.
+--
+-- The same pass dresses the machine (looks.lua): one decision about the state a
+-- machine is in drives both its 3D face and its light. A shop that needs no
+-- mains burns softer than a powered one, so the two read differently at night.
 
 local Core = PhunMart
 
@@ -72,6 +76,9 @@ local AHEAD = {
 -- How far in front to hang it. Zero puts the light back on the machine.
 local AHEAD_TILES = 1
 
+--- How bright a machine that needs no mains burns, against a powered one.
+local SOFT_LIGHT = 0.6
+
 --- The lamppost burning for a machine, keyed by the machine's own square.
 local lit = {}
 
@@ -90,19 +97,13 @@ end
 
 --- The shop an object is a machine for, if it is one.
 ---
---- Asked of the sprite rather than of the object's name, the same way
---- ClientSystem:checkObjectAdded asks it. A machine is named
---- PhunMartVendingMachine only once that handler has been past, and that can be
---- after this one has, while CustomName is on the sprite from the moment it is
---- drawn -- on the unpowered faces as well, so it answers the same for a
---- machine in either state.
+--- Core.shopKeyForObject, the same test ClientSystem:checkObjectAdded makes:
+--- the type the machine carries, else a sprite only one shop uses. Not the
+--- object's name, which a machine is given only once that handler has been
+--- past, and that can be after this one has.
 local function shopOf(isoObject)
-    local props = propsOf(isoObject)
-    local name = props and props:get("CustomName")
-    if not name or not Core.shops then
-        return nil
-    end
-    return Core.shops[name]
+    local key = Core.shopKeyForObject(isoObject)
+    return key and Core.shops and Core.shops[key] or nil
 end
 
 --- The machine standing on a square, and the shop it belongs to.
@@ -160,20 +161,24 @@ local function lightFor(def)
     }
 end
 
---- Whether a machine on this square should be burning.
+--- The state a machine on this square is in: "soft" for a shop that needs no
+--- mains, otherwise "powered" or "off".
 ---
 --- The powered branch is worded to match ServerObject:hasElectricity, which is
 --- what picks the sprite. A machine wearing its unpowered face and glowing
 --- anyway would be worse than no light at all.
-local function shouldBurn(def, square)
+local function stateOf(def, square)
     if def.powered ~= true then
-        return true
+        return "soft"
     end
     if square:haveElectricity() then
-        return true
+        return "powered"
     end
     local grace = SandboxVars.ElecShutModifier
-    return grace ~= nil and grace > -1 and GameTime:getInstance():getNightsSurvived() < grace
+    if grace ~= nil and grace > -1 and GameTime:getInstance():getNightsSurvived() < grace then
+        return "powered"
+    end
+    return "off"
 end
 
 local function extinguish(key)
@@ -232,12 +237,22 @@ local function settleAt(x, y, z, shopKey)
         -- Either the square is not loaded or what stood on it has gone, and a
         -- lamppost burning over nothing is the same mistake either way.
         extinguish(key)
+        if Core.looks then
+            Core.looks.forget(key)
+        end
         return false
     end
+    local state = stateOf(def, square)
+    if Core.looks then
+        Core.looks.settle(key, object, def, state)
+    end
     local colour = lightFor(def)
-    if not colour or not shouldBurn(def, square) then
+    if not colour or state == "off" then
         extinguish(key)
         return true
+    end
+    if state == "soft" then
+        colour.r, colour.g, colour.b = colour.r * SOFT_LIGHT, colour.g * SOFT_LIGHT, colour.b * SOFT_LIGHT
     end
     local lx, ly, lz = lightSquare(object, square)
     ignite(key, lx, ly, lz, colour)
@@ -269,6 +284,9 @@ end
 local function forget(key)
     met[key] = nil
     extinguish(key)
+    if Core.looks then
+        Core.looks.forget(key)
+    end
 end
 
 --- A square that has just arrived, read in case it is carrying a machine.
@@ -363,5 +381,16 @@ Events[Core.events.OnDefsUpdated].Add(function()
     for key in pairs(lit) do
         extinguish(key)
     end
+    if Core.looks then
+        Core.looks.reset()
+    end
     owed = true
 end)
+
+--- Decide every machine again now rather than at the next minute. For a player
+--- changing an option, who wants to see it take.
+Core.lights = {
+    resettle = sweep,
+    -- A machine this client has just learned the type of (ClientObject:fromModData).
+    note = note
+}

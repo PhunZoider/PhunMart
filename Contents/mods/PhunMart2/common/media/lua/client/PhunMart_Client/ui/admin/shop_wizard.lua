@@ -60,12 +60,9 @@ local FACINGS = tools.TILE_FACINGS
 
 local tileTexture = tools.tileTexture
 
-local function backgroundTexture(name)
-    if not name or name == "" then
-        return nil
-    end
-    local ok, tex = pcall(getTexture, "media/textures/" .. name)
-    return ok and tex or nil
+--- Whether a name refers to a machine texture that exists.
+local function machineTexture(name)
+    return Core.looks and Core.looks.findTexture(name) or nil
 end
 
 --- Expand a first-tile name into the eight the shop definition needs.
@@ -117,16 +114,10 @@ local function appearanceOptions()
     return opts, byLabel
 end
 
-local function backgroundOptions()
-    local seen, opts = {}, {}
-    for _, def in pairs(Core.defs and Core.defs.shops or {}) do
-        if def.background and not seen[def.background] then
-            seen[def.background] = true
-            table.insert(opts, def.background)
-        end
-    end
-    table.sort(opts)
-    return opts
+--- Every machine texture on offer, by the name a shop def uses (relative to
+--- media/textures/phunmart/): the ones shops wear plus the registered ones.
+local function textureOptions()
+    return Core.looks and Core.looks.textureOptions() or {}
 end
 
 ---------------------------------------------------------------------------
@@ -226,7 +217,7 @@ local function create(values)
         category = values.category,
         probability = values.probability,
         minDistance = values.minDistance,
-        background = values.background,
+        texture = values.texture,
         sprites = values.sprites,
         -- Left off entirely when there are none. A machine that does not need
         -- power has nothing to draw in its unpowered state, and an empty list
@@ -308,7 +299,7 @@ end
 function ShopWizard.open(player, onDone)
     local shops = Core.defs and Core.defs.shops or {}
     local appearances, tileByLabel = appearanceOptions()
-    local backgrounds = backgroundOptions()
+    local textures = textureOptions()
     local categories = categoryOptions()
     local prices = priceOptions()
 
@@ -316,7 +307,7 @@ function ShopWizard.open(player, onDone)
     -- bringing your own is the deliberate choice rather than the first thing
     -- you trip over.
     table.insert(appearances, getText(OTHER))
-    table.insert(backgrounds, getText(OTHER))
+    table.insert(textures, getText(OTHER))
     table.insert(categories, getText(OTHER))
 
     local form
@@ -332,7 +323,7 @@ function ShopWizard.open(player, onDone)
                 category = pickOrCustom(f, "category", "categoryOther"),
                 probability = math.floor(f:getFieldNumber("probability") or 15),
                 minDistance = f:getFieldNumber("minDistance"),
-                background = pickOrCustom(f, "background", "backgroundOther"),
+                texture = pickOrCustom(f, "texture", "textureOther"),
                 sprites = chosenSprites(f, tileByLabel, "sprites"),
                 unpoweredSprites = chosenSprites(f, tileByLabel, "unpowered"),
                 price = f:getFieldValue("price"),
@@ -472,28 +463,44 @@ function ShopWizard.open(player, onDone)
             return out
         end
     })
-    form:addComboField("background", getText("IGUI_PhunMart_Wiz_Lbl_Background"), {
-        options = backgrounds,
-        selected = backgrounds[1],
-        hint = getText("IGUI_PhunMart_Wiz_Hint_Background"),
+    -- The machine's one picture: its 3D model and its shop window both come
+    -- from it (client looks.lua). The background image a shop can still name
+    -- is an override, set in the shop editor if ever wanted.
+    form:addComboField("texture", getText("IGUI_PhunMart_Lbl_MachineTexture"), {
+        options = textures,
+        selected = textures[1],
+        hint = getText("IGUI_PhunMart_Wiz_Hint_Texture"),
         group = "w_look",
         onChange = function(f)
-            f:setFieldVisible("backgroundOther", isOther(f:getFieldValue("background")))
+            f:setFieldVisible("textureOther", isOther(f:getFieldValue("texture")))
+            f:reflowFields()
         end
     })
-    form:addTextField("backgroundOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+    form:addTextField("textureOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
         default = "",
-        hint = getText("IGUI_PhunMart_Wiz_Hint_BackgroundOther"),
+        hint = getText("IGUI_PhunMart_Hint_MachineTextureOther"),
         group = "w_look",
-        conditional = true
+        conditional = true,
+        validate = function(value, f)
+            if not isOther(f:getFieldValue("texture")) then
+                return nil
+            end
+            if not value or value == "" then
+                return getText("IGUI_PhunMart_Err_Required")
+            end
+            if not machineTexture(value) then
+                return getText("IGUI_PhunMart_Err_NoMachineTexture", value)
+            end
+        end
     })
-    form:addImageField("backgroundPreview", getText("IGUI_PhunMart_Wiz_Lbl_Preview"), {
+    form:addSceneField("texturePreview", getText("IGUI_PhunMart_Lbl_Preview3D"), {
         group = "w_look",
-        height = math.floor(72 * FONT_SCALE),
-        images = function()
-            return {{
-                texture = backgroundTexture(pickOrCustom(form, "background", "backgroundOther"))
-            }}
+        height = math.floor(200 * FONT_SCALE),
+        width = math.floor(150 * FONT_SCALE),
+        update = function(scene, f)
+            if Core.looks then
+                Core.looks.showInScene(scene, pickOrCustom(f, "texture", "textureOther"))
+            end
         end
     })
 
@@ -571,7 +578,7 @@ function ShopWizard.open(player, onDone)
     -- Nothing starts on Other, so none of the fields it reveals should be on
     -- screen. They stay hidden until a combo asks for them, and stepping leaves
     -- that decision alone.
-    form:setFieldVisible("backgroundOther", false)
+    form:setFieldVisible("textureOther", false)
     form:setFieldVisible("spritesCsv", false)
     form:setFieldVisible("unpoweredCsv", false)
 

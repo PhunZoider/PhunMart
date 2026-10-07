@@ -8,5 +8,50 @@ module PhunMart
 		scale = 0.015,
 	}
 
+	/* 3D vending machines, shared by every shop. Mesh: Tools/blender/make_vending_mesh.py.
+	   Texture: a wrap texture (media/textures/phunmart/*.png, layout in Tools/blender/vending_layout.py);
+	   each sprite model names its own, so the texture here is only the fallback.
+	   The four models differ only in shader:
+	     Vending         vanilla shader, no glow
+	     VendingPowered  needs power and has it: glow mask at full brightness
+	     VendingSoft     needs no power: softer glow
+	     VendingOff      needs power and has none: masked areas dimmed and greyed */
+	model Vending
+	{
+		mesh = PhunMart/Vending,
+		texture = phunmart/none,
+		static = true,
+		scale = 1.0,
+		undoCoreScale = true,
+	}
 
+	model VendingPowered
+	{
+		mesh = PhunMart/Vending,
+		texture = phunmart/none,
+		shader = phunmartVending,
+		static = true,
+		scale = 1.0,
+		undoCoreScale = true,
+	}
+
+	model VendingSoft
+	{
+		mesh = PhunMart/Vending,
+		texture = phunmart/none,
+		shader = phunmartVendingSoft,
+		static = true,
+		scale = 1.0,
+		undoCoreScale = true,
+	}
+
+	model VendingOff
+	{
+		mesh = PhunMart/Vending,
+		texture = phunmart/none,
+		shader = phunmartVendingOff,
+		static = true,
+		scale = 1.0,
+		undoCoreScale = true,
+	}
 }

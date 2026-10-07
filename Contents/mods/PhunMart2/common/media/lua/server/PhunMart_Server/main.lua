@@ -522,5 +522,9 @@ function Core:ini()
     Core.playerData.importLegacy()
     Core.debug("Server System initialized")
     triggerEvent(self.events.OnReady, self)
+
+    -- Last, so held squares see the same finished state a square loaded after
+    -- ini would.
+    Core.ServerSystem.instance:loadHeldSquares()
 end
 

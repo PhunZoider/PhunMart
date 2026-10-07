@@ -1335,8 +1335,14 @@ function Compiler.compileAll(ctx)
             local compiled = {
                 key = shopKey,
                 category = shopDef.category,
-                sprites = shopDef.sprites,
-                unpoweredSprites = shopDef.unpoweredSprites,
+                -- A shop with no tiles of its own stands on the generic ones and is
+                -- told apart by the type its machines carry (Core.shopKeyForObject).
+                -- Generic tiles bring their own unpowered faces, whether the shop
+                -- left sprites out or an editor wrote the generic list back in.
+                sprites = shopDef.sprites or Core.genericSprites,
+                unpoweredSprites = shopDef.unpoweredSprites or
+                    ((shopDef.sprites or Core.genericSprites)[1] == Core.genericSprites[1] and
+                        Core.genericUnpoweredSprites) or nil,
                 powered = shopDef.powered,
                 -- {r, g, b, radius} for the glow a machine casts, in 0..255 and
                 -- tiles. Absent takes the default warm white; false is a shop
@@ -1349,6 +1355,9 @@ function Compiler.compileAll(ctx)
                 -- nil here means "use the server default" and 0 means "never".
                 rerollFrequency = shopDef.rerollFrequency,
                 background = shopDef.background,
+                -- Wrap texture for the 3D machine (media/textures/...). Absent derives
+                -- phunmart/<background without "machine-"> in client looks.lua.
+                texture = shopDef.texture,
                 defaultView = shopDef.defaultView,
                 probability = shopDef.probability,
                 minDistance = shopDef.minDistance,

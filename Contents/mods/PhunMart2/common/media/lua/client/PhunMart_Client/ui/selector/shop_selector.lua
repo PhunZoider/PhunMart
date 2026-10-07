@@ -40,6 +40,11 @@ end
 -- all is the set whose sprite CustomName is their own key -- which is exactly
 -- the set with a scripted item. So asking for the item is not the narrower
 -- test, it is the accurate one.
+--
+-- A shop with no scripted item, which is every shop on the generic tiles, gets
+-- a generic machine item instead, stamped with its type (Core.newMachineItem).
+-- The type rides on the item and lands on the machine it installs as, so it
+-- installs as itself, not as whatever its tiles say.
 ---------------------------------------------------------------------------
 
 --- Give `player` the machine item for `shopType`. Returns true, or false and a
@@ -56,11 +61,25 @@ local function spawnShopItem(player, shopType)
     end
 
     -- One item per shop, named for the shop key. A shop added by an admin or
-    -- another mod has no such item and cannot be installed this way; saying so
-    -- beats handing over something that installs as a different shop.
+    -- another mod has none, and gets the generic machine item stamped with its
+    -- type; in MP the server makes it, for the same reason as /additem below.
     local fullType = Core.name .. "." .. shopType
     if not getScriptManager():getItem(fullType) then
-        return false, getText("IGUI_PhunMart_Msg_NoItemForShop", shopLabel(shopType))
+        if isClient() then
+            Core.ClientSystem.instance:sendCommand(player, Core.commands.giveMachineItem, {
+                type = shopType
+            })
+            return true
+        end
+        local item = Core.newMachineItem(shopType)
+        if not item then
+            return false, getText("IGUI_PhunMart_Msg_NoItemForShop", shopLabel(shopType))
+        end
+        local inventory = player:getInventory()
+        inventory:AddItem(item)
+        sendAddItemToContainer(inventory, item)
+        ISInventoryPage.dirtyUI()
+        return true
     end
 
     -- In MP the server has to create the item. One added here exists only on

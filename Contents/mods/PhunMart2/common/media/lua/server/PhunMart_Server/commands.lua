@@ -19,6 +19,22 @@ Commands[Core.commands.setBlacklist] = function(playerObj, args)
     Core.setBlacklist(args)
 end
 
+-- A machine item for a shop with no scripted item of its own (see
+-- shared/PhunMart/machine_item.lua). Made here rather than on the client: an
+-- item that exists only on one client cannot be installed in MP.
+Commands[Core.commands.giveMachineItem] = function(playerObj, args)
+    if not Core.utils.isAdmin(playerObj) then
+        return
+    end
+    local item = Core.newMachineItem(args.type)
+    if not item then
+        return
+    end
+    local inventory = playerObj:getInventory()
+    inventory:AddItem(item)
+    sendAddItemToContainer(inventory, item)
+end
+
 Commands[Core.commands.openShop] = function(playerObj, args)
     Core.ServerSystem.instance:openShop(playerObj, args)
 end

@@ -135,11 +135,7 @@ function ServerSystem:reconcileMachineAt(square, objects)
         local obj = objects:get(i)
         local isMachine = self:isValidIsoObject(obj)
         if not isMachine then
-            local sprite = obj:getSprite()
-            if sprite and sprite.getProperties then
-                local customName = sprite:getProperties():get("CustomName")
-                isMachine = customName ~= nil and Core.shops[customName] ~= nil
-            end
+            isMachine = Core.shopKeyForObject(obj) ~= nil
         end
         if isMachine then
             -- Standing, so not a ghost. The caller only gets here having failed
@@ -223,7 +219,7 @@ function ServerSystem.addToWorld(square, shop, direction)
     -- Plain IsoObject (not IsoThumpable): zombies ignore it and it can't be
     -- destroyed. Admin pickup/relocate goes through transmitRemoveItemFromSquare.
     local isoObject = IsoObject.new(square:getCell(), square, sprite)
-    ServerSystem.initializeShopObject(isoObject)
+    ServerSystem.initializeShopObject(isoObject, shop)
     square:AddSpecialObject(isoObject, -1)
     -- Clients must have the object before anything addresses it by index.
     -- OnObjectAdded is fired last because it builds the Lua object, whose
@@ -254,15 +250,15 @@ function ServerSystem.addToWorld(square, shop, direction)
 
 end
 
-function ServerSystem.initializeShopObject(obj)
+--- Mark an object as a machine of shop `shopKey`. Without a key the object
+--- must already say which shop it is (Core.shopKeyForObject): by the type it
+--- carries, or by a sprite only one shop uses. The generic tiles are shared, so
+--- a machine standing on one is only ever told apart by the type written here.
+function ServerSystem.initializeShopObject(obj, shopKey)
     obj:setName("PhunMartVendingMachine")
 
-    local sprite = obj:getSprite()
-    local props = sprite:getProperties()
-    local customName = props:get("CustomName")
-
     local data = {
-        type = customName,
+        type = shopKey or Core.shopKeyForObject(obj),
         facing = tostring(obj:getFacing()),
         created = GameTime:getInstance():getWorldAgeHours(),
         x = obj:getX(),
@@ -878,7 +874,7 @@ function ServerSystem:checkObjectAdded(obj)
     Core.debugLn("checkObjectAdded: sprite=" .. spriteName .. " customName=" .. tostring(customName) .. " objType=" ..
                      objType .. " objName=" .. objName)
 
-    if not customName or not Core.shops[customName] then
+    if not Core.shopKeyForObject(obj) then
         return
     end
 
@@ -929,7 +925,7 @@ function ServerSystem:upgradeThumpableShop(square, obj)
         lastRestock = oldData.lastRestock,
         offers = oldData.offers
     }
-    local customName = obj:getSprite():getProperties():get("CustomName")
+    local shopKey = Core.shopKeyForObject(obj)
     local facing = obj:getFacing()
 
     local x, y, z = obj:getX(), obj:getY(), obj:getZ()
@@ -956,7 +952,7 @@ function ServerSystem:upgradeThumpableShop(square, obj)
     end
     square:RecalcAllWithNeighbours(true)
 
-    ServerSystem.addToWorld(square, customName, facing)
+    ServerSystem.addToWorld(square, shopKey, facing)
 
     local newLua = self:getLuaObjectAt(x, y, z)
     if newLua and saved.offers then
@@ -972,7 +968,38 @@ function ServerSystem:upgradeThumpableShop(square, obj)
         end
     end
 
-    Core.debugLn("upgradeThumpableShop: " .. tostring(customName) .. " at " .. x .. "," .. y .. "," .. z)
+    Core.debugLn("upgradeThumpableShop: " .. tostring(shopKey) .. " at " .. x .. "," .. y .. "," .. z)
+end
+
+-- Squares that arrived before ini. Until then Core.shops is empty, so a vanilla
+-- machine would be stamped as rolled, find no shop to become, and never be
+-- looked at again. Normally nothing lands here. It fills when another mod holds
+-- LoadGridsquare back and replays it from an OnGameStart/OnServerStarted
+-- handler that runs ahead of ours: Let Me Drive (3805307651) does exactly that
+-- with the whole starting area, which then never converted.
+local heldSquares = {}
+
+function ServerSystem.holdSquare(square)
+    heldSquares[#heldSquares + 1] = square
+end
+
+--- Called at the end of Core:ini, on both the server and SP paths into it.
+function ServerSystem:loadHeldSquares()
+    local held = heldSquares
+    heldSquares = {}
+    local seen = {}
+    local count = 0
+    for _, square in ipairs(held) do
+        -- getChunk is nil once the square's chunk has unloaded.
+        if not seen[square] and square:getChunk() then
+            seen[square] = true
+            count = count + 1
+            self:loadGridsquare(square)
+        end
+    end
+    if #held > 0 then
+        Core.debugLn("loaded " .. count .. " of " .. #held .. " squares that arrived before ini")
+    end
 end
 
 function ServerSystem:loadGridsquare(square)
@@ -986,8 +1013,7 @@ function ServerSystem:loadGridsquare(square)
         local obj = objects:get(i)
         local sprite = obj:getSprite()
         if sprite and sprite.getProperties then
-            local customName = sprite:getProperties():get("CustomName")
-            if customName and Core.shops[customName] then
+            if Core.shopKeyForObject(obj) then
                 existing[#existing + 1] = obj
             elseif convertEnabled and Core.targetSprites[sprite:getName()] and not obj:getModData().PhunMart then
                 -- Untested vanilla vending machine: eligible for one conversion roll.

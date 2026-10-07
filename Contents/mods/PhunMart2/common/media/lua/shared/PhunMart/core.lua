@@ -31,6 +31,7 @@ PhunMart = {
         restockAllShops = "PhunMartRestockAllShops",
         restockShopTypes = "PhunMartRestockShopTypes",
         changeTo = "PhunMartChangeShopType",
+        giveMachineItem = "PhunMartGiveMachineItem",
         restock = "PhunMartRestockShop",
         closeShop = "PhunMartCloseShop",
         closeAllShops = "PhunMartCloseAllShops",
@@ -201,16 +202,80 @@ function Core.debug(...)
     end
 end
 
+-- Tiles any machine can stand on: a plain vending machine, one per facing in
+-- the order E, S, W, N, and its unpowered faces. A shop that names no sprites of
+-- its own stands on these, and its look comes from its texture (client
+-- looks.lua). Shared by many shops, they say nothing about which shop a machine
+-- belongs to; that is carried on the object itself. See shopKeyForObject.
+Core.genericSprites = {"phunmart_01_0", "phunmart_01_1", "phunmart_01_2", "phunmart_01_3"}
+Core.genericUnpoweredSprites = {"phunmart_01_4", "phunmart_01_5", "phunmart_01_6", "phunmart_01_7"}
+
+-- Machine textures offered in the editors' dropdowns, by the name a shop def
+-- uses: relative to media/textures/phunmart/, no extension. The game cannot list
+-- a folder, so the dropdown is every texture a shop already wears plus these:
+-- the ones PhunMart ships, and any a mod adds with registerMachineTexture.
+Core.machineTextures = {
+    "broken",
+    "budget-xp",
+    "car-a-part",
+    "collectors",
+    "csv",
+    "electronics",
+    "final-amendment",
+    "gifted-xp",
+    "good-phoods",
+    "hard-wear",
+    "hoes",
+    "lootgoblin",
+    "luxury-xp",
+    "michelles",
+    "necromart",
+    "none",
+    "phat-phoods",
+    "phish4u",
+    "pity-the-tool",
+    "prawn-stars",
+    "sheds-and-commoners",
+    "traiter-joes",
+    "travellers",
+    "wrent-a-wreck",
+    "zetsy",}
+
+--- For a mod shipping machine textures (in its own media/textures/phunmart/)
+--- that no shop of its wears yet, so admins can pick them. Call from a shared
+--- file: Core.registerMachineTexture("my-machine").
+function Core.registerMachineTexture(name)
+    for _, known in ipairs(Core.machineTextures) do
+        if known == name then
+            return
+        end
+    end
+    table.insert(Core.machineTextures, name)
+end
+
 function Core:reloadShopDefinitions()
     -- Rebuild spriteToShop index from whatever is currently in Core.shops.
     -- On the server this is called after Core.compile() sets Core.shops = runtime.shops.
-    self.spriteToShop = {}
+    --
+    -- Only a sprite that belongs to exactly one shop is indexed. One that several
+    -- shops stand on, the generic tiles above first among them, cannot say which
+    -- of them a machine is, and guessing would hand a machine to the wrong shop.
+    local owners = {}
     for k, v in pairs(self.shops or {}) do
-        for _, sprite in ipairs(v.sprites or {}) do
-            self.spriteToShop[sprite] = k
+        for _, list in ipairs({v.sprites or {}, v.unpoweredSprites or {}}) do
+            for _, sprite in ipairs(list) do
+                if owners[sprite] == nil then
+                    owners[sprite] = k
+                elseif owners[sprite] ~= k then
+                    owners[sprite] = false
+                end
+            end
         end
-        for _, sprite in ipairs(v.unpoweredSprites or {}) do
-            self.spriteToShop[sprite] = k
+    end
+    self.spriteToShop = {}
+    for sprite, owner in pairs(owners) do
+        if owner then
+            self.spriteToShop[sprite] = owner
         end
     end
     return self.shops
@@ -236,12 +301,49 @@ function Core.isShopDestructible(shopKey)
     return shopAllows(shopKey, "destructible", "ShopsDestructible")
 end
 
--- The shop key an iso object is a machine of, or nil. Keyed on the sprite
--- name rather than CustomName so the unpowered sprites count too.
+-- The shop key an iso object is a machine of, or nil.
+--
+-- The type the machine carries comes first: initializeShopObject writes it into
+-- the object's modData, it is saved with the object, it travels with it when a
+-- player picks the machine up and puts it down again, and it is the only thing
+-- that tells apart two shops standing on the same generic tiles. A machine whose
+-- data has not reached this client yet, or one from before machines carried
+-- their type, falls back to its sprite, which still names the shop for every
+-- shop with tiles of its own -- unpowered faces included.
+--
+-- Last, the tile's CustomName, which every shop tile carries as its shop's key.
+-- That catches a machine just installed from a shop's own scripted item, which
+-- has no type yet, after its shop has dropped those tiles for the generic ones
+-- and so stopped listing them. The generic tiles say "Vending", which is no
+-- shop, so they still name nothing.
+--
+-- hasModData first: getModData makes a table for an object that has none, and
+-- this is asked of every object on every square that loads.
 function Core.shopKeyForObject(obj)
-    local sprite = obj and obj.getSprite and obj:getSprite()
-    local name = sprite and sprite:getName()
-    return name and Core.spriteToShop[name] or nil
+    if not obj then
+        return nil
+    end
+    if obj.hasModData and obj:hasModData() then
+        local stored = obj:getModData().type
+        if stored and Core.shops and Core.shops[stored] then
+            return stored
+        end
+    end
+    local sprite = obj.getSprite and obj:getSprite()
+    if not sprite then
+        return nil
+    end
+    local name = sprite:getName()
+    local key = name and Core.spriteToShop[name]
+    if key then
+        return key
+    end
+    local props = sprite:getProperties()
+    local custom = props and props:get("CustomName")
+    if custom and Core.shops and Core.shops[custom] then
+        return custom
+    end
+    return nil
 end
 
 function Core:ini()

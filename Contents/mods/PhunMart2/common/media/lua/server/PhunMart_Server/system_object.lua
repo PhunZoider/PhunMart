@@ -420,7 +420,10 @@ function ServerObject:stateFromIsoObject(isoObject)
     local data = isoObject:getModData()
     -- specify props derived from sprite
 
-    data.type = isoObject:getSprite():getProperties():get("CustomName")
+    -- The type the object carries, if it carries one; otherwise the one its
+    -- sprite names. Never the sprite over the object: on the generic tiles the
+    -- sprite names no shop at all.
+    data.type = Core.shopKeyForObject(isoObject) or data.type
     data.facing = tostring(isoObject:getFacing())
     data.created = data.created or GameTime:getInstance():getWorldAgeHours()
     data.x = isoObject:getX()

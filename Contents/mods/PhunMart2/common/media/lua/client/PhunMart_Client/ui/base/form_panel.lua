@@ -298,6 +298,65 @@ function FormPanel:addImageField(key, label, opts)
     return self:_registerField(opts)
 end
 
+--- The height a scene field's row takes: the scene, or its images with their
+--- labels underneath, whichever is taller.
+local function sceneRowHeight(f)
+    local imagesH = f.images and (f.imageHeight + FONT_HGT_SMALL) or 0
+    return math.max(f.sceneHeight, imagesH)
+end
+
+--- Draw a row of preview images at (x, y), each `size` square with its label
+--- under it. Shared by image fields and the images beside a scene.
+function FormPanel:_drawImageRow(images, x, y, size)
+    local ix = x
+    for _, img in ipairs(images) do
+        -- Extra space before an entry that starts a second group, so one row
+        -- can hold two related sets without a caption explaining where one
+        -- ends.
+        if img.gap then
+            ix = ix + PAD * 2
+        end
+        if img.texture then
+            self:drawTextureScaledAspect(img.texture, ix, y, size, size, 1, 1, 1, 1)
+        else
+            -- A slot we could not resolve. Drawn as an empty frame, because
+            -- silence would read as "there is nothing here" when it means "this
+            -- name did not match anything".
+            self:drawRectBorder(ix, y, size, size, 0.5, 0.6, 0.4, 0.4)
+        end
+        if img.label then
+            self:drawTextCentre(img.label, ix + size / 2, y + size, 0.6, 0.6, 0.6, 1, UIFont.Small)
+        end
+        ix = ix + size + PAD
+    end
+end
+
+--- A live 3D view, for showing what a choice will look like in the world.
+--- opts: { section, group, conditional, height, width,
+---         update = function(scene, form),
+---         images = function() -> array of { texture, label, gap }, imageHeight }
+--- `images`, when given, are drawn to the right of the scene in the same row,
+--- the way an image field draws them, so related previews sit side by side.
+--- `scene` is an ISUI3DScene. `update` runs on every reflow, after the scene
+--- has been placed, so it can follow the fields above it; set the scene up
+--- there, since a scene cannot be given objects before it is on screen.
+function FormPanel:addSceneField(key, label, opts)
+    opts = opts or {}
+    table.insert(self._fields, {
+        type = "scene",
+        key = key,
+        label = label,
+        update = opts.update,
+        images = opts.images,
+        imageHeight = opts.imageHeight or math.floor(48 * FONT_SCALE),
+        sceneHeight = opts.height or math.floor(160 * FONT_SCALE),
+        sceneWidth = opts.width or math.floor(120 * FONT_SCALE),
+        group = opts.group,
+        visible = true
+    })
+    return self:_registerField(opts)
+end
+
 function FormPanel:addSeparator(key, opts)
     opts = opts or {}
     table.insert(self._fields, {
@@ -809,6 +868,8 @@ function FormPanel:_computeNeededHeight()
                 y = y + PAD
             elseif f.type == "image" then
                 y = y + f.imageHeight + FONT_HGT_SMALL + PAD
+            elseif f.type == "scene" then
+                y = y + sceneRowHeight(f) + PAD
             elseif f.type == "check" then
                 y = y + ROW_H
                 if f.hasMessageRow then
@@ -1338,6 +1399,11 @@ function FormPanel:_createField(f)
 
     elseif f.type == "separator" or f.type == "image" then
         -- No widgets; both are drawn in prerender
+    elseif f.type == "scene" then
+        local scene = ISUI3DScene:new(0, 0, f.sceneWidth, f.sceneHeight)
+        scene:initialise()
+        self:addChild(scene)
+        f._scene = scene
     end
 end
 
@@ -1574,6 +1640,19 @@ function FormPanel:reflowFields()
                 f._drawY = y
                 f._fieldX = x + labelW
                 y = y + f.imageHeight + FONT_HGT_SMALL + PAD
+
+            elseif f.type == "scene" then
+                f._drawY = y
+                f._fieldX = x + labelW
+                f._scene:setX(f._fieldX)
+                f._scene:setY(y)
+                if f.update then
+                    local ok, err = pcall(f.update, f._scene, self)
+                    if not ok then
+                        print("[PhunMart] scene field " .. tostring(f.key) .. ": " .. tostring(err))
+                    end
+                end
+                y = y + sceneRowHeight(f) + PAD
             end
 
             -- Now that the row's extent is known, take it back off screen if it
@@ -1689,6 +1768,9 @@ function FormPanel:_setFieldWidgetsVisible(f, vis)
     if f._list then
         f._list:setVisible(vis)
     end
+    if f._scene then
+        f._scene:setVisible(vis)
+    end
     for _, entry in ipairs(f._btnRow or {}) do
         entry.btn:setVisible(vis)
     end
@@ -1765,33 +1847,25 @@ function FormPanel:prerender()
                 self:drawText(f.label .. ":", PAD, f._drawY + (f.imageHeight - FONT_HGT_SMALL) / 2, 1, 1, 1, 1,
                     UIFont.Small)
             end
-            local ix = f._fieldX or PAD
-            local sz = f.imageHeight
             -- Recomputed each frame rather than cached: what to show depends on
             -- the field above, and this is a handful of draw calls.
             local ok, images = pcall(f.images or function()
                 return {}
             end)
             if ok and images then
-                for _, img in ipairs(images) do
-                    -- Extra space before an entry that starts a second group,
-                    -- so one row can hold two related sets without a caption
-                    -- explaining where one ends.
-                    if img.gap then
-                        ix = ix + PAD * 2
-                    end
-                    if img.texture then
-                        self:drawTextureScaledAspect(img.texture, ix, f._drawY, sz, sz, 1, 1, 1, 1)
-                    else
-                        -- A slot we could not resolve. Drawn as an empty frame,
-                        -- because silence would read as "there is nothing here"
-                        -- when it means "this name did not match anything".
-                        self:drawRectBorder(ix, f._drawY, sz, sz, 0.5, 0.6, 0.4, 0.4)
-                    end
-                    if img.label then
-                        self:drawTextCentre(img.label, ix + sz / 2, f._drawY + sz, 0.6, 0.6, 0.6, 1, UIFont.Small)
-                    end
-                    ix = ix + sz + PAD
+                self:_drawImageRow(images, f._fieldX or PAD, f._drawY, f.imageHeight)
+            end
+        elseif f.type == "scene" and f._drawY then
+            if f.label then
+                self:drawText(f.label .. ":", PAD, f._drawY + (f.sceneHeight - FONT_HGT_SMALL) / 2, 1, 1, 1, 1,
+                    UIFont.Small)
+            end
+            self:drawRectBorder(f._fieldX, f._drawY, f.sceneWidth, f.sceneHeight, 0.4, 0.4, 0.4, 0.4)
+            if f.images then
+                local ok, images = pcall(f.images)
+                if ok and images then
+                    self:_drawImageRow(images, f._fieldX + f.sceneWidth + PAD * 2,
+                        f._drawY + (f.sceneHeight - f.imageHeight - FONT_HGT_SMALL) / 2, f.imageHeight)
                 end
             end
         elseif f.type == "list" and f._headerY then
@@ -1831,7 +1905,7 @@ end
 
 --- Run one field's rules. Returns an error string, or nil when the field is ok.
 local function validateField(form, f)
-    if f.type == "separator" or f.type == "image" or f.type == "list" or f.type == "check" then
+    if f.type == "separator" or f.type == "image" or f.type == "scene" or f.type == "list" or f.type == "check" then
         return nil
     end
 

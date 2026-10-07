@@ -18,6 +18,13 @@ function ClientObject:fromModData(modData)
     for k, v in pairs(modData) do
         self[k] = v
     end
+    -- The server's word on what this machine is, which can land after the
+    -- machine itself: one placed on the generic tiles reaches this client before
+    -- the modData that says which shop it is, and its square has already been
+    -- read and found nothing. Lights and looks settle it now.
+    if self.type and self.x and self.y and self.z and Core.lights then
+        Core.lights.note(self.x, self.y, self.z, self.type)
+    end
 end
 
 function ClientObject:getObject()

@@ -3,7 +3,7 @@ return {
     GoodPhoods = {
         probability = 15,
         category = "Food",
-        background = "machine-good-phoods.png",
+        texture = "good-phoods",
         sprites = {"phunmart_01_8", "phunmart_01_9", "phunmart_01_10", "phunmart_01_11"},
         unpoweredSprites = {"phunmart_01_12", "phunmart_01_13", "phunmart_01_14", "phunmart_01_15"},
         roll = {
@@ -31,7 +31,7 @@ return {
     PittyTheTool = {
         probability = 15,
         category = "Tool",
-        background = "machine-pity-the-tool.png",
+        texture = "pity-the-tool",
         sprites = {"phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"},
         unpoweredSprites = {"phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"},
         roll = {
@@ -54,7 +54,7 @@ return {
         probability = 8,
         minDistance = 400,
         category = "Weapon",
-        background = "machine-final-amendment.png",
+        texture = "final-amendment",
         sprites = {"phunmart_01_32", "phunmart_01_33", "phunmart_01_34", "phunmart_01_35"},
         unpoweredSprites = {"phunmart_01_36", "phunmart_01_37", "phunmart_01_38", "phunmart_01_39"},
         poolSets = {{
@@ -118,7 +118,7 @@ return {
         category = "Vehicle",
         defaultView = "list",
         restockFrequency = 168, -- weekly car delivery
-        background = "machine-wrent-a-wreck.png",
+        texture = "wrent-a-wreck",
         sprites = {"phunmart_01_40", "phunmart_01_41", "phunmart_01_42", "phunmart_01_43"},
         unpoweredSprites = {"phunmart_01_44", "phunmart_01_45", "phunmart_01_46", "phunmart_01_47"},
         roll = {
@@ -149,7 +149,7 @@ return {
     MichellesCrafts = {
         probability = 15,
         category = "Crafts",
-        background = "machine-michelles.png",
+        texture = "michelles",
         sprites = {"phunmart_01_48", "phunmart_01_49", "phunmart_01_50", "phunmart_01_51"},
         unpoweredSprites = {"phunmart_01_52", "phunmart_01_53", "phunmart_01_54", "phunmart_01_55"},
         roll = {
@@ -171,7 +171,7 @@ return {
     CarAParts = {
         probability = 15,
         category = "Vehicle",
-        background = "machine-car-a-part.png",
+        texture = "car-a-part",
         sprites = {"phunmart_01_56", "phunmart_01_57", "phunmart_01_58", "phunmart_01_59"},
         unpoweredSprites = {"phunmart_01_60", "phunmart_01_61", "phunmart_01_62", "phunmart_01_63"},
         roll = {
@@ -194,7 +194,7 @@ return {
         probability = 5,
         minDistance = 500,
         category = "Trait",
-        background = "machine-traiter-joes.png",
+        texture = "traiter-joes",
         sprites = {"phunmart_02_0", "phunmart_02_1", "phunmart_02_2", "phunmart_02_3"},
         unpoweredSprites = {"phunmart_02_4", "phunmart_02_5", "phunmart_02_6", "phunmart_02_7"},
         poolSets = {{
@@ -229,7 +229,7 @@ return {
     CSVPharmacy = {
         probability = 15,
         category = "Medical",
-        background = "machine-csv.png",
+        texture = "csv",
         sprites = {"phunmart_02_8", "phunmart_02_9", "phunmart_02_10", "phunmart_02_11"},
         unpoweredSprites = {"phunmart_02_12", "phunmart_02_13", "phunmart_02_14", "phunmart_02_15"},
         poolSets = {{
@@ -262,7 +262,7 @@ return {
     RadioHacks = {
         probability = 15,
         category = "Electronics",
-        background = "machine-electronics.png",
+        texture = "electronics",
         sprites = {"phunmart_02_16", "phunmart_02_17", "phunmart_02_18", "phunmart_02_19"},
         unpoweredSprites = {"phunmart_02_20", "phunmart_02_21", "phunmart_02_22", "phunmart_02_23"},
         roll = {
@@ -284,7 +284,7 @@ return {
     Phish4U = {
         probability = 15,
         category = "Fishing",
-        background = "machine-phish4u.png",
+        texture = "phish4u",
         sprites = {"phunmart_02_24", "phunmart_02_25", "phunmart_02_26", "phunmart_02_27"},
         unpoweredSprites = {"phunmart_02_28", "phunmart_02_29", "phunmart_02_30", "phunmart_02_31"},
         roll = {
@@ -306,7 +306,7 @@ return {
     HoesNMoes = {
         probability = 15,
         category = "Gardening",
-        background = "machine-hoes.png",
+        texture = "hoes",
         sprites = {"phunmart_02_32", "phunmart_02_33", "phunmart_02_34", "phunmart_02_35"},
         unpoweredSprites = {"phunmart_02_36", "phunmart_02_37", "phunmart_02_38", "phunmart_02_39"},
         roll = {
@@ -330,7 +330,7 @@ return {
         minDistance = 500,
         category = "XP",
         defaultView = "list",
-        background = "machine-budget-xp.png",
+        texture = "budget-xp",
         sprites = {"phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"},
         unpoweredSprites = {"phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"},
         roll = {
@@ -366,7 +366,7 @@ return {
     HardWear = {
         probability = 15,
         category = "Clothing",
-        background = "machine-hard-wear.png",
+        texture = "hard-wear",
         sprites = {"phunmart_03_0", "phunmart_03_1", "phunmart_03_2", "phunmart_03_3"},
         unpoweredSprites = {"phunmart_03_4", "phunmart_03_5", "phunmart_03_6", "phunmart_03_7"},
         poolSets = {{
@@ -399,7 +399,7 @@ return {
     ShedsAndCommoners = {
         probability = 15,
         category = "Literature",
-        background = "machine-sheds-and-commoners.png",
+        texture = "sheds-and-commoners",
         sprites = {"phunmart_03_24", "phunmart_03_25", "phunmart_03_26", "phunmart_03_27"},
         unpoweredSprites = {"phunmart_03_28", "phunmart_03_29", "phunmart_03_30", "phunmart_03_31"},
         roll = {
@@ -433,7 +433,7 @@ return {
         probability = 8,
         minDistance = 300,
         category = "Collectors",
-        background = "machine-collectors.png",
+        texture = "collectors",
         sprites = {"phunmart_03_8", "phunmart_03_9", "phunmart_03_10", "phunmart_03_11"},
         unpoweredSprites = {"phunmart_03_12", "phunmart_03_13", "phunmart_03_14", "phunmart_03_15"},
         roll = {
@@ -455,7 +455,7 @@ return {
         probability = 8,
         minDistance = 300,
         category = "PrawnStars",
-        background = "machine-prawn-stars.png",
+        texture = "prawn-stars",
         sprites = {"phunmart_03_32", "phunmart_03_33", "phunmart_03_34", "phunmart_03_35"},
         unpoweredSprites = {"phunmart_03_36", "phunmart_03_37", "phunmart_03_38", "phunmart_03_39"},
         poolSets = {{

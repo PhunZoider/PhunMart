@@ -11,6 +11,10 @@ Events.OnServerStarted.Add(function()
 end)
 
 Events.LoadGridsquare.Add(function(square)
+    if not Core.inied or not Core.ServerSystem.instance then
+        Core.ServerSystem.holdSquare(square)
+        return
+    end
     Core.ServerSystem.instance:loadGridsquare(square)
 end)
 

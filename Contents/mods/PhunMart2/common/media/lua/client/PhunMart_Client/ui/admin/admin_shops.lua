@@ -42,6 +42,44 @@ end
 -- none, and Other trails, so bringing your own reads as the deliberate choice.
 -- `current` is folded in for a shop read from the runtime fallback, which may
 -- name a category no definition still declares.
+--- A texture as the dropdown names it: "phunmart/zetsy.png" and "zetsy" are the
+--- same file, and showing the long form beside the short one reads as two.
+local function shortTexture(name)
+    if type(name) ~= "string" or name == "" or not Core.looks then
+        return name
+    end
+    local path = Core.looks.findTexture(name)
+    return path and Core.looks.shortName(path) or name
+end
+
+-- Machine textures to pick from (client looks.lua), with `current` folded in when
+-- it is not one of them, so a shop naming its texture some other way still shows
+-- what it has. Blank leads: no 3D texture, the machine stays on its tiles.
+local function getTextureKeys(current)
+    current = shortTexture(current)
+    local keys = Core.looks and Core.looks.textureOptions() or {}
+    local seen = {}
+    for _, k in ipairs(keys) do
+        seen[k] = true
+    end
+    if type(current) == "string" and current ~= "" and not seen[current] then
+        table.insert(keys, current)
+        table.sort(keys)
+    end
+    table.insert(keys, 1, "")
+    table.insert(keys, getText(OTHER))
+    return keys
+end
+
+--- The texture the look fields currently name, Other resolved.
+local function chosenTexture(f)
+    local tex = f:getFieldValue("texture")
+    if isOther(tex) then
+        tex = f:getFieldValue("textureOther")
+    end
+    return (tex and tex ~= "") and tex or nil
+end
+
 local function getCategoryKeys(current)
     local seen = {}
     local keys = {}
@@ -363,6 +401,7 @@ local function parseCSV(text)
     return result
 end
 
+
 -- A per-shop yes/no that may also defer to a sandbox option. The first entry
 -- names what the server currently says, so "default" is never a mystery.
 local function overrideOptions(option)
@@ -457,6 +496,8 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
 
             local bg = f:getFieldValue("background")
             result.background = (bg and bg ~= "") and bg or nil
+
+            result.texture = chosenTexture(f)
 
             result.sprites = parseCSV(f:getFieldValue("sprites"))
             result.unpoweredSprites = parseCSV(f:getFieldValue("unpSprites"))
@@ -577,6 +618,14 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         hint = getText("IGUI_PhunMart_Hint_ShopEnabled"),
         section = "s_basics"
     })
+    -- With the basics, not the look: it decides whether the machine works at
+    -- all without mains, and only after that how it looks when it does not.
+    form:addCheckField("powered", getText("IGUI_PhunMart_Lbl_Powered"), {
+        checked = def.powered == true,
+        text = getText("IGUI_PhunMart_Lbl_Powered_Checkbox"),
+        hint = getText("IGUI_PhunMart_Hint_Powered"),
+        section = "s_basics"
+    })
 
     -- Grid or list is how the shop looks when opened, so it belongs with the
     -- rest of the machine's appearance rather than among the placement rules.
@@ -586,41 +635,72 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         hint = getText("IGUI_PhunMart_Hint_ViewMode"),
         section = "s_look"
     })
+    -- The machine's picture comes first: it is the 3D model and, unless a
+    -- background overrides it, the shop window too (client looks.lua).
+    form:addComboField("texture", getText("IGUI_PhunMart_Lbl_MachineTexture"), {
+        options = getTextureKeys(def.texture),
+        selected = shortTexture(def.texture) or "",
+        hint = getText("IGUI_PhunMart_Hint_MachineTexture"),
+        section = "s_look",
+        onChange = function(f)
+            f:setFieldVisible("textureOther", isOther(f:getFieldValue("texture")))
+            f:reflowFields()
+        end
+    })
+    form:addTextField("textureOther", getText("IGUI_PhunMart_Wiz_Lbl_Other"), {
+        default = "",
+        hint = getText("IGUI_PhunMart_Hint_MachineTextureOther"),
+        section = "s_look",
+        conditional = true,
+        onChange = function(f)
+            f:reflowFields()
+        end,
+        -- A name with no file behind it leaves the machine on its plain tiles,
+        -- and the only other place that says so is the console.
+        validate = function(value, f)
+            if not isOther(f:getFieldValue("texture")) then
+                return nil
+            end
+            if value and value ~= "" and Core.looks and not Core.looks.findTexture(value) then
+                return getText("IGUI_PhunMart_Err_NoMachineTexture", value)
+            end
+        end
+    })
     form:addTextField("background", getText("IGUI_PhunMart_Lbl_Background"), {
         default = def.background or "",
         hint = getText("IGUI_PhunMart_Hint_Background"),
         section = "s_look"
     })
-    form:addTextField("sprites", getText("IGUI_PhunMart_Lbl_Sprites"), {
+    form:addTextField("sprites", getText("IGUI_PhunMart_Lbl_FallbackSprites"), {
         default = def.sprites and table.concat(def.sprites, ", ") or "",
-        hint = getText("IGUI_PhunMart_Hint_Sprites"),
+        hint = getText("IGUI_PhunMart_Hint_FallbackSprites"),
         section = "s_look",
         onChange = function(f)
             f:reflowFields()
         end
     })
-    -- Directly above the unpowered sprites, because it is what decides whether
-    -- they are ever drawn: unticked, the machine ignores power entirely and the
-    -- list below it is dead weight.
-    form:addCheckField("powered", getText("IGUI_PhunMart_Lbl_Powered"), {
-        checked = def.powered == true,
-        text = getText("IGUI_PhunMart_Lbl_Powered_Checkbox"),
-        hint = getText("IGUI_PhunMart_Hint_Powered"),
-        section = "s_look"
-    })
-    form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_UnpSprites"), {
+    form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_FallbackUnpSprites"), {
         default = def.unpoweredSprites and table.concat(def.unpoweredSprites, ", ") or "",
-        hint = getText("IGUI_PhunMart_Hint_UnpSprites"),
+        hint = getText("IGUI_PhunMart_Hint_FallbackUnpSprites"),
         section = "s_look",
         onChange = function(f)
             f:reflowFields()
         end
     })
-    -- The tiles themselves, so a sprite name typed wrong is visibly wrong rather
-    -- than discovered by walking to a machine that renders as nothing.
-    form:addImageField("spritePreview", getText("IGUI_PhunMart_Lbl_Preview"), {
+    -- Everything the machine can look like in one row: the 3D machine wearing
+    -- the chosen texture, then the 2D tiles when there are any, so a sprite
+    -- name typed wrong is visibly wrong rather than discovered by walking to a
+    -- machine that renders as nothing.
+    form:addSceneField("machinePreview", getText("IGUI_PhunMart_Lbl_Preview3D"), {
         section = "s_look",
-        height = math.floor(64 * FONT_SCALE),
+        height = math.floor(110 * FONT_SCALE),
+        width = math.floor(80 * FONT_SCALE),
+        imageHeight = math.floor(64 * FONT_SCALE),
+        update = function(scene, f)
+            if Core.looks then
+                Core.looks.showInScene(scene, chosenTexture(f))
+            end
+        end,
         images = function()
             local out = {}
             local function add(csv, gap)
@@ -642,6 +722,7 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             return out
         end
     })
+    form:setFieldVisible("textureOther", isOther(form:getFieldValue("texture")))
 
     -- How often it restocks sits with what it restocks, not with where it spawns.
     form:addTextField("restockFrequency", getText("IGUI_PhunMart_Lbl_RestockFrequency"), {

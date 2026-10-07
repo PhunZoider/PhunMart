@@ -10,20 +10,21 @@ local tools = require "PhunMart_Client/ui/ui_utils"
 -- ─────────────────────────────────────────────────────────────────────────────
 -- PhunMart shop window
 --
--- Layout (% of window, matched to machine-hard-wear.png proportions):
+-- The window is the front of the machine, at the machine's own proportions:
+-- the shop's wrap texture (client looks.lua) drawn unstretched, with each
+-- part of the cabinet given a job.
 --
---   ┌─────────────────────────────────────────┐
---   │  [X]                                    │  ← close btn overlay
---   │  ┌──────────────────┐  ┌─────────────┐  │
---   │  │                  │  │  PREVIEW     │  │  yellow
---   │  │   ITEM GRID      │  ├─────────────┤  │
---   │  │   (5 col icon)   │  │  DETAILS     │  │  purple
---   │  │                  │  │  price/desc  │  │
---   │  │                  │  └─────────────┘  │
---   │  ├──────────────────┤  ┌─────────────┐  │
---   │  │  FEEDBACK        │  │    BUY       │  │  orange / green
---   │  └──────────────────┘  └─────────────┘  │
---   └─────────────────────────────────────────┘
+--   ┌───────────────────────────┐
+--   │ [gear]   BANNER       [X] │
+--   │  ┌─────────────────┐ ┌──┐ │
+--   │  │                 │ │$ │ │  display screen: balance
+--   │  │   ITEM GRID     │ │  │ │
+--   │  │   (the glass)   │ │##│ │  keypad (the art's own)
+--   │  │                 │ │  │ │
+--   │  └─────────────────┘ └──┘ │
+--   │  [img][ details (tray) ][BUY]│
+--   │  [ details overflow / message ]│  kick panel
+--   └───────────────────────────┘
 -- ─────────────────────────────────────────────────────────────────────────────
 
 local profileName = "PhunMartUIShop"
@@ -39,9 +40,10 @@ local FS = tools.FONT_SCALE
 local FONT_SM = tools.FONT_HGT_SMALL
 local FONT_MD = tools.FONT_HGT_MEDIUM
 
--- Base window size before font scaling (portrait, matches machine image ratio ~0.73)
-local BASE_W = 480
-local BASE_H = 660
+-- Base window size: the machine front's proportions (512 x 1024 in the wrap
+-- texture), so its art is drawn without stretching.
+local BASE_W = 360
+local BASE_H = 720
 
 -- Auto-close when the player leaves the machine or takes a hit (tiles²).
 -- Player stands on the front square (~1 tile); ~3 tiles covers a step away without
@@ -49,81 +51,75 @@ local BASE_H = 660
 local CLOSE_DIST_SQ = 3 * 3
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Layout: all positions in BASE pixel coordinates (window = 480 × 660).
--- Measured against machine-hard-wear.png stretched to fill that canvas.
--- Every value is multiplied by FS at runtime → px().
--- Tune these numbers to realign zones with any background image.
+-- Layout: all positions in BASE pixels (window = 360 x 720), taken from the
+-- front of the wrap texture (Tools/blender/vending_layout.py, front_base.png)
+-- at 360 / 512 = 0.703: front pixel (fx, fy) is base pixel (fx, fy) * 0.703.
+-- Move these with the art if the cabinet layout ever changes.
 -- ─────────────────────────────────────────────────────────────────────────────
 local L = {
-    bannerH = 135, -- bottom of the top Hard-Wear banner
+    -- Top of the glass (front row 209). The item grid starts here.
+    bannerH = 147,
 
-    -- Left column: items grid (glass door area)
-    glassX = 40,
-    glassW = 270,
-    glassH = 410, -- from bannerH down to top of tray, minus a small gap
+    -- The glass: the item grid (front 47..392 x 209..729, less a small gap).
+    glassX = 33,
+    glassW = 243,
+    glassH = 362,
 
-    -- Right column: control panel
-    panelX = 335,
-    panelW = 140,
+    -- The keypad column (front 415..507), and the Buy button at the foot of it,
+    -- level with the tray.
+    panelX = 292,
+    panelW = 64,
 
-    -- Right column rows
-    screenY = 130,
-    screenH = 140, -- display screen  (preview)
-    keypadY = 278,
-    keypadH = 210, -- keypad area     (details)
-    -- 488 → 580: lower machine section, balance pane lives here
+    -- The machine's display screen, above the keypad: the balance
+    -- (front 420..492 x 381..470).
+    balanceX = 295,
+    balanceY = 268,
+    balanceW = 51,
+    balanceH = 62,
 
-    -- Balance zone: between keypad bottom (488) and tray (580)
-    balanceY = 493,
-    balanceH = 80,
+    -- The tray: the selected offer's picture and details, in line with Buy
+    -- (front 27..404 x 771..863).
+    trayX = 19,
+    trayY = 542,
+    trayW = 265,
+    trayH = 65,
 
-    -- Bottom strip: dispenser tray (feedback left, buy right)
-    trayY = 580,
-    trayH = 71,
+    -- The kick panel under the tray: where details run on when the tray is full,
+    -- and where a purchase message shows over them for its few seconds
+    -- (front 10..502 x 891..992, inset).
+    stripX = 12,
+    stripY = 629,
+    stripW = 336,
+    stripH = 66,
 
-    -- Close button sits inside the banner, top-right corner
-    closeX = 448,
+    -- Close and admin buttons in the banner's corners.
+    closeX = 330,
     closeY = 5,
     closeSize = 24,
-
-    -- Admin button: top-left corner of banner (mirrors close button top-right)
     adminBtnX = 5,
     adminBtnY = 5,
     adminBtnSize = 24,
 
-    -- Mode strip: sits along the bottom of the banner, directly above the glass
-    -- and clear of the branding higher up. Drawn only when a machine offers
-    -- more than one mode, so every shop that only sells looks as it always has.
-    --
-    -- Anchored by its BOTTOM edge, five above the glass at bannerH: the gap to
-    -- the door is what the eye reads, and a taller strip should grow up into
-    -- the banner rather than push down into the machine. Change the height and
-    -- move the Y by the same amount in the opposite direction.
-    --
-    -- There is only about 28px between the header border the machine art draws
-    -- and the top of the glass, so the strip has to live inside that. Height is
-    -- what pays for clearing the border, since the gap below is the part worth
-    -- keeping.
-    modeStripY = 110,
+    -- Mode strip: between the header (front row 166) and the glass, drawn only
+    -- when a machine offers more than one mode. Anchored by its bottom edge a
+    -- few pixels above the glass; a taller strip grows up into the header.
+    modeStripY = 120,
     modeStripH = 20,
 
     -- A strip a mode may own, between the glass and the grid inside it. Only
-    -- reserved when the active mode asks for one, so a machine that just sells
-    -- keeps the full height of its door for stock.
+    -- reserved when the active mode asks for one.
     filterStripH = 26,
-    filterStripGap = 4,
-
-    -- Inset left and right by the margin the preview box leaves against the
-    -- right edge of the window: panelX + panelW is 475 on a 480 canvas, so 5.
-    -- Not written down here as a number, because both edges are floored
-    -- independently at the current font scale and the gap that actually shows
-    -- is not always that 5 scaled. buildModeStrip derives it from the same
-    -- arithmetic instead, so the strip stays flush with the panel below it.
-    --
-    -- Starting at glassX aligned the strip with the item grid but hung it
-    -- off-centre against a banner spanning the whole machine, so it read as a
-    -- floating control rather than part of the cabinet.
+    filterStripGap = 4
 }
+
+-- Base pixels to window pixels. The font scale, capped so the window always
+-- fits the screen: at the machine's proportions it is tall. Text keeps the
+-- font scale (FS); only positions and sizes use this.
+local LS = FS
+
+local function px(n)
+    return math.floor(n * LS)
+end
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- text helpers
@@ -131,6 +127,18 @@ local L = {
 
 local wrapText = tools.wrapText
 local truncate = tools.truncate
+
+--- A balance short enough for the machine's little display: 1234 -> 1.2k.
+local function compactAmount(n)
+    n = tonumber(n) or 0
+    local a = math.abs(n)
+    if a >= 1000000 then
+        return string.format("%.1fM", n / 1000000)
+    elseif a >= 1000 then
+        return string.format("%.1fk", n / 1000)
+    end
+    return tostring(math.floor(n))
+end
 
 -- Human-readable label for a condition key, using the compiled def when available.
 -- Maps a failure object from R.evaluate (has textKey + args) to a player-readable string.
@@ -176,9 +184,10 @@ function UI.open(player, data)
     end
 
     if not instance then
-        local w = math.floor(BASE_W * FS)
-        local h = math.floor(BASE_H * FS)
         local core = getCore()
+        LS = math.min(FS, core:getScreenHeight() * 0.92 / BASE_H)
+        local w = px(BASE_W)
+        local h = px(BASE_H)
         local x = math.floor((core:getScreenWidth() - w) / 2)
         local y = math.floor((core:getScreenHeight() - h) / 2)
 
@@ -246,11 +255,9 @@ end
 
 function UI:createChildren()
     ISPanel.createChildren(self)
+    tools.freeCursorWhileShown(self)
 
     -- Scale a base-pixel value to the actual (font-scaled) window size.
-    local function px(n)
-        return math.floor(n * FS)
-    end
 
     local gridX = px(L.glassX)
     local gridY = px(L.bannerH)
@@ -260,13 +267,16 @@ function UI:createChildren()
     local rightX = px(L.panelX)
     local rightW = px(L.panelW)
 
-    local previewY = px(L.screenY)
-    local previewH = px(L.screenH)
-    local detailY = px(L.keypadY)
-    local detailH = px(L.keypadH)
-
     local trayY = px(L.trayY)
     local trayH = px(L.trayH)
+
+    -- The tray: picture, then details. The kick panel below takes the overflow,
+    -- and messages.
+    local trayX, trayW = px(L.trayX), px(L.trayW)
+    local previewW = trayH
+    local detailX = trayX + previewW + px(6)
+    local stripX, stripY = px(L.stripX), px(L.stripY)
+    local stripW, stripH = px(L.stripW), px(L.stripH)
 
     -- ── item grid ────────────────────────────────────────────────────────────
     self.controls = {}
@@ -373,7 +383,7 @@ function UI:createChildren()
     self:addChild(self.controls.adminBtn)
 
     -- ── 3D vehicle preview (fills the preview zone; hidden until a vehicle offer is selected) ──
-    local p3d = ISUI3DScene:new(rightX, previewY, rightW, previewH)
+    local p3d = ISUI3DScene:new(trayX, trayY, previewW, trayH)
     p3d:initialise()
     p3d.rotX = 22
     p3d.rotY = 45
@@ -411,32 +421,46 @@ function UI:createChildren()
     -- ── zone rects stored for prerender + render ──────────────────────────────
     self.zones = {
         preview = {
-            x = rightX,
-            y = previewY,
-            w = rightW,
-            h = previewH
+            x = trayX,
+            y = trayY,
+            w = previewW,
+            h = trayH
         },
         details = {
-            x = rightX,
-            y = detailY,
-            w = rightW,
-            h = detailH
+            x = detailX,
+            y = trayY,
+            w = trayX + trayW - detailX,
+            h = trayH
+        },
+        -- Where details run on once the tray is full.
+        more = {
+            x = stripX,
+            y = stripY,
+            w = stripW,
+            h = stripH
         },
         balance = {
-            x = rightX,
+            x = px(L.balanceX),
             y = px(L.balanceY),
-            w = rightW,
+            w = px(L.balanceW),
             h = px(L.balanceH)
         },
+        -- Over the overflow, only while a message is showing.
         feedback = {
-            x = px(L.glassX),
-            y = trayY,
-            w = px(L.glassW),
-            h = trayH
+            x = stripX,
+            y = stripY,
+            w = stripW,
+            h = stripH
         }
     }
 
-    self.bgTexture = getTexture("media/textures/machine-none.png")
+    self:useDefaultBackground()
+end
+
+--- The blank machine: the front of the generic wrap texture.
+function UI:useDefaultBackground()
+    self.bgTexture = getTexture("media/textures/phunmart/none.png")
+    self.bgRegion = Core.looks and Core.looks.FRONT or nil
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -506,9 +530,6 @@ function UI:buildModeStrip()
         return
     end
 
-    local function px(n)
-        return math.floor(n * FS)
-    end
     -- Mirror the preview box's margin on both sides. Read off the panel's own
     -- right edge rather than scaling a constant, so the strip lines up with
     -- what is actually drawn below it however the two floors land, and stays
@@ -582,9 +603,6 @@ function UI:buildModeFilter()
     end
     self.controls.filterWidgets = {}
 
-    local function px(n)
-        return math.floor(n * FS)
-    end
     local gridX, gridW = px(L.glassX), px(L.glassW)
     local top = px(L.bannerH)
     local stripH = px(L.filterStripH)
@@ -749,12 +767,25 @@ function UI:setData(data)
     self.selectedEntry = nil
     self.feedbackText = nil
 
+    -- A shop's own background image if it names one: an override, for a window
+    -- that should not look like the machine. Otherwise the front of the
+    -- machine's wrap texture, so the window and the 3D machine are the same
+    -- picture and a shop needs only that one.
+    -- By shopType: data.key is this machine's instance key, not its shop.
+    local shopType = data and data.shopType
+    local def = shopType and Core.shops and Core.shops[shopType]
     local bg = data and data.background
-    if bg then
-        local tex = getTexture("media/textures/" .. bg)
-        if tex then
-            self.bgTexture = tex
-        end
+    local bgTex = bg and getTexture("media/textures/" .. bg)
+    local wrap = def and Core.looks and Core.looks.textureFor(def)
+    local wrapTex = wrap and getTexture(wrap)
+    if bgTex then
+        self.bgTexture = bgTex
+        self.bgRegion = nil
+    elseif wrapTex then
+        self.bgTexture = wrapTex
+        self.bgRegion = Core.looks.FRONT
+    else
+        self:useDefaultBackground()
     end
 
     -- Reset 3D preview so it doesn't show a stale vehicle on reopen
@@ -835,7 +866,14 @@ end
 function UI:updateBuyButtonTitle(offer)
     local mode = self:currentMode()
     local title = mode and mode.actionLabel and mode.actionLabel(self, offer)
-    self.controls.buyBtn:setTitle(title or getText("IGUI_PhunMart_Buy"))
+    title = title or getText("IGUI_PhunMart_Buy")
+    -- The button is the width of the keypad column, and a mode can name its
+    -- action anything ("Buy back", "Collect"): the medium font when the title
+    -- fits, the small one when it does not.
+    local btn = self.controls.buyBtn
+    local room = btn.width - 6
+    btn.font = getTextManager():MeasureStringX(UIFont.Medium, title) <= room and UIFont.Medium or UIFont.Small
+    btn:setTitle(title)
 end
 
 function UI:onOfferSelected(id, offer, entry)
@@ -1400,7 +1438,11 @@ function UI:prerender()
     ISPanel.prerender(self)
 
     -- 1. machine background image (fully opaque)
-    if self.bgTexture then
+    local region = self.bgRegion
+    if self.bgTexture and region then
+        self.javaObject:DrawSubTextureRGBA(self.bgTexture, region.x, region.y, region.w, region.h, 0, 0, self.width,
+            self.height, 1, 1, 1, 1)
+    elseif self.bgTexture then
         self:drawTextureScaled(self.bgTexture, 0, 0, self.width, self.height, 1)
     else
         self:drawRect(0, 0, self.width, self.height, 1, 0.08, 0.08, 0.10)
@@ -1427,10 +1469,11 @@ function UI:prerender()
         self:drawRect(bz.x, bz.y, bz.w, bz.h, 0.82, 0.04, 0.04, 0.06)
         self:drawRectBorder(bz.x, bz.y, bz.w, bz.h, 0.50, 0.30, 0.30, 0.35)
     end
-    if fz then
-        -- feedback tray: always visible as a recessed slot
-        self:drawRect(fz.x, fz.y, fz.w, fz.h, 0.70, 0.03, 0.03, 0.04)
-        self:drawRectBorder(fz.x, fz.y, fz.w, fz.h, 0.40, 0.25, 0.25, 0.28)
+    local mz = self.zones and self.zones.more
+    if mz then
+        -- The kick panel: details overflow, and messages over it.
+        self:drawRect(mz.x, mz.y, mz.w, mz.h, 0.82, 0.04, 0.04, 0.06)
+        self:drawRectBorder(mz.x, mz.y, mz.w, mz.h, 0.50, 0.30, 0.30, 0.35)
     end
 
     -- Toggle admin button each frame so mid-game admin promotion works
@@ -1477,11 +1520,14 @@ function UI:render()
                 end
             end
         end
-        self:renderDetails(dz)
+        self:renderDetails(dz, self.zones.more)
     else
+        -- Across the picture and the details together: the picture alone is too
+        -- narrow for the words.
         local hint = getText("IGUI_PhunMart_SelectAnItem")
+        local hx, hw = pz.x, dz.x + dz.w - pz.x
         local tw = getTextManager():MeasureStringX(UIFont.Small, hint)
-        self:drawText(hint, math.floor(pz.x + (pz.w - tw) / 2), math.floor(pz.y + (pz.h - FONT_SM) / 2), 0.38, 0.38,
+        self:drawText(hint, math.floor(hx + (hw - tw) / 2), math.floor(pz.y + (pz.h - FONT_SM) / 2), 0.38, 0.38,
             0.38, 1, UIFont.Small)
     end
 
@@ -1524,16 +1570,39 @@ function UI:render()
             else
                 local def = Core.wallet.pools[pool]
                 if def then
+                    local raw = Core.wallet:getBalance(self.player, pool)
                     table.insert(rows, {
                         label = def.label,
-                        amount = fmtBalance(pool, Core.wallet:getBalance(self.player, pool)),
+                        raw = def.format == "cents" and (raw / 100) or raw,
+                        amount = fmtBalance(pool, raw),
                         tex = self._poolIcons[pool] and self._poolIcons[pool].tex
                     })
                 end
             end
         end
 
-        if #rows > 0 then
+        if #rows > 0 and bz.w < px(110) then
+            -- The machine's display screen is narrow: no header or labels, just
+            -- each coin and its amount, shortened when the full figure would
+            -- not fit beside the coin.
+            local contentH = #rows * rowH + math.max(0, #rows - 1) * 2
+            local ry = math.floor(bz.y + (bz.h - contentH) / 2)
+            local tm = getTextManager()
+            for _, row in ipairs(rows) do
+                local amount = row.amount
+                local room = bz.w - 4 - (row.tex and (iconSz + 2) or 0)
+                if tm:MeasureStringX(UIFont.Small, amount) > room then
+                    amount = compactAmount(row.raw)
+                end
+                if row.tex then
+                    self:drawTextureScaledAspect(row.tex, bz.x + 2, ry, iconSz, iconSz, 0.85, 1, 1, 1)
+                end
+                local aw = tm:MeasureStringX(UIFont.Small, amount)
+                self:drawText(amount, bz.x + bz.w - aw - 2, ry + math.floor((iconSz - FONT_SM) / 2), 0.88, 0.88,
+                    0.50, 1, UIFont.Small)
+                ry = ry + rowH + 2
+            end
+        elseif #rows > 0 then
             -- "Balance" header + divider
             self:drawText(getText("IGUI_PhunMart_Balance"), bz.x + pad, bz.y + pad, 0.52, 0.52, 0.58, 0.90, UIFont.Small)
             local divY = bz.y + pad + FONT_SM + 2
@@ -1568,6 +1637,8 @@ function UI:render()
 
     if self.feedbackText then
         local fc = self.feedbackColor
+        self:drawRect(fz.x, fz.y, fz.w, fz.h, 0.95, 0.03, 0.03, 0.04)
+        self:drawRectBorder(fz.x, fz.y, fz.w, fz.h, 0.50, 0.30, 0.30, 0.35)
         local txt = truncate(self.feedbackText, fz.w - 12, UIFont.Small)
         local tw = getTextManager():MeasureStringX(UIFont.Small, txt)
         self:drawText(txt, math.floor(fz.x + (fz.w - tw) / 2), math.floor(fz.y + (fz.h - FONT_SM) / 2), fc.r, fc.g,
@@ -1591,25 +1662,46 @@ end
 -- details panel content
 -- ─────────────────────────────────────────────────────────────────────────────
 
-function UI:renderDetails(z)
+--- Draw the selected offer's details into `z`, running on into `more` (when
+--- given) once `z` is full.
+function UI:renderDetails(z, more)
     local offer = self.selectedOffer
     if not offer then
         return
     end
 
     local pad = 8
-    local x = z.x + pad
-    local maxW = z.w - pad * 2
-    local y = z.y + pad
     local lh = FONT_SM + 3
-    local maxY = z.y + z.h - lh - 4
     local adapter = Core.getPlayerAdapter and Core.getPlayerAdapter(self.player)
 
-    -- item name (word-wrapped, max 2 lines)
+    -- Filled area by area: when a line would run off the bottom of one, it
+    -- starts at the top of the next. A zone tall enough for everything never
+    -- leaves the first.
+    local areas = {z, more}
+    local area = 1
+    local x, y, maxW, maxY
+    local function enter(a)
+        x = a.x + pad
+        y = a.y + pad
+        maxW = a.w - pad * 2
+        maxY = a.y + a.h - lh - 4
+    end
+    enter(z)
+    local function room(h)
+        local a = areas[area]
+        if y + h > a.y + a.h - pad + 2 and areas[area + 1] then
+            area = area + 1
+            enter(areas[area])
+        end
+    end
+
+    -- item name (word-wrapped, max 2 lines; one when the zone is short)
     local name = tools.resolveOfferDisplayName(offer)
     local nameLines = wrapText(name, maxW, UIFont.Small)
-    for i = 1, math.min(2, #nameLines) do
-        local line = (i == 2 and #nameLines > 2) and truncate(nameLines[i], maxW, UIFont.Small) or nameLines[i]
+    local nameMax = z.h < lh * 5 and 1 or 2
+    for i = 1, math.min(nameMax, #nameLines) do
+        local line = (i == nameMax and #nameLines > nameMax) and truncate(nameLines[i], maxW, UIFont.Small) or
+                         nameLines[i]
         self:drawText(line, x, y, 1.0, 0.88, 0.45, 1, UIFont.Small)
         y = y + lh
     end
@@ -1714,6 +1806,7 @@ function UI:renderDetails(z)
     end
     local priceIconSz = lh - 3
     local priceIconRoom = priceItemTex and (priceIconSz + 4) or 0
+    room(lh)
     local truncatedPrice = truncate(priceText, maxW - priceIconRoom, UIFont.Small)
     self:drawText(truncatedPrice, x, y, pr, pg, pb, 1, UIFont.Small)
     if priceItemTex then
@@ -1762,6 +1855,7 @@ function UI:renderDetails(z)
             receiveText = getText("IGUI_PhunMart_ReceiveItems", tostring(giveItemTotal), itemName)
         end
         if receiveText then
+            room(lh)
             local iconSz = lh - 3
             local iconRoom = receiveTex and (iconSz + 4) or 0
             local truncated = truncate(receiveText, maxW - iconRoom, UIFont.Small)
@@ -1793,6 +1887,7 @@ function UI:renderDetails(z)
             sr, sg, sb = 0.95, 0.72, 0.30
         end
     end
+    room(lh)
     self:drawText(truncate(stockText, maxW, UIFont.Small), x, y, sr, sg, sb, 1, UIFont.Small)
     y = y + lh + 4
 
@@ -1810,6 +1905,7 @@ function UI:renderDetails(z)
     local extra = mode and mode.detailLines and mode.detailLines(self, offer)
     if extra and #extra > 0 then
         for _, line in ipairs(extra) do
+            room(lh)
             if y > maxY then
                 break
             end
@@ -1834,11 +1930,13 @@ function UI:renderDetails(z)
 
     local condDefs = self.data and self.data.conditionsDefs
     local R = Core.conditionsRuntime
+    room(lh * 2)
     local headerY = y -- reserve space; header drawn on first blocking condition
     local headerDrawn = false
     y = y + lh
 
     for _, condKey in ipairs(condList) do
+        room(lh)
         if y > maxY then
             self:drawText("...", x + 4, y, 0.35, 0.35, 0.35, 1, UIFont.Small)
             break

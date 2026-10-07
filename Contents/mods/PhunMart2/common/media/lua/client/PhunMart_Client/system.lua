@@ -207,15 +207,14 @@ function ClientSystem:pollPendingSolids()
             for i = 0, objects:size() - 1 do
                 local obj = objects:get(i)
                 if obj:getName() == "PhunMartVendingMachine" then
-                    local sprite = obj:getSprite()
-                    local customName = sprite and sprite:getProperties():get("CustomName")
                     -- The same test checkObjectAdded makes, not just "has a
                     -- sprite": a machine whose shop type an admin has since
-                    -- deleted has a CustomName that matches nothing, and
-                    -- calling checkObjectAdded for it would only put the
-                    -- square back on this list and hold it here forever.
-                    -- Left to age out instead.
-                    if customName and Core.shops[customName] then
+                    -- deleted matches nothing, and calling checkObjectAdded for
+                    -- it would only put the square back on this list and hold it
+                    -- here forever. Left to age out instead. On the generic
+                    -- tiles it is the type arriving with the modData, not the
+                    -- sprite, that ends the wait.
+                    if Core.shopKeyForObject(obj) then
                         -- The whole arrival, not just the recalculation: with a
                         -- sprite in hand this run can also match the shop and
                         -- put a global object behind the machine, which is what
@@ -275,7 +274,9 @@ function ClientSystem:checkObjectAdded(obj)
     -- at all: no global object behind it, and a square nothing folded a solid
     -- flag into, so a player walked through a machine they could not
     -- right-click, and a relog brought back only the half the server sends.
-    local known = customName ~= nil and Core.shops[customName] ~= nil
+    -- Asked of the object first (Core.shopKeyForObject): a machine on the
+    -- generic tiles is only told apart by the type it carries.
+    local known = Core.shopKeyForObject(obj) ~= nil
     if not known and name ~= "PhunMartVendingMachine" then
         return
     end

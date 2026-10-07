@@ -54,8 +54,7 @@ Core.contexts.open = function(player, context, worldobjects, test)
                 local iso = objects:get(i)
                 local sprite = iso:getSprite()
                 if sprite then
-                    local cn = sprite:getProperties():get("CustomName")
-                    if cn and Core.shops[cn] then
+                    if Core.shopKeyForObject(iso) then
                         Core.ClientSystem.instance:checkObjectAdded(iso)
                         obj = Core.ClientSystem.instance:getLuaObjectOnSquare(sq)
                         break
@@ -97,9 +96,13 @@ Core.contexts.open = function(player, context, worldobjects, test)
                     disabled = true
                 end
             end
-            local option = context:addOptionOnTop(text, getSpecificPlayer(player), function()
+            -- The machine goes in as param1 even though the closure could reach
+            -- it. First person mods (Viewpoint) rebuild this menu for the object
+            -- under the crosshair and drop any top-level option whose target and
+            -- params do not name that object, so without it the shop never shows.
+            local option = context:addOptionOnTop(text, getSpecificPlayer(player), function(_, machine)
 
-                local o = Core.ClientSystem.instance:getLuaObjectOnSquare(wObj:getSquare())
+                local o = Core.ClientSystem.instance:getLuaObjectOnSquare(machine:getSquare())
 
                 local square = o:getFrontSquare()
                 if not square then
@@ -109,7 +112,7 @@ Core.contexts.open = function(player, context, worldobjects, test)
                 ISTimedActionQueue.add(ISWalkToTimedAction:new(playerObj, square))
                 ISTimedActionQueue.add(Core.actions.openShop:new(playerObj, o))
 
-            end)
+            end, wObj)
 
             local toolTip = ISToolTip:new();
             toolTip:setVisible(false);

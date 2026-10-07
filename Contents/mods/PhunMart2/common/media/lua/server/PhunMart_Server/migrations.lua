@@ -28,7 +28,7 @@ local VERSION_KEY = "overrideVersion"
 
 --- Bump this when adding a migration. A file stamped lower than this runs
 --- everything above its stamp, in order.
-Migrations.CURRENT = 2
+Migrations.CURRENT = 3
 
 -- Printed once, unconditionally. debugLn prefixes "[PhunMart] " and prints too,
 -- so calling both put every line out twice with slightly different spacing.
@@ -186,6 +186,80 @@ Migrations.list = {{
             end
         end
 
+        return fixed
+    end
+}, {
+    version = 3,
+    describe = "Move shops off the old machine-*.png window backgrounds onto 3D textures",
+    apply = function(files, touch)
+        -- A shop's `background` is now an override for the shop window, and it
+        -- beats the front of the shop's 3D texture. The old machine-*.png art is
+        -- drawn to the old window's proportions, so under the relaid window its
+        -- glass, screen and tray no longer line up with the controls drawn on
+        -- top. Every one of them has a 3D texture of the same name in
+        -- textures/phunmart/, made from it, which lines up and also dresses the
+        -- machine.
+        --
+        -- Overrides are diffs against the defaults, so a shipped shop only has a
+        -- background here if an admin picked a different one. A wizard-made shop
+        -- has every field, background included.
+        --
+        -- Only the shipped art is touched. A background naming anything else is
+        -- an image someone chose on purpose, maybe painted for the window, and
+        -- stays the override it now is.
+        --
+        -- Spelled out rather than read from Core.machineTextures, for the reason
+        -- given in v2: the list may move on, the data written before it did not.
+        local SHIPPED_ART = {
+            ["broken"] = true,
+            ["budget-xp"] = true,
+            ["car-a-part"] = true,
+            ["collectors"] = true,
+            ["csv"] = true,
+            ["electronics"] = true,
+            ["final-amendment"] = true,
+            ["gifted-xp"] = true,
+            ["good-phoods"] = true,
+            ["hard-wear"] = true,
+            ["hoes"] = true,
+            ["lootgoblin"] = true,
+            ["luxury-xp"] = true,
+            ["michelles"] = true,
+            ["necromart"] = true,
+            ["none"] = true,
+            ["phat-phoods"] = true,
+            ["phish4u"] = true,
+            ["pity-the-tool"] = true,
+            ["prawn-stars"] = true,
+            ["sheds-and-commoners"] = true,
+            ["traiter-joes"] = true,
+            ["travellers"] = true,
+            ["wrent-a-wreck"] = true,
+            ["zetsy"] = true
+        }
+
+        local fixed = 0
+        for _, name in ipairs(Core.overridePaths.shops) do
+            local tbl = files[name]
+            if tbl then
+                for key, def in pairs(tbl) do
+                    local art = type(def) == "table" and type(def.background) == "string" and
+                                    def.background:match("^machine%-(.+)%.png$")
+                    if art and SHIPPED_ART[art] then
+                        -- A texture the admin already chose wins; otherwise the
+                        -- texture made from the art they picked keeps the look.
+                        if def.texture == nil then
+                            def.texture = art
+                        end
+                        def.background = nil
+                        fixed = fixed + 1
+                        touch(name)
+                        log("  " .. name .. ": shop '" .. tostring(key) .. "' now wears texture '" ..
+                                tostring(def.texture) .. "' instead of background machine-" .. art .. ".png")
+                    end
+                end
+            end
+        end
         return fixed
     end
 }}
