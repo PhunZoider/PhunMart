@@ -489,6 +489,84 @@ function Core.wallet:addChangeToContainer(container, entries)
     end
 end
 
+--- Credits a wallet item's entries to a player as far as each pool's cap
+--- allows. Returns the entries that did not fit, and whether anything was
+--- credited at all.
+---
+--- The clamp is floored at zero. A balance already over its cap, which an admin
+--- grant can do, made cap - balance negative, so the pickup credited nothing and
+--- the caller then consumed the item anyway, destroying the money.
+function Core.wallet:creditEntries(player, entries)
+    local leftover = {}
+    local credited = false
+    for _, entry in ipairs(entries or {}) do
+        local amount = tonumber(entry.amount) or 0
+        if entry.pool and amount > 0 then
+            local toAdd = amount
+            local cap = self:getCap(entry.pool)
+            if cap then
+                toAdd = math.max(0, math.min(amount, cap - self:getBalance(player, entry.pool)))
+            end
+            if toAdd > 0 then
+                self:adjustByPool(player, "current", entry.pool, toAdd)
+                credited = true
+            end
+            if toAdd < amount then
+                table.insert(leftover, {
+                    pool = entry.pool,
+                    amount = amount - toAdd
+                })
+            end
+        end
+    end
+    return leftover, credited
+end
+
+--- True when at least part of these entries would fit under the player's caps,
+--- which is the test for whether picking the item up is allowed at all.
+function Core.wallet:hasRoomFor(player, entries)
+    for _, entry in ipairs(entries or {}) do
+        local amount = tonumber(entry.amount) or 0
+        if entry.pool and amount > 0 then
+            local cap = self:getCap(entry.pool)
+            if not cap or self:getBalance(player, entry.pool) < cap then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+--- Removes a redeemed wallet item and, when part of it did not fit under the
+--- cap, puts a new one holding the remainder into `into`, the player's
+--- inventory. A new item rather than an edit of the old one's modData, because
+--- in multiplayer a modData change on the server never reaches the client.
+--- Only call from a server/SP context.
+function Core.wallet:settleWalletItem(item, leftover, into)
+    local container = item:getContainer()
+    if container then
+        container:Remove(item)
+        sendRemoveItemFromContainer(container, item)
+    end
+    if not into or not leftover or #leftover == 0 then
+        return
+    end
+    local data = item:getModData().PhunWallet or {}
+    local itemType = item:getFullType()
+    local replacement = self:makeWalletItem(leftover, data.owner, nil, {
+        itemType = itemType,
+        anyone = data.anyone
+    })
+    local name = itemType == "PhunMart.Change" and changeItemName(leftover) or item:getName()
+    if name then
+        replacement:setName(name)
+    end
+    local added = into:AddItem(replacement)
+    if added then
+        sendAddItemToContainer(into, added)
+    end
+end
+
 -- Spawns a DroppedWallet item containing the given pool amounts on the square.
 -- entries = { {pool="change", amount=500}, ... }. Caller deducts balances first.
 -- opts.anyone = true lets any player pick it up regardless of OnlyPickupOwn.

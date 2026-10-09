@@ -239,6 +239,7 @@
   "IGUI_PhunMart_Btn_Drop": "Drop",
   "IGUI_PhunMart_Drop_TitleCents": "Drop from %1 (balance $%2). Enter cents:",
   "IGUI_PhunMart_Drop_TitleCount": "Drop from %1 (balance %2). Enter amount:",
+  "IGUI_PhunMart_WalletFull": "My wallet is full",
   "IGUI_PhunMart_Btn_Prices": "Prices",
   "IGUI_PhunMart_Btn_Conditions": "Conditions",
   "IGUI_PhunMart_Btn_Items": "Overrides",

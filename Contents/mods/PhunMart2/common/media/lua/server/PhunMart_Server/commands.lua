@@ -696,16 +696,7 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
         return
     end
 
-    for _, entry in ipairs(walletData) do
-        if entry.pool and entry.amount and entry.amount > 0 then
-            local cap = Core.wallet:getCap(entry.pool)
-            local bal = Core.wallet:getBalance(playerObj, entry.pool)
-            local toAdd = cap and math.min(entry.amount, cap - bal) or entry.amount
-            if toAdd > 0 then
-                Core.wallet:adjustByPool(playerObj, "current", entry.pool, toAdd)
-            end
-        end
-    end
+    local leftover = Core.wallet:creditEntries(playerObj, walletData)
 
     -- Race condition: the client fires onComplete when the client-side transfer
     -- animation ends, but the server may not have processed the transfer packet
@@ -736,9 +727,7 @@ Commands[Core.commands.consumeDroppedWallet] = function(playerObj, args)
         end
     end
     if walletItem then
-        local container = walletItem:getContainer()
-        container:Remove(walletItem)
-        sendRemoveItemFromContainer(container, walletItem)
+        Core.wallet:settleWalletItem(walletItem, leftover, inv)
     end
 
     sendServerCommand(playerObj, Core.name, Core.commands.getWallet, {

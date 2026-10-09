@@ -38,6 +38,22 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                     ignoreAction = true
                 }
             end
+            -- At the cap nothing in it would be credited, so leave it where it
+            -- is. Covers bags too, or a full wallet could still be carried
+            -- around as stashed money. Moves between the player's own
+            -- containers are left alone so a wallet already carried can be
+            -- reorganised. The balance here is the client's copy and can lag
+            -- the server, which is why the pickup itself still keeps whatever
+            -- does not fit rather than trusting this check.
+            local inv = player:getInventory()
+            local carried = srcContainer and (srcContainer == inv or srcContainer:isInCharacterInventory(player))
+            local intoCarried = destContainer and (destContainer == inv or destContainer:isInCharacterInventory(player))
+            if wallet.wallet and intoCarried and not carried and not Wallet:hasRoomFor(player, wallet.wallet) then
+                HaloTextHelper.addBadText(player, getText("IGUI_PhunMart_WalletFull"))
+                return {
+                    ignoreAction = true
+                }
+            end
         end
     end
 
@@ -53,18 +69,15 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
                 return
             end
             if Core.isLocal then
-                -- SP: merge dropped wallet pool balances locally, respecting caps.
-                for _, entry in ipairs(wallet.wallet or {}) do
-                    if entry.pool and entry.amount and entry.amount > 0 then
-                        local cap = Wallet:getCap(entry.pool)
-                        local bal = Wallet:getBalance(player, entry.pool)
-                        local toAdd = cap and math.min(entry.amount, cap - bal) or entry.amount
-                        if toAdd > 0 then
-                            Wallet:adjustByPool(player, "current", entry.pool, toAdd)
-                        end
-                    end
+                -- SP: merge dropped wallet pool balances locally, respecting
+                -- caps. Whatever does not fit stays behind as a smaller item.
+                local leftover, credited = Wallet:creditEntries(player, wallet.wallet)
+                Wallet:settleWalletItem(item, leftover, player:getInventory())
+                ISInventoryPage.dirtyUI()
+                if not credited then
+                    -- Nothing fit, so there is nothing to celebrate.
+                    return
                 end
-                consumeItem(item)
             else
                 -- MP: B42 is server-authoritative for inventory state, so the
                 -- server must remove the item. Pass the exact item ID so it
