@@ -138,9 +138,10 @@ local function playerIsNear(obj)
     return false
 end
 
--- Check power state every minute so sprite swaps within ~1 minute of electricity changing.
--- updateSprite() compares hasPower against self.powered and no-ops when unchanged,
--- so this loop is near-zero cost during steady state.
+-- Check power state every minute so a machine's synced power flag follows the
+-- electricity within ~1 minute. updateSprite() compares hasPower against
+-- self.powered and no-ops when unchanged, so this loop is near-zero cost during
+-- steady state.
 --
 -- Rerolling rides along here rather than on shop open, which is where restocking
 -- happens. Restocking on open is invisible; changing the whole shop on open

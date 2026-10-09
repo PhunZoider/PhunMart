@@ -19,6 +19,7 @@ Core.compiler = Compiler
 local shallowCopy = Core.utils.shallowClone
 local isSequence = Core.utils.isSequence
 local deepMerge = Core.utils.deepMerge
+local Recordings = require "PhunMart/recordings"
 
 -- -----------------------------
 -- Utility: logging
@@ -793,6 +794,29 @@ local function expandGroupItems(groupDef, resolvedSpecials, logger)
         outSet = normalized
     end
 
+    -- recordings: each item that holds a recording becomes one key per title,
+    -- in place of the blank item. Runs after normalizing so the category lookup
+    -- sees full names, and the blacklist is applied again so a single title can
+    -- be left out by its key.
+    if groupDef.recordings then
+        local expanded = {}
+        for itemType, _ in pairs(outSet) do
+            local category = Recordings.categoryOf(itemType)
+            local ids = category and Recordings.idsFor(category) or {}
+            if #ids > 0 then
+                for _, id in ipairs(ids) do
+                    expanded[Recordings.key(itemType, id)] = true
+                end
+            else
+                expanded[itemType] = true
+            end
+        end
+        for _, key in ipairs(type(groupDef.blacklist) == "table" and groupDef.blacklist or {}) do
+            expanded[key] = nil
+        end
+        outSet = expanded
+    end
+
     -- convert set -> array
     local out = {}
     for itemType, _ in pairs(outSet) do
@@ -824,6 +848,13 @@ end
 -- Apply precedence: pool.defaults → group.defaults → special fields → itemDef override
 local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, itemDef, logger)
     local merged = {}
+
+    -- A recording's key names the item and the title together (recordings.lua).
+    -- The offer id keeps the whole key so each title stays its own offer; what
+    -- is given, shown and checked is the item.
+    local offerKey = itemType
+    local mediaId
+    itemType, mediaId = Recordings.split(itemType)
 
     -- Pool defaults (price is now a valid fallback in the merge chain)
     local poolDefaults = poolDef.defaults
@@ -894,8 +925,23 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     local rewardResolved = resolveSpecial(ctx.specials, merged.reward, itemType, merged.offer.qty, logger,
         type(merged.spawn) == "table" and merged.spawn or nil)
 
-    local offerId = buildOfferId(poolKey, itemType)
+    local offerId = buildOfferId(poolKey, offerKey)
     local offerConditions = normalizeConditions(merged.conditions)
+
+    -- The title rides on the action that hands the item over, which is what
+    -- puts it on the tape (grantReward). Copied rather than set in place,
+    -- because a named special's actions are shared by every offer using it.
+    if mediaId and rewardResolved and type(rewardResolved.actions) == "table" then
+        local actions = {}
+        for i, action in ipairs(rewardResolved.actions) do
+            if action.type == "giveItem" and action.item == itemType then
+                action = shallowCopy(action)
+                action.media = mediaId
+            end
+            actions[i] = action
+        end
+        rewardResolved.actions = actions
+    end
 
     -- For grantTrait reward actions: filter out disabledInMultiplayer offers on MP server,
     -- and auto-inject a canGrantTrait condition for mutex/already-has checks at runtime.
@@ -1075,6 +1121,7 @@ local function compileOfferForItem(ctx, poolKey, poolDef, groupDef, itemType, it
     return offerId, {
         id = offerId,
         item = itemType,
+        media = mediaId,
         price = priceResolved,
         reward = rewardResolved,
         offer = merged.offer,
@@ -1239,6 +1286,16 @@ function Compiler.compileAll(ctx)
             -- build offers
             for itemType, meta in pairs(itemsSet) do
                 local itemDef = resolved.items[itemType]
+                local baseItem, mediaId = Recordings.split(itemType)
+
+                -- A group can price the recordings that teach a skill apart
+                -- from the rest (recordings = {skill = {...}}). It sits where an
+                -- item override would, under any override actually written.
+                local recordings = meta.fromGroup and meta.fromGroup.recordings
+                if mediaId and type(recordings) == "table" and type(recordings.skill) == "table" and
+                    #Recordings.skillsOf(mediaId) > 0 then
+                    itemDef = deepMerge(deepMerge({}, recordings.skill), itemDef or {})
+                end
                 if itemDef and itemDef.template == true then
                     logger:warn("Item key '" .. itemType .. "' is marked template=true but was pulled into pool '" ..
                                     poolKey .. "'. Skipping.")
@@ -1251,7 +1308,7 @@ function Compiler.compileAll(ctx)
                         -- validate item exists for game items only.
                         -- Non-item offers (trait, skill, boost, vehicle) use arbitrary
                         -- string keys without a module prefix (no "."), so skip them.
-                        if itemType:find("%.") and not itemExists(itemType) then
+                        if baseItem:find("%.") and not itemExists(baseItem) then
                             logger:warn("Unknown item type '" .. itemType .. "' (pool '" .. poolKey ..
                                             "'). It may be from a mod or typo.")
                         end
@@ -1337,8 +1394,10 @@ function Compiler.compileAll(ctx)
                 category = shopDef.category,
                 -- A shop with no tiles of its own stands on the generic ones and is
                 -- told apart by the type its machines carry (Core.shopKeyForObject).
-                -- Generic tiles bring their own unpowered faces, whether the shop
-                -- left sprites out or an editor wrote the generic list back in.
+                -- Unpowered tiles are legacy, never swapped to; the list lets the
+                -- server spot a machine an older build left on one and move it
+                -- back. Generic tiles bring their own, whether the shop left
+                -- sprites out or an editor wrote the generic list back in.
                 sprites = shopDef.sprites or Core.genericSprites,
                 unpoweredSprites = shopDef.unpoweredSprites or
                     ((shopDef.sprites or Core.genericSprites)[1] == Core.genericSprites[1] and

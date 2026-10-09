@@ -410,7 +410,6 @@
   "IGUI_PhunMart_Wiz_Hint_CategoryOther": "Your own category name",
   "IGUI_PhunMart_Wiz_Lbl_Other": "Enter your own:",
   "IGUI_PhunMart_Wiz_Lbl_Sprites": "Powered tiles:",
-  "IGUI_PhunMart_Wiz_Lbl_Unpowered": "Unpowered tiles:",
   "IGUI_PhunMart_Wiz_Err_FourTiles": "Needs four names, one per facing. Found %1",
   "IGUI_PhunMart_Wiz_Lbl_Restock": "Restock every:",
   "IGUI_PhunMart_Wiz_Lbl_Preview": "Preview",
@@ -421,7 +420,6 @@
   "IGUI_PhunMart_Wiz_North": "north",
   "IGUI_PhunMart_Wiz_Hint_BackgroundOther": "Image filename from your own mod",
   "IGUI_PhunMart_Wiz_Hint_Sprites": "Four tile names from your tileset, comma separated: east, south, west, north",
-  "IGUI_PhunMart_Wiz_Hint_Unpowered": "Same four, for when the power is out. Blank if it needs no power",
   "IGUI_PhunMart_Wiz_Hint_Restock": "Hours between restocks. Blank follows the sandbox setting (%1)",
   "IGUI_PhunMart_Wiz_Hint_Appearance": "2D tiles, shown when a player turns 3D machines off. The generic machine needs no art of its own",
   "IGUI_PhunMart_Wiz_Hint_Background": "The image behind the shop window",
@@ -615,7 +613,5 @@
   "IGUI_PhunMart_Lbl_Preview3D": "Preview",
   "IGUI_PhunMart_Hint_MachineTextureOther": "A file in media/textures/phunmart/ by name (e.g. my-machine), or a path under media/textures/",
   "IGUI_PhunMart_Lbl_FallbackSprites": "2D sprites:",
-  "IGUI_PhunMart_Hint_FallbackSprites": "Optional. 4 tiles (E, S, W, N) shown when 3D machines are off. Empty uses the generic machine",
-  "IGUI_PhunMart_Lbl_FallbackUnpSprites": "2D unpowered:",
-  "IGUI_PhunMart_Hint_FallbackUnpSprites": "Optional. 4 tiles (E, S, W, N) for a machine that needs power and has none, when 3D is off"
+  "IGUI_PhunMart_Hint_FallbackSprites": "Optional. 4 tiles (E, S, W, N) shown when 3D machines are off. Empty uses the generic machine"
 }

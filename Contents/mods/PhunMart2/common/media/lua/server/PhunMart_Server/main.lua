@@ -4,6 +4,7 @@ end
 local Core = PhunMart
 Core.fileUtils = require "PhunMart_Server/utils_file"
 local Migrations = require "PhunMart_Server/migrations"
+local Recordings = require "PhunMart/recordings"
 Core.instances = {}
 
 -- Load an optional server-side override file from disk. Returns {} if absent.
@@ -57,6 +58,12 @@ function Core:grantReward(player, action, qty, context)
         for i = 1, total do
             local item = inv:AddItem(action.item)
             if item then
+                -- Before it is sent, so the client receives the tape with its
+                -- title already on it.
+                if action.media and not Recordings.apply(item, action.media) then
+                    Core.debugLn("grantReward: no recording '" .. tostring(action.media) .. "' for '" ..
+                                     tostring(action.item) .. "'")
+                end
                 sendAddItemToContainer(inv, item)
             else
                 Core.debugLn("grantReward: AddItem failed for '" .. tostring(action.item) .. "'")

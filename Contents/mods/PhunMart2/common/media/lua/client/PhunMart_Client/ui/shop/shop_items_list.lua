@@ -7,6 +7,7 @@ require "ISUI/ISToolTipInv"
 require "ISUI/ISToolTip"
 local Core = PhunMart
 local tools = require "PhunMart_Client/ui/ui_utils"
+local Recordings = require "PhunMart/recordings"
 
 local FONT_SM = getTextManager():getFontHeight(UIFont.Small)
 local FONT_TINY = getTextManager():getFontHeight(UIFont.Tiny)
@@ -107,10 +108,17 @@ function UI:updateTooltip()
     -- Try inventory item tooltip first (real items only, not traits/vehicles/boosts)
     local itemName = e.offer and e.offer.item
     if itemName and getScriptManager():getItem(itemName) then
-        -- Cache InventoryItem per key: instanceItem is a Java call, avoid per-frame
-        if self._tipItemKey ~= itemName then
-            self._tipItemKey = itemName
+        -- Cache InventoryItem per key: instanceItem is a Java call, avoid per-frame.
+        -- A recording keys on its title too, and goes on the instance, so the
+        -- tooltip shows the tape being sold rather than a blank one.
+        local media = e.offer.media
+        local tipKey = media and Recordings.key(itemName, media) or itemName
+        if self._tipItemKey ~= tipKey then
+            self._tipItemKey = tipKey
             self._tipItem = instanceItem(itemName)
+            if self._tipItem and media then
+                Recordings.apply(self._tipItem, media)
+            end
         end
         if self._tipItem then
             if self._txtInUI then

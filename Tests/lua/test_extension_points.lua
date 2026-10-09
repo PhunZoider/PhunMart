@@ -417,6 +417,29 @@ do
     ok("leaves no key behind", compiled and compiled.neverSet == nil)
 end
 
+print("-- defaultPaths given a table instead of a module path --")
+do
+    -- What lets a small mod keep its groups, pools and shops in one file.
+    _G.triggerEvent = _G.triggerEvent or function()
+    end
+    Core.shopDefPassthrough = {}
+    local entry = {
+        TableShop = {
+            title = "Table Shop",
+            category = "Test",
+            probability = 0
+        }
+    }
+    table.insert(Core.defaultPaths.shops, entry)
+    local okCall, err = pcall(Core.compileWith, {})
+    ok("compiles", okCall, tostring(err))
+    ok("reaches the definitions", Core.defs and Core.defs.shops.TableShop ~= nil)
+    ok("and the runtime", Core.runtime and Core.runtime.shops.TableShop ~= nil)
+    ok("counts as shipped, so admins cannot delete it", Core.isShippedKey("shops", "TableShop"))
+    ok("module paths still load beside it", Core.defs and Core.defs.shops.GoodPhoods ~= nil)
+    table.remove(Core.defaultPaths.shops)
+end
+
 ---------------------------------------------------------------------------
 
 print("")

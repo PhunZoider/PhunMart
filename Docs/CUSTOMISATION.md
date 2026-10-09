@@ -694,11 +694,40 @@ than listing game items.
 | `specials`              | Explicit special keys to include (non-item groups)                           |
 | `blacklist`             | Item or special keys to exclude after inclusion                              |
 | `blacklistCategories`   | Category names to exclude after inclusion                                    |
+| `recordings`            | Sell tapes and CDs one title at a time. See [Recording groups](#recording-groups) |
 | `label`                 | Optional display label for this group in the UI                              |
 | `fallbackTexture`       | Texture name used when an item has no icon                                   |
 | `fallbackCategory`      | Category label shown in the shop details panel                               |
 | `title`                 | Name for this group in the admin lists. Cosmetic; falls back to the key      |
 | `enabled`               | Set `false` to drop the group from every pool that names it                  |
+
+### Recording groups
+
+VHS tapes and CDs are a single item each in the game (`Base.VHS_Retail`, `Base.VHS_Home`,
+`Base.Disc_Retail`), with the movie or album attached when the loot spawner places one. Sold
+as a plain item, a tape arrives blank.
+
+Set `recordings` on a group and every item in it that can hold a recording becomes one offer
+per title instead, named for the title: "VHS: Woodcraft E4 (Carpentry)". The buyer gets that
+exact tape. Items in the group that hold no recording are sold as usual.
+
+```json
+"vhs_all": {
+    "defaults": { "price": "currency_low" },
+    "items": ["Base.VHS_Retail", "Base.VHS_Home"],
+    "recordings": {
+        "skill": { "price": "currency_mid" }
+    }
+}
+```
+
+`recordings` is `true`, or a table whose `skill` entry is applied to the titles that teach a
+skill, with the same fields an item override takes. It sits under any item override written
+for that title. To leave one title out, blacklist its key, which is the item and the title id
+joined by `#` (`Base.VHS_Retail#929a2ae1-a7f1-4fe5-9b4e-7779a4483091`).
+
+There are about 280 titles across the two tape items, so give the shop a weighted `roll`
+rather than `mode = "all"`.
 
 ### Vehicle groups
 
@@ -852,7 +881,6 @@ pools into one candidate list, then rolls a random subset.
     "category": "Tool",
     "texture": "pity-the-tool",
     "sprites": ["phunmart_01_24", "phunmart_01_25", "phunmart_01_26", "phunmart_01_27"],
-    "unpoweredSprites": ["phunmart_01_28", "phunmart_01_29", "phunmart_01_30", "phunmart_01_31"],
     "roll": { "mode": "weighted", "count": { "min": 5, "max": 8 } },
     "poolSets": [
       {
@@ -867,7 +895,6 @@ pools into one candidate list, then rolls a random subset.
     "defaultView": "list",
     "texture": "budget-xp",
     "sprites": ["phunmart_02_40", "phunmart_02_41", "phunmart_02_42", "phunmart_02_43"],
-    "unpoweredSprites": ["phunmart_02_44", "phunmart_02_45", "phunmart_02_46", "phunmart_02_47"],
     "roll": { "mode": "weighted", "count": { "min": 4, "max": 8 } },
     "poolSets": [{
       "keys": [
@@ -900,8 +927,8 @@ to make your own.
 | `texture`          | The machine's picture: its 3D model and its shop window. A name under `media/textures/phunmart/`, no extension: `"zetsy"`. Spare ones: [Machine Art](MACHINE_ART.md#spare-textures) |
 | `background`       | Optional. An image under `media/textures/` drawn as the shop window instead of the texture's front. Leave it out unless the window should not look like the machine. See [The shop window](MACHINE_ART.md#the-shop-window) |
 | `sprites`          | Optional. 4-element array of tile sprite names (E/S/W/N facing), shown when a player turns 3D machines off. Absent stands the shop on the generic machine. See [2D tiles](MACHINE_ART.md#2d-tiles) |
-| `unpoweredSprites` | Tiles shown when the machine is unpowered. Not needed on the generic machine, which has its own. |
-| `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless, and the unpowered sprites are never drawn. |
+| `unpoweredSprites` | No longer used: machines keep the same tiles with the power off, and the 3D model shows it. Old lists are harmless. |
+| `powered`          | Set `true` to make the machine need mains power. Absent means it works regardless. |
 | `moveable`         | `true` or `false`: whether players may pick this shop's machines up and put them down elsewhere. Absent follows the `ShopsMoveable` sandbox option. Admins can always move them. |
 | `destructible`     | `true` or `false`: whether players may destroy this shop's machines with a sledgehammer. Absent follows `ShopsDestructible`. Admins can always destroy them. |
 | `light`            | The glow the machine casts: `{ "r": 255, "g": 214, "b": 170, "radius": 2 }`, colours in 0-255 and radius in tiles. Absent takes that warm white. Set `false` for a machine that stays dark. The light hangs on the square the machine faces, not on the machine. |

@@ -56,6 +56,25 @@ return {
 
 The same works for `pools`, `groups`, `items`, `prices`, `specials` and `conditionsDefs`.
 
+For a small mod, hand over the table itself instead of a module path, and the whole thing
+fits in one file:
+
+```lua
+table.insert(PhunMart.defaultPaths.shops, {
+    YourShop = { ... }
+})
+```
+
+[Apocalypse & Chill](https://github.com/PhunZoider/ApocalypseAndChill) is a complete shop
+done this way, in one Lua file, and makes a good starting point.
+
+### Why a mod at all?
+
+Admins can already create shops, groups and pools in game, from the admin window, with no
+mod. What they cannot do from there is add a picture. Every texture a machine can wear has to
+ship inside a mod, so a shop with art of its own is a mod. Once it is, putting its
+definitions in the mod too means it arrives complete on every server that installs it.
+
 ### Its look
 
 Every machine is the same 3D model wearing its shop's `texture`, and the shop window is the
@@ -92,14 +111,13 @@ If you want tiles of your own for the 2D view, ship a pack declared in your `mod
 `pack=` and `tiledef=`, and add:
 
 ```lua
-sprites          = {"yourshop_01_0", "yourshop_01_1", "yourshop_01_2", "yourshop_01_3"},
-unpoweredSprites = {"yourshop_01_4", "yourshop_01_5", "yourshop_01_6", "yourshop_01_7"},
+sprites = {"yourshop_01_0", "yourshop_01_1", "yourshop_01_2", "yourshop_01_3"},
 ```
 
 Pick a tiledef index that collides with nothing else installed. Sprite names are global once a
 pack loads, so you _can_ reference PhunMart's themed blocks, but then your machine's art ships
 from a repository you do not own and the two have to be versioned together to change a sprite.
-[Machine Art Reference](MACHINE_ART.md#2d-tiles) covers the eight-tile block layout.
+[Machine Art Reference](MACHINE_ART.md#2d-tiles) covers the tile block layout.
 
 ### Finding your machines
 

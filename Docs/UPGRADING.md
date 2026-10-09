@@ -217,8 +217,9 @@ PhunMart.registerMachineTexture("yourshop-alt")
 
 ### Tiles are optional
 
-`sprites` and `unpoweredSprites` are now only the 2D view, shown when a player turns 3D models
-off, and are optional. Leave them out and your shop stands on PhunMart's generic machine.
+`sprites` is now only the 2D view, shown when a player turns 3D models off, and is optional.
+`unpoweredSprites` is no longer used: a machine keeps the same tiles with the power off, and
+the 3D model shows the power state. You can delete the list. Leave them out and your shop stands on PhunMart's generic machine.
 
 If you drop your own tiles, you can also drop your tile pack, along with the `pack=` and
 `tiledef=` lines in `mod.info`. Keep them if you would rather the 2D view still looked like

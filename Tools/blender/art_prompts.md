@@ -4,12 +4,12 @@ Image-generation prompts for the shop textures. Attach the layout reference with
 
 Each prompt makes four panels. They land on the texture like this:
 
-| Panel          | Lands on                | Texture size | Ratio  |
-| -------------- | ----------------------- | ------------ | ------ |
-| Top banner     | Banner + shop window    | 457 x 154    | ~3:1   |
-| Bottom banner  | Spare plate (no text)   |              | ~3:1   |
-| Left vertical  | Machine's left side     | 142 x 467    | ~1:3.3 |
-| Right vertical | Machine's right side    | 142 x 467    | ~1:3.3 |
+| Panel          | Lands on              | Texture size | Ratio  |
+| -------------- | --------------------- | ------------ | ------ |
+| Top banner     | Banner + shop window  | 457 x 154    | ~3:1   |
+| Bottom banner  | Spare plate (no text) |              | ~3:1   |
+| Left vertical  | Machine's left side   | 142 x 467    | ~1:3.3 |
+| Right vertical | Machine's right side  | 142 x 467    | ~1:3.3 |
 
 The left side panel's left edge faces the back of the machine, so subjects on the left panel face
 right and subjects on the right panel face left. That way both sides look toward the front.

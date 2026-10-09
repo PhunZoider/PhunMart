@@ -499,8 +499,10 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
 
             result.texture = chosenTexture(f)
 
+            -- No unpowered tiles field: machines no longer swap to them. Any list
+            -- the def already has rides along in result, so old machines still
+            -- standing on one are recognised and moved back.
             result.sprites = parseCSV(f:getFieldValue("sprites"))
-            result.unpoweredSprites = parseCSV(f:getFieldValue("unpSprites"))
 
             -- Same shape as enabled above, inverted: only written when true,
             -- because absent already means the machine needs no power. Clearing
@@ -679,14 +681,6 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
             f:reflowFields()
         end
     })
-    form:addTextField("unpSprites", getText("IGUI_PhunMart_Lbl_FallbackUnpSprites"), {
-        default = def.unpoweredSprites and table.concat(def.unpoweredSprites, ", ") or "",
-        hint = getText("IGUI_PhunMart_Hint_FallbackUnpSprites"),
-        section = "s_look",
-        onChange = function(f)
-            f:reflowFields()
-        end
-    })
     -- Everything the machine can look like in one row: the 3D machine wearing
     -- the chosen texture, then the 2D tiles when there are any, so a sprite
     -- name typed wrong is visibly wrong rather than discovered by walking to a
@@ -703,22 +697,15 @@ local function createEditModal(shopKey, shopDef, preserveBase, cb)
         end,
         images = function()
             local out = {}
-            local function add(csv, gap)
-                local first = true
-                for i, name in ipairs(parseCSV(csv) or {}) do
-                    table.insert(out, {
-                        texture = tileTexture(name),
-                        -- Which way the tile faces, not its name: the names are
-                        -- already in the box above, and the order is not the
-                        -- compass order anyone would guess.
-                        label = getText(FACINGS[i] or ""),
-                        gap = first and gap or false
-                    })
-                    first = false
-                end
+            for i, name in ipairs(parseCSV(form:getFieldValue("sprites")) or {}) do
+                table.insert(out, {
+                    texture = tileTexture(name),
+                    -- Which way the tile faces, not its name: the names are
+                    -- already in the box above, and the order is not the
+                    -- compass order anyone would guess.
+                    label = getText(FACINGS[i] or "")
+                })
             end
-            add(form:getFieldValue("sprites"), false)
-            add(form:getFieldValue("unpSprites"), true)
             return out
         end
     })

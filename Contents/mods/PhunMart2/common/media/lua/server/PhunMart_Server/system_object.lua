@@ -5,6 +5,7 @@ end
 require "Map/SGlobalObject"
 require "PhunMart_Server/system"
 local Core = PhunMart
+local Recordings = require "PhunMart/recordings"
 local ServerSystem = Core.ServerSystem
 Core.ServerObject = SGlobalObject:derive("SPhunMartObject")
 local ServerObject = Core.ServerObject
@@ -303,7 +304,9 @@ function ServerObject:buildOffers()
                 else
                     for offerId, offer in pairs(pool.offers or {}) do
                         if not excluded[offer.item] then
-                            local itemKey = offer.item
+                            -- Each recording is its own offer on the same item, so
+                            -- dedupe on both or every title after the first is lost.
+                            local itemKey = offer.media and Recordings.key(offer.item, offer.media) or offer.item
                             if not seenItems[itemKey] then
                                 seenItems[itemKey] = true
                                 if pool.sticky then
@@ -333,6 +336,7 @@ function ServerObject:buildOffers()
             offers[sel.id] = {
                 id = offerDef.id,
                 item = offerDef.item,
+                media = offerDef.media,
                 price = bakePrice(offerDef.price or poolSet.price, offerDef.item),
                 reward = offerDef.reward,
                 offer = {
@@ -378,6 +382,7 @@ function ServerObject:buildOffers()
             offers[offerId] = {
                 id = offerDef.id,
                 item = offerDef.item,
+                media = offerDef.media,
                 price = bakePrice(offerDef.price or poolSet.price, offerDef.item), -- poolSet price as fallback
                 reward = offerDef.reward,
                 offer = {
@@ -500,14 +505,12 @@ end
 --- the same call that caused it. setSpriteFromName takes a String and only a
 --- String, so there is nothing to resolve wrongly.
 ---
---- updateSprite cannot do this job, because neither of its branches is about
---- the type changing. For a shop declaring powered = true it swaps sprites only
---- when the power state moved; for every other shop, which is all sixteen of
---- the shipped ones, it only rescues a machine stuck on an unpowered sprite, by
---- testing the current sprite against the new type's unpowered list. After a
---- reroll the sprite on the machine belongs to the type it just stopped being
---- and appears in nobody's list, so that test finds nothing and the machine
---- keeps the wrong face while selling the new shop's stock.
+--- updateSprite cannot do this job, because it is not about the type changing.
+--- It only rescues a machine stuck on an unpowered sprite, by testing the
+--- current sprite against the type's unpowered list. After a reroll the sprite
+--- on the machine belongs to the type it just stopped being and appears in
+--- nobody's list, so that test finds nothing and the machine keeps the wrong
+--- face while selling the new shop's stock.
 function ServerObject:applyTypeSprite()
     local isoObject = self:getIsoObject()
     local def = Core.runtime and Core.runtime.shops and Core.runtime.shops[self.type]
@@ -515,14 +518,9 @@ function ServerObject:applyTypeSprite()
         return false
     end
 
-    local idx = self:getSpriteIndex()
-    local sprite = def.sprites[idx]
+    local sprite = def.sprites[self:getSpriteIndex()]
     if def.powered == true then
-        local hasPower = self:hasElectricity()
-        self.powered = hasPower
-        if not hasPower then
-            sprite = (def.unpoweredSprites or {})[idx] or sprite
-        end
+        self.powered = self:hasElectricity()
     end
     if not sprite then
         return false
@@ -543,31 +541,26 @@ function ServerObject:updateSprite(force)
         return
     end
 
+    -- The power state is still tracked (the client's context menu reads it),
+    -- but a machine no longer changes face with it: the 3D look shows power
+    -- (client looks.lua). Skipped when unchanged to save a transmit every tick.
     if def.powered == true then
         local hasPower = self:hasElectricity()
-        -- skip if power state unchanged: avoids redundant setSprite + network transmit on every tick
-        if not force and hasPower == self.powered then
-            return
+        if force or hasPower ~= self.powered then
+            self.powered = hasPower
+            self:saveData()
         end
-        local idx = self:getSpriteIndex()
-        if hasPower then
-            isoObject:setSpriteFromName(def.sprites[idx])
-        else
-            isoObject:setSpriteFromName((def.unpoweredSprites or {})[idx] or def.sprites[idx])
-        end
-        isoObject:transmitUpdatedSpriteToClients()
-        self.powered = hasPower
-        self:saveData()
-    else
-        -- non-powered shop: ensure powered sprite is showing (recovery from bad state)
-        local sprite = isoObject:getSprite():getName()
-        local unpoweredSet = {}
-        for _, s in ipairs(def.unpoweredSprites or {}) do
-            unpoweredSet[s] = true
-        end
-        if unpoweredSet[sprite] then
+    end
+
+    -- A machine left on an unpowered tile by an older build goes back to its
+    -- powered one. The unpowered lists are kept for this and for recognising
+    -- such a machine at all (Core.spriteToShop).
+    local current = isoObject:getSprite() and isoObject:getSprite():getName()
+    for _, s in ipairs(def.unpoweredSprites or {}) do
+        if s == current then
             isoObject:setSpriteFromName(def.sprites[self:getSpriteIndex()])
             isoObject:transmitUpdatedSpriteToClients()
+            return
         end
     end
 end

@@ -28,9 +28,10 @@ local ShopWizard = {}
 ---------------------------------------------------------------------------
 -- Appearance
 --
--- A machine needs four powered tiles and four unpowered ones, taken as a block
--- of eight: the first four lit, the last four dark. Every shipped shop follows
--- that, so a spare block is describable by its first tile alone.
+-- A machine needs four tiles, one per facing, at the start of a block of eight.
+-- The last four were its unpowered faces, which machines no longer swap to.
+-- Every shipped shop follows that, so a spare block is describable by its first
+-- tile alone.
 ---------------------------------------------------------------------------
 
 local SPARE_SETS = {{
@@ -65,21 +66,19 @@ local function machineTexture(name)
     return Core.looks and Core.looks.findTexture(name) or nil
 end
 
---- Expand a first-tile name into the eight the shop definition needs.
---- Returns powered, unpowered, or nil when the name is not of the form
---- <sheet>_<index>.
+--- Expand a first-tile name into the four the shop definition needs, or nil
+--- when the name is not of the form <sheet>_<index>.
 local function spritesFrom(firstTile)
     local sheet, idx = tostring(firstTile or ""):match("^(.+)_(%d+)$")
     if not sheet then
         return nil
     end
     idx = tonumber(idx)
-    local powered, unpowered = {}, {}
+    local out = {}
     for i = 0, 3 do
-        table.insert(powered, sheet .. "_" .. tostring(idx + i))
-        table.insert(unpowered, sheet .. "_" .. tostring(idx + 4 + i))
+        table.insert(out, sheet .. "_" .. tostring(idx + i))
     end
-    return powered, unpowered
+    return out
 end
 
 --- Every appearance on offer: the spare tile blocks, then each existing shop
@@ -219,11 +218,6 @@ local function create(values)
         minDistance = values.minDistance,
         texture = values.texture,
         sprites = values.sprites,
-        -- Left off entirely when there are none. A machine that does not need
-        -- power has nothing to draw in its unpowered state, and an empty list
-        -- would be stored as a real, wrong answer.
-        unpoweredSprites = (values.unpoweredSprites and #values.unpoweredSprites > 0) and values.unpoweredSprites or
-            nil,
         restockFrequency = values.restockFrequency,
         roll = {
             mode = "weighted",
@@ -281,15 +275,13 @@ local function pickOrCustom(form, comboKey, textKey)
     return chosen
 end
 
---- The four tile names for one state of the machine. A named set expands from
---- its first tile; Other reads the comma-separated field, which may be empty
---- for unpowered because that art is optional.
-local function chosenSprites(form, tileByLabel, which)
+--- The machine's four tile names. A named set expands from its first tile;
+--- Other reads the comma-separated field.
+local function chosenSprites(form, tileByLabel)
     if isOther(form:getFieldValue("appearance")) then
-        return parseCsv(form:getFieldValue(which == "sprites" and "spritesCsv" or "unpoweredCsv"))
+        return parseCsv(form:getFieldValue("spritesCsv"))
     end
-    local powered, unpowered = spritesFrom(tileByLabel[form:getFieldValue("appearance")] or "phunmart_01_0")
-    return which == "sprites" and powered or unpowered
+    return spritesFrom(tileByLabel[form:getFieldValue("appearance")] or "phunmart_01_0")
 end
 
 ---------------------------------------------------------------------------
@@ -324,8 +316,7 @@ function ShopWizard.open(player, onDone)
                 probability = math.floor(f:getFieldNumber("probability") or 15),
                 minDistance = f:getFieldNumber("minDistance"),
                 texture = pickOrCustom(f, "texture", "textureOther"),
-                sprites = chosenSprites(f, tileByLabel, "sprites"),
-                unpoweredSprites = chosenSprites(f, tileByLabel, "unpowered"),
+                sprites = chosenSprites(f, tileByLabel),
                 price = f:getFieldValue("price"),
                 restockFrequency = f:getFieldNumber("restockFrequency"),
                 rollMin = math.floor(rollLo or 4),
@@ -394,17 +385,11 @@ function ShopWizard.open(player, onDone)
         onChange = function(f)
             local other = isOther(f:getFieldValue("appearance"))
             f:setFieldVisible("spritesCsv", other)
-            f:setFieldVisible("unpoweredCsv", other)
         end
     })
-    -- Eight fields for an admin who has packed their own tileset. Only the
-    -- powered four are required: a machine that needs no power has no unpowered
-    -- state to draw.
-    -- Two comma-separated fields rather than eight boxes. Eight made the step
-    -- taller than the screen at some resolutions, which pushed the unpowered
-    -- ones out of sight and made them look broken. The preview below carries
-    -- the facing labels, so nothing is lost by not naming each box, and this
-    -- matches how the existing shop editor already takes its sprite lists.
+    -- For an admin who has packed their own tileset. One comma-separated field
+    -- rather than four boxes: the preview below carries the facing labels, and
+    -- this matches how the shop editor already takes its sprite list.
     form:addTextField("spritesCsv", getText("IGUI_PhunMart_Wiz_Lbl_Sprites"), {
         default = "",
         hint = getText("IGUI_PhunMart_Wiz_Hint_Sprites"),
@@ -423,41 +408,16 @@ function ShopWizard.open(player, onDone)
             end
         end
     })
-    form:addTextField("unpoweredCsv", getText("IGUI_PhunMart_Wiz_Lbl_Unpowered"), {
-        default = "",
-        hint = getText("IGUI_PhunMart_Wiz_Hint_Unpowered"),
-        group = "w_look",
-        conditional = true,
-        validate = function(value, f)
-            if not isOther(f:getFieldValue("appearance")) then
-                return nil
-            end
-            local n = #parseCsv(value)
-            if n > 0 and n ~= 4 then
-                return getText("IGUI_PhunMart_Wiz_Err_FourTiles", tostring(n))
-            end
-        end
-    })
     -- Shown whatever the choice: the point of a preview is to confirm the set
     -- is the one you meant, which matters most when you typed the names.
     form:addImageField("spritePreview", getText("IGUI_PhunMart_Wiz_Lbl_Preview"), {
         group = "w_look",
         images = function()
             local out = {}
-            for i, name in ipairs(chosenSprites(form, tileByLabel, "sprites") or {}) do
+            for i, name in ipairs(chosenSprites(form, tileByLabel) or {}) do
                 table.insert(out, {
                     texture = tileTexture(name),
                     label = getText(FACINGS[i] or "")
-                })
-            end
-            -- Unpowered on the same row, after a gap. A second row would have
-            -- cost the height this step was already short of, and the two sets
-            -- read as a pair anyway: same four facings, lights off.
-            for i, name in ipairs(chosenSprites(form, tileByLabel, "unpowered") or {}) do
-                table.insert(out, {
-                    texture = tileTexture(name),
-                    label = getText(FACINGS[i] or ""),
-                    gap = (i == 1)
                 })
             end
             return out
@@ -580,7 +540,6 @@ function ShopWizard.open(player, onDone)
     -- that decision alone.
     form:setFieldVisible("textureOther", false)
     form:setFieldVisible("spritesCsv", false)
-    form:setFieldVisible("unpoweredCsv", false)
 
     form:initialise()
     form:addToUIManager()

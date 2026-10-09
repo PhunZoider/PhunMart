@@ -3,6 +3,7 @@ if isServer() then
 end
 
 local Core = PhunMart
+local Recordings = require "PhunMart/recordings"
 local tools = {}
 local getTextManager = getTextManager
 local UIFont = UIFont
@@ -137,6 +138,11 @@ function tools.resolveOfferDisplayName(offer)
     local traitKey = Traits.getOfferTraitKey(offer)
     if traitKey then
         return Traits.getLabel(traitKey)
+    end
+    -- One of many titles on the same tape item: name the title, not the tape.
+    local mediaLabel = offer.media and Recordings.label(offer.media)
+    if mediaLabel then
+        return mediaLabel
     end
     local scriptItem = getScriptManager():getItem(offer.item)
     if scriptItem then

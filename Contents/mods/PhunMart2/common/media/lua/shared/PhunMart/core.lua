@@ -203,7 +203,9 @@ function Core.debug(...)
 end
 
 -- Tiles any machine can stand on: a plain vending machine, one per facing in
--- the order E, S, W, N, and its unpowered faces. A shop that names no sprites of
+-- the order E, S, W, N. The unpowered list is legacy: machines no longer swap
+-- to it, but older saves may have machines standing on it, which
+-- ServerObject:updateSprite moves back. A shop that names no sprites of
 -- its own stands on these, and its look comes from its texture (client
 -- looks.lua). Shared by many shops, they say nothing about which shop a machine
 -- belongs to; that is carried on the object itself. See shopKeyForObject.
@@ -854,15 +856,21 @@ local _deepMerge = Core.utils.deepMerge
 local _stripRemoved = Core.utils.stripRemoved
 
 local function _loadDefaults(path)
+    -- Another mod may hand over its definitions as a table rather than a module
+    -- path, so a small extension can keep everything in one file.
+    if type(path) == "table" then
+        return path
+    end
     local ok, result = pcall(require, path)
     if not ok then
-        Core.debugLn("Warning: could not load defaults '" .. path .. "': " .. tostring(result))
+        Core.debugLn("Warning: could not load defaults '" .. tostring(path) .. "': " .. tostring(result))
         return {}
     end
     return result or {}
 end
 
--- Which default modules feed each definition category. Single source of truth:
+-- Which default modules feed each definition category. Each entry is a module
+-- path, or a table of definitions given directly. Single source of truth:
 -- compileWith builds the base context from these, and the admin UI uses them to
 -- tell an admin-created key (deletable) from one that ships with the mod (only
 -- maskable, never removable).

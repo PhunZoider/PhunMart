@@ -173,19 +173,28 @@ and [images/phunmart_03.png](images/phunmart_03.png).
 
 Every machine is a block of eight tiles in a row:
 
-| Offset | Used for                 | Facing |
-| ------ | ------------------------ | ------ |
-| `+0`   | `sprites[1]`             | East   |
-| `+1`   | `sprites[2]`             | South  |
-| `+2`   | `sprites[3]`             | West   |
-| `+3`   | `sprites[4]`             | North  |
-| `+4`   | `unpoweredSprites[1]`    | East   |
-| `+5`   | `unpoweredSprites[2]`    | South  |
-| `+6`   | `unpoweredSprites[3]`    | West   |
-| `+7`   | `unpoweredSprites[4]`    | North  |
+| Offset       | Used for     | Facing                 |
+| ------------ | ------------ | ---------------------- |
+| `+0`         | `sprites[1]` | East                   |
+| `+1`         | `sprites[2]` | South                  |
+| `+2`         | `sprites[3]` | West                   |
+| `+3`         | `sprites[4]` | North                  |
+| `+4` to `+7` | nothing      | Copies of `+0` to `+3` |
 
-The order is East, South, West, North, not the compass order you might expect. The unpowered
-tiles are only drawn when the shop sets `"powered": true` and the power is off.
+The order is East, South, West, North, not the compass order you might expect. The last four
+used to be the unpowered faces. Machines no longer change tiles with the power (the 3D model
+shows it), but the tiles stay in the pack because machines in older saves may stand on them;
+PhunMart moves any it finds back to the matching first-four tile.
+
+The tiles are rendered from the 3D model, so they always match the textures. After changing a
+texture or the mesh, run
+
+```
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python Tools/blender/render_sprites.py
+```
+
+from the repo root (add `-- phunmart_01` to render one sheet). It writes
+`Tools/blender/sprites/phunmart_0N.png`; copy those into TileZed's 2x folder and repack.
 
 ### The generic machine
 
