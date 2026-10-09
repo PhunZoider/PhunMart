@@ -44,12 +44,17 @@ end
 -- Picking a machine up: the shop is read before vanilla takes the machine off
 -- the square, and written on the item vanilla hands back, before the caller puts
 -- it in an inventory.
+--
+-- Returns exactly one value, as vanilla does. Multi-tile furniture (beds,
+-- shelves) is collected with table.insert(items, self:pickUpMoveableInternal(...)),
+-- and a second return value, even nil, turns that into the three-argument
+-- insert, which takes the item as a position and throws.
 local oldPickUpInternal = ISMoveableSpriteProps.pickUpMoveableInternal
 function ISMoveableSpriteProps:pickUpMoveableInternal(_character, _square, _object, ...)
     local shopKey = Core.shopKeyForObject(_object)
-    local item, extra = oldPickUpInternal(self, _character, _square, _object, ...)
+    local item = oldPickUpInternal(self, _character, _square, _object, ...)
     if shopKey and item and item.getModData then
         Core.stampMachineItem(item, shopKey)
     end
-    return item, extra
+    return item
 end
