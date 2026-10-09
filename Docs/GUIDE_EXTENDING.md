@@ -70,8 +70,9 @@ Blender script turns it into a texture:
 blender -b --factory-startup --python Tools/blender/make_wrap_textures.py -- --convert machine-yourshop.png yourshop.png
 ```
 
-[Machine Art Reference](MACHINE_ART.md#making-a-texture) has the layout, for painting one from
-scratch.
+To paint one instead, the quickest start is the
+[overlay](MACHINE_ART.md#the-easy-way-an-overlay): a finished machine with its banner and side
+panels cut out, to lay over your art in any image editor.
 
 To offer admins a texture none of your shops wears yet, register it from a shared file so it
 appears in the editors' texture lists:

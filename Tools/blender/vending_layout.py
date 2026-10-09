@@ -38,6 +38,9 @@ MASK = (MASK_ORIGIN, MASK_ORIGIN, TEX, TEX)
 # the 3D machine's proportions (512 x 1024 = 0.49 x 1 of the machine). make_vending_mesh.py
 # cuts the recesses here, and the starter glow mask lights BANNER and GLASS.
 BANNER = (0, 0, 512, 166)  # header box: the shop's banner
+# The banner art inside its silver frame, where shops differ: measured by comparing the shipped
+# textures, since the shop art's frame lands a few pixels off any simple scaling of it.
+BANNER_ART = (27, 9, 484, 163)
 GLASS = (47, 209, 392, 729)  # recessed window
 TRAY = (27, 771, 404, 863)  # recessed pickup tray
 # Below the tray (rows 881 on) is a kick panel with a vent grille; paint_kick_panel.py draws it.

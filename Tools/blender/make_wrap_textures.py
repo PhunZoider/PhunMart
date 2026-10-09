@@ -26,6 +26,10 @@ A mod's textures belong in its own media/textures/phunmart/, where shops find th
 
 Also writes Tools/blender/vending_template.png: every region in its own colour with the starter
 glow areas outlined, for painting a new machine from scratch.
+
+And Tools/blender/vending_overlay.png: a finished machine with the banner and side panels cut
+out to transparency, to lay over a shop's own art in an image editor. Only that one:
+    ... --python Tools/blender/make_wrap_textures.py -- --overlay
 """
 
 import glob
@@ -44,6 +48,9 @@ TEXTURES = os.path.join(ROOT, "Contents", "mods", "PhunMart2", "common", "media"
 OUT_DIR = os.path.join(TEXTURES, "phunmart")
 TEMPLATE = os.path.join(HERE, "vending_template.png")
 FRONT_BASE = os.path.join(HERE, "front_base.png")
+OVERLAY = os.path.join(HERE, "vending_overlay.png")
+# The art the overlay's cabinet and frames come from; its banner and side panels are cut away.
+OVERLAY_SOURCE = os.path.join(TEXTURES, "machine-hard-wear.png")
 
 # Textures painted by hand, by name. Skipped entirely.
 HAND_PAINTED = {"budget-xp"}
@@ -174,7 +181,10 @@ def starter_mask(tex):
 
 
 def convert(src_path, out_path):
-    art = load(src_path)
+    save(build(load(src_path)), out_path)
+
+
+def build(art):
     tex = np.zeros((L.TEX, L.TEX, 4), np.float32)
     tex[..., 3] = 1
 
@@ -204,7 +214,27 @@ def convert(src_path, out_path):
         outline(tex, (x0, y0, x1, y1), tex[y0 - 4, x0 - 4], 3)
 
     starter_mask(tex)
-    save(tex, out_path)
+    return tex
+
+
+def overlay():
+    """A finished machine with the ad spaces cut out: the banner inside its frame and both side
+    panels inside their trim are fully transparent. Put it as the top layer in an image editor,
+    paint the shop's own art on a layer beneath, and export the two flattened: that is a
+    texture, glow mask and all."""
+    tex = build(load(OVERLAY_SOURCE))
+    fx, fy = L.FRONT[0], L.FRONT[1]
+    x0, y0, x1, y1 = L.BANNER_ART
+    holes = [(fx + x0, fy + y0, fx + x1, fy + y1)]
+    for side in (L.LEFT, L.RIGHT):
+        x0, y0, x1, y1 = L.side_panel(side)
+        holes.append((x0 + 3, y0 + 3, x1 - 3, y1 - 3))
+    for rect in holes:
+        fill(tex, rect, (0, 0, 0, 0))
+    save(tex, OVERLAY)
+    print("wrote", OVERLAY)
+    for rect in holes:
+        print("  transparent", rect)
 
 
 def template():
@@ -236,6 +266,9 @@ def refresh_masks(names):
 
 def main():
     args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    if args[:1] == ["--overlay"]:
+        overlay()
+        return
     if args[:1] == ["--mask-only"]:
         refresh_masks(args[1:])
         return
@@ -255,6 +288,7 @@ def main():
         print("wrote", out)
     template()
     print("wrote", TEMPLATE)
+    overlay()
 
 
 main()

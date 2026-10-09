@@ -97,6 +97,36 @@ shop window draws its controls over them.
 
 Keep it a power of two. The engine pads other sizes, and the glow shaders assume it has not.
 
+### The easy way: an overlay
+
+[Tools/blender/vending_overlay.png](../Tools/blender/vending_overlay.png) is a finished machine,
+glow mask included, with its three ad spaces cut out to transparency. Download it and, in GIMP,
+Photoshop, Krita or anything else with layers:
+
+1. Open it, and add a new layer **underneath** it.
+2. Paint or paste your art on that lower layer, filling the holes. The overlay hides anything
+   that spills outside them.
+3. Export the image as a PNG, which flattens the two together. That is your texture.
+
+<p>
+  <img src="../Tools/blender/vending_overlay.png" width="320" alt="vending_overlay.png">
+</p>
+
+| Hole        | Pixels (x, y to x, y) | Size      | Seen                                     |
+| ----------- | --------------------- | --------- | ---------------------------------------- |
+| Banner      | 27, 9 to 484, 163     | 457 x 154 | Across the top of the front, and in the shop window |
+| Left panel  | 529, 17 to 671, 484   | 142 x 467 | Down the machine's left side             |
+| Right panel | 705, 17 to 847, 484   | 142 x 467 | Down the machine's right side            |
+
+Paint the side panels upright, as you would see them standing beside the machine. The left
+panel's left edge is towards the back of the machine; the right panel's left edge is towards
+the front.
+
+The glow mask (bottom right) already lights the banner and both side panels, so they glow when
+the machine has power. Leave it alone unless you want a different glow.
+
+### Tools
+
 The tools that build the shipped textures are in the repository under
 [Tools/blender](../Tools/blender), and run in Blender from the command line:
 
@@ -107,6 +137,10 @@ The tools that build the shipped textures are in the repository under
   ```
 - **Painting from scratch.** `Tools/blender/vending_template.png` has every region in its own
   colour with the glow areas outlined. Paint over it, or over any shipped texture.
+- **Rebuilding the overlay**, after a change to the layout:
+  ```
+  blender -b --factory-startup --python Tools/blender/make_wrap_textures.py -- --overlay
+  ```
 
 Ship the result in your mod's own `media/textures/phunmart/`. Mod textures folders merge, so it
 is found by name like the shipped ones.
