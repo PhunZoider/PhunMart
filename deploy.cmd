@@ -27,7 +27,7 @@ echo [PhunMart2] Deploying to %MODDIR%
 rem --- Live mods -------------------------------------------------------------
 for %%M in (%MODS%) do (
     rmdir /S /Q "%MODDIR%\%%M" 2>nul
-    xcopy "%SRC%Contents\mods\%%M" "%MODDIR%\%%M" /Y /I /E /F /Q >nul
+    xcopy "%SRC%Contents\mods\%%M" "%MODDIR%\%%M" /Y /I /E /F /Q /EXCLUDE:%SRC%xclude >nul
     if errorlevel 1 echo [PhunMart2] FAILED copying %%M
 )
 
