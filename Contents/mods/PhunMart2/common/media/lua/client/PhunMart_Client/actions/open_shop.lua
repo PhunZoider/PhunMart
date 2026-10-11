@@ -95,6 +95,7 @@ function action:update()
         if not self.uiOpened then
             self.uiOpened = true
             Core.ui.client.shop.open(self.character, self.shopData)
+            Core.markShopOnMap(self.character, self.shopObj)
         end
         return -- do NOT call resetJobDelta(); perform() will fire next
     end
@@ -121,6 +122,7 @@ function action:perform()
     if not self.uiOpened and self.shopData then
         self.uiOpened = true
         Core.ui.client.shop.open(self.character, self.shopData)
+        Core.markShopOnMap(self.character, self.shopObj)
     end
     ISBaseTimedAction.perform(self)
 end

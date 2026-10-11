@@ -33,6 +33,11 @@
   "Sandbox_PhunMart_ShopsMoveable_tooltip": "If enabled, players can pick up and move shop machines like any other furniture. A shop can override this in its Basics tab. Admins can always move machines.",
   "Sandbox_PhunMart_ShopsDestructible": "Players can destroy machines",
   "Sandbox_PhunMart_ShopsDestructible_tooltip": "If enabled, players can destroy shop machines with a sledgehammer. A shop can override this in its Basics tab. Admins can always destroy machines.",
+  "Sandbox_PhunMart_MarkShopsOnMap": "Mark visited machines on the map",
+  "Sandbox_PhunMart_MarkShopsOnMap_tooltip": "The first time a player opens a machine, it is marked with a dollar sign on their own world map. Each machine is marked once per character, so a mark the player deletes stays deleted. Players can also turn marks off for themselves under Options > Mods.",
+  "Sandbox_PhunMart_MarkShopsOnMap_option1": "Disabled",
+  "Sandbox_PhunMart_MarkShopsOnMap_option2": "Only with a pen or pencil",
+  "Sandbox_PhunMart_MarkShopsOnMap_option3": "Always, no writing tool needed",
 
   "Sandbox_PhunMart_WalletReturnRate": "Wallets return rate",
   "Sandbox_PhunMart_WalletReturnRate_tooltip": "The percentage of money that is returned to the player on death. 0 means no money is returned, 100 means all money is returned. Only applies when a balance is dropped on the body; the other two options have nothing to scale.",

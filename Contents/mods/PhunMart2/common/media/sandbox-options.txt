@@ -83,6 +83,15 @@ option PhunMart.ShopsDestructible
     translation = PhunMart_ShopsDestructible,
 }
 
+option PhunMart.MarkShopsOnMap
+{
+    type = enum,
+    numValues = 3,
+    default = 2,
+    page = PhunMart,
+    translation = PhunMart_MarkShopsOnMap,
+}
+
 option PhunMart.ReturnRate
 { 
     type = integer, 
