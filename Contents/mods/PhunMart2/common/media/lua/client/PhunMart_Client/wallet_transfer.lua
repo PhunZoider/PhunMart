@@ -61,11 +61,13 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
 
     if wallet and wallet.wallet then
         action:setOnComplete(function()
-            -- Only process if the destination is the player's own inventory.
-            -- Moving it between floor/external containers must not grant currency.
-            -- item:getContainer() is unreliable at onComplete time in B42 MP
-            -- (client state lags server sync), so check destContainer instead.
-            if destContainer ~= player:getInventory() then
+            -- Only process if the destination is the player's own inventory or
+            -- a bag they are carrying. Moving it between floor/external
+            -- containers must not grant currency. item:getContainer() is
+            -- unreliable at onComplete time in B42 MP (client state lags
+            -- server sync), so check destContainer instead.
+            local inv = player:getInventory()
+            if not destContainer or (destContainer ~= inv and not destContainer:isInCharacterInventory(player)) then
                 return
             end
             if Core.isLocal then
@@ -95,8 +97,10 @@ function ISInventoryTransferAction:new(player, item, srcContainer, destContainer
         end)
     elseif Wallet:isCurrency(itemType) then
         action:setOnComplete(function()
-            local destType = destContainer:getType()
-            if destType ~= "floor" then
+            -- Same rule as wallets: only the player's own inventory or a bag
+            -- they are carrying credits the coin, not the floor or a crate.
+            local inv = player:getInventory()
+            if destContainer and (destContainer == inv or destContainer:isInCharacterInventory(player)) then
                 if Core.isLocal then
                     -- SP: adjust locally; if at cap leave coin in inventory.
                     local adjusted, atCap = Wallet:adjust(player, itemType, 1)
