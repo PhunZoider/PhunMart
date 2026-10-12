@@ -2,7 +2,7 @@ if isServer() then
     return
 end
 
-require "Map/SGlobalObject"
+require "Map/CGlobalObject"
 require "PhunMart_Client/system"
 local Core = PhunMart
 local ClientSystem = Core.ClientSystem
