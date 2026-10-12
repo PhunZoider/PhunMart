@@ -18,6 +18,15 @@
   "Sandbox_PhunMart_ChangeDropMode_option2": "A single Change item",
   "Sandbox_PhunMart_ChangeDropMode_option3": "Straight into the wallet",
 
+  "Sandbox_PhunMart_ChanceForTillChange": "Chance for a till to hold change",
+  "Sandbox_PhunMart_ChanceForTillChange_tooltip": "The probability that a cash register holds change when its loot first spawns. It arrives in the same form as zombie drops: loose coins, or a single Change item for the other two settings, since a till has nobody to credit.",
+
+  "Sandbox_PhunMart_MinTillChange": "Minimum cents in a till",
+  "Sandbox_PhunMart_MinTillChange_tooltip": "The minimum number of cents a cash register can hold.",
+
+  "Sandbox_PhunMart_MaxTillChange": "Maximum cents in a till",
+  "Sandbox_PhunMart_MaxTillChange_tooltip": "The maximum number of cents a cash register can hold.",
+
   "Sandbox_PhunMart_WalletOnDeath": "What happens to a balance on death",
   "Sandbox_PhunMart_WalletOnDeath_tooltip": "Dropped leaves a wallet on the ground where the player died, to be walked back for, scaled by the return rate below. It lands on the ground rather than on the corpse so that a zombie wandering into a zone that clears zombies cannot carry it off. Kept moves the balance straight to the next character, with nothing to recover. Lost wipes it. Bound pools such as tokens are restored to their allowance in all three.",
   "Sandbox_PhunMart_WalletOnDeath_option1": "Dropped where they died",

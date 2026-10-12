@@ -285,6 +285,44 @@ Events.OnZombieDead.Add(function(character)
     addCoins(inv, totalCents)
 end)
 
+-- Change in the tills. Done here rather than as entries in the cashregister
+-- distribution, because a Change item spawned by the loot tables would carry no
+-- amount in its modData and pay out nothing. This way a till follows
+-- ChangeDropMode like a zombie does, and EnableChangePool can switch it off.
+-- Straight-into-the-wallet has nobody to credit, so it gets the Change item,
+-- the same fallback as a zombie with no killer.
+Events.OnFillContainer.Add(function(roomName, containerType, container)
+    if containerType ~= "cashregister" or not container then
+        return
+    end
+
+    if Core.getOption("EnableChangePool") == false then
+        return
+    end
+
+    if ZombRand(100) >= Core.getOption("ChanceForTillChange", 40) then
+        return
+    end
+
+    local minCents = Core.getOption("MinTillChange", 25)
+    local maxCents = math.max(minCents, Core.getOption("MaxTillChange", 300))
+    local steps = math.floor((maxCents - minCents) / 5)
+    local totalCents = minCents + ZombRand(0, steps + 1) * 5
+    if totalCents <= 0 then
+        return
+    end
+
+    if Core.getOption("ChangeDropMode", DROP_COINS) == DROP_COINS then
+        addCoins(container, totalCents)
+        return
+    end
+
+    Core.wallet:addChangeToContainer(container, {{
+        pool = "change",
+        amount = totalCents
+    }}, true)
+end)
+
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == Core.name then
         if Commands[command] then

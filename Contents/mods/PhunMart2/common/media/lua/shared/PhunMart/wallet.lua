@@ -465,8 +465,11 @@ end
 --- AddItem paired with sendAddItemToContainer, the same as grantConfigReward:
 --- on a dedicated server AddItem alone builds the item in the server's copy of
 --- the container and the client never hears about it.
+---
+--- silent skips that send, for a container still being filled as its chunk
+--- loads: the items travel with the chunk, and nobody has it open to tell.
 --- Only call from a server/SP context.
-function Core.wallet:addChangeToContainer(container, entries)
+function Core.wallet:addChangeToContainer(container, entries, silent)
     if not container or not entries or #entries == 0 then
         return
     end
@@ -480,7 +483,12 @@ function Core.wallet:addChangeToContainer(container, entries)
             item:setName(name)
         end
         local added = container:AddItem(item)
-        if added then
+        -- A dying zombie's inventory is not on a square yet, so the send NPEs
+        -- in INetworkPacket.send. It needs no send anyway: the inventory moves
+        -- onto the corpse, which syncs it, the same way the coin drops arrive.
+        local parent = container:getParent()
+        local unsendable = parent and (instanceof(parent, "IsoZombie") or not parent:getSquare())
+        if added and not unsendable and not silent then
             sendAddItemToContainer(container, added)
         end
     end)

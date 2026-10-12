@@ -41,6 +41,36 @@ option PhunMart.ChangeDropMode
     valueTranslation = PhunMart_ChangeDropMode,
 }
 
+option PhunMart.ChanceForTillChange
+{
+    type = integer,
+    default = 40,
+    min=0,
+    max=100,
+    page = PhunMart,
+    translation = PhunMart_ChanceForTillChange,
+}
+
+option PhunMart.MinTillChange
+{
+    type = integer,
+    default = 25,
+    min=5,
+    max=10000,
+    page = PhunMart,
+    translation = PhunMart_MinTillChange,
+}
+
+option PhunMart.MaxTillChange
+{
+    type = integer,
+    default = 300,
+    min=5,
+    max=10000,
+    page = PhunMart,
+    translation = PhunMart_MaxTillChange,
+}
+
 option PhunMart.WalletOnDeath
 {
     type = enum,
