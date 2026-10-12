@@ -1,13 +1,13 @@
 version=1
 id=3689006725
-title=PhunMart 2
+title=PhunMart 2: Economy, Shops & Trading
 description=[b]Shop Smart. Shop PhunMart.[/b]
 description=Every server needs an economy. PhunMart gives you one out of the box.
 description=
-description=Vending machines become fully configurable shops that sell items, skills, traits, vehicles, and more. Players can pick up change from dead zeds. Built for multiplayer, but works in single player too.
+description=Vending machines become fully configurable shops and traders that sell items, skills, traits, vehicles, and more. Players earn currency and cash from dead zeds, then buy, sell, and trade at stores across the map. Built for multiplayer, but works in single player too.
 description=
 description=[h2]Add ons[/h2]
-description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522]PhleaMarket[/url] - Player to Player shops!
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522]PhleaMarket[/url] - Player to Player trading: shops and market stalls!
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3816322755]Apocalypse & Chill[/url] - VHS store and simple template custom shops
 description=
 description=[h2]What Makes PhunMart Different[/h2]
