@@ -469,7 +469,14 @@ function ServerObject:stateToIsoObject(isoObject)
         self:stateFromIsoObject(isoObject)
         return
     end
-    self:toModData(isoObject:getModData())
+    local data = isoObject:getModData()
+    self:toModData(data)
+    -- Re-registered on every load, not only on creation. The registry is
+    -- ModData and comes back from a save as its own copy, no longer the table
+    -- this machine writes to, so anything that changes later (a reroll's new
+    -- type) never reached it. Spacing then measured against the old types and
+    -- let two neighbours reroll into the same shop.
+    Core:addInstance(data)
     self:updateSprite(true)
     isoObject:transmitModData()
 end
@@ -749,6 +756,10 @@ function ServerObject:reroll()
     -- type, and updateSprite only ever reacts to power. See its comment.
     self:applyTypeSprite()
     self:saveData()
+    -- Explicitly, rather than trusting the registry to share this table. When
+    -- it holds a copy instead, the next machine to reroll this tick still sees
+    -- the old type here and is free to pick the one this machine just became.
+    Core:addInstance(data)
 
     Core.debugLn("reroll: " .. tostring(previous) .. " -> " .. tostring(picked) .. " at " .. tostring(self.x) .. "," ..
                      tostring(self.y))
